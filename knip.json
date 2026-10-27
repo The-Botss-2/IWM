@@ -1,0 +1,55 @@
+{
+  "$schema": "https://unpkg.com/knip@5/schema.json",
+  "ignoreExportsUsedInFile": true,
+  "workspaces": {
+    ".": {
+      "entry": [],
+      "project": [],
+      "ignoreDependencies": ["@prisma/client", "better-auth", "zod", "prisma"]
+    },
+    "apps/web": {
+      "ignoreDependencies": ["@botss/config"],
+      "entry": [
+        "src/app/**/{page,layout,error,global-error,not-found,loading,route,template,default}.tsx",
+        "public/sw.js"
+      ],
+      "project": ["src/**/*.{ts,tsx}"]
+    },
+    "apps/api": {
+      "entry": ["src/main.ts", "src/scripts/*.ts"],
+      "project": ["src/**/*.ts"]
+    },
+    "apps/desktop": {
+      "entry": ["src/preload.ts"],
+      "project": ["src/**/*.ts"]
+    },
+    "apps/mobile": {
+      "entry": ["app/**/*.tsx"],
+      "project": ["app/**/*.tsx", "lib/**/*.ts"],
+      "ignoreDependencies": [
+        "@babel/core",
+        "react-dom",
+        "expo-updates",
+        "@expo/metro-config"
+      ],
+      "ignoreUnresolved": ["babel-preset-expo", "expo-asset/tools/hashAssetFiles", "metro-minify-terser"]
+    },
+    "packages/database": {
+      "entry": ["src/index.ts", "prisma/*.ts"],
+      "project": ["src/**/*.ts", "prisma/*.ts"]
+    },
+    "packages/api-client": {
+      "project": ["src/**/*.ts"]
+    },
+    "packages/auth": {
+      "project": ["src/**/*.ts"],
+      "ignoreDependencies": ["better-auth"]
+    },
+    "packages/shared-types": {
+      "project": ["src/**/*.ts"]
+    },
+    "packages/config": {
+      "ignoreUnresolved": ["next"]
+    }
+  }
+}

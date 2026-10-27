@@ -1,0 +1,674 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --bg-app: 253 240 245;
+    --bg-surface: 255 255 255;
+    --bg-subtle: 251 246 250;
+    --ink: 26 26 46;
+    --ink-muted: 136 136 136;
+    --ink-disabled: 196 196 208;
+    --line: 232 232 240;
+    --line-strong: 212 212 224;
+    --brand-purple: 123 111 232;
+    --brand-magenta: 224 64 251;
+    --brand-orange: 244 132 95;
+    --brand-blue: 91 124 232;
+    --brand-teal: 34 197 197;
+    --state-error: 229 72 77;
+    --brand-50: 244 238 252;
+    --brand-700: 84 70 176;
+    --tint-error: 254 242 243;
+    --tint-warning: 254 241 232;
+    --tint-info: 232 248 248;
+
+    /* Optional gradient body wash. Empty by default; ThemeMount writes a
+     * preset gradient here when the user picks "gradient background" so the
+     * whole CRM surface tints without losing component layering. */
+    --app-bg-gradient: none;
+
+    /*
+     * Brand gradient - the primary "pink" the user sees on every gradient
+     * surface (sidebar header, FAB, primary buttons, sign-in panel). Defined
+     * as a CSS variable so the `/settings/appearance` page can swap it at
+     * runtime without rebuilding Tailwind. The Tailwind utility
+     * `bg-brand-gradient` reads this variable directly.
+     *
+     * Add new presets to GRADIENT_PRESETS in `apps/web/src/lib/app-prefs.ts`.
+     */
+    --brand-gradient: linear-gradient(90deg, #7B6FE8 0%, #E040FB 50%, #F4845F 100%);
+    --brand-gradient-soft: linear-gradient(
+      90deg,
+      rgba(123, 111, 232, 0.1),
+      rgba(224, 64, 251, 0.1),
+      rgba(244, 132, 95, 0.1)
+    );
+  }
+
+  /* App-wide overflow safety net: long unbreakable strings (URLs, IDs, pasted
+   * tokens, long names) wrap onto the next line instead of overflowing their
+   * container. Inherited by every element.
+   *
+   * This must be `break-word`, NOT `anywhere`. `anywhere` also shrinks every
+   * element's min-content width to a single character, so any flex/grid item
+   * or table cell could be squeezed until short labels broke mid-word
+   * ("Compac" / "t" in select triggers, menus, buttons, chips, headers).
+   * `break-word` only splits a word when it genuinely cannot fit on its own
+   * line, and never lets layout squeeze a box narrower than its longest word.
+   * Row layouts that must shrink around a long string use `min-w-0` (+
+   * `truncate` / `break-words`) on that child; long-form user content
+   * (chat bubbles, document prose) opts back into `anywhere` below. */
+  html {
+    overflow-wrap: break-word;
+  }
+
+  /*
+   * Dark theme overrides. Activated by the global ThemeMount which adds
+   * `class="dark"` to <html> when the user picks Dark in /settings/appearance.
+   * Hardcoded component colors that lack `dark:` variants still render light;
+   * those can adopt dark mode incrementally.
+   */
+  html.dark {
+    color-scheme: dark;
+    --bg-app: 15 17 24;
+    --bg-surface: 22 25 36;
+    --bg-subtle: 30 33 48;
+    --ink: 233 234 240;
+    --ink-muted: 156 160 175;
+    --ink-disabled: 96 102 120;
+    --line: 49 53 70;
+    --line-strong: 64 70 92;
+    --brand-50: 38 35 70;
+    --brand-700: 211 188 241;
+    /* The light tints composited at ~15% over the dark surface. */
+    --tint-error: 53 32 42;
+    --tint-warning: 55 41 45;
+    --tint-info: 24 51 60;
+  }
+
+  /* Solid white container backgrounds should resolve to surface in dark mode */
+  html.dark .bg-white {
+    background-color: rgb(var(--bg-surface)) !important;
+  }
+
+  /* Pastel color backgrounds should render as subtle translucent dark colors.
+   * The error / warning / info tints are real tokens now (`bg-tint-*`, dark
+   * values above); these cover the remaining one-off hexes. */
+  html.dark [class*="bg-[#EAF0FC]"] {
+    background-color: rgba(91, 124, 232, 0.15) !important;
+  }
+  html.dark [class*="bg-[#FAEBFE]"] {
+    background-color: rgba(224, 64, 251, 0.15) !important;
+  }
+  html.dark [class*="bg-[#d9fdd3]"] {
+    background-color: rgb(5 97 98) !important;
+    color: rgb(233 234 240) !important;
+  }
+
+  /* High contrast text replacements for badges in dark mode */
+  html.dark [class*="text-emerald-800"] {
+    color: rgb(34, 197, 197) !important;
+  }
+  html.dark [class*="text-amber-700"] {
+    color: rgb(244, 132, 95) !important;
+  }
+  html.dark [class*="text-red-700"] {
+    color: rgb(229, 72, 77) !important;
+  }
+
+  /* Whole-CRM gradient wash. Applied as a fixed background-image on <html>
+   * when the user opts into a gradient body in /settings/appearance. The
+   * overlay rides below every surface so cards/panels still read on top. */
+  html[data-app-bg='gradient'],
+  html[data-app-bg='gradient'] body {
+    background-image: var(--app-bg-gradient);
+    background-attachment: fixed;
+    background-size: cover;
+  }
+
+  /* ---------- Dark-mode bridge: complement to the block above ----------
+   *
+   * The block at the top of this file already remaps `bg-white` and the
+   * pastel `bg-[#hex]` accents. These additions cover the slate/gray
+   * neutrals scattered through older UI primitives plus shadow tokens -
+   * card shadows on a near-black surface look like nothing, so we add a
+   * faint outline ring + a heavier drop.
+   *
+   * Each rule is `!important` because the targets ship as Tailwind atomic
+   * classes which live in `@layer utilities` (higher specificity than a
+   * normal class). Skipping `!important` means the original light value
+   * still wins.
+   *
+   * Components that *genuinely* want pure white in dark mode (chips on
+   * top of a gradient call overlay, gradient-button text) should not use
+   * `bg-white`. The chat-input, call overlay, and pill nav use
+   * `text-white` directly which is intentionally NOT remapped - bright
+   * text on a coloured pill stays bright.
+   */
+  html.dark .ring-slate-200,
+  html.dark .ring-slate-100,
+  html.dark .ring-slate-300 {
+    --tw-ring-color: rgb(var(--line)) !important;
+  }
+  html.dark .border-slate-200,
+  html.dark .border-slate-100,
+  html.dark .border-slate-300 {
+    border-color: rgb(var(--line)) !important;
+  }
+  html.dark .bg-slate-50,
+  html.dark .bg-slate-100,
+  html.dark .bg-gray-50,
+  html.dark .bg-gray-100 {
+    background-color: rgb(var(--bg-subtle)) !important;
+  }
+  html.dark .bg-slate-200,
+  html.dark .bg-gray-200 {
+    background-color: rgb(var(--line)) !important;
+  }
+  /* Hex-literal ink colour (`text-[#1A1A2E]` appears in a few legacy
+   * spots). Flip to the theme ink so it doesn't disappear into the dark
+   * background. */
+  html.dark [class*='text-[#1A1A2E]'],
+  html.dark [class*='text-[#1a1a2e]'] {
+    color: rgb(var(--ink)) !important;
+  }
+  /* Light-grey emerald-toned badge backgrounds used by status pills. */
+  html.dark .bg-emerald-50,
+  html.dark .bg-emerald-100 {
+    background-color: rgba(34, 197, 197, 0.15) !important;
+  }
+  html.dark .bg-amber-50,
+  html.dark .bg-amber-100 {
+    background-color: rgba(244, 132, 95, 0.15) !important;
+  }
+  html.dark .bg-red-50,
+  html.dark .bg-red-100 {
+    background-color: rgba(229, 72, 77, 0.15) !important;
+  }
+  html.dark .border-red-100,
+  html.dark .border-red-200 {
+    border-color: rgba(229, 72, 77, 0.35) !important;
+  }
+  /* Card shadows vanish on a near-black surface - pair the existing
+   * shadow with a thin neutral outline so panels still have an edge. */
+  html.dark .shadow-popover {
+    box-shadow:
+      0 0 0 1px rgb(var(--line)),
+      0 8px 28px rgba(0, 0, 0, 0.6) !important;
+  }
+  html.dark .shadow-soft {
+    box-shadow:
+      0 0 0 1px rgb(var(--line)),
+      0 4px 20px rgba(0, 0, 0, 0.45) !important;
+  }
+  html.dark .shadow-soft-lg {
+    box-shadow:
+      0 0 0 1px rgb(var(--line)),
+      0 8px 28px rgba(0, 0, 0, 0.55) !important;
+  }
+  html.dark .shadow-drawer {
+    box-shadow:
+      -8px 0 32px rgba(0, 0, 0, 0.55),
+      0 0 0 1px rgb(var(--line)) !important;
+  }
+
+  /* ==================================================================
+   * Direction A ("rail") page surfaces.
+   *
+   * THE PROBLEM THIS SOLVES
+   * The default page body is blush pink (--bg-app: 253 240 245) and warm,
+   * while the rail chrome is a cool near-black (#14161A / #1B1E24) built on
+   * the grey family #6B7280 / #8A919D / #A7AEBA. Putting them side by side
+   * mixes a warm and a cool palette in one viewport, which is why switching
+   * layouts read as "only the sidebars changed" - the page never adopted the
+   * rail's language, it just got a dark thing bolted to its left edge.
+   *
+   * THE FIX
+   * Retune the design tokens, not the components. Every surface, tab, button,
+   * card and table already reads these variables, so one scoped override
+   * restyles the whole app for this layout with no component edits and no
+   * risk to the top-bar layout.
+   *
+   * The greys below are taken FROM the rail so both halves share one family:
+   * --ink is its background colour, --ink-muted is its own muted text.
+   *
+   * `data-nav-layout` is stamped on <html> by ThemeMount (and pre-hydration
+   * by ThemePreScript), so this applies on the first paint without a flash.
+   * ================================================================== */
+  html[data-nav-layout='rail'] {
+    /* Cool workbench neutrals - no blush. */
+    --bg-app: 244 245 247;
+    --bg-surface: 255 255 255;
+    --bg-subtle: 237 239 242;
+    --ink: 20 22 26; /* #14161A - the rail's own background */
+    --ink-muted: 107 114 128; /* #6B7280 - the rail's own muted text */
+    --ink-disabled: 154 161 172;
+    --line: 226 229 234;
+    --line-strong: 203 208 216;
+  }
+
+  /* Dark + rail is the direction at its most coherent: the page continues the
+   * chrome rather than sitting in a separate box. Values match RAIL_BG and
+   * PANEL_BG exactly so there is no seam where the panel meets the page. */
+  html.dark[data-nav-layout='rail'] {
+    --bg-app: 20 22 26; /* #14161A */
+    --bg-surface: 27 30 36; /* #1B1E24 */
+    --bg-subtle: 35 39 46;
+    --ink: 242 244 247; /* #F2F4F7 */
+    --ink-muted: 138 145 157; /* #8A919D */
+    --ink-disabled: 107 114 128;
+    --line: 42 47 56;
+    --line-strong: 58 64 75;
+  }
+
+  /* The rail is flat and hairline-bordered. Diffuse drop shadows under it make
+   * cards look like they are floating in a different application, so trade
+   * blur for a crisp edge and keep elevation for things that genuinely float
+   * (popovers, drawers, dialogs keep their own shadows). */
+  html[data-nav-layout='rail'] .shadow-soft {
+    box-shadow:
+      0 0 0 1px rgb(var(--line)),
+      0 1px 2px rgba(16, 18, 24, 0.04) !important;
+  }
+  html[data-nav-layout='rail'] .shadow-soft-lg {
+    box-shadow:
+      0 0 0 1px rgb(var(--line-strong)),
+      0 4px 12px rgba(16, 18, 24, 0.08) !important;
+  }
+  html.dark[data-nav-layout='rail'] .shadow-soft {
+    box-shadow:
+      0 0 0 1px rgb(var(--line)),
+      0 1px 2px rgba(0, 0, 0, 0.4) !important;
+  }
+  html.dark[data-nav-layout='rail'] .shadow-soft-lg {
+    box-shadow:
+      0 0 0 1px rgb(var(--line-strong)),
+      0 4px 14px rgba(0, 0, 0, 0.5) !important;
+  }
+
+  /* Tabular figures in every data table, both layouts. This is a CRM whose
+   * tables carry money, hours and dates in vertical columns; proportional
+   * digits make those columns ragged and genuinely harder to scan. Applies to
+   * cells only, so prose and headings keep the nicer proportional figures. */
+  th,
+  td {
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Stop single-word orphans on headings. Cheap, and it removes the ragged
+   * last line that makes section headers look accidental. */
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+  }
+
+  html,
+  body {
+    height: 100%;
+  }
+  body {
+    @apply bg-bg-app text-ink antialiased;
+    font-family: var(--font-poppins), 'Poppins', ui-sans-serif, system-ui,
+      -apple-system, 'Segoe UI', Roboto, sans-serif;
+    font-feature-settings: 'cv02', 'cv03', 'cv04';
+    /* Prevent any single overflowing child from forcing horizontal scroll
+     * on the whole document - the symptom users reported on Android Chrome
+     * ("things doesn't fit on the screen, need to tilt"). Individual scroll
+     * containers (kanban, tables, code blocks) still scroll horizontally
+     * inside their own bounds, just not by dragging the body around. */
+    overflow-x: hidden;
+  }
+
+  /* Honour the iPhone notch / dynamic island on the auth landing + app
+   * shell. `viewportFit: cover` is set in the Next viewport metadata; this
+   * pulls the safe-area inset into our top/bottom padding so chrome sits
+   * below the status bar instead of being clipped by it. */
+  body {
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  /* Long URLs / unbroken tokens in chat or doc views were forcing
+   * horizontal overflow on narrow screens. Wrapping mid-token is uglier
+   * than scrolling, but better than the whole page tilting. */
+  .chat-bubble-content,
+  .prose,
+  .prose td,
+  .prose th {
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+
+  /* Table cells wrap at word boundaries only. Every data table sits in an
+   * `overflow-x-auto` wrapper, so on narrow screens the table scrolls
+   * sideways instead of crushing columns until "Status" renders as
+   * "Stat" / "us". An over-long token still breaks once its column can't
+   * grow any further. */
+  td,
+  th {
+    overflow-wrap: break-word;
+  }
+
+  /* Custom selection - soft brand purple. */
+  ::selection {
+    background: rgba(123, 111, 232, 0.2);
+    color: #1a1a2e;
+  }
+
+  /* Global progress bar slider - used by <GlobalProgress />. The bar is
+   * a fixed-width gradient strip that translates across the viewport so
+   * users get a visible heartbeat while React Query refetches. */
+  @keyframes progress-slide {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(400%); }
+  }
+  .animate-progress-slide {
+    animation: progress-slide 1.4s ease-in-out infinite;
+  }
+
+  /* Pulse hint for "Loading…" text under the spinner so even on a fast
+   * page the user knows something is loading. Slower than the default
+   * `animate-pulse` so the text doesn't strobe. */
+  @keyframes pulse-text {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+  }
+  .animate-pulse-text {
+    animation: pulse-text 1.8s ease-in-out infinite;
+  }
+
+  /* Thin neutral scrollbars (chromium / webkit). Reads `--line` so the
+   * thumb tracks the active theme's neutral instead of glowing pink on a
+   * dark surface. */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: rgb(var(--line)) transparent;
+  }
+  *::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  *::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  *::-webkit-scrollbar-thumb {
+    background: rgb(var(--line));
+    border-radius: 9999px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+  }
+  *::-webkit-scrollbar-thumb:hover {
+    background: rgb(var(--line-strong));
+    background-clip: padding-box;
+  }
+}
+
+@layer components {
+  /* ---------- Brand gradient utilities ---------- */
+  .bg-brand-gradient {
+    background-image: linear-gradient(
+      90deg,
+      #7b6fe8 0%,
+      #e040fb 50%,
+      #f4845f 100%
+    );
+  }
+  .bg-brand-gradient-soft {
+    background-image: linear-gradient(
+      90deg,
+      rgba(123, 111, 232, 0.08),
+      rgba(224, 64, 251, 0.08),
+      rgba(244, 132, 95, 0.08)
+    );
+  }
+  .text-brand-gradient {
+    background-image: linear-gradient(
+      90deg,
+      #7b6fe8 0%,
+      #e040fb 50%,
+      #f4845f 100%
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .text-gradient-success {
+    background-image: linear-gradient(90deg, #5b7ce8 0%, #22c5c5 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  /* Type-badge accent text colors (no background pill). */
+  .text-meeting { color: #7b6fe8; }
+  .text-call { color: #22c5c5; }
+  .text-task { color: #e040fb; }
+  .text-document { color: #f4845f; }
+  .text-email { color: #5b7ce8; }
+  .text-active { background-image: linear-gradient(90deg, #5b7ce8 0%, #22c5c5 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .text-inactive { color: #1a1a2e; }
+
+  /* ---------- Cards / panels ---------- */
+  .card-surface {
+    @apply rounded-xl bg-bg-surface shadow-soft;
+  }
+  .card-surface-hover {
+    @apply transition-shadow duration-200 hover:shadow-soft-lg;
+  }
+
+  /* ---------- Legacy helpers (compat with code that still uses .btn / .input / .card / .label / .badge) ---------- */
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-full px-5 py-2 text-sm font-medium
+           transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  .btn-primary {
+    @apply btn bg-brand-gradient text-white shadow-soft hover:shadow-soft-lg active:scale-[0.98];
+  }
+  .btn-secondary {
+    @apply btn border border-line bg-bg-surface text-ink hover:bg-bg-subtle;
+  }
+  .btn-ghost {
+    @apply btn text-ink hover:bg-bg-subtle;
+  }
+  .input {
+    @apply w-full rounded-md border border-line bg-bg-surface px-3.5 py-2.5 text-sm text-ink
+           placeholder:text-ink-disabled focus:outline-none focus:border-brand-purple
+           focus:shadow-focus transition-shadow duration-200;
+  }
+  .label {
+    @apply text-[13px] font-medium text-ink;
+  }
+  .card {
+    @apply rounded-xl bg-bg-surface shadow-soft;
+  }
+  .badge {
+    @apply inline-flex items-center whitespace-nowrap rounded-full px-2 py-0.5 text-xs font-medium;
+  }
+
+  /* Focus ring helper (use on custom interactive non-button surfaces). */
+  .focus-brand {
+    @apply focus-visible:outline-none focus-visible:shadow-focus focus-visible:border-brand-purple;
+  }
+
+  /* AI floating action button (referenced in §18 of the brief). */
+  .fab-ai {
+    @apply fixed bottom-6 right-6 z-30 grid h-14 w-14 place-items-center rounded-full
+           bg-brand-gradient text-white shadow-fab transition-all duration-200
+           hover:scale-105 hover:shadow-fab-hover focus-visible:outline-none
+           focus-visible:ring-2 focus-visible:ring-brand-purple/40;
+  }
+
+  /* Conic gradient spinner used for non-skeleton loading. Defaults to 24px
+   * but `h-* w-*` overrides win - the mask radius scales with the box. */
+  .spinner-gradient {
+    width: 24px;
+    height: 24px;
+    border-radius: 9999px;
+    background:
+      conic-gradient(from 0deg, #7b6fe8, #e040fb, #f4845f, #7b6fe8);
+    -webkit-mask: radial-gradient(circle at center, transparent 35%, black 38%);
+    mask: radial-gradient(circle at center, transparent 35%, black 38%);
+    animation: gradient-spin 0.8s linear infinite;
+  }
+
+  /* Full-page loading dim - drop into a Suspense fallback or Next.js
+   * loading.tsx to show a centered gradient spinner over the current
+   * page surface. */
+  .loading-overlay {
+    @apply absolute inset-0 z-30 flex items-center justify-center bg-bg-app/60 backdrop-blur-sm;
+  }
+
+  /* Soft pulse used on idle "thinking" states (button labels while the
+   * underlying mutation is in flight, etc.). */
+  .pulse-text {
+    animation: pulse-text 1.6s ease-in-out infinite;
+  }
+
+  /* Skeleton shimmer - keep shape but use blush -> line gradient. */
+  .skeleton {
+    @apply relative overflow-hidden rounded-md bg-bg-subtle;
+  }
+  .skeleton::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(232, 232, 240, 0.7) 50%,
+      transparent 100%
+    );
+    animation: shimmer 1.4s ease-in-out infinite;
+    transform: translateX(-100%);
+  }
+
+  /* Manual Prose Styles for Tiptap */
+  .prose {
+    @apply text-ink leading-relaxed max-w-none;
+  }
+  .prose h1 {
+    @apply mt-8 mb-4 text-3xl font-bold text-ink;
+  }
+  .prose h2 {
+    @apply mt-6 mb-3 text-2xl font-semibold text-ink;
+  }
+  .prose h3 {
+    @apply mt-4 mb-2 text-xl font-semibold text-ink;
+  }
+  .prose p {
+    @apply my-4;
+  }
+  .prose ul {
+    @apply my-4 ml-6 list-disc;
+  }
+  .prose ol {
+    @apply my-4 ml-6 list-decimal;
+  }
+  .prose li {
+    @apply my-1;
+  }
+  .prose strong, .prose b {
+    @apply font-bold text-ink;
+  }
+  .prose em, .prose i {
+    @apply italic;
+  }
+  .prose u {
+    @apply underline;
+  }
+  .prose s {
+    @apply line-through;
+  }
+  .prose blockquote {
+    @apply my-4 border-l-4 border-line pl-4 italic text-ink-muted;
+  }
+  .prose code {
+    @apply rounded bg-bg-subtle px-1 py-0.5 font-mono text-sm text-ink;
+  }
+  .prose pre {
+    @apply my-4 overflow-x-auto rounded-lg bg-ink p-4 font-mono text-sm text-white;
+  }
+  .prose a {
+    @apply font-medium text-brand-purple underline decoration-brand-purple/30 underline-offset-4 hover:decoration-brand-purple;
+  }
+  .prose img {
+    @apply my-4 rounded-md max-w-full h-auto block;
+  }
+  .ProseMirror img,
+  .botss-doc-image {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    margin: 0.5rem 0;
+    border-radius: 4px;
+  }
+  .botss-doc-image[data-align="left"] {
+    margin-left: 0;
+    margin-right: auto;
+  }
+  .botss-doc-image[data-align="right"] {
+    margin-left: auto;
+    margin-right: 0;
+  }
+  .botss-doc-image[data-align="center"] {
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .prose hr {
+    @apply my-8 border-t border-line;
+  }
+
+  .prose-sm {
+    @apply text-sm leading-6;
+  }
+  .prose-sm h1 {
+    @apply text-2xl;
+  }
+  .prose-sm h2 {
+    @apply text-xl;
+  }
+  .prose-sm h3 {
+    @apply text-lg;
+  }
+  .prose table {
+    @apply w-full border-collapse border border-line my-4;
+  }
+  .prose th {
+    @apply border border-line bg-bg-subtle px-3 py-2 text-left font-semibold text-ink;
+  }
+  .prose td {
+    @apply border border-line px-3 py-2 text-ink;
+  }
+
+  .prose ul[data-type="taskList"] {
+    @apply list-none p-0 my-4;
+  }
+  .prose ul[data-type="taskList"] li {
+    @apply flex items-start gap-2 my-1;
+  }
+  .prose ul[data-type="taskList"] li > label {
+    @apply shrink-0 mt-1 select-none;
+  }
+  .prose ul[data-type="taskList"] li > div {
+    @apply flex-1 min-w-0;
+  }
+}
+
+/*
+ * Honour the OS "reduce motion" setting: kill animations/transitions for users
+ * who ask for it. Doubles as a battery win - no continuous repaints from
+ * decorative motion (gradients, pulses, spinners) on laptops/phones that opt in.
+ */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}

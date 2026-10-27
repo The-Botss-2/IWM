@@ -1,0 +1,7 @@
+# gitleaks config. Extends the default ruleset.
+#
+# Never commit real secrets. apps/mobile/google-services.json (your Firebase
+# Android client config) is gitignored; copy apps/mobile/google-services.example.json
+# and fill in your own project's values locally or in your EAS build secrets.
+[extend]
+useDefault = true

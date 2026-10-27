@@ -1,0 +1,17 @@
+{
+  "$schema": "https://raw.githubusercontent.com/fallow-rs/fallow/main/schema.json",
+  "ignoreDependencies": [
+    "@botss/database",
+    "@botss/config",
+    "zod",
+    "better-auth",
+    "react",
+    "@nestjs/schematics",
+    "eslint-config-next",
+    "electron",
+    "expo-secure-store",
+    "expo-splash-screen",
+    "expo-notifications",
+    "react-native-screens"
+  ]
+}

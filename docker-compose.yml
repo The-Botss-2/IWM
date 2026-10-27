@@ -1,0 +1,113 @@
+# Development / self-host infrastructure: Postgres, Redis, MinIO, Gotenberg and
+# LiveKit. The credentials below are local-development defaults that match the
+# API's fallbacks and .env.example: change all of them before exposing a host.
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: botss-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: botss
+      POSTGRES_PASSWORD: botss
+      POSTGRES_DB: botss
+    # Host port 5433 to avoid clashing with other local Postgres instances on 5432.
+    # Bind to 127.0.0.1 so the database is unreachable from outside the host
+    # even if a firewall is misconfigured. The app connects via the host
+    # loopback (the API runs on the same host).
+    ports:
+      - '127.0.0.1:5433:5432'
+    volumes:
+      - botss-postgres:/var/lib/postgresql/data
+      # Installs pg_trgm on first start (empty volume only).
+      - ./docker/postgres/init.sql:/docker-entrypoint-initdb.d/10-extensions.sql:ro
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U botss -d botss']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    container_name: botss-redis
+    restart: unless-stopped
+    # Host port 6380 to avoid clashing with other local Redis instances on 6379.
+    # Bind to 127.0.0.1 - Redis has no auth in this compose file; never expose
+    # it on a public interface.
+    ports:
+      - '127.0.0.1:6380:6379'
+    volumes:
+      - botss-redis:/data
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  minio:
+    image: minio/minio:latest
+    container_name: botss-minio
+    restart: unless-stopped
+    command: server /data --console-address ':9001'
+    environment:
+      MINIO_ROOT_USER: botss-local
+      MINIO_ROOT_PASSWORD: botss-local-secret
+      # Origins allowed to load files directly from MinIO. Add your web app's
+      # public origin (e.g. https://app.example.com) when self-hosting.
+      MINIO_API_CORS_ALLOW_ORIGIN: "http://localhost:3000"
+    # Host ports 9100/9101 to avoid clashes with any other local MinIO.
+    # Bind to 127.0.0.1 so the bucket is not internet-reachable. The API
+    # talks to MinIO via loopback; signed URLs handed to clients should go
+    # through a reverse-proxied subdomain (S3_PUBLIC_URL) rather than direct
+    # access to this port.
+    ports:
+      - '127.0.0.1:9100:9000'
+      - '127.0.0.1:9101:9001'
+    volumes:
+      - botss-minio:/data
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:9000/minio/health/live']
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  # HTML to PDF for invoices. Headless Chromium in its own container so a
+  # render can never take the API process down. JavaScript is disabled and
+  # only the uploaded document itself (a file under /tmp) may load, so a
+  # template cannot run script or fetch anything over the network; the API
+  # sends fully self-contained HTML. Loopback only.
+  gotenberg:
+    image: gotenberg/gotenberg:8
+    container_name: botss-gotenberg
+    restart: unless-stopped
+    command:
+      - gotenberg
+      - --chromium-disable-javascript=true
+      - --chromium-allow-list=^file:///tmp/.*
+      - --api-timeout=60s
+    ports:
+      - '127.0.0.1:3100:3000'
+
+  livekit:
+    image: livekit/livekit-server:latest
+    container_name: botss-livekit
+    restart: unless-stopped
+    environment:
+      LIVEKIT_CONFIG: |
+        port: 7880
+        bind_addresses:
+          - ""
+        rtc:
+          tcp_port: 7881
+          udp_port: 7882
+          use_external_ip: true
+        keys:
+          ${LIVEKIT_API_KEY}: "${LIVEKIT_API_SECRET}"
+    ports:
+      - '7880:7880'
+      - '7881:7881'
+      - '7882:7882/udp'
+
+volumes:
+  botss-postgres:
+  botss-redis:
+  botss-minio:

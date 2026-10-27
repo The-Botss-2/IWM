@@ -1,0 +1,21 @@
+{
+  "extends": "../../packages/config/tsconfig/nestjs.json",
+  "compilerOptions": {
+    "outDir": "dist",
+    "rootDir": "src",
+    "baseUrl": "./",
+    "paths": {
+      "@/*": ["src/*"]
+    },
+    "declaration": false,
+    "declarationMap": false,
+    "exactOptionalPropertyTypes": false,
+    "skipLibCheck": true,
+    // Keep the incremental cache INSIDE dist so Nest's `deleteOutDir: true`
+    // wipes it together with the emit. Otherwise the buildinfo survives a
+    // dist wipe, tsc thinks the prior emit is still valid, and emits nothing
+    // on the next run - producing `Cannot find module 'dist/main'` at runtime.
+    "tsBuildInfoFile": "./dist/.tsbuildinfo"
+  },
+  "include": ["src/**/*"]
+}

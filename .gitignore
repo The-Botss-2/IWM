@@ -1,0 +1,87 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+# This repo uses pnpm only.
+package-lock.json
+yarn.lock
+
+# Build outputs
+dist/
+build/
+.next/
+.turbo/
+*.tsbuildinfo
+
+# Desktop packaging icons are committed so electron-builder can use them.
+!apps/desktop/build/
+apps/desktop/build/*
+!apps/desktop/build/icon.ico
+!apps/desktop/build/icon.icns
+!apps/desktop/build/icon.png
+
+# Generated
+**/generated/
+.prisma/
+# Local Prisma migrations created by `pnpm db:migrate --name init`. The public
+# repo does not ship a migration history yet; generate your own from
+# schema.prisma (see README).
+packages/database/prisma/migrations/
+
+# Logs
+*.log
+*.err
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Never commit real environment files.
+.env
+.env.local
+.env.production
+.env.*.local
+!.env.example
+
+# Firebase Admin / Google service-account private keys - server secrets; NEVER
+# commit. Your Firebase Android client config (google-services.json) is also kept
+# out of the repo: copy apps/mobile/google-services.example.json and fill it in.
+apps/mobile/google-services.json
+*-firebase-adminsdk-*.json
+**/serviceAccount*.json
+**/google-service-account*.json
+
+# IDE
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Test
+coverage/
+.nyc_output/
+
+# Misc
+*.pem
+.cache/
+
+# Tauri (later)
+src-tauri/target/
+
+# Expo (later)
+.expo/
+expo-env.d.ts
+
+#fallow
+fallow_dead_code.json
+fallow_dupes.json
+fallow_health.json
+fallow_schema.json
+# Claude Code agent worktrees (local only)
+.claude/worktrees/

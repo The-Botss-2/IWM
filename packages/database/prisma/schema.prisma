@@ -1,0 +1,3088 @@
+// IWM database schema.
+// Single source of truth for all data models. Do not duplicate models elsewhere.
+
+generator client {
+  provider        = "prisma-client-js"
+  // NOTE: spec asked for "fullTextSearchPostgres" (Prisma 6.x flag); on the pinned
+  // Prisma 5.22 line the equivalent flag is "fullTextSearch". When upgrading to 6.x,
+  // rename this to "fullTextSearchPostgres".
+  previewFeatures = ["fullTextSearch"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================================================
+// Enums
+// ============================================================================
+
+enum WorkspaceRole {
+  OWNER
+  ADMIN
+  MEMBER
+  VIEWER
+  CLIENT
+  /// Phase 4 - finer-grained roles for the org-layer refactor. Appended
+  /// only; do not reorder or remove existing values.
+  MANAGER
+  EDITOR
+}
+
+/// Cross-workspace role attached to User. Independent of WorkspaceRole.
+///
+/// - `SUPER_ADMIN`: platform operator. Sees + manages across every tenant
+///   org (tenant management, cross-org audit log, the org filter on
+///   /settings/users). Restricted to the root (platform) org by the
+///   application.
+/// - `ADMIN`: scoped to their own org. Manages users + workspaces inside
+///   that one tenant only.
+/// - `HR`: scoped to their own org's Attendance + Leave.
+/// - `EMPLOYEE` / `PROJECT_MANAGER`: regular members.
+///
+/// Enum values are append-only; reordering rewrites the Postgres type
+/// and risks data drift on existing rows.
+enum SystemRole {
+  ADMIN
+  PROJECT_MANAGER
+  EMPLOYEE
+  /// Org-level Human Resources. Read/write Attendance + Leave for their
+  /// own org, no access to project / workspace governance unless also
+  /// granted ADMIN via a separate membership.
+  HR
+  /// Org-level finance manager. Read/write Contracts, Payments, Expenses,
+  /// PaymentSources and Invoices for their own org. Mirrors HR: an org-level
+  /// role, NOT a workspace role - a workspace OWNER does not get money access
+  /// by owning a workspace. See `hasFinanceAccess` in packages/auth.
+  FINANCE
+  /// Cross-tenant platform operator. Only valid when organizationId
+  /// points at the root (platform) org; the API refuses to set this on a
+  /// tenant-org user.
+  SUPER_ADMIN
+}
+
+/// Who an account belongs to. `STAFF` is everyone who works in the CRM.
+/// `CLIENT` is an external person at one of our clients: they sign in to the
+/// client portal only. AuthGuard refuses a CLIENT account on every route not
+/// marked `@PortalRoute()`, and a CLIENT account never gets a workspace, so
+/// none of the internal read scopes can reach it. CLIENT accounts carry
+/// `organizationId = null`; their tenant is reached through `ClientContact`.
+enum AccountType {
+  STAFF
+  CLIENT
+}
+
+/// A client person's standing inside their client's portal. `PRIMARY` is the
+/// main contact (one per client, enforced in the service) and is the only one
+/// who sees billing. `MEMBER` sees progress, shared documents and their own
+/// signature requests.
+enum ClientContactRole {
+  PRIMARY
+  MEMBER
+}
+
+enum ProjectRole {
+  PROJECT_LEAD
+  CONTRIBUTOR
+  REVIEWER
+  VIEWER
+}
+
+enum ProjectStatus {
+  DRAFT
+  ACTIVE
+  ON_HOLD
+  COMPLETED
+  ARCHIVED
+}
+
+enum ProjectVisibility {
+  PRIVATE
+  WORKSPACE
+  PUBLIC
+}
+
+enum TaskStatus {
+  BACKLOG
+  TODO
+  IN_PROGRESS
+  IN_REVIEW
+  DONE
+  CANCELLED
+}
+
+enum TaskPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum LeadStage {
+  NEW
+  QUALIFIED
+  CONTACTED
+  DEMO_SCHEDULED
+  DEMO_COMPLETED
+  PROPOSAL
+  NEGOTIATION
+  WON
+  LOST
+}
+
+enum LeadSource {
+  WEBSITE
+  REFERRAL
+  COLD_OUTREACH
+  EVENT
+  SOCIAL
+  PARTNER
+  OTHER
+}
+
+enum ClientStatus {
+  PROSPECT
+  ACTIVE
+  PAUSED
+  CHURNED
+}
+
+enum DocumentVisibility {
+  PRIVATE
+  PROJECT
+  WORKSPACE
+  PUBLIC_LINK
+}
+
+enum DocumentPermission {
+  READ
+  WRITE
+}
+
+enum NotificationType {
+  TASK_COMMENT
+  TASK_ASSIGNED
+  // Added 2026-06 - cross-app notification coverage. New values are append-only
+  // (safe, additive enum migration). The bell maps each to an icon/label and
+  // the OS web-push payload is built from title/body/url regardless of type.
+  MAIL_RECEIVED
+  CHAT_MESSAGE
+  MENTION
+  TODO_ASSIGNED
+  TASK_COMPLETED
+  TASK_IN_REVIEW
+  PROJECT_ADDED
+  LEAD_ASSIGNED
+  CLIENT_ASSIGNED
+  LEAVE_DECISION
+  TIMESHEET_WARNING
+  SPRINT_STARTED
+  GOAL_ASSIGNED
+  CALL_MISSED
+  INVOICE_UPDATE
+  DOCUMENT_SHARED
+  INVITE_ACCEPTED
+  LEAD_FOLLOWUP_DUE
+  /// Financials. PAYMENT_RECEIVED fans out to the org's finance managers when
+  /// a payment lands; MILESTONE_DELIVERED fires when linked project work
+  /// completes and a milestone becomes billable.
+  PAYMENT_RECEIVED
+  MILESTONE_DELIVERED
+  // E-signature (2026-09). SIGNED fires per signer, COMPLETED once the
+  // sealed PDF exists, DECLINED when any signer declines.
+  SIGNATURE_SIGNED
+  SIGNATURE_COMPLETED
+  SIGNATURE_DECLINED
+  // Cross-org chat requests (2026-10): a request reached you, or one you
+  // sent was accepted.
+  CHAT_REQUEST
+}
+
+enum MailAccountStatus {
+  CONNECTING
+  ACTIVE
+  AUTH_FAILED
+  CONNECTION_FAILED
+  DISABLED
+}
+
+enum MailFolderRole {
+  INBOX
+  SENT
+  DRAFTS
+  TRASH
+  SPAM
+  ARCHIVE
+  OUTBOX
+  ALL
+  FLAGGED
+  IMPORTANT
+}
+
+enum MailOutboxStatus {
+  QUEUED
+  SENDING
+  SENT
+  FAILED
+  CANCELLED
+}
+
+enum FileKind {
+  IMAGE
+  VIDEO
+  AUDIO
+  PDF
+  DOC
+  SHEET
+  SLIDE
+  ARCHIVE
+  OTHER
+}
+
+// ============================================================================
+// Sprints (Phase 3 - project management)
+// ============================================================================
+
+enum SprintStatus {
+  PLANNED
+  ACTIVE
+  COMPLETED
+}
+
+// ============================================================================
+// Custom fields (Phase 2 Step F) - typed per-workspace / per-project definitions
+// ============================================================================
+
+enum CustomFieldScope {
+  PROJECT
+  TASK
+  LEAD
+  CLIENT
+}
+
+enum CustomFieldType {
+  TEXT
+  NUMBER
+  DATE
+  SELECT
+  MULTI_SELECT
+  CHECKBOX
+  URL
+  USER
+}
+
+// ============================================================================
+// Invoices (Phase 4 Step J)
+// ============================================================================
+
+enum InvoiceStatus {
+  DRAFT
+  SENT
+  PARTIALLY_PAID
+  PAID
+  OVERDUE
+  CANCELLED
+  REFUNDED
+}
+
+/// How a contract is billed. RETAINER ships in the enum from day one because
+/// adding an enum value later is the expensive migration; it renders as
+/// MILESTONE until the recurring-milestone generator lands.
+enum BillingModel {
+  ONE_TIME
+  MILESTONE
+  RETAINER
+}
+
+enum ContractStatus {
+  DRAFT
+  ACTIVE
+  COMPLETED
+  CANCELLED
+}
+
+/// Derived money state, cached on Contract and ContractMilestone so it can be
+/// indexed and filtered. Never set by hand - `recalcContract` owns it.
+enum PaymentStatus {
+  NOT_PAID
+  PARTIAL
+  PAID
+}
+
+/// DELIVERY state only. Deliberately separate from `paymentStatus`: collapsing
+/// the two means that once a milestone is part-paid you can no longer tell
+/// whether the work actually shipped, which is exactly the
+/// "delivered, awaiting payment" view the finance tab is built around.
+enum MilestoneStatus {
+  PENDING
+  IN_PROGRESS
+  DELIVERED
+  CANCELLED
+}
+
+/// A transaction is local or international - never both. "Both" is a property
+/// of the rail, so it lives on PaymentSource.defaultRegion as a nullable
+/// ("ask every time").
+enum PaymentRegion {
+  LOCAL
+  INTERNATIONAL
+}
+
+enum PaymentSourceKind {
+  FREELANCE_PLATFORM
+  BANK
+  REMITTANCE
+  WALLET
+  GATEWAY
+  CASH
+  OTHER
+}
+
+/// Coarse grouping for the expense breakdown. The fine-grained label is the
+/// admin-managed PaymentSource / free-text vendor on the row itself.
+enum ExpenseCategory {
+  SALARY
+  CONTRACTOR
+  SUBSCRIPTION
+  PLATFORM_FEE
+  HARDWARE
+  SOFTWARE
+  MARKETING
+  TAX
+  OFFICE
+  OTHER
+}
+
+enum PaymentMethod {
+  MANUAL
+  POLAR
+  STRIPE
+  BANK_TRANSFER
+  CASH
+  OTHER
+}
+
+// ============================================================================
+// Task intake forms
+// ============================================================================
+
+// (TaskForm uses TaskStatus + TaskPriority for defaults; no new enum needed.)
+
+// ============================================================================
+// Goals / OKRs
+// ============================================================================
+
+enum GoalStatus {
+  ON_TRACK
+  AT_RISK
+  OFF_TRACK
+  COMPLETED
+  ARCHIVED
+}
+
+enum KeyResultMetric {
+  NUMBER
+  PERCENT
+  CURRENCY
+  BOOLEAN
+}
+
+// ============================================================================
+// Saved views (project shortcuts)
+// ============================================================================
+
+enum SavedViewScope {
+  TASKS
+  PROJECT
+}
+
+// ============================================================================
+// Auth - Better Auth compatible
+// ============================================================================
+
+model User {
+  id              String      @id @default(cuid())
+  email           String      @unique
+  emailVerified   Boolean     @default(false)
+  name            String
+  image           String?
+  phone           String?
+  timezone        String      @default("Asia/Karachi")
+  locale          String      @default("en")
+  /// Cross-workspace role. Distinct from WorkspaceMembership.role (which is
+  /// per-workspace). EMPLOYEE is the default; ADMIN gates the Users admin
+  /// panel and other system-wide privileged operations.
+  systemRole      SystemRole  @default(EMPLOYEE)
+  /// STAFF for everyone who works in the CRM; CLIENT for client-portal people.
+  /// Never writable through Better Auth (no `additionalFields`), only by the
+  /// client-portal invite flow.
+  accountType     AccountType @default(STAFF)
+  /// When true, this user is not obligated to submit timesheets and is
+  /// skipped entirely by the timesheet-warning pass. Toggled by Admin/HR
+  /// from Settings -> Users. Default false (everyone is obligated).
+  timesheetExempt Boolean     @default(false)
+  /// Optional custom company role (Role with scope COMPANY). When set, its
+  /// permissions replace the preset derived from `systemRole`.
+  customRoleId    String?
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  deletedAt       DateTime?
+
+  // Better Auth
+  sessions Session[]
+  accounts Account[]
+
+  // Configurable roles & permissions
+  customRole               Role?                    @relation("UserCustomRole", fields: [customRoleId], references: [id], onDelete: SetNull)
+  permissionOverrides      UserPermissionOverride[] @relation("UserPermissionOverrides")
+  permissionOverridesGiven UserPermissionOverride[] @relation("UserPermissionOverrideCreator")
+
+  // Workspace ownership / membership
+  ownedWorkspaces      Workspace[]
+  workspaceMemberships WorkspaceMembership[] @relation("WorkspaceMember")
+  workspaceInvitesSent WorkspaceMembership[] @relation("WorkspaceInviter")
+
+  // Project relations
+  projectMemberships ProjectMembership[]
+  createdProjects    Project[]
+
+  // Lead relations. `createdLeads` is the "owner" surfaced in the UI (whoever
+  // captured the lead); `assignedLeads` is who currently works it and drives
+  // per-record visibility for non-admins.
+  createdLeads  Lead[] @relation("LeadCreator")
+  assignedLeads Lead[] @relation("LeadAssignee")
+
+  // Client relations - same owner/assignee split as leads.
+  createdClients  Client[] @relation("ClientCreator")
+  assignedClients Client[] @relation("ClientAssignee")
+
+  // Client portal. `clientContacts` is set only on CLIENT accounts.
+  clientContacts              ClientContact[]       @relation("ClientContactUser")
+  clientContactsInvited       ClientContact[]       @relation("ClientContactInviter")
+  documentClientSharesGranted DocumentClientShare[] @relation("DocumentClientShareGranter")
+
+  // Task relations
+  createdTasks  Task[]    @relation("TaskCreator")
+  assignedTasks Task[]    @relation("TaskAssignee")
+  taskComments  Comment[]
+
+  // Document + File relations
+  createdDocuments          Document[]
+  uploadedFiles             FileObject[]
+  documentAccess            DocumentAccess[]   @relation("DocumentAccessUser")
+  grantedDocumentAccess     DocumentAccess[]   @relation("DocumentAccessGranter")
+  createdDocumentTemplates  DocumentTemplate[] @relation("DocumentTemplateCreator")
+  authoredDocumentRevisions DocumentRevision[] @relation("DocumentRevisionAuthor")
+  createdSignatureRequests  SignatureRequest[] @relation("SignatureRequestCreator")
+
+  // Notifications
+  notifications        Notification[]   @relation("NotificationRecipient")
+  notificationsCreated Notification[]   @relation("NotificationActor")
+  pushDevices          UserPushDevice[]
+
+  // Mail
+  mailAccounts MailAccount[]
+  mailOutbox   MailOutbox[]
+
+  // Sprint / form / goal / saved-view relations (Phase 3 project management)
+  sprintTasksAdded SprintTask[]
+  createdTaskForms TaskForm[]   @relation("TaskFormCreator")
+  defaultForForms  TaskForm[]   @relation("TaskFormDefaultAssignee")
+  ownedGoals       Goal[]
+
+  // Invoicing (Phase 4 Step J)
+  createdInvoices       Invoice[]         @relation("InvoiceCreator")
+  recordedPayments      Payment[]         @relation("PaymentRecorder")
+  voidedPayments        Payment[]         @relation("PaymentVoider")
+  createdContracts      Contract[]        @relation("ContractCreator")
+  recordedExpenses      Expense[]         @relation("ExpenseRecorder")
+  payrollEntries        PayrollEmployee[] @relation("PayrollEmployeeUser")
+  addedPayrollEmployees PayrollEmployee[] @relation("PayrollEmployeeCreator")
+  createdPayrollRuns    PayrollRun[]      @relation("PayrollRunCreator")
+  goalUpdates           GoalUpdate[]
+  createdSavedViews     SavedView[]
+
+  channelParticipations ChannelParticipant[]
+  chatMessages          ChatMessage[]
+  pollVotes             PollVote[]
+
+  chatRoomMemberships    ChatRoomParticipant[]     @relation("ChatRoomParticipantUser")
+  chatRoomMessages       ChatRoomMessage[]         @relation("ChatRoomMessageSender")
+  callsInitiated         CallSession[]             @relation("CallSessionCaller")
+  chatRoomInvitesCreated ChatRoomInvite[]          @relation("ChatRoomInviteCreator")
+  chatRoomReactions      ChatRoomMessageReaction[] @relation("ChatRoomReactionUser")
+  createdChatRooms       ChatRoom[]                @relation("ChatRoomCreator")
+
+  chatRequestsSent          ChatRequest[]      @relation("ChatRequestRequester")
+  chatRequestsReceived      ChatRequest[]      @relation("ChatRequestRecipient")
+  chatRequestBlocksMade     ChatRequestBlock[] @relation("ChatRequestBlocker")
+  chatRequestBlocksReceived ChatRequestBlock[] @relation("ChatRequestBlocked")
+
+  todos         Todo[]      @relation("TodoUser")
+  assignedTodos Todo[]      @relation("TodoAssignee")
+  timeEntries   TimeEntry[] @relation("TimeEntryUser")
+
+  /// Org-level attendance + leave history. Back-relations only; the
+  /// owning models live near the bottom of this schema.
+  attendance      Attendance[] @relation("UserAttendance")
+  leaves          Leave[]      @relation("UserLeaves")
+  approvedLeaves  Leave[]      @relation("ApprovedLeaves")
+  createdHolidays Holiday[]    @relation("UserCreatedHolidays")
+
+  /// Per-tenant audit log: rows where this user was the actor.
+  auditEntries AuditLog[] @relation("ActorAuditLogs")
+
+  /// Support access grants this user created / revoked as an org admin.
+  supportGrantsGranted SupportGrant[] @relation("SupportGrantGrantedBy")
+  supportGrantsRevoked SupportGrant[] @relation("SupportGrantRevokedBy")
+
+  /// Tenant organization the user belongs to. Nullable for back-compat
+  /// (and for CLIENT accounts).
+  /// Auto-routed at signup/login by email domain when an Organization
+  /// has a matching `emailDomain`.
+  organizationId String?
+  organization   Organization? @relation("OrganizationMembers", fields: [organizationId], references: [id], onDelete: SetNull)
+
+  /// Web Push subscriptions for native OS notifications. One row per
+  /// browser/device the user has granted notification permission on.
+  notificationSubscriptions UserNotificationSubscription[]
+
+  /// Appearance + navigation settings that follow the user across devices.
+  preferences UserPreferences?
+
+  // `email` is @unique; its unique index serves every lookup.
+  @@index([deletedAt])
+  @@index([organizationId])
+  @@index([accountType])
+}
+
+/// Per-user UI preferences (Settings -> Appearance / Navigation), one row per
+/// user. `data` is a versioned JSON document validated by
+/// `userPreferencesSchema` in @botss/shared-types on every read and write, so
+/// adding a preference never needs a migration. Absent row = the user never
+/// saved anything server-side (the web client then uploads its local copy
+/// once). Not soft-deleted: it is meaningless without the user and cascades
+/// away with a hard delete of that user.
+model UserPreferences {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  data      Json     @default("{}")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+/// Web Push subscription record. Carries the endpoint + crypto keys
+/// needed to dispatch a VAPID-signed push to the user's browser even
+/// when the CRM tab is closed. Rows are pruned automatically when the
+/// browser endpoint returns 404/410 (see notifications-push.service).
+model UserNotificationSubscription {
+  id        String   @id @default(cuid())
+  userId    String
+  /// Push service endpoint URL (FCM / Apple / Edge / Mozilla). Unique
+  /// per device - re-subscribing on the same device produces the same
+  /// endpoint and upserts in place.
+  endpoint  String   @unique
+  /// VAPID `auth` secret, base64-url-encoded.
+  auth      String
+  /// VAPID `p256dh` public key, base64-url-encoded.
+  p256dh    String
+  /// Free-text UA string for diagnostics. Optional so older clients work.
+  userAgent String?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+/// Native mobile push token (Expo / FCM / APNs). Distinct from
+/// UserNotificationSubscription, which holds browser Web Push endpoints + VAPID
+/// keys. A native token is a single opaque string delivered to the OS push
+/// network, so notifications reach the device even when the app is fully
+/// closed. Rows are pruned automatically when Expo reports the token as
+/// DeviceNotRegistered (see notifications-push.service).
+model UserPushDevice {
+  id         String   @id @default(cuid())
+  userId     String
+  /// Expo push token (ExponentPushToken[...]) or raw FCM/APNs token. Unique
+  /// per device - re-registering the same device upserts in place.
+  token      String   @unique
+  /// 'android' | 'ios' | 'expo'. Free-text so new platforms don't need a
+  /// migration; the sender treats anything Expo-shaped via the Expo push API.
+  platform   String
+  /// Free-text UA / device label for diagnostics. Optional.
+  userAgent  String?
+  createdAt  DateTime @default(now())
+  /// Bumped on every re-registration so stale devices can be reaped later.
+  lastSeenAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  ipAddress String?
+  userAgent String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  // `token` is @unique; no separate index.
+  @@index([expiresAt])
+}
+
+model Account {
+  id           String   @id @default(cuid())
+  userId       String
+  providerId   String
+  accountId    String
+  password     String?
+  accessToken  String?
+  refreshToken String?
+  idToken      String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([providerId, accountId])
+  @@index([userId])
+}
+
+model VerificationToken {
+  id         String   @id @default(cuid())
+  identifier String
+  value      String
+  /// Workspace invitations only: sha256 of the 6-digit code emailed with the
+  /// link (second factor). Null for Better Auth and portal tokens.
+  codeHash     String?
+  /// Wrong codes typed for this token; the row is deleted at the limit.
+  codeAttempts Int      @default(0)
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([identifier, value])
+  @@index([expiresAt])
+}
+
+// ============================================================================
+// Organizations (Phase 4 - multi-tenant layer)
+// ============================================================================
+
+/// Tenant organization. Workspaces and Users hang off this. Exactly one
+/// row has `isRoot = true` (the platform organization), which the
+/// application-layer guards keep immutable. Tenant
+/// organizations are isolated: no data ever crosses org boundaries
+/// except via global admins (User.systemRole=ADMIN inside the root org).
+model Organization {
+  id              String    @id @default(cuid())
+  name            String
+  slug            String    @unique
+  /// Domain that auto-routes signup/login to this organization,
+  /// e.g. "example.com". Nullable so manually-invited
+  /// tenants don't have to claim a domain.
+  emailDomain     String?   @unique
+  /// Exactly one row has this true: the platform organization. The API
+  /// keeps this row immutable.
+  isRoot          Boolean   @default(false)
+  /// Admin-toggleable suspend switch. Root cannot be suspended (trigger).
+  isActive        Boolean   @default(true)
+  /// Tenant-scoped feature toggles. Validated by orgFeatureFlagsSchema in
+  /// @botss/shared-types.
+  featureFlags    Json      @default("{}")
+  /// Reporting currency every `baseAmount` on Payment / Expense is converted
+  /// into. Contracts and payments keep their own currency; this is purely the
+  /// denominator the finance dashboard sums in.
+  baseCurrency    String    @default("PKR")
+  /// Invoice branding and defaults (company details, logo, bank details,
+  /// payment terms, default template). Validated by `invoiceSettingsSchema`
+  /// in @botss/shared-types.
+  invoiceSettings Json      @default("{}")
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  deletedAt       DateTime?
+
+  workspaces     Workspace[]             @relation("OrganizationWorkspaces")
+  members        User[]                  @relation("OrganizationMembers")
+  mailConfig     OrganizationMailConfig?
+  auditLogs      AuditLog[]              @relation("OrganizationAuditLogs")
+  holidays       Holiday[]               @relation("OrganizationHolidays")
+  paymentSources PaymentSource[]         @relation("OrganizationPaymentSources")
+  roles          Role[]                  @relation("OrganizationRoles")
+  supportGrants  SupportGrant[]          @relation("OrganizationSupportGrants")
+
+  // `slug` is @unique; no separate index.
+  @@index([isRoot])
+  @@index([deletedAt])
+}
+
+/// Per-tenant audit log. Every sensitive mutation (member added/removed,
+/// role changed, workspace renamed, doc shared, file deleted, tenant
+/// archived, etc.) writes one row here. Scoped to organizationId so a
+/// tenant admin only ever sees their own org's history; the root-org
+/// global admin can query across by passing the wildcard.
+model AuditLog {
+  id             String   @id @default(cuid())
+  organizationId String
+  /// Acting user. Nullable so a system-triggered event (cron, BullMQ
+  /// worker) can still be recorded without inventing a User row.
+  actorUserId    String?
+  /// Free-form action token, e.g. `workspace.invite`, `org.archive`,
+  /// `task.delete`. Kept as a string column so feature work can add new
+  /// actions without a migration; the Zod schema in @botss/shared-types
+  /// describes the well-known set.
+  action         String
+  /// Target identifier(s) - typically the cuid of the row that was acted
+  /// on. Stored as `${entity}:${id}` (e.g. `workspace:cl123`) so a query
+  /// for "all events on workspace X" is a single LIKE.
+  target         String?
+  /// Arbitrary metadata about the action - diff before/after, IP address,
+  /// new role, etc. Free-form JSON; consumers Zod-parse the well-known shapes.
+  metadata       Json     @default("{}")
+  createdAt      DateTime @default(now())
+
+  organization Organization @relation("OrganizationAuditLogs", fields: [organizationId], references: [id], onDelete: Cascade)
+  actorUser    User?        @relation("ActorAuditLogs", fields: [actorUserId], references: [id], onDelete: SetNull)
+
+  @@index([organizationId, createdAt(sort: Desc)])
+  @@index([organizationId, action])
+  @@index([actorUserId])
+  /// The client page's activity feed reads one target's history newest first.
+  @@index([target, createdAt(sort: Desc)])
+}
+
+/// Temporary support access: an organization admin lets the platform
+/// operators (SUPER_ADMIN) read this organization until `expiresAt`. Active
+/// while `revokedAt` is null and `expiresAt` is in the future; AuthGuard
+/// checks that on every support request, so a revoke or the end time takes
+/// effect on the very next request. Not soft-deleted: `revokedAt` is the
+/// lifecycle, and the rows stay as the organization's record of who let
+/// support in and when.
+model SupportGrant {
+  id             String    @id @default(cuid())
+  organizationId String
+  /// Null once the granting admin's account is deleted; the grant history stays.
+  grantedById    String?
+  expiresAt      DateTime
+  revokedAt      DateTime?
+  revokedById    String?
+  /// Always true today: support sessions refuse every write.
+  readOnly       Boolean   @default(true)
+  /// Optional note from the org admin to the support team.
+  reason         String?
+  createdAt      DateTime  @default(now())
+
+  organization Organization @relation("OrganizationSupportGrants", fields: [organizationId], references: [id], onDelete: Cascade)
+  grantedBy    User?        @relation("SupportGrantGrantedBy", fields: [grantedById], references: [id], onDelete: SetNull)
+  revokedBy    User?        @relation("SupportGrantRevokedBy", fields: [revokedById], references: [id], onDelete: SetNull)
+
+  @@index([organizationId, createdAt(sort: Desc)])
+  @@index([revokedAt, expiresAt])
+  @@index([grantedById])
+  @@index([revokedById])
+}
+
+/// Optional org-level fallback for outbound/inbound mail. Precedence at
+/// transport-build time: user's MailAccount > this row > platform env
+/// defaults. Both ciphertext columns use AES-256-GCM in the format
+/// `iv.hex:cipher.hex:tag.hex` produced by `aes-gcm.util.ts`.
+model OrganizationMailConfig {
+  id             String   @id @default(cuid())
+  organizationId String   @unique
+  smtpHost       String
+  smtpPort       Int
+  smtpSecure     Boolean  @default(true)
+  smtpUser       String
+  /// AES-256-GCM ciphertext. Never serialized in any API response.
+  smtpPasswordCt String
+  imapHost       String
+  imapPort       Int
+  imapSecure     Boolean  @default(true)
+  imapUser       String
+  imapPasswordCt String
+  fromEmail      String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  // `organizationId` is @unique; no separate index.
+}
+
+// ============================================================================
+// Workspaces
+// ============================================================================
+
+model Workspace {
+  id             String    @id @default(cuid())
+  name           String
+  slug           String    @unique
+  description    String?
+  logoUrl        String?
+  ownerId        String
+  /// Parent tenant organization. Every workspace must belong to an org. The FK is RESTRICT so an org
+  /// cannot be hard-deleted while workspaces hang off it; soft-delete
+  /// the org instead.
+  organizationId String
+  /// Admin-toggleable suspend switch for individual tenant workspaces.
+  isActive       Boolean   @default(true)
+  /// Workspace-scoped feature toggles.
+  featureFlags   Json      @default("{}")
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  deletedAt      DateTime?
+
+  owner               User                     @relation(fields: [ownerId], references: [id])
+  organization        Organization             @relation("OrganizationWorkspaces", fields: [organizationId], references: [id], onDelete: Restrict)
+  memberships         WorkspaceMembership[]
+  permissionOverrides UserPermissionOverride[] @relation("WorkspacePermissionOverrides")
+  projects            Project[]
+  leads               Lead[]
+  clients             Client[]
+  documents           Document[]
+  documentTemplates   DocumentTemplate[]
+  signatureRequests   SignatureRequest[]
+  invoices            Invoice[]                @relation("InvoiceWorkspace")
+  files               FileObject[]
+  mailAccounts        MailAccount[]
+  channels            Channel[]
+  chatRooms           ChatRoom[]               @relation("WorkspaceChatRooms")
+  todos               Todo[]                   @relation("TodoWorkspace")
+  timeEntries         TimeEntry[]              @relation("TimeEntryWorkspace")
+  contracts           Contract[]               @relation("ContractWorkspace")
+  payments            Payment[]                @relation("PaymentWorkspace")
+  expenses            Expense[]                @relation("ExpenseWorkspace")
+  payrollEmployees    PayrollEmployee[]        @relation("PayrollEmployeeWorkspace")
+  payrollRuns         PayrollRun[]             @relation("PayrollRunWorkspace")
+
+  @@index([ownerId])
+  // `slug` is @unique; no separate index.
+  @@index([deletedAt])
+  @@index([organizationId])
+}
+
+model WorkspaceMembership {
+  id           String        @id @default(cuid())
+  workspaceId  String
+  userId       String
+  role         WorkspaceRole @default(MEMBER)
+  invitedById  String?
+  /// Optional custom workspace role (Role with scope WORKSPACE). When set, its
+  /// permissions replace the preset derived from `role`.
+  customRoleId String?
+  joinedAt     DateTime      @default(now())
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  customRole Role?     @relation("MembershipCustomRole", fields: [customRoleId], references: [id], onDelete: SetNull)
+  workspace  Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  user       User      @relation("WorkspaceMember", fields: [userId], references: [id], onDelete: Cascade)
+  invitedBy  User?     @relation("WorkspaceInviter", fields: [invitedById], references: [id], onDelete: SetNull)
+
+  // The unique index leads with workspaceId, so it serves workspaceId lookups.
+  @@unique([workspaceId, userId])
+  @@index([userId])
+}
+
+// ============================================================================
+// Projects + Tasks
+// ============================================================================
+
+model Project {
+  id                 String            @id @default(cuid())
+  workspaceId        String
+  clientId           String?
+  createdById        String
+  name               String
+  key                String
+  description        String?
+  status             ProjectStatus     @default(DRAFT)
+  visibility         ProjectVisibility @default(WORKSPACE)
+  startDate          DateTime?
+  dueDate            DateTime?
+  color              String?
+  /// Workflow tuning: WIP limits per status column, etc. Free-form JSON
+  /// validated by the projectWorkflowSettingsSchema in @botss/shared-types.
+  workflowSettings   Json              @default("{}")
+  /// Client portal: whether the linked client's people see this project at
+  /// all. On by default - linking a project to a client is the intent.
+  portalVisible      Boolean           @default(true)
+  /// Client portal task list: false = only tasks with `Task.portalVisible`,
+  /// true = every task. Progress % always counts every task either way.
+  portalShowAllTasks Boolean           @default(false)
+  createdAt          DateTime          @default(now())
+  updatedAt          DateTime          @updatedAt
+  deletedAt          DateTime?
+
+  workspace   Workspace           @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  client      Client?             @relation(fields: [clientId], references: [id], onDelete: SetNull)
+  createdBy   User                @relation(fields: [createdById], references: [id])
+  memberships ProjectMembership[]
+  tasks       Task[]
+  documents   Document[]
+  sprints     Sprint[]
+  taskForms   TaskForm[]
+  goals       Goal[]
+  savedViews  SavedView[]
+  channels    Channel[]
+  chatRooms   ChatRoom[]          @relation("ProjectChatRooms")
+  timeEntries TimeEntry[]         @relation("TimeEntryProject")
+  todos       Todo[]              @relation("TodoProject")
+  invoices    Invoice[]           @relation("InvoiceProject")
+  contracts   Contract[]          @relation("ContractProject")
+  expenses    Expense[]           @relation("ExpenseProject")
+
+  @@unique([workspaceId, key])
+  @@index([workspaceId])
+  @@index([clientId])
+  @@index([status])
+  @@index([deletedAt])
+  @@index([createdById])
+  // Global search (name OR description, case-insensitive contains).
+  @@index([name(ops: raw("gin_trgm_ops"))], type: Gin, map: "Project_name_trgm_idx")
+  @@index([description(ops: raw("gin_trgm_ops"))], type: Gin, map: "Project_description_trgm_idx")
+  // "Project_fts_idx" (full-text GIN expression index) lives only in migration 20261026130000_search_fulltext_indexes; Prisma cannot model it. Mirrored in apps/api/src/search/search-sql.ts.
+}
+
+model ProjectMembership {
+  id                   String      @id @default(cuid())
+  projectId            String
+  userId               String
+  role                 ProjectRole @default(CONTRIBUTOR)
+  /// CASL ability rule overrides for this user on this project
+  abilities            Json?
+  /// Per-project notification preferences (digest frequency, mention behavior, ...)
+  notificationSettings Json        @default("{}")
+  createdAt            DateTime    @default(now())
+  updatedAt            DateTime    @updatedAt
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // The unique index leads with projectId, so it serves projectId lookups.
+  @@unique([projectId, userId])
+  @@index([userId])
+}
+
+model Task {
+  id            String       @id @default(cuid())
+  projectId     String
+  parentTaskId  String?
+  createdById   String
+  assigneeId    String?
+  title         String
+  description   String?
+  status        TaskStatus   @default(BACKLOG)
+  priority      TaskPriority @default(MEDIUM)
+  position      Int          @default(0)
+  startDate     DateTime?
+  dueDate       DateTime?
+  completedAt   DateTime?
+  estimateHours Decimal?     @db.Decimal(6, 2)
+  /// Client portal: shown to the project's client when the project lists
+  /// marked tasks only (`Project.portalShowAllTasks = false`).
+  portalVisible Boolean      @default(false)
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  deletedAt     DateTime?
+
+  project         Project              @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  parentTask      Task?                @relation("TaskSubtasks", fields: [parentTaskId], references: [id], onDelete: SetNull)
+  subtasks        Task[]               @relation("TaskSubtasks")
+  createdBy       User                 @relation("TaskCreator", fields: [createdById], references: [id])
+  assignee        User?                @relation("TaskAssignee", fields: [assigneeId], references: [id], onDelete: SetNull)
+  sprintTasks     SprintTask[]
+  formSubmissions TaskFormSubmission[]
+  comments        Comment[]
+  notifications   Notification[]
+  timeEntries     TimeEntry[]          @relation("TimeEntryTask")
+  milestoneLinks  MilestoneTask[]
+
+  @@index([projectId])
+  @@index([assigneeId])
+  @@index([parentTaskId])
+  @@index([status])
+  @@index([dueDate])
+  @@index([deletedAt])
+  @@index([createdById])
+  // Kanban column reads and the reorder rewrite: one project, one status, by position.
+  @@index([projectId, status, position])
+  @@index([title(ops: raw("gin_trgm_ops"))], type: Gin, map: "Task_title_trgm_idx")
+  // Search ORs title with description; both sides need an index to avoid a scan.
+  @@index([description(ops: raw("gin_trgm_ops"))], type: Gin, map: "Task_description_trgm_idx")
+  // "Task_fts_idx" (full-text GIN expression index) lives only in migration 20261026130000_search_fulltext_indexes; Prisma cannot model it. Mirrored in apps/api/src/search/search-sql.ts.
+}
+
+// ============================================================================
+// Task comments (Tiptap content with image attachments)
+// ============================================================================
+
+model Comment {
+  id          String    @id @default(cuid())
+  taskId      String
+  authorId    String
+  /// Tiptap JSON document. Supports text, marks, mentions, inline images.
+  /// Validated by commentContentSchema in @botss/shared-types.
+  content     Json
+  /// Plain-text extraction (for search and notification previews). Always
+  /// derived from `content` at write time so we never search the JSON blob.
+  contentText String
+  editedAt    DateTime?
+  deletedAt   DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  task          Task                @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  author        User                @relation(fields: [authorId], references: [id])
+  attachments   CommentAttachment[]
+  notifications Notification[]
+
+  @@index([taskId, createdAt])
+  @@index([authorId])
+  @@index([deletedAt])
+}
+
+model CommentAttachment {
+  id           String   @id @default(cuid())
+  commentId    String
+  fileObjectId String
+  createdAt    DateTime @default(now())
+
+  comment Comment    @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  file    FileObject @relation(fields: [fileObjectId], references: [id])
+
+  @@unique([commentId, fileObjectId])
+  @@index([fileObjectId])
+}
+
+// ============================================================================
+// Notifications (in-app only - Phase 3 will add transport channels)
+// ============================================================================
+
+model Notification {
+  id         String           @id @default(cuid())
+  /// Recipient.
+  userId     String
+  /// Who triggered it (e.g. comment author). Optional for system events.
+  actorId    String?
+  type       NotificationType
+  title      String
+  body       String
+  /// Optional links to the originating entities so the client can deep-link.
+  taskId     String?
+  commentId  String?
+  /// Generic entity link for cross-app notifications (mail, chat, todo, lead,
+  /// client, project, ...). `entityType`+`entityId` let the client clear a
+  /// notification from the bell the moment the user opens that entity
+  /// (contextual auto-read), without needing a typed FK column per feature.
+  /// `url` is the deep-link the OS push banner / bell row navigates to.
+  entityType String?
+  entityId   String?
+  url        String?
+  readAt     DateTime?
+  createdAt  DateTime         @default(now())
+
+  user    User     @relation("NotificationRecipient", fields: [userId], references: [id], onDelete: Cascade)
+  actor   User?    @relation("NotificationActor", fields: [actorId], references: [id], onDelete: SetNull)
+  task    Task?    @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  comment Comment? @relation(fields: [commentId], references: [id], onDelete: Cascade)
+
+  @@index([userId, readAt])
+  @@index([userId, createdAt])
+  @@index([userId, entityType, entityId])
+  @@index([taskId])
+  @@index([actorId])
+  // FK used by the ON DELETE CASCADE from Comment; unindexed it scans the table.
+  @@index([commentId])
+}
+
+// ============================================================================
+// CRM - Leads + Clients
+// ============================================================================
+
+model Lead {
+  id                  String     @id @default(cuid())
+  workspaceId         String
+  createdById         String
+  // Who the lead is assigned to. Doubles as the access-control key: a user
+  // without full sales access only ever sees rows where this is their id.
+  assigneeId          String?
+  name                String
+  email               String?
+  phone               String?
+  company             String?
+  jobTitle            String?
+  source              LeadSource @default(OTHER)
+  stage               LeadStage  @default(NEW)
+  estimatedValue      Decimal?   @db.Decimal(12, 2)
+  currency            String     @default("USD")
+  notes               String?
+  tags                String[]   @default([])
+  customFields        Json?
+  followupAt          DateTime?
+  // Guards the follow-up reminder cron against re-firing. Reset to null
+  // whenever followupAt changes so a rescheduled follow-up re-arms.
+  followupNotifiedAt  DateTime?
+  convertedToClientId String?    @unique
+  convertedAt         DateTime?
+  createdAt           DateTime   @default(now())
+  updatedAt           DateTime   @updatedAt
+  deletedAt           DateTime?
+
+  workspace         Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  createdBy         User      @relation("LeadCreator", fields: [createdById], references: [id])
+  assignee          User?     @relation("LeadAssignee", fields: [assigneeId], references: [id], onDelete: SetNull)
+  convertedToClient Client?   @relation("LeadConversion", fields: [convertedToClientId], references: [id], onDelete: SetNull)
+
+  @@index([workspaceId])
+  @@index([assigneeId])
+  @@index([stage])
+  @@index([email])
+  @@index([deletedAt])
+  @@index([followupAt])
+  @@index([createdById])
+  // Global search (name OR company OR email, case-insensitive contains).
+  @@index([name(ops: raw("gin_trgm_ops"))], type: Gin, map: "Lead_name_trgm_idx")
+  @@index([company(ops: raw("gin_trgm_ops"))], type: Gin, map: "Lead_company_trgm_idx")
+  @@index([email(ops: raw("gin_trgm_ops"))], type: Gin, map: "Lead_email_trgm_idx")
+  // "Lead_fts_idx" (full-text GIN expression index) lives only in migration 20261026130000_search_fulltext_indexes; Prisma cannot model it. Mirrored in apps/api/src/search/search-sql.ts.
+}
+
+model Client {
+  id           String       @id @default(cuid())
+  workspaceId  String
+  createdById  String
+  // Same role as Lead.assigneeId - assignment is what makes a client visible
+  // to a user who doesn't have full sales access.
+  assigneeId   String?
+  name         String
+  legalName    String?
+  email        String?
+  phone        String?
+  website      String?
+  industry     String?
+  status       ClientStatus @default(PROSPECT)
+  addressLine1 String?
+  addressLine2 String?
+  city         String?
+  state        String?
+  postalCode   String?
+  country      String?
+  taxId        String?
+  notes        String?
+  tags         String[]     @default([])
+  customFields Json?
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+  deletedAt    DateTime?
+
+  workspace     Workspace  @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  createdBy     User       @relation("ClientCreator", fields: [createdById], references: [id])
+  assignee      User?      @relation("ClientAssignee", fields: [assigneeId], references: [id], onDelete: SetNull)
+  projects      Project[]
+  convertedFrom Lead?      @relation("LeadConversion")
+  invoices      Invoice[]  @relation("InvoiceClient")
+  contracts     Contract[] @relation("ContractClient")
+
+  // Client portal
+  contacts       ClientContact[]
+  documentShares DocumentClientShare[]
+  /// Documents filed under this client (Document.clientId). Filing is not
+  /// sharing: the portal only sees DocumentClientShare / DocumentAccess.
+  documents      Document[]
+
+  @@index([workspaceId])
+  @@index([assigneeId])
+  @@index([status])
+  @@index([email])
+  @@index([deletedAt])
+  @@index([createdById])
+  // Global search (name OR email, case-insensitive contains).
+  @@index([name(ops: raw("gin_trgm_ops"))], type: Gin, map: "Client_name_trgm_idx")
+  @@index([email(ops: raw("gin_trgm_ops"))], type: Gin, map: "Client_email_trgm_idx")
+  // "Client_fts_idx" (full-text GIN expression index) lives only in migration 20261026130000_search_fulltext_indexes; Prisma cannot model it. Mirrored in apps/api/src/search/search-sql.ts.
+}
+
+/// Client portal access: one row per person at a client who can sign in to
+/// the portal. `user` is always a CLIENT account. Soft-deleted on revoke, so a
+/// re-invite revives the row (upsert on the unique key) instead of creating a
+/// second one.
+model ClientContact {
+  id          String            @id @default(cuid())
+  clientId    String
+  userId      String
+  role        ClientContactRole @default(MEMBER)
+  invitedById String?
+  /// Last portal visit, bumped at most hourly by GET /portal/me.
+  lastSeenAt  DateTime?
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  deletedAt   DateTime?
+
+  client    Client @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  user      User   @relation("ClientContactUser", fields: [userId], references: [id], onDelete: Cascade)
+  invitedBy User?  @relation("ClientContactInviter", fields: [invitedById], references: [id], onDelete: SetNull)
+
+  // The unique index leads with clientId, so it serves clientId lookups.
+  @@unique([clientId, userId])
+  @@index([userId])
+  @@index([deletedAt])
+}
+
+/// A document shared with a whole client company: every live contact of the
+/// client can read it, including people added after the share. Sharing with
+/// one specific person uses a plain `DocumentAccess` row instead.
+model DocumentClientShare {
+  id          String   @id @default(cuid())
+  documentId  String
+  clientId    String
+  grantedById String?
+  createdAt   DateTime @default(now())
+
+  document  Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  client    Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  grantedBy User?    @relation("DocumentClientShareGranter", fields: [grantedById], references: [id], onDelete: SetNull)
+
+  @@unique([documentId, clientId])
+  @@index([clientId])
+}
+
+// ============================================================================
+// Documents
+// ============================================================================
+
+model Document {
+  id              String             @id @default(cuid())
+  workspaceId     String
+  projectId       String?
+  /// The client this document is filed under, if any. Filing only groups it
+  /// on the client page; it grants nobody access.
+  clientId        String?
+  createdById     String
+  parentId        String?
+  title           String
+  icon            String?
+  coverUrl        String?
+  visibility      DocumentVisibility @default(WORKSPACE)
+  /// Tiptap JSON content
+  content         Json?
+  publicSlug      String?            @unique
+  publicReadOnly  Boolean            @default(true)
+  /// When set, the public link stops resolving after this instant (UTC).
+  publicExpiresAt DateTime?
+  /// Plain text extracted from `content` on save. Powers full-text search.
+  contentText     String?
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+  deletedAt       DateTime?
+
+  workspace    Workspace             @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  project      Project?              @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  client       Client?               @relation(fields: [clientId], references: [id], onDelete: SetNull)
+  createdBy    User                  @relation(fields: [createdById], references: [id])
+  parent       Document?             @relation("DocumentTree", fields: [parentId], references: [id], onDelete: SetNull)
+  children     Document[]            @relation("DocumentTree")
+  access       DocumentAccess[]
+  clientShares DocumentClientShare[]
+  revisions    DocumentRevision[]
+  collab       DocumentCollab?       @relation("DocumentCollabState")
+
+  signatureRequests SignatureRequest[]
+
+  @@index([workspaceId])
+  @@index([projectId])
+  @@index([clientId])
+  @@index([parentId])
+  // `publicSlug` is @unique; no separate index.
+  @@index([deletedAt])
+  @@index([createdById])
+  @@index([contentText(ops: raw("gin_trgm_ops"))], type: Gin, map: "Document_contentText_trgm_idx")
+  @@index([title(ops: raw("gin_trgm_ops"))], type: Gin, map: "Document_title_trgm_idx")
+  // "Document_fts_idx" (full-text GIN expression index) lives only in migration 20261026130000_search_fulltext_indexes; Prisma cannot model it. Mirrored in apps/api/src/search/search-sql.ts.
+}
+
+// ============================================================================
+// Document access grants (explicit per-user share, in addition to visibility)
+// ============================================================================
+
+model DocumentAccess {
+  id          String             @id @default(cuid())
+  documentId  String
+  userId      String
+  permission  DocumentPermission @default(READ)
+  grantedById String
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+
+  document  Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  user      User     @relation("DocumentAccessUser", fields: [userId], references: [id], onDelete: Cascade)
+  grantedBy User     @relation("DocumentAccessGranter", fields: [grantedById], references: [id])
+
+  @@unique([documentId, userId])
+  @@index([userId])
+  @@index([documentId])
+}
+
+// ============================================================================
+// Document templates + revisions + collab state (Phase 3 Step I)
+// ============================================================================
+
+model DocumentTemplate {
+  id          String   @id @default(cuid())
+  workspaceId String
+  name        String
+  icon        String?
+  coverUrl    String?
+  /// Tiptap JSON content seeded into new docs when this template is picked.
+  content     Json
+  isShared    Boolean  @default(true)
+  createdById String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  createdBy User      @relation("DocumentTemplateCreator", fields: [createdById], references: [id])
+
+  @@index([workspaceId])
+}
+
+model DocumentRevision {
+  id            String   @id @default(cuid())
+  documentId    String
+  /// Snapshot of the Tiptap JSON at the time of this revision.
+  content       Json
+  /// Plain-text projection for search (and future fulltext indexing).
+  contentText   String
+  changedById   String
+  changeSummary String?
+  createdAt     DateTime @default(now())
+
+  document  Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  changedBy User     @relation("DocumentRevisionAuthor", fields: [changedById], references: [id])
+
+  @@index([documentId, createdAt])
+}
+
+/// Yjs CRDT state for the Hocuspocus server (Phase 3 Step I). The Hocuspocus
+/// server reads/writes this row on connect/disconnect; the editor falls back
+/// to the existing autosave when Hocuspocus is unreachable.
+model DocumentCollab {
+  documentId String   @id
+  /// Binary Yjs state vector. Stored as Bytes (bytea in Postgres).
+  ystate     Bytes
+  updatedAt  DateTime @updatedAt
+
+  document Document @relation("DocumentCollabState", fields: [documentId], references: [id], onDelete: Cascade)
+}
+
+// ============================================================================
+// File storage (S3-compatible metadata only - binaries live in object storage)
+// ============================================================================
+
+model FileObject {
+  id           String    @id @default(cuid())
+  workspaceId  String
+  uploadedById String
+  bucket       String
+  objectKey    String
+  url          String?
+  filename     String
+  mimeType     String
+  sizeBytes    BigInt
+  kind         FileKind  @default(OTHER)
+  width        Int?
+  height       Int?
+  durationMs   Int?
+  checksum     String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  deletedAt    DateTime?
+
+  workspace          Workspace           @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  uploadedBy         User                @relation(fields: [uploadedById], references: [id])
+  commentAttachments CommentAttachment[]
+  mailAttachments    MailAttachment[]
+  expenseReceipts    Expense[]           @relation("ExpenseReceipt")
+  invoicePdfs        Invoice[]           @relation("InvoicePdf")
+  signatureSources   SignatureRequest[]  @relation("SignatureSourceFile")
+  signatureSealed    SignatureRequest[]  @relation("SignatureSignedFile")
+  signatureImages    SignatureSigner[]   @relation("SignatureImage")
+
+  @@unique([bucket, objectKey])
+  @@index([workspaceId])
+  @@index([uploadedById])
+  @@index([kind])
+  @@index([deletedAt])
+  @@index([filename(ops: raw("gin_trgm_ops"))], type: Gin, map: "FileObject_filename_trgm_idx")
+  // "FileObject_filename_fts_idx" (full-text GIN expression index) lives only in migration 20261026130000_search_fulltext_indexes; Prisma cannot model it. Mirrored in apps/api/src/search/search-sql.ts.
+}
+
+// ============================================================================
+// Sprints (Phase 3) - backlog planning
+// ============================================================================
+
+model Sprint {
+  id        String       @id @default(cuid())
+  projectId String
+  name      String
+  goal      String?
+  startDate DateTime
+  endDate   DateTime
+  status    SprintStatus @default(PLANNED)
+  position  Int          @default(0)
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+
+  project    Project             @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  tasks      SprintTask[]
+  milestones ContractMilestone[] @relation("MilestoneSprint")
+
+  @@index([projectId])
+  @@index([status])
+}
+
+model SprintTask {
+  id        String   @id @default(cuid())
+  sprintId  String
+  taskId    String
+  position  Int      @default(0)
+  addedAt   DateTime @default(now())
+  addedById String
+
+  sprint  Sprint @relation(fields: [sprintId], references: [id], onDelete: Cascade)
+  task    Task   @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  addedBy User   @relation(fields: [addedById], references: [id])
+
+  @@unique([sprintId, taskId])
+  @@index([sprintId])
+  @@index([taskId])
+}
+
+// ============================================================================
+// Custom fields (Phase 2 Step F) - typed per-workspace / per-project schema
+// ============================================================================
+
+model CustomFieldDefinition {
+  id          String           @id @default(cuid())
+  workspaceId String
+  scope       CustomFieldScope
+  /// Null for workspace-wide definitions; required when scope is PROJECT-bound.
+  projectId   String?
+  name        String
+  /// URL-safe slug - unique within (workspaceId, scope, projectId).
+  key         String
+  type        CustomFieldType
+  /// For SELECT / MULTI_SELECT - array of `{ value: string, label: string }`.
+  options     Json?
+  required    Boolean          @default(false)
+  position    Int              @default(0)
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  values CustomFieldValue[]
+
+  @@unique([workspaceId, scope, projectId, key])
+  @@index([workspaceId, scope, projectId])
+}
+
+model CustomFieldValue {
+  id           String   @id @default(cuid())
+  definitionId String
+  /// Polymorphic - entity id matches the definition's scope. Not an FK because
+  /// it crosses tables (Task, Project, Lead, Client).
+  entityId     String
+  /// Typed payload. Shape depends on the definition's `type`:
+  /// TEXT/URL → string; NUMBER → number; DATE → ISO string; CHECKBOX → bool;
+  /// SELECT → string; MULTI_SELECT → string[]; USER → cuid.
+  value        Json
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  definition CustomFieldDefinition @relation(fields: [definitionId], references: [id], onDelete: Cascade)
+
+  // The unique index covers (definitionId, entityId) lookups.
+  @@unique([definitionId, entityId])
+  @@index([entityId])
+}
+
+// ============================================================================
+// Task forms (Phase 3) - non-member intake forms
+// ============================================================================
+
+model TaskForm {
+  id                String       @id @default(cuid())
+  projectId         String
+  name              String
+  description       String?
+  isPublic          Boolean      @default(false)
+  publicSlug        String?      @unique
+  /// Array of field definitions: { id, label, type, required, options? }.
+  /// Validated by taskFormFieldsSchema in @botss/shared-types.
+  fields            Json         @default("[]")
+  defaultStatus     TaskStatus   @default(BACKLOG)
+  defaultPriority   TaskPriority @default(MEDIUM)
+  defaultAssigneeId String?
+  createdById       String
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
+  deletedAt         DateTime?
+
+  project         Project              @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  defaultAssignee User?                @relation("TaskFormDefaultAssignee", fields: [defaultAssigneeId], references: [id], onDelete: SetNull)
+  createdBy       User                 @relation("TaskFormCreator", fields: [createdById], references: [id])
+  submissions     TaskFormSubmission[]
+
+  @@index([projectId])
+  // `publicSlug` is @unique; no separate index.
+  @@index([deletedAt])
+}
+
+model TaskFormSubmission {
+  id               String   @id @default(cuid())
+  formId           String
+  taskId           String?
+  /// Submitted field values: { [fieldId]: value }
+  payload          Json
+  submittedByEmail String?
+  submittedAt      DateTime @default(now())
+  ip               String?
+  userAgent        String?
+
+  form TaskForm @relation(fields: [formId], references: [id], onDelete: Cascade)
+  task Task?    @relation(fields: [taskId], references: [id], onDelete: SetNull)
+
+  @@index([formId])
+  @@index([taskId])
+}
+
+// ============================================================================
+// Goals / OKRs (Phase 3)
+// ============================================================================
+
+model Goal {
+  id           String     @id @default(cuid())
+  workspaceId  String
+  projectId    String?
+  parentGoalId String?
+  title        String
+  description  String?
+  ownerId      String
+  startDate    DateTime
+  endDate      DateTime
+  status       GoalStatus @default(ON_TRACK)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  project    Project?     @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  parentGoal Goal?        @relation("GoalParent", fields: [parentGoalId], references: [id], onDelete: SetNull)
+  childGoals Goal[]       @relation("GoalParent")
+  owner      User         @relation(fields: [ownerId], references: [id])
+  keyResults KeyResult[]
+  updates    GoalUpdate[]
+
+  @@index([workspaceId, projectId])
+  @@index([ownerId])
+  @@index([status])
+  @@index([projectId])
+}
+
+model KeyResult {
+  id           String          @id @default(cuid())
+  goalId       String
+  title        String
+  metricType   KeyResultMetric @default(NUMBER)
+  targetValue  Decimal         @db.Decimal(14, 4)
+  currentValue Decimal         @default(0) @db.Decimal(14, 4)
+  unit         String?
+  position     Int             @default(0)
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+
+  goal    Goal         @relation(fields: [goalId], references: [id], onDelete: Cascade)
+  updates GoalUpdate[]
+
+  @@index([goalId])
+}
+
+model GoalUpdate {
+  id          String   @id @default(cuid())
+  goalId      String
+  keyResultId String?
+  authorId    String
+  body        String
+  valueAt     Decimal? @db.Decimal(14, 4)
+  createdAt   DateTime @default(now())
+
+  goal      Goal       @relation(fields: [goalId], references: [id], onDelete: Cascade)
+  keyResult KeyResult? @relation(fields: [keyResultId], references: [id], onDelete: SetNull)
+  author    User       @relation(fields: [authorId], references: [id])
+
+  @@index([goalId])
+  @@index([keyResultId])
+}
+
+// ============================================================================
+// Saved views (Phase 3) - project shortcuts
+// ============================================================================
+
+model SavedView {
+  id          String         @id @default(cuid())
+  projectId   String?
+  workspaceId String
+  createdById String
+  name        String
+  icon        String?
+  scope       SavedViewScope @default(TASKS)
+  isShared    Boolean        @default(false)
+  /// Filter spec: status, assignee, priority, columns, groupBy, viewType.
+  /// Validated by savedViewConfigSchema in @botss/shared-types.
+  config      Json           @default("{}")
+  position    Int            @default(0)
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  project   Project? @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  createdBy User     @relation(fields: [createdById], references: [id])
+
+  @@index([projectId])
+  @@index([workspaceId])
+  @@index([createdById])
+}
+
+// ============================================================================
+// Mail (Phase 1) - per-user IMAP/SMTP accounts
+// ============================================================================
+
+model MailAccount {
+  id                   String            @id @default(cuid())
+  workspaceId          String
+  userId               String
+  email                String
+  displayName          String?
+  imapHost             String
+  imapPort             Int
+  imapSecure           Boolean           @default(true)
+  smtpHost             String
+  smtpPort             Int
+  smtpSecure           Boolean           @default(true)
+  username             String
+  /// AES-256-GCM ciphertext (iv|tag|ciphertext) encrypted with MAIL_ENCRYPTION_KEY.
+  /// Never serialized in any API response.
+  passwordCiphertext   Bytes
+  /// Legacy single email sign-off (HTML). Superseded by the MailSignature
+  /// table + the new/reply default pointers below. Retained (never dropped) so
+  /// no historical data is lost; backfilled into a MailSignature row.
+  signature            String?
+  /// Signature applied to brand-new messages. Null = no signature.
+  newSignatureId       String?
+  /// Signature applied to replies and forwards. Null = no signature.
+  replySignatureId     String?
+  /// When true, the signature is inserted above the quoted text in replies
+  /// (Gmail's "insert before quoted text"); otherwise it trails the quote.
+  signatureBeforeQuote Boolean           @default(false)
+  status               MailAccountStatus @default(CONNECTING)
+  lastError            String?
+  lastSyncedAt         DateTime?
+  /// JSON-serialized cursor (UIDVALIDITY + last UID). Populated by SyncService.
+  syncCursor           String?
+  /// When true, this account is preferred for sending transactional email
+  /// (password reset, workspace invitations) workspace-wide.
+  isDefault            Boolean           @default(false)
+  createdAt            DateTime          @default(now())
+  updatedAt            DateTime          @updatedAt
+  deletedAt            DateTime?
+
+  workspace Workspace     @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  folders   MailFolder[]
+  messages  MailMessage[]
+  outbox    MailOutbox[]
+
+  signatures     MailSignature[] @relation("AccountSignatures")
+  newSignature   MailSignature?  @relation("NewSignature", fields: [newSignatureId], references: [id], onDelete: SetNull)
+  replySignature MailSignature?  @relation("ReplySignature", fields: [replySignatureId], references: [id], onDelete: SetNull)
+
+  @@unique([userId, email])
+  @@index([workspaceId])
+  @@index([userId])
+  @@index([status])
+  @@index([deletedAt])
+}
+
+/// A named, reusable email signature (HTML) belonging to one MailAccount.
+/// A user can keep several (e.g. "Full", "Short") and pick which one applies
+/// to new mail vs replies via MailAccount.newSignatureId / replySignatureId.
+model MailSignature {
+  id        String   @id @default(cuid())
+  accountId String
+  name      String
+  html      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  account  MailAccount   @relation("AccountSignatures", fields: [accountId], references: [id], onDelete: Cascade)
+  newFor   MailAccount[] @relation("NewSignature")
+  replyFor MailAccount[] @relation("ReplySignature")
+
+  @@index([accountId])
+}
+
+model MailFolder {
+  id          String          @id @default(cuid())
+  accountId   String
+  path        String
+  name        String
+  role        MailFolderRole?
+  delimiter   String          @default("/")
+  uidValidity BigInt?
+  uidNext     BigInt?
+  totalCount  Int             @default(0)
+  unreadCount Int             @default(0)
+  position    Int             @default(0)
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+
+  account  MailAccount   @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  messages MailMessage[]
+
+  @@unique([accountId, path])
+  @@index([accountId])
+}
+
+model MailMessage {
+  id               String    @id @default(cuid())
+  accountId        String
+  folderId         String
+  uid              BigInt
+  messageId        String?
+  threadId         String?
+  subject          String    @default("")
+  fromAddress      String
+  fromName         String?
+  toAddresses      Json
+  ccAddresses      Json
+  bccAddresses     Json
+  replyTo          String?
+  bodyTextPreview  String    @default("")
+  bodyText         String?
+  bodyHtml         String?
+  hasAttachments   Boolean   @default(false)
+  attachmentCount  Int       @default(0)
+  sizeBytes        Int       @default(0)
+  receivedAt       DateTime
+  sentAt           DateTime?
+  flags            Json
+  isUnread         Boolean   @default(true)
+  isStarred        Boolean   @default(false)
+  /// Set when the user changes read state (or star) here and the mail
+  /// server has not confirmed it yet. While set, sync re-sends our state
+  /// instead of adopting the server's, so a failed STORE is retried, never
+  /// undone. Separate per flag, so one never re-sends the other.
+  seenPendingAt    DateTime?
+  starredPendingAt DateTime?
+  isAnswered       Boolean   @default(false)
+  isDeleted        Boolean   @default(false)
+  inReplyTo        String?
+  references       Json?
+  rawHeaders       Json?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  account     MailAccount      @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  folder      MailFolder       @relation(fields: [folderId], references: [id], onDelete: Cascade)
+  attachments MailAttachment[]
+
+  @@unique([accountId, folderId, uid])
+  @@index([accountId, receivedAt(sort: Desc)])
+  @@index([folderId, receivedAt(sort: Desc)])
+  @@index([messageId])
+  @@index([threadId])
+  @@index([isUnread])
+  // Per-folder unread counts.
+  @@index([folderId, isUnread])
+  @@index([subject(ops: raw("gin_trgm_ops"))], type: Gin, map: "MailMessage_subject_trgm_idx")
+  @@index([bodyTextPreview(ops: raw("gin_trgm_ops"))], type: Gin, map: "MailMessage_bodyTextPreview_trgm_idx")
+  // Mail search ORs subject / sender / preview; every branch needs an index.
+  @@index([fromAddress(ops: raw("gin_trgm_ops"))], type: Gin, map: "MailMessage_fromAddress_trgm_idx")
+  @@index([fromName(ops: raw("gin_trgm_ops"))], type: Gin, map: "MailMessage_fromName_trgm_idx")
+}
+
+model MailAttachment {
+  id           String   @id @default(cuid())
+  messageId    String
+  partId       String
+  filename     String
+  contentType  String
+  sizeBytes    Int
+  contentId    String?
+  isInline     Boolean  @default(false)
+  /// Bytes are fetched from IMAP on demand; fileObjectId is set after caching
+  /// to object storage so subsequent downloads are fast.
+  fileObjectId String?
+  createdAt    DateTime @default(now())
+
+  message    MailMessage @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  fileObject FileObject? @relation(fields: [fileObjectId], references: [id])
+
+  @@index([messageId])
+  @@index([fileObjectId])
+}
+
+model MailOutbox {
+  id                      String           @id @default(cuid())
+  accountId               String
+  userId                  String
+  toAddresses             Json
+  ccAddresses             Json
+  bccAddresses            Json
+  subject                 String
+  bodyText                String
+  bodyHtml                String?
+  inReplyToMessageId      String?
+  /// When set, this outbox row was created from a draft. The IMAP draft is
+  /// deleted after the SMTP send succeeds.
+  replacesDraftId         String?
+  attachmentFileObjectIds Json
+  status                  MailOutboxStatus @default(QUEUED)
+  attemptCount            Int              @default(0)
+  lastError               String?
+  sentAt                  DateTime?
+  createdAt               DateTime         @default(now())
+  updatedAt               DateTime         @updatedAt
+
+  account MailAccount @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  user    User        @relation(fields: [userId], references: [id])
+
+  @@index([accountId, status])
+  @@index([status])
+}
+
+enum ChannelType {
+  DM
+  GROUP_DM
+  TEXT_CHANNEL
+  VOICE_CHANNEL
+}
+
+enum ChatMessageType {
+  TEXT
+  MEDIA
+  POLL
+  CALL_LOG
+}
+
+model Channel {
+  id          String      @id @default(cuid())
+  workspaceId String?
+  projectId   String?
+  name        String?
+  type        ChannelType
+  isPrivate   Boolean     @default(false)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  deletedAt   DateTime?
+
+  workspace    Workspace?           @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  project      Project?             @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  participants ChannelParticipant[]
+  messages     ChatMessage[]
+
+  @@index([workspaceId])
+  @@index([projectId])
+  @@index([type])
+  @@index([deletedAt])
+}
+
+model ChannelParticipant {
+  id        String   @id @default(cuid())
+  channelId String
+  userId    String
+  joinedAt  DateTime @default(now())
+
+  channel Channel @relation(fields: [channelId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([channelId, userId])
+  @@index([userId])
+  @@index([channelId])
+}
+
+model ChatMessage {
+  id        String          @id @default(cuid())
+  channelId String
+  senderId  String
+  type      ChatMessageType @default(TEXT)
+  content   String?
+  createdAt DateTime        @default(now())
+  deletedAt DateTime?
+
+  channel     Channel          @relation(fields: [channelId], references: [id], onDelete: Cascade)
+  sender      User             @relation(fields: [senderId], references: [id], onDelete: Cascade)
+  attachments ChatAttachment[]
+  poll        ChatPoll?
+
+  @@index([channelId, createdAt])
+  @@index([senderId])
+  @@index([deletedAt])
+}
+
+model ChatAttachment {
+  id        String @id @default(cuid())
+  messageId String
+  fileUrl   String
+  fileType  String
+  fileName  String
+  fileSize  Int
+
+  message ChatMessage @relation(fields: [messageId], references: [id], onDelete: Cascade)
+
+  @@index([messageId])
+}
+
+model ChatPoll {
+  id        String    @id @default(cuid())
+  messageId String    @unique
+  question  String
+  expiresAt DateTime?
+
+  message ChatMessage  @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  options PollOption[]
+
+  // `messageId` is @unique; no separate index.
+}
+
+model PollOption {
+  id     String @id @default(cuid())
+  pollId String
+  text   String
+
+  poll  ChatPoll   @relation(fields: [pollId], references: [id], onDelete: Cascade)
+  votes PollVote[]
+
+  @@index([pollId])
+}
+
+model PollVote {
+  id       String @id @default(cuid())
+  optionId String
+  userId   String
+
+  option PollOption @relation(fields: [optionId], references: [id], onDelete: Cascade)
+  user   User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([optionId, userId])
+  @@index([userId])
+}
+
+enum RoomType {
+  DM
+  GROUP
+  TEXT_CHANNEL
+  VOICE_CHANNEL
+}
+
+enum MessageStatus {
+  SENT
+  DELIVERED
+  READ
+}
+
+enum CallStatus {
+  RINGING
+  ONGOING
+  COMPLETED
+  MISSED
+  REJECTED
+}
+
+enum ChatRoomParticipantRole {
+  ADMIN
+  MEMBER
+}
+
+model ChatRoom {
+  id          String    @id @default(cuid())
+  name        String?
+  description String?
+  type        RoomType
+  workspaceId String?
+  projectId   String?
+  createdById String?
+  isPrivate   Boolean   @default(false)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+
+  workspace    Workspace?            @relation("WorkspaceChatRooms", fields: [workspaceId], references: [id], onDelete: Cascade)
+  project      Project?              @relation("ProjectChatRooms", fields: [projectId], references: [id], onDelete: Cascade)
+  createdBy    User?                 @relation("ChatRoomCreator", fields: [createdById], references: [id], onDelete: SetNull)
+  participants ChatRoomParticipant[]
+  messages     ChatRoomMessage[]
+  calls        CallSession[]
+  invites      ChatRoomInvite[]      @relation("ChatRoomInviteRoom")
+  chatRequests ChatRequest[]         @relation("ChatRequestRoom")
+
+  @@index([type])
+  @@index([workspaceId])
+  @@index([projectId])
+  @@index([createdById])
+  @@index([deletedAt])
+  @@index([updatedAt])
+}
+
+model ChatRoomParticipant {
+  id       String                  @id @default(cuid())
+  roomId   String
+  userId   String
+  role     ChatRoomParticipantRole @default(MEMBER)
+  joinedAt DateTime                @default(now())
+
+  room ChatRoom @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  user User     @relation("ChatRoomParticipantUser", fields: [userId], references: [id], onDelete: Cascade)
+
+  // The unique index leads with roomId, so it serves roomId lookups.
+  @@unique([roomId, userId])
+  @@index([userId])
+}
+
+model ChatRoomMessage {
+  id              String        @id @default(cuid())
+  roomId          String
+  senderId        String
+  content         String?
+  status          MessageStatus @default(SENT)
+  parentMessageId String?
+  createdAt       DateTime      @default(now())
+  editedAt        DateTime?
+  deletedAt       DateTime?
+
+  room          ChatRoom                  @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  sender        User                      @relation("ChatRoomMessageSender", fields: [senderId], references: [id], onDelete: Cascade)
+  parentMessage ChatRoomMessage?          @relation("ChatRoomMessageReply", fields: [parentMessageId], references: [id], onDelete: SetNull)
+  replies       ChatRoomMessage[]         @relation("ChatRoomMessageReply")
+  attachments   ChatRoomAttachment[]
+  reactions     ChatRoomMessageReaction[] @relation("ChatRoomMessageReactions")
+
+  @@index([roomId, createdAt])
+  // Unread counts per room (status SENT / DELIVERED).
+  @@index([roomId, status])
+  @@index([senderId])
+  @@index([parentMessageId])
+  @@index([deletedAt])
+  @@index([content(ops: raw("gin_trgm_ops"))], type: Gin, map: "ChatRoomMessage_content_trgm_idx")
+  // "ChatRoomMessage_content_fts_idx" (full-text GIN expression index) lives only in migration 20261026130000_search_fulltext_indexes; Prisma cannot model it. Mirrored in apps/api/src/search/search-sql.ts.
+}
+
+model ChatRoomAttachment {
+  id        String @id @default(cuid())
+  messageId String
+  fileUrl   String
+  fileType  String
+  fileName  String
+  fileSize  Int
+
+  message ChatRoomMessage @relation(fields: [messageId], references: [id], onDelete: Cascade)
+
+  @@index([messageId])
+  @@index([fileName(ops: raw("gin_trgm_ops"))], type: Gin, map: "ChatRoomAttachment_fileName_trgm_idx")
+  // "ChatRoomAttachment_fileName_fts_idx" (full-text GIN expression index) lives only in migration 20261026130000_search_fulltext_indexes; Prisma cannot model it. Mirrored in apps/api/src/search/search-sql.ts.
+}
+
+model CallSession {
+  id             String     @id @default(cuid())
+  callerId       String
+  receiverRoomId String
+  status         CallStatus @default(RINGING)
+  startedAt      DateTime   @default(now())
+  endedAt        DateTime?
+
+  caller       User     @relation("CallSessionCaller", fields: [callerId], references: [id], onDelete: Cascade)
+  receiverRoom ChatRoom @relation(fields: [receiverRoomId], references: [id], onDelete: Cascade)
+
+  @@index([receiverRoomId])
+  @@index([callerId])
+  @@index([status])
+}
+
+model ChatRoomInvite {
+  id          String    @id @default(cuid())
+  roomId      String
+  code        String    @unique
+  createdById String
+  maxUses     Int?
+  usedCount   Int       @default(0)
+  expiresAt   DateTime?
+  createdAt   DateTime  @default(now())
+  deletedAt   DateTime?
+
+  room      ChatRoom @relation("ChatRoomInviteRoom", fields: [roomId], references: [id], onDelete: Cascade)
+  createdBy User     @relation("ChatRoomInviteCreator", fields: [createdById], references: [id], onDelete: Cascade)
+
+  @@index([roomId])
+  // `code` is @unique; no separate index.
+  @@index([deletedAt])
+}
+
+model ChatRoomMessageReaction {
+  id        String   @id @default(cuid())
+  messageId String
+  userId    String
+  emoji     String
+  createdAt DateTime @default(now())
+
+  message ChatRoomMessage @relation("ChatRoomMessageReactions", fields: [messageId], references: [id], onDelete: Cascade)
+  user    User            @relation("ChatRoomReactionUser", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([messageId, userId, emoji])
+  @@index([messageId])
+  @@index([userId])
+}
+
+enum ChatRequestStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+  CANCELLED
+}
+
+/// Cross-org chat request (A5). recipientEmail is never resolved on the send
+/// path (enumeration safety). Not soft-deleted: status is the lifecycle.
+model ChatRequest {
+  id             String            @id @default(cuid())
+  requesterId    String
+  /// lowercased
+  recipientEmail String
+  /// set when the recipient responds
+  recipientId    String?
+  message        String
+  status         ChatRequestStatus @default(PENDING)
+  roomId         String?
+  attemptCount   Int               @default(1)
+  sentAt         DateTime          @default(now())
+  respondedAt    DateTime?
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+
+  requester User      @relation("ChatRequestRequester", fields: [requesterId], references: [id], onDelete: Cascade)
+  recipient User?     @relation("ChatRequestRecipient", fields: [recipientId], references: [id], onDelete: SetNull)
+  room      ChatRoom? @relation("ChatRequestRoom", fields: [roomId], references: [id], onDelete: SetNull)
+
+  @@unique([requesterId, recipientEmail])
+  @@index([recipientEmail, status, sentAt])
+  @@index([recipientId])
+  @@index([roomId])
+}
+
+/// "Decline & block" on a chat request: the blocker never sees requests from
+/// the blocked user again, and a cross-org DM between them refuses new
+/// messages.
+model ChatRequestBlock {
+  id            String   @id @default(cuid())
+  blockerId     String
+  blockedUserId String
+  createdAt     DateTime @default(now())
+
+  blocker User @relation("ChatRequestBlocker", fields: [blockerId], references: [id], onDelete: Cascade)
+  blocked User @relation("ChatRequestBlocked", fields: [blockedUserId], references: [id], onDelete: Cascade)
+
+  @@unique([blockerId, blockedUserId])
+  @@index([blockedUserId])
+}
+
+enum TodoPriority {
+  NONE
+  LOW
+  MEDIUM
+  HIGH
+}
+
+model Todo {
+  id          String       @id @default(cuid())
+  /// Creator. Existing rows treat this as the owner; for non-assigned
+  /// todos `userId` and `assigneeId` resolve to the same person.
+  userId      String
+  workspaceId String
+  /// Optional project link. When set, this todo is rendered next to the
+  /// project on the cross-workspace todo view and on the project's own
+  /// surface. Nullable for back-compat - existing rows are unaffected.
+  projectId   String?
+  /// Optional assignee. When a boss creates a todo on behalf of someone
+  /// else, this is the person it lands with - the todo appears in their
+  /// inbox. When null, the creator (`userId`) is the implicit assignee.
+  assigneeId  String?
+  title       String
+  notes       String?
+  dueDate     DateTime?
+  priority    TodoPriority @default(NONE)
+  done        Boolean      @default(false)
+  doneAt      DateTime?
+  sortOrder   Int          @default(0)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  deletedAt   DateTime?
+
+  user      User      @relation("TodoUser", fields: [userId], references: [id], onDelete: Cascade)
+  workspace Workspace @relation("TodoWorkspace", fields: [workspaceId], references: [id], onDelete: Cascade)
+  project   Project?  @relation("TodoProject", fields: [projectId], references: [id], onDelete: SetNull)
+  assignee  User?     @relation("TodoAssignee", fields: [assigneeId], references: [id], onDelete: SetNull)
+
+  @@index([userId, done, sortOrder])
+  @@index([workspaceId])
+  @@index([projectId])
+  @@index([assigneeId])
+  @@index([dueDate])
+  @@index([deletedAt])
+}
+
+model TimeEntry {
+  id                  String    @id @default(cuid())
+  userId              String
+  workspaceId         String
+  projectId           String?
+  /// Free-text fallback for the project name when no `projectId` is set -
+  /// surfaces when a user is tracking time against a project that doesn't
+  /// have a row yet, so the timesheet UI can degrade to a manual input.
+  projectLabel        String?
+  taskId              String?
+  /// Free-text fallback for the task title when no `taskId` is set -
+  /// lets users log ad-hoc work without forcing a Task row to exist first.
+  taskLabel           String?
+  description         String?
+  startTime           DateTime
+  endTime             DateTime?
+  durationMin         Int?
+  /// Set when the user pauses an active (running) entry. Resuming clears
+  /// this and adds (now - pausedAt) to `accumulatedPauseMin`. Stopping
+  /// while paused folds the open delta in and then clears it. Null on
+  /// every legacy row - the resume / stop logic treats null as "never
+  /// paused" so existing entries behave exactly as before.
+  pausedAt            DateTime?
+  /// Total minutes the entry has been in the paused state. Final
+  /// `durationMin` on stop is computed as max(0, gross - accumulatedPauseMin).
+  /// Defaults to 0 so historic rows that don't carry pause history come
+  /// out unchanged.
+  accumulatedPauseMin Int       @default(0)
+  billable            Boolean   @default(true)
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+  deletedAt           DateTime?
+
+  user      User      @relation("TimeEntryUser", fields: [userId], references: [id], onDelete: Cascade)
+  workspace Workspace @relation("TimeEntryWorkspace", fields: [workspaceId], references: [id], onDelete: Cascade)
+  project   Project?  @relation("TimeEntryProject", fields: [projectId], references: [id], onDelete: SetNull)
+  task      Task?     @relation("TimeEntryTask", fields: [taskId], references: [id], onDelete: SetNull)
+
+  @@index([userId, startTime])
+  @@index([workspaceId, startTime])
+  @@index([projectId])
+  @@index([taskId])
+  @@index([deletedAt])
+}
+
+/// HR / Attendance + Leave models - added 2026-05.
+/// Both tables are write-only by application code; rows are never
+/// soft-deleted because attendance + leave history is auditable. Cleanup
+/// is left to administrators via explicit SQL if ever required.
+enum AttendanceStatus {
+  PRESENT
+  ABSENT
+  LEAVE
+  /// Company-wide day off (national / religious / company holiday).
+  /// Distinct from LEAVE which is personal time off taken from a balance.
+  /// HOLIDAY rows are stamped by the daily cron when the date matches a
+  /// `Holiday` row for the user's organization; bulk-applied retroactively
+  /// by HR via the "Mark as public holiday" admin action.
+  HOLIDAY
+}
+
+/// Public holidays per organisation. Distinct from `Leave` because a
+/// holiday applies to *every* member of the org automatically and
+/// doesn't consume a leave balance. The (organizationId, date) unique
+/// index keeps add-the-same-date-twice safe; the date is stored as
+/// UTC midnight so cross-timezone comparisons match the same convention
+/// `Attendance.date` uses.
+model Holiday {
+  id             String   @id @default(cuid())
+  organizationId String
+  /// UTC midnight of the holiday. Pair with `organizationId` for the
+  /// natural key.
+  date           DateTime
+  /// Human label shown in the attendance grid + summary ("Eid al-Fitr",
+  /// "Republic Day"). Free-text, max length enforced server-side via
+  /// the Zod schema in @botss/shared-types.
+  name           String
+  /// Optional HR note ("observed on Monday", "half day").
+  notes          String?
+  createdAt      DateTime @default(now())
+  /// Who created this entry. RESTRICT prevents accidentally deleting
+  /// a User who has standing holiday rows; the row needs to be
+  /// reassigned or removed first.
+  createdById    String
+
+  organization Organization @relation("OrganizationHolidays", fields: [organizationId], references: [id], onDelete: Cascade)
+  createdBy    User         @relation("UserCreatedHolidays", fields: [createdById], references: [id], onDelete: Restrict)
+
+  @@unique([organizationId, date])
+  @@index([organizationId])
+  @@index([date])
+}
+
+model Attendance {
+  id        String           @id @default(cuid())
+  userId    String
+  /// Date the row pertains to, stored as UTC midnight. The (userId, date)
+  /// unique constraint makes the cron job idempotent - re-running for a
+  /// given day silently no-ops via `skipDuplicates: true`.
+  date      DateTime
+  status    AttendanceStatus
+  /// Admin / HR audit trail for manual overrides (e.g. "approved a half
+  /// day", "system marked absent but user was on call"). Free-text up to
+  /// 255 chars enforced server-side via Zod, not the DB.
+  notes     String?
+  createdAt DateTime         @default(now())
+  updatedAt DateTime         @updatedAt
+
+  user User @relation("UserAttendance", fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, date])
+  @@index([userId])
+  @@index([date])
+}
+
+enum LeaveType {
+  SICK
+  CASUAL
+  ANNUAL
+  UNPAID
+}
+
+enum LeaveStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model Leave {
+  id           String      @id @default(cuid())
+  userId       String
+  /// Inclusive UTC-midnight start of the leave window. The (startDate,
+  /// endDate) range is matched against `Attendance.date` by the cron to
+  /// stamp days as LEAVE.
+  startDate    DateTime
+  endDate      DateTime
+  type         LeaveType
+  status       LeaveStatus @default(PENDING)
+  reason       String?
+  /// FK to the User who approved / rejected the request. Nullable so a
+  /// PENDING row simply has no approver; SetNull on delete so a removed
+  /// admin does not invalidate historic leave records.
+  approvedById String?
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  user       User  @relation("UserLeaves", fields: [userId], references: [id], onDelete: Cascade)
+  approvedBy User? @relation("ApprovedLeaves", fields: [approvedById], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([startDate, endDate])
+  @@index([status])
+  // A user's leaves by status, and approved leaves overlapping a date range.
+  @@index([userId, status])
+  @@index([status, startDate, endDate])
+}
+
+// ============================================================================
+// Invoices (Phase 4 Step J)
+// ============================================================================
+
+model Invoice {
+  id             String        @id @default(cuid())
+  workspaceId    String
+  clientId       String
+  projectId      String?
+  createdById    String
+  number         String
+  status         InvoiceStatus @default(DRAFT)
+  currency       String        @default("USD")
+  issuedAt       DateTime      @default(now())
+  dueAt          DateTime
+  subtotal       Decimal       @default(0) @db.Decimal(12, 2)
+  discountAmount Decimal       @default(0) @db.Decimal(12, 2)
+  taxAmount      Decimal       @default(0) @db.Decimal(12, 2)
+  total          Decimal       @default(0) @db.Decimal(12, 2)
+  amountPaid     Decimal       @default(0) @db.Decimal(12, 2)
+  notes          String?
+  terms          String?
+  footer         String?
+  /// Optional linkage to the Financials module. An invoice is a DOCUMENT
+  /// raised against a contract or one of its milestones - the contract, not
+  /// the invoice, is the root money object.
+  contractId     String?
+  milestoneId    String?
+  /// FileObject holding the last rendered PDF, so regenerating is idempotent.
+  pdfFileId      String?
+  /// Folder name under apps/api/invoice-templates. Null = organization default.
+  templateKey    String?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  deletedAt      DateTime?
+
+  workspace Workspace          @relation("InvoiceWorkspace", fields: [workspaceId], references: [id], onDelete: Cascade)
+  client    Client             @relation("InvoiceClient", fields: [clientId], references: [id], onDelete: Restrict)
+  project   Project?           @relation("InvoiceProject", fields: [projectId], references: [id], onDelete: SetNull)
+  createdBy User               @relation("InvoiceCreator", fields: [createdById], references: [id])
+  contract  Contract?          @relation("InvoiceContract", fields: [contractId], references: [id], onDelete: SetNull)
+  milestone ContractMilestone? @relation("InvoiceMilestone", fields: [milestoneId], references: [id], onDelete: SetNull)
+  pdfFile   FileObject?        @relation("InvoicePdf", fields: [pdfFileId], references: [id], onDelete: SetNull)
+  lineItems InvoiceLineItem[]
+  payments  Payment[]
+
+  @@unique([workspaceId, number])
+  @@index([workspaceId, status])
+  @@index([clientId])
+  @@index([projectId])
+  @@index([contractId])
+  @@index([deletedAt])
+  @@index([milestoneId])
+}
+
+model InvoiceLineItem {
+  id           String   @id @default(cuid())
+  invoiceId    String
+  position     Int      @default(0)
+  description  String
+  quantity     Decimal  @default(1) @db.Decimal(10, 2)
+  unitPrice    Decimal  @default(0) @db.Decimal(12, 2)
+  taxRate      Decimal  @default(0) @db.Decimal(5, 2)
+  discountRate Decimal  @default(0) @db.Decimal(5, 2)
+  amount       Decimal  @default(0) @db.Decimal(12, 2)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  invoice Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+
+  @@index([invoiceId])
+}
+
+/// The single money-in record. A payment may settle a Contract (optionally one
+/// of its milestones), an Invoice, or both - an invoice raised against a
+/// milestone produces a payment that advances both. Enforced by a DB CHECK:
+/// at least one of contractId / invoiceId must be set.
+///
+/// THREE amount pairs, on purpose. One row is asked three different questions:
+///   1. "Is the contract settled?"  -> `amount` + `currency`, asserted equal to
+///      the contract currency. Single-currency arithmetic, so
+///      `amountPaid == totalValue` is exactly true. Only this pair moves
+///      Contract.amountPaid / ContractMilestone.amountPaid.
+///   2. "What hit our account?"     -> `receivedAmount` + `receivedCurrency` +
+///      `feeAmount`. Upwork bills the client $5,000, keeps $500, wires PKR.
+///   3. "What is our base revenue?" -> `fxRate` + `baseAmount`, where
+///      baseAmount = (receivedAmount - feeAmount) * fxRate. THE ONLY column
+///      any dashboard sums.
+/// Consequence, and it is correct: contracts advance on GROSS, revenue reports
+/// on NET. `amount * fxRate - baseAmount` is the platform-fee + FX cost.
+///
+/// Payments are VOIDED (`voidedAt`), never deleted, and Payment is deliberately
+/// absent from SOFT_DELETE_MODELS so the void stays visible. Every aggregate
+/// must filter `voidedAt: null` by hand.
+model Payment {
+  id              String  @id @default(cuid())
+  workspaceId     String
+  invoiceId       String?
+  contractId      String?
+  milestoneId     String?
+  paymentSourceId String?
+
+  /// Settles the contract, denominated in `currency`.
+  /// Left at Decimal(12,2) deliberately: widening to (14,2) would force a full
+  /// table rewrite for no benefit. The base-currency column below is (14,2)
+  /// because it is a fresh column and PKR figures are ~280x larger.
+  amount           Decimal @db.Decimal(12, 2)
+  currency         String  @default("USD")
+  /// What actually landed, gross, in the currency of the rail.
+  receivedAmount   Decimal @db.Decimal(14, 2)
+  receivedCurrency String  @default("USD")
+  /// Platform / wire cut, denominated in `receivedCurrency`.
+  feeAmount        Decimal @default(0) @db.Decimal(14, 2)
+  /// receivedCurrency -> Organization.baseCurrency, entered by the finance
+  /// manager and stored per row (auditable; a rates table can come later).
+  fxRate           Decimal @default(1) @db.Decimal(18, 8)
+  baseAmount       Decimal @default(0) @db.Decimal(14, 2)
+
+  region       PaymentRegion @default(LOCAL)
+  /// Bank reference / platform transaction id.
+  reference    String?
+  paidAt       DateTime      @default(now())
+  notes        String?
+  recordedById String
+  voidedAt     DateTime?
+  voidReason   String?
+  voidedById   String?
+
+  /// DEPRECATED - superseded by `paymentSourceId`. Retained so a rollback stays
+  /// possible; the finance module never reads or writes it.
+  method     PaymentMethod @default(MANUAL)
+  /// DEPRECATED - superseded by `reference`.
+  externalId String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  workspace     Workspace          @relation("PaymentWorkspace", fields: [workspaceId], references: [id], onDelete: Cascade)
+  invoice       Invoice?           @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+  contract      Contract?          @relation(fields: [contractId], references: [id], onDelete: Cascade)
+  /// SetNull, NOT Cascade: deleting a milestone must never silently destroy a
+  /// money record. `recalcContract` reassigns the payment to the contract tier.
+  milestone     ContractMilestone? @relation(fields: [milestoneId], references: [id], onDelete: SetNull)
+  /// Restrict: a source with payments can only be deactivated, never removed.
+  paymentSource PaymentSource?     @relation(fields: [paymentSourceId], references: [id], onDelete: Restrict)
+  recordedBy    User               @relation("PaymentRecorder", fields: [recordedById], references: [id])
+  voidedBy      User?              @relation("PaymentVoider", fields: [voidedById], references: [id])
+
+  @@index([invoiceId])
+  @@index([workspaceId, paidAt])
+  @@index([contractId])
+  @@index([milestoneId])
+  @@index([paymentSourceId])
+  @@index([voidedAt])
+}
+
+/// The root money object: what we agreed to bill a client, and on what model.
+/// A project may hold several (an initial build plus a later retainer or a
+/// change-order), so there is no unique on projectId - the UI just defaults to
+/// one and opens straight into it when only one exists.
+model Contract {
+  id             String         @id @default(cuid())
+  workspaceId    String
+  projectId      String?
+  clientId       String?
+  createdById    String
+  title          String
+  billingModel   BillingModel   @default(ONE_TIME)
+  status         ContractStatus @default(ACTIVE)
+  currency       String         @default("USD")
+  totalValue     Decimal        @default(0) @db.Decimal(14, 2)
+  /// Cached. Maintained ONLY by a full recompute inside `recalcContract`,
+  /// never by increment - two concurrent payment inserts must converge.
+  amountPaid     Decimal        @default(0) @db.Decimal(14, 2)
+  paymentStatus  PaymentStatus  @default(NOT_PAID)
+  /// contract currency -> Organization.baseCurrency, BOOKED at creation.
+  /// Outstanding is reported at this booked rate while received revenue is
+  /// reported at the realized rate of each payment. The gap is standard
+  /// booked-vs-realized accounting, not a bug.
+  fxRateToBase   Decimal        @default(1) @db.Decimal(18, 8)
+  baseTotalValue Decimal        @default(0) @db.Decimal(14, 2)
+  startDate      DateTime?
+  endDate        DateTime?
+  notes          String?
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  deletedAt      DateTime?
+
+  workspace  Workspace           @relation("ContractWorkspace", fields: [workspaceId], references: [id], onDelete: Cascade)
+  project    Project?            @relation("ContractProject", fields: [projectId], references: [id], onDelete: SetNull)
+  client     Client?             @relation("ContractClient", fields: [clientId], references: [id], onDelete: SetNull)
+  createdBy  User                @relation("ContractCreator", fields: [createdById], references: [id])
+  milestones ContractMilestone[]
+  payments   Payment[]
+  expenses   Expense[]
+  invoices   Invoice[]           @relation("InvoiceContract")
+
+  @@index([workspaceId, status])
+  @@index([workspaceId, paymentStatus])
+  @@index([projectId])
+  @@index([clientId])
+  @@index([deletedAt])
+}
+
+/// A payment stage on a contract, optionally tied to the project work that
+/// earns it. `status` is delivery; `paymentStatus` is money. Delivery never
+/// moves money on its own - DELIVERED is the signal to raise an invoice.
+model ContractMilestone {
+  id            String          @id @default(cuid())
+  contractId    String
+  position      Int             @default(0)
+  title         String
+  description   String?
+  amount        Decimal         @default(0) @db.Decimal(14, 2)
+  amountPaid    Decimal         @default(0) @db.Decimal(14, 2)
+  status        MilestoneStatus @default(PENDING)
+  paymentStatus PaymentStatus   @default(NOT_PAID)
+  dueDate       DateTime?
+  deliveredAt   DateTime?
+
+  /// Optional linkage to project work. Nothing is added to Sprint or Task
+  /// beyond a back-relation, so teams that never open Financials are
+  /// unaffected. When `autoDeliver` is set, completing the linked sprint (or
+  /// finishing every linked task) flips `status` to DELIVERED.
+  sprintId    String?
+  autoDeliver Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  contract Contract        @relation(fields: [contractId], references: [id], onDelete: Cascade)
+  sprint   Sprint?         @relation("MilestoneSprint", fields: [sprintId], references: [id], onDelete: SetNull)
+  tasks    MilestoneTask[]
+  payments Payment[]
+  invoices Invoice[]       @relation("InvoiceMilestone")
+
+  @@unique([contractId, position])
+  @@index([contractId])
+  @@index([sprintId])
+  @@index([dueDate, paymentStatus])
+}
+
+/// Join table: a milestone may bill an explicit set of tasks instead of, or as
+/// well as, a whole sprint. Kept as a join rather than `Task.milestoneId` so
+/// the Task table never grows a finance column.
+model MilestoneTask {
+  milestoneId String
+  taskId      String
+  createdAt   DateTime @default(now())
+
+  milestone ContractMilestone @relation(fields: [milestoneId], references: [id], onDelete: Cascade)
+  task      Task              @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  @@id([milestoneId, taskId])
+  @@index([taskId])
+}
+
+/// The admin-managed list of rails money moves through (Upwork, IBFT, Wise,
+/// Remitly...). Scoped to the ORGANISATION, not the workspace: "we get paid
+/// through Upwork" is a company fact, and rebuilding the list per workspace
+/// would be busywork.
+model PaymentSource {
+  id                String            @id @default(cuid())
+  organizationId    String
+  name              String
+  kind              PaymentSourceKind @default(OTHER)
+  /// Null means "ask every time" - some rails are used both ways.
+  defaultRegion     PaymentRegion?
+  defaultFeePercent Decimal?          @db.Decimal(5, 2)
+  isActive          Boolean           @default(true)
+  position          Int               @default(0)
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
+
+  organization Organization @relation("OrganizationPaymentSources", fields: [organizationId], references: [id], onDelete: Cascade)
+  payments     Payment[]
+  expenses     Expense[]
+  payrollRuns  PayrollRun[]
+
+  @@unique([organizationId, name])
+  @@index([organizationId, isActive, position])
+}
+
+/// Money out. Simpler than Payment on purpose: an expense has no "settles a
+/// contract in its currency" question, so it needs only amount/currency plus
+/// the fxRate/baseAmount reporting pair.
+///
+/// This is the ONLY cost basis available - the schema has no rate field on
+/// User, Project or Client, so labour cost cannot be derived from TimeEntry.
+/// Project P&L is SUM(Payment.baseAmount) - SUM(Expense.baseAmount).
+model Expense {
+  id              String          @id @default(cuid())
+  workspaceId     String
+  /// Null means company overhead rather than a project cost.
+  projectId       String?
+  contractId      String?
+  category        ExpenseCategory @default(OTHER)
+  vendor          String?
+  description     String
+  amount          Decimal         @db.Decimal(14, 2)
+  currency        String          @default("PKR")
+  fxRate          Decimal         @default(1) @db.Decimal(18, 8)
+  baseAmount      Decimal         @default(0) @db.Decimal(14, 2)
+  paymentSourceId String?
+  incurredAt      DateTime        @default(now())
+  reference       String?
+  receiptFileId   String?
+  recordedById    String
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+  deletedAt       DateTime?
+
+  workspace     Workspace      @relation("ExpenseWorkspace", fields: [workspaceId], references: [id], onDelete: Cascade)
+  project       Project?       @relation("ExpenseProject", fields: [projectId], references: [id], onDelete: SetNull)
+  contract      Contract?      @relation(fields: [contractId], references: [id], onDelete: SetNull)
+  paymentSource PaymentSource? @relation(fields: [paymentSourceId], references: [id], onDelete: Restrict)
+  receipt       FileObject?    @relation("ExpenseReceipt", fields: [receiptFileId], references: [id], onDelete: SetNull)
+  recordedBy    User           @relation("ExpenseRecorder", fields: [recordedById], references: [id])
+  /// Set when payroll created this expense. Such rows are edited through the
+  /// payroll run (undo paid), never directly.
+  payrollItem   PayrollItem?
+
+  @@index([workspaceId, incurredAt])
+  @@index([projectId])
+  @@index([contractId])
+  @@index([category])
+  @@index([deletedAt])
+  @@index([paymentSourceId])
+}
+
+enum PayrollRunStatus {
+  DRAFT
+  PAID
+}
+
+/// How a person's salary reaches them. Only BANK_TRANSFER lines go into the
+/// bank transfer CSV.
+enum PayrollPaymentMethod {
+  BANK_TRANSFER
+  CASH
+  CHEQUE
+}
+
+/// A person on payroll in this workspace, with their default monthly salary
+/// and the bank details the transfer CSV needs. Removing someone soft-deletes
+/// the row; adding them again restores it (upsert on workspaceId + userId).
+///
+/// `userId` is null for someone paid through payroll without a platform
+/// account (added from an imported sheet); `name` holds their name then. The
+/// migration's CHECK constraint keeps at least one of the two set.
+model PayrollEmployee {
+  id            String               @id @default(cuid())
+  workspaceId   String
+  userId        String?
+  /// Only for people without a platform account; otherwise the user's name.
+  name          String?
+  /// Where payslips are emailed. Null falls back to the user's account email.
+  email         String?
+  /// 13 digits, stored as 12345-1234567-1.
+  cnic          String?
+  dateOfJoining DateTime?            @db.Date
+  paymentMethod PayrollPaymentMethod @default(BANK_TRANSFER)
+  monthlySalary Decimal              @db.Decimal(14, 2)
+  currency      String               @default("PKR")
+  designation   String?
+  bankName      String?
+  accountTitle  String?
+  accountNumber String?
+  isActive      Boolean              @default(true)
+  createdById   String
+  createdAt     DateTime             @default(now())
+  updatedAt     DateTime             @updatedAt
+  deletedAt     DateTime?
+
+  workspace Workspace     @relation("PayrollEmployeeWorkspace", fields: [workspaceId], references: [id], onDelete: Cascade)
+  /// Cascade: removing a user from the platform takes them off payroll.
+  /// Past payslips survive through PayrollItem's name/bank snapshot.
+  user      User?         @relation("PayrollEmployeeUser", fields: [userId], references: [id], onDelete: Cascade)
+  createdBy User          @relation("PayrollEmployeeCreator", fields: [createdById], references: [id])
+  items     PayrollItem[]
+
+  @@unique([workspaceId, userId])
+  @@index([deletedAt])
+  @@index([userId])
+}
+
+/// One month's payroll. Items are editable while DRAFT. Marking it PAID
+/// creates one SALARY Expense per item (linked through PayrollItem.expenseId),
+/// so salaries flow into the financial reports.
+model PayrollRun {
+  id              String           @id @default(cuid())
+  workspaceId     String
+  year            Int
+  /// 1-12.
+  month           Int
+  status          PayrollRunStatus @default(DRAFT)
+  paidAt          DateTime?
+  paymentSourceId String?
+  fxRate          Decimal          @default(1) @db.Decimal(18, 8)
+  createdById     String
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  deletedAt       DateTime?
+
+  workspace     Workspace      @relation("PayrollRunWorkspace", fields: [workspaceId], references: [id], onDelete: Cascade)
+  paymentSource PaymentSource? @relation(fields: [paymentSourceId], references: [id], onDelete: Restrict)
+  createdBy     User           @relation("PayrollRunCreator", fields: [createdById], references: [id])
+  items         PayrollItem[]
+
+  @@unique([workspaceId, year, month])
+  @@index([deletedAt])
+  @@index([paymentSourceId])
+}
+
+/// One person's line in a run. Name, bank and identity details are snapshots
+/// taken when the line was added, so a later roster edit never rewrites a
+/// PAID payslip (DRAFT lines pick up roster detail edits until the run is
+/// paid). `employeeId` goes null when the person is removed from the
+/// platform; the snapshot keeps the payslip intact.
+///
+/// net = salary + bonus + commission - deduction - tax, computed by the server.
+model PayrollItem {
+  id            String               @id @default(cuid())
+  runId         String
+  employeeId    String?
+  employeeName  String
+  designation   String?
+  bankName      String?
+  accountTitle  String?
+  accountNumber String?
+  cnic          String?
+  dateOfJoining DateTime?            @db.Date
+  paymentMethod PayrollPaymentMethod @default(BANK_TRANSFER)
+  /// Where this payslip is emailed.
+  email         String?
+  salary        Decimal              @db.Decimal(14, 2)
+  bonus         Decimal              @default(0) @db.Decimal(14, 2)
+  commission    Decimal              @default(0) @db.Decimal(14, 2)
+  deduction     Decimal              @default(0) @db.Decimal(14, 2)
+  tax           Decimal              @default(0) @db.Decimal(14, 2)
+  net           Decimal              @db.Decimal(14, 2)
+  bonusNote     String?
+  deductionNote String?
+  expenseId     String?              @unique
+  /// Last time this payslip was emailed, and to which address.
+  payslipSentAt DateTime?
+  payslipSentTo String?
+  createdAt     DateTime             @default(now())
+  updatedAt     DateTime             @updatedAt
+
+  run      PayrollRun       @relation(fields: [runId], references: [id], onDelete: Cascade)
+  employee PayrollEmployee? @relation(fields: [employeeId], references: [id], onDelete: SetNull)
+  expense  Expense?         @relation(fields: [expenseId], references: [id], onDelete: SetNull)
+
+  @@unique([runId, employeeId])
+  @@index([employeeId])
+}
+
+model InvoiceNumberSequence {
+  workspaceId String   @id
+  year        Int
+  lastNumber  Int      @default(0)
+  updatedAt   DateTime @updatedAt
+}
+
+// ============================================================================
+// E-signature. A request freezes one PDF (rendered from a Document, or an
+// uploaded PDF) and collects a signature from each signer through a
+// login-free emailed link. Only sha256(token) is stored, never the token.
+// ============================================================================
+
+enum SignatureRequestStatus {
+  DRAFT
+  SENT
+  COMPLETED
+  DECLINED
+  CANCELLED
+  EXPIRED
+}
+
+enum SignerStatus {
+  PENDING
+  VIEWED
+  SIGNED
+  DECLINED
+}
+
+enum SignatureMethod {
+  DRAWN
+  TYPED
+}
+
+enum SignatureFieldKind {
+  SIGNATURE
+  DATE
+}
+
+enum SignatureEventKind {
+  CREATED
+  SENT
+  VIEWED
+  SIGNED
+  DECLINED
+  RESENT
+  CANCELLED
+  COMPLETED
+  SEAL_FAILED
+}
+
+model SignatureRequest {
+  id           String                 @id @default(cuid())
+  workspaceId  String
+  createdById  String
+  /// Source document, when the PDF was rendered from one.
+  documentId   String?
+  /// The frozen PDF every signer signs. Never changes after creation.
+  sourceFileId String
+  /// The sealed PDF (signatures stamped + certificate page), once COMPLETED.
+  signedFileId String?
+  title        String
+  message      String?
+  status       SignatureRequestStatus @default(DRAFT)
+  expiresAt    DateTime
+  /// SHA-256 (hex) of the frozen source PDF.
+  sourceSha256 String
+  /// SHA-256 (hex) of the sealed PDF.
+  signedSha256 String?
+  pageCount    Int
+  sentAt       DateTime?
+  completedAt  DateTime?
+  createdAt    DateTime               @default(now())
+  updatedAt    DateTime               @updatedAt
+  deletedAt    DateTime?
+
+  workspace  Workspace         @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  createdBy  User              @relation("SignatureRequestCreator", fields: [createdById], references: [id])
+  document   Document?         @relation(fields: [documentId], references: [id], onDelete: SetNull)
+  sourceFile FileObject        @relation("SignatureSourceFile", fields: [sourceFileId], references: [id])
+  signedFile FileObject?       @relation("SignatureSignedFile", fields: [signedFileId], references: [id], onDelete: SetNull)
+  signers    SignatureSigner[]
+  fields     SignatureField[]
+  events     SignatureEvent[]
+
+  @@index([workspaceId, status])
+  @@index([documentId])
+  @@index([createdById])
+  @@index([sourceFileId])
+  @@index([signedFileId])
+  @@index([deletedAt])
+}
+
+model SignatureSigner {
+  id              String           @id @default(cuid())
+  requestId       String
+  email           String
+  name            String?
+  /// Reserved for sequential signing; v1 signs in parallel.
+  order           Int              @default(0)
+  /// sha256(token) hex. The raw token only ever exists in the emailed link.
+  tokenHash       String           @unique
+  /// sha256 of the 6-digit code emailed with the link (second factor). Null
+  /// on drafts and on links minted before codes existed: those are refused.
+  codeHash        String?
+  /// Wrong codes typed since the link was (re)issued.
+  codeAttempts    Int              @default(0)
+  /// Set after too many wrong codes; a resend issues a new link and clears it.
+  codeLockedAt    DateTime?
+  status          SignerStatus     @default(PENDING)
+  viewedAt        DateTime?
+  signedAt        DateTime?
+  declinedAt      DateTime?
+  declineReason   String?
+  signatureFileId String?
+  method          SignatureMethod?
+  typedName       String?
+  consentAt       DateTime?
+  ip              String?
+  userAgent       String?
+  lastEmailedAt   DateTime?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  request       SignatureRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  signatureFile FileObject?      @relation("SignatureImage", fields: [signatureFileId], references: [id], onDelete: SetNull)
+  fields        SignatureField[]
+  events        SignatureEvent[]
+
+  // The unique index leads with requestId, so it serves requestId lookups.
+  @@unique([requestId, email])
+  @@index([signatureFileId])
+}
+
+model SignatureField {
+  id             String             @id @default(cuid())
+  requestId      String
+  signerId       String
+  kind           SignatureFieldKind @default(SIGNATURE)
+  /// 1-based page number.
+  page           Int
+  /// Fractions (0..1) of the page box, origin top-left.
+  x              Float
+  y              Float
+  w              Float
+  h              Float
+  placedBySigner Boolean            @default(false)
+  createdAt      DateTime           @default(now())
+
+  request SignatureRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  signer  SignatureSigner  @relation(fields: [signerId], references: [id], onDelete: Cascade)
+
+  @@index([requestId])
+  @@index([signerId])
+}
+
+/// Append-only audit trail. Never updated or deleted by application code.
+model SignatureEvent {
+  id        String             @id @default(cuid())
+  requestId String
+  signerId  String?
+  kind      SignatureEventKind
+  ip        String?
+  userAgent String?
+  metadata  Json               @default("{}")
+  createdAt DateTime           @default(now())
+
+  request SignatureRequest @relation(fields: [requestId], references: [id], onDelete: Cascade)
+  signer  SignatureSigner? @relation(fields: [signerId], references: [id], onDelete: SetNull)
+
+  @@index([requestId, createdAt])
+  @@index([signerId])
+}
+
+// ============================================================================
+// Configurable roles & permissions
+// ============================================================================
+
+enum RoleScope {
+  COMPANY
+  WORKSPACE
+}
+
+/// A custom role defined by an org admin. Presets (SystemRole / WorkspaceRole)
+/// live in code (packages/auth/src/permissions.ts); only custom roles are rows.
+model Role {
+  id             String    @id @default(cuid())
+  organizationId String
+  scope          RoleScope
+  name           String
+  description    String?
+  /// Permission keys from the catalog in packages/auth/src/permissions.ts.
+  permissions    String[]  @default([])
+  /// The preset this role was cloned from, informational only.
+  basePreset     String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  deletedAt      DateTime?
+
+  organization Organization          @relation("OrganizationRoles", fields: [organizationId], references: [id], onDelete: Cascade)
+  users        User[]                @relation("UserCustomRole")
+  memberships  WorkspaceMembership[] @relation("MembershipCustomRole")
+
+  @@index([organizationId, scope])
+  @@index([deletedAt])
+}
+
+/// Per-person permission grant or deny on top of their role(s). A null
+/// workspaceId means a company-scope override.
+model UserPermissionOverride {
+  id          String   @id @default(cuid())
+  userId      String
+  permission  String
+  grant       Boolean
+  workspaceId String?
+  createdById String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user      User       @relation("UserPermissionOverrides", fields: [userId], references: [id], onDelete: Cascade)
+  createdBy User?      @relation("UserPermissionOverrideCreator", fields: [createdById], references: [id], onDelete: SetNull)
+  workspace Workspace? @relation("WorkspacePermissionOverrides", fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([workspaceId])
+}

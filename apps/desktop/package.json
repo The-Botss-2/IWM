@@ -1,0 +1,32 @@
+{
+  "name": "@botss/desktop",
+  "version": "0.1.11",
+  "private": true,
+  "description": "IWM desktop client - Electron shell around the hosted web app.",
+  "author": "IWM contributors",
+  "main": "dist/main.js",
+  "scripts": {
+    "dev": "tsc -p tsconfig.json && cross-env BOTSS_APP_URL=http://localhost:3000 electron .",
+    "start": "cross-env BOTSS_APP_URL=http://localhost:3000 electron .",
+    "build": "tsc -p tsconfig.json",
+    "package": "tsc -p tsconfig.json && electron-builder",
+    "build:win": "tsc -p tsconfig.json && electron-builder --win",
+    "build:mac": "tsc -p tsconfig.json && electron-builder --mac",
+    "build:linux": "tsc -p tsconfig.json && electron-builder --linux",
+    "lint": "echo 'no eslint yet' && exit 0",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "echo 'no tests yet' && exit 0",
+    "clean": "rimraf dist release .turbo *.tsbuildinfo || exit 0"
+  },
+  "dependencies": {
+    "electron-updater": "^6.8.11"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "cross-env": "^7.0.3",
+    "electron": "45.0.0",
+    "electron-builder": "^26.18.0",
+    "rimraf": "^6.0.1",
+    "typescript": "^5.6.0"
+  }
+}

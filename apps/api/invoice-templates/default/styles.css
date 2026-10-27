@@ -1,0 +1,125 @@
+/* Default invoice styles. Print-first: sizes in pt, no web fonts required. */
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  font-size: 10pt;
+  line-height: 1.45;
+  color: #1f2433;
+  background: #ffffff;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+.invoice { --accent: #7b6fe8; }
+.muted { color: #6b7280; }
+.right { text-align: right; }
+.strong { font-weight: 600; }
+.label {
+  font-size: 7.5pt;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #6b7280;
+  margin-bottom: 4pt;
+}
+
+.top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 24pt;
+  padding-bottom: 16pt;
+  border-bottom: 2pt solid var(--accent);
+}
+.brand { display: flex; gap: 14pt; align-items: flex-start; }
+.logo { max-height: 48pt; max-width: 140pt; object-fit: contain; }
+.wordmark { font-size: 16pt; font-weight: 700; color: var(--accent); }
+.company-lines { font-size: 8.5pt; color: #4b5563; }
+.company-name { font-weight: 600; color: #1f2433; }
+.title-block { text-align: right; }
+.title-block h1 {
+  margin: 0;
+  font-size: 22pt;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: #111827;
+}
+.number { font-size: 10pt; color: #4b5563; margin-top: 2pt; }
+.badge {
+  display: inline-block;
+  margin-top: 6pt;
+  padding: 2pt 8pt;
+  border-radius: 999pt;
+  font-size: 7.5pt;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  background: #f3f4f6;
+  color: #6b7280;
+}
+.badge.paid { background: #dcfce7; color: #15803d; }
+
+.meta {
+  display: flex;
+  justify-content: space-between;
+  gap: 24pt;
+  margin: 18pt 0 16pt;
+}
+.client-name { font-size: 11pt; font-weight: 600; }
+.dates { margin: 0; display: grid; grid-template-columns: auto auto; gap: 3pt 14pt; }
+.dates > div { display: contents; }
+.dates dt { color: #6b7280; font-size: 8.5pt; text-align: right; }
+.dates dd { margin: 0; font-weight: 600; }
+
+.items { width: 100%; border-collapse: collapse; }
+.items thead th {
+  font-size: 7.5pt;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #6b7280;
+  text-align: left;
+  padding: 6pt 6pt;
+  border-bottom: 1pt solid #d1d5db;
+}
+.items thead th.right { text-align: right; }
+.items td { padding: 7pt 6pt; border-bottom: 0.5pt solid #e5e7eb; vertical-align: top; }
+.items .num { width: 18pt; color: #9ca3af; }
+.items .desc { width: 46%; }
+.items tr { page-break-inside: avoid; }
+.items .empty { text-align: center; color: #9ca3af; padding: 18pt; }
+
+.summary {
+  display: flex;
+  justify-content: space-between;
+  gap: 24pt;
+  margin-top: 14pt;
+  page-break-inside: avoid;
+}
+.notes { flex: 1; font-size: 9pt; color: #374151; }
+.notes p { margin: 0 0 10pt; }
+.totals { width: 42%; border-collapse: collapse; }
+.totals td { padding: 4pt 6pt; }
+.totals .grand td {
+  border-top: 1pt solid #d1d5db;
+  padding-top: 7pt;
+  font-size: 12pt;
+  font-weight: 700;
+}
+.totals .due td {
+  background: var(--accent);
+  color: #ffffff;
+  font-weight: 700;
+  padding: 7pt 6pt;
+}
+
+.terms { margin-top: 18pt; font-size: 8.5pt; color: #4b5563; page-break-inside: avoid; }
+.terms p { margin: 0; }
+.footer {
+  margin-top: 22pt;
+  padding-top: 10pt;
+  border-top: 0.5pt solid #e5e7eb;
+  font-size: 8pt;
+  color: #6b7280;
+  text-align: center;
+}

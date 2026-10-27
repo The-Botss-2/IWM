@@ -1,0 +1,45 @@
+{
+  "extends": ["next/core-web-vitals"],
+  "rules": {
+    "@next/next/no-html-link-for-pages": "off",
+    "no-restricted-syntax": [
+      "error",
+      {
+        "selector": "CallExpression[callee.object.name='toast'][callee.property.name='error']",
+        "message": "Use toastError(err, \"Couldn't <verb> <thing>\"), toastErrorMessage(text) or a mutation's meta.errorTitle instead of toast.error."
+      },
+      {
+        "selector": "Literal[value=/^(Failed to|Could not) /]",
+        "message": "User-facing wording is \"Couldn't <verb> <thing>\", not \"Failed to\" / \"Could not\"."
+      },
+      {
+        "selector": "TemplateElement[value.raw=/^(Failed to|Could not) /]",
+        "message": "User-facing wording is \"Couldn't <verb> <thing>\", not \"Failed to\" / \"Could not\"."
+      },
+      {
+        "selector": "JSXText[value=/^\\s*(Failed to|Could not) /]",
+        "message": "User-facing wording is \"Couldn&apos;t <verb> <thing>\", not \"Failed to\" / \"Could not\"."
+      }
+    ],
+    "no-restricted-imports": [
+      "error",
+      {
+        "paths": [
+          {
+            "name": "sonner",
+            "message": "Import toast helpers from '@/lib/toast' (toastError, toastErrorMessage, toastSuccess, toastInfo)."
+          }
+        ]
+      }
+    ]
+  },
+  "overrides": [
+    {
+      "files": ["src/lib/toast.ts", "src/components/shell/app-toaster.tsx"],
+      "rules": {
+        "no-restricted-imports": "off"
+      }
+    }
+  ],
+  "ignorePatterns": [".next/", "node_modules/", "dist/"]
+}

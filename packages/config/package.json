@@ -1,0 +1,39 @@
+{
+  "name": "@botss/config",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "main": "./eslint-preset/index.js",
+  "files": [
+    "eslint-preset",
+    "tsconfig",
+    "prettier"
+  ],
+  "exports": {
+    "./eslint": "./eslint-preset/index.js",
+    "./eslint-react": "./eslint-preset/react.js",
+    "./tsconfig/base": "./tsconfig/base.json",
+    "./tsconfig/library": "./tsconfig/library.json",
+    "./tsconfig/nestjs": "./tsconfig/nestjs.json",
+    "./tsconfig/nextjs": "./tsconfig/nextjs.json"
+  },
+  "scripts": {
+    "lint": "echo 'no source to lint' && exit 0",
+    "typecheck": "echo 'no source to typecheck' && exit 0",
+    "test": "echo 'no tests' && exit 0",
+    "clean": "echo 'nothing to clean' && exit 0"
+  },
+  "dependencies": {
+    "@eslint/js": "^9.16.0",
+    "eslint": "^9.16.0",
+    "eslint-plugin-import": "^2.31.0",
+    "eslint-plugin-react": "^7.37.2",
+    "eslint-plugin-react-hooks": "^5.1.0",
+    "eslint-plugin-unused-imports": "^4.1.4",
+    "globals": "^15.13.0",
+    "typescript-eslint": "^8.18.0"
+  },
+  "peerDependencies": {
+    "typescript": "^5.6.0"
+  }
+}

@@ -1,0 +1,50 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "globalDependencies": [".env", ".env.*"],
+  "globalEnv": ["NODE_ENV", "NODE_OPTIONS"],
+  "tasks": {
+    "build": {
+      "dependsOn": ["^build"],
+      "outputs": ["dist/**", ".next/**", "!.next/cache/**"]
+    },
+    "@botss/desktop#build": {
+      "outputs": []
+    },
+    "@botss/mobile#build": {
+      "outputs": []
+    },
+    "dev": {
+      "cache": false,
+      "persistent": true
+    },
+    "start": {
+      "cache": false,
+      "persistent": true,
+      "dependsOn": ["build"]
+    },
+    "lint": {
+      "dependsOn": ["^build"]
+    },
+    "test": {
+      "dependsOn": ["^build"]
+    },
+    "typecheck": {
+      "dependsOn": ["^build"]
+    },
+    "clean": {
+      "cache": false
+    },
+    "@botss/database#generate": {
+      "cache": false,
+      "outputs": ["src/generated/**"]
+    },
+    "@botss/database#migrate": {
+      "cache": false,
+      "persistent": false
+    },
+    "@botss/database#seed": {
+      "cache": false,
+      "persistent": false
+    }
+  }
+}

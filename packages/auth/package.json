@@ -1,0 +1,61 @@
+{
+  "name": "@botss/auth",
+  "version": "0.1.0",
+  "private": true,
+  "type": "commonjs",
+  "main": "./dist/index.js",
+  "module": "./src/index.ts",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./src/index.ts",
+      "default": "./dist/index.js"
+    },
+    "./server": {
+      "types": "./dist/server.d.ts",
+      "import": "./src/server.ts",
+      "default": "./dist/server.js"
+    },
+    "./client": {
+      "types": "./dist/client.d.ts",
+      "import": "./src/client.ts",
+      "default": "./dist/client.js"
+    },
+    "./ability": {
+      "types": "./dist/ability.d.ts",
+      "import": "./src/ability.ts",
+      "default": "./dist/ability.js"
+    }
+  },
+  "files": [
+    "dist",
+    "src"
+  ],
+  "scripts": {
+    "build": "cross-env NODE_OPTIONS=\"--max-old-space-size=6144\" tsc -p tsconfig.json",
+    "dev": "cross-env NODE_OPTIONS=\"--max-old-space-size=6144\" tsc -p tsconfig.json --watch --preserveWatchOutput",
+    "lint": "echo 'lint defers to root' && exit 0",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "echo 'no tests yet' && exit 0",
+    "clean": "rimraf dist .turbo *.tsbuildinfo || exit 0"
+  },
+  "dependencies": {
+    "@botss/database": "workspace:*",
+    "@botss/shared-types": "workspace:*",
+    "@casl/ability": "^6.7.1",
+    "better-auth": "1.6.33"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "cross-env": "^7.0.3",
+    "rimraf": "^6.0.1"
+  }
+}

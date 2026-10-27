@@ -1,0 +1,104 @@
+{{! Default invoice template. Copy this folder to start your own. }}
+<div class="invoice" style="--accent: {{company.accentColor}}">
+  <header class="top">
+    <div class="brand">
+      {{#if company.logo}}
+        <img class="logo" src="{{company.logo}}" alt="{{company.name}}" />
+      {{else}}
+        <div class="wordmark">{{company.name}}</div>
+      {{/if}}
+      <div class="company-lines">
+        {{#if company.logo}}<div class="company-name">{{company.name}}</div>{{/if}}
+        {{#if company.address}}<div>{{nl2br company.address}}</div>{{/if}}
+        {{#if company.email}}<div>{{company.email}}</div>{{/if}}
+        {{#if company.phone}}<div>{{company.phone}}</div>{{/if}}
+        {{#if company.website}}<div>{{company.website}}</div>{{/if}}
+        {{#if company.taxId}}<div>Tax ID: {{company.taxId}}</div>{{/if}}
+      </div>
+    </div>
+    <div class="title-block">
+      <h1>Invoice</h1>
+      <div class="number">{{invoice.number}}</div>
+      {{#if invoice.isPaid}}<div class="badge paid">Paid</div>{{/if}}
+    </div>
+  </header>
+
+  <section class="meta">
+    <div class="bill-to">
+      <div class="label">Bill to</div>
+      <div class="client-name">{{client.name}}</div>
+      {{#if client.legalName}}<div>{{client.legalName}}</div>{{/if}}
+      {{#each client.addressLines}}<div>{{this}}</div>{{/each}}
+      {{#if client.email}}<div>{{client.email}}</div>{{/if}}
+      {{#if client.taxId}}<div>Tax ID: {{client.taxId}}</div>{{/if}}
+    </div>
+    <dl class="dates">
+      <div><dt>Issued</dt><dd>{{date invoice.issuedAt}}</dd></div>
+      {{#if invoice.dueAt}}<div><dt>Due</dt><dd>{{date invoice.dueAt}}</dd></div>{{/if}}
+      {{#if project}}<div><dt>Project</dt><dd>{{project.name}}</dd></div>{{/if}}
+      {{#if contract}}<div><dt>Contract</dt><dd>{{contract.title}}</dd></div>{{/if}}
+      <div><dt>Currency</dt><dd>{{invoice.currency}}</dd></div>
+    </dl>
+  </section>
+
+  <table class="items">
+    <thead>
+      <tr>
+        <th class="num">#</th>
+        <th>Description</th>
+        <th class="right">Qty</th>
+        <th class="right">Unit price</th>
+        <th class="right">Tax</th>
+        <th class="right">Amount</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#each lineItems}}
+        <tr>
+          <td class="num">{{@number}}</td>
+          <td class="desc">{{nl2br description}}{{#if (gt discountRate 0)}}<span class="muted"> ({{percent discountRate}} off)</span>{{/if}}</td>
+          <td class="right">{{number quantity 2}}</td>
+          <td class="right">{{money unitPrice ../invoice.currency}}</td>
+          <td class="right">{{percent taxRate}}</td>
+          <td class="right strong">{{money amount ../invoice.currency}}</td>
+        </tr>
+      {{else}}
+        <tr><td colspan="6" class="empty">No line items yet.</td></tr>
+      {{/each}}
+    </tbody>
+  </table>
+
+  <section class="summary">
+    <div class="notes">
+      {{#if invoice.notes}}
+        <div class="label">Notes</div>
+        <p>{{nl2br invoice.notes}}</p>
+      {{/if}}
+      {{#if company.bankDetails}}
+        <div class="label">Payment details</div>
+        <p>{{nl2br company.bankDetails}}</p>
+      {{/if}}
+    </div>
+    <table class="totals">
+      <tr><td>Subtotal</td><td class="right">{{money invoice.subtotal invoice.currency}}</td></tr>
+      {{#if (gt invoice.discount 0)}}<tr><td>Discount</td><td class="right">-{{money invoice.discount invoice.currency}}</td></tr>{{/if}}
+      {{#if (gt invoice.tax 0)}}<tr><td>Tax</td><td class="right">{{money invoice.tax invoice.currency}}</td></tr>{{/if}}
+      <tr class="grand"><td>Total</td><td class="right">{{money invoice.total invoice.currency}}</td></tr>
+      {{#if (gt invoice.amountPaid 0)}}
+        <tr><td>Paid</td><td class="right">-{{money invoice.amountPaid invoice.currency}}</td></tr>
+        <tr class="due"><td>Balance due</td><td class="right">{{money invoice.balanceDue invoice.currency}}</td></tr>
+      {{/if}}
+    </table>
+  </section>
+
+  {{#if invoice.terms}}
+    <section class="terms">
+      <div class="label">Terms</div>
+      <p>{{nl2br invoice.terms}}</p>
+    </section>
+  {{/if}}
+
+  {{#if invoice.footer}}
+    <footer class="footer">{{nl2br invoice.footer}}</footer>
+  {{/if}}
+</div>

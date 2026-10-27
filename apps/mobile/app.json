@@ -1,0 +1,77 @@
+{
+  "expo": {
+    "name": "IWM",
+    "slug": "iwm",
+    "version": "0.1.10",
+    "orientation": "portrait",
+    "userInterfaceStyle": "automatic",
+    "scheme": "botss",
+    "icon": "./assets/icon.png",
+    "newArchEnabled": false,
+    "ios": {
+      "bundleIdentifier": "com.example.iwm",
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSCameraUsageDescription": "IWM uses the camera for video calls and screen sharing.",
+        "NSMicrophoneUsageDescription": "IWM uses the microphone for voice and video calls.",
+        "NSPhotoLibraryUsageDescription": "IWM lets you attach photos to chats and documents."
+      }
+    },
+    "android": {
+      "package": "com.example.iwm",
+      "googleServicesFile": "./google-services.json",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "permissions": [
+        "android.permission.INTERNET",
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO",
+        "android.permission.MODIFY_AUDIO_SETTINGS",
+        "android.permission.POST_NOTIFICATIONS",
+        "android.permission.VIBRATE"
+      ],
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "autoVerify": true,
+          "data": [
+            {
+              "scheme": "botss"
+            }
+          ],
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ]
+        }
+      ]
+    },
+    "plugins": [
+      "expo-router",
+      "expo-secure-store",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/splash-icon.png",
+          "imageWidth": 200,
+          "backgroundColor": "#ffffff",
+          "resizeMode": "contain"
+        }
+      ],
+      "expo-notifications",
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "kotlinVersion": "1.9.24"
+          }
+        }
+      ]
+    ],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}

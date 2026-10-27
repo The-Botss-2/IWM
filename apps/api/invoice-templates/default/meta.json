@@ -1,0 +1,6 @@
+{
+  "name": "Default",
+  "description": "Clean single-page invoice with company branding, line items, totals and payment details.",
+  "paper": "A4",
+  "marginsMm": { "top": 14, "right": 14, "bottom": 16, "left": 14 }
+}

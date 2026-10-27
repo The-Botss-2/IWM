@@ -1,0 +1,88 @@
+{{! Salary slip layout. Rendered once per person, one A4 page each; the "all payslips" PDF repeats it. assets.logo and assets.stamp say whether logo.png and stamp.png (next to this file) are available; they and signatory are only set for the root organization (payslip-render.service.ts). The bundled logo.png and stamp.png are neutral placeholders: replace them with your own. }}
+<section class="payslip">
+  <div class="bar bar-top"></div>
+
+  <header class="top">
+    <div class="brand">
+      {{#if assets.logo}}
+        <div class="logo asset-logo" role="img" aria-label="{{company.name}}"></div>
+      {{else}}
+        {{#if company.logo}}
+          <img class="logo" src="{{company.logo}}" alt="{{company.name}}" />
+        {{else}}
+          <div class="wordmark">{{company.name}}</div>
+        {{/if}}
+      {{/if}}
+      {{#if company.address}}<div class="address">{{nl2br company.address}}</div>{{/if}}
+    </div>
+    <h1>SALARY SLIP</h1>
+  </header>
+
+  <section class="employee">
+    <h2 class="section-title">Employee information</h2>
+    <dl class="info">
+      <dt>Name:</dt><dd>{{employee.name}}</dd>
+      <dt>Designation:</dt><dd>{{default employee.designation "-"}}</dd>
+      <dt>Date of Joining:</dt><dd>{{#if employee.dateOfJoining}}{{date employee.dateOfJoining}}{{else}}-{{/if}}</dd>
+      <dt>Salary Month:</dt><dd>{{period.label}}</dd>
+      <dt>CNIC:</dt><dd>{{default employee.cnic "-"}}</dd>
+    </dl>
+  </section>
+
+  <table class="lines">
+    <thead>
+      <tr><th>Description</th><th class="right">Total</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Basic Salary</td>
+        <td class="right">{{amount amounts.salary amounts.currency}}</td>
+      </tr>
+      <tr>
+        <td>Bonus{{#if bonusNote}}<div class="note">{{bonusNote}}</div>{{/if}}</td>
+        <td class="right">{{amount amounts.bonus amounts.currency}}</td>
+      </tr>
+      <tr>
+        <td>Deduction{{#if deductionNote}}<div class="note">{{deductionNote}}</div>{{/if}}</td>
+        <td class="right">{{amount amounts.deduction amounts.currency}}</td>
+      </tr>
+      <tr>
+        <td>Commission</td>
+        <td class="right">{{amount amounts.commission amounts.currency}}</td>
+      </tr>
+      <tr>
+        <td>Tax</td>
+        <td class="right">{{amount amounts.tax amounts.currency}}</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="rule"></div>
+
+  <section class="settle">
+    <div class="payment">
+      <h3 class="subhead">Payment Method</h3>
+      {{#if employee.isBankTransfer}}
+        {{#if employee.bankName}}<div class="kv"><b>Bank Name:</b> {{employee.bankName}}</div>{{/if}}
+        {{#if employee.accountNumber}}<div class="kv"><b>Account Number:</b> {{employee.accountNumber}}</div>{{/if}}
+      {{/if}}
+      <div class="kv"><b>Method:</b> {{employee.paymentMethod}}</div>
+    </div>
+    <div class="total">
+      <div class="total-label">Total:</div>
+      <div class="total-value">{{amount amounts.net amounts.currency}}</div>
+    </div>
+  </section>
+
+  <section class="signatory">
+    <h3 class="subhead">Authorized Signatory</h3>
+    <div class="kv"><b>Company Name:</b> {{company.name}}</div>
+    {{#if signatory}}
+      <div class="kv"><b>Authorized Person Name:</b> {{signatory.name}}</div>
+      <div class="kv"><b>Designation Name:</b> {{signatory.title}}</div>
+    {{/if}}
+    {{#if assets.stamp}}<div class="stamp asset-stamp" role="img" aria-label="Signature and company stamp"></div>{{/if}}
+  </section>
+
+  <div class="bar bar-bottom"></div>
+</section>

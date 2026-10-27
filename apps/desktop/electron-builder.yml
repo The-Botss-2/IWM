@@ -1,0 +1,51 @@
+# Local packaging config for the desktop shell. Replace appId, productName and
+# the icons in build/ with your own before distributing a build.
+appId: com.example.iwm
+productName: IWM
+copyright: Copyright (c) IWM contributors
+
+# electron is hoisted to the repo-root node_modules (pnpm), so electron-builder
+# can't auto-detect its version from apps/desktop. State it explicitly; keep in
+# sync with the pinned electron devDependency in package.json.
+electronVersion: 45.0.0
+
+# Space-free artifact names (e.g. IWM-0.1.0.exe) so download URLs don't have
+# to deal with %20-encoded spaces.
+artifactName: ${productName}-${version}.${ext}
+
+directories:
+  output: release
+  buildResources: build
+
+# Only the compiled main/preload + manifest ship inside the asar. The UI is
+# loaded over HTTPS from BOTSS_APP_URL at runtime, so no web assets are bundled.
+files:
+  - dist/**/*
+  - package.json
+
+# No publish / auto-update feed is configured. To ship updates, add a
+# `publish:` entry (e.g. `provider: generic` with `url: https://app.example.com/releases/`)
+# that points at a server you control.
+
+win:
+  target:
+    - nsis
+  icon: build/icon.ico
+
+nsis:
+  oneClick: false
+  perMachine: false
+  allowToChangeInstallationDirectory: true
+  shortcutName: IWM
+
+mac:
+  target:
+    - dmg
+  category: public.app-category.business
+  icon: build/icon.icns
+
+linux:
+  target:
+    - AppImage
+  category: Office
+  icon: build/icon.png
