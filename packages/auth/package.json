@@ -44,7 +44,7 @@
     "@botss/database": "workspace:*",
     "@botss/shared-types": "workspace:*",
     "@casl/ability": "^6.7.1",
-    "better-auth": "1.6.33"
+    "better-auth": "1.7.12"
   },
   "peerDependencies": {
     "react": "^19.0.0"
