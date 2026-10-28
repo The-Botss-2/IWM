@@ -99,8 +99,7 @@ function playMessageBlipSynth(volume: number): void {
     osc.connect(gain).connect(ac.destination);
     osc.start(now);
     osc.stop(now + 0.24);
-  } catch {
-  }
+  } catch {}
 }
 
 let activeBlipAudio: HTMLAudioElement | null = null;
@@ -190,14 +189,12 @@ function playRingtoneOnceSynth(volume = 0.6): () => void {
       stops.push(() => {
         try {
           osc.stop();
-        } catch {
-        }
+        } catch {}
       });
     };
     buildBeep(0);
     buildBeep(0.55);
-  } catch {
-  }
+  } catch {}
   return () => {
     for (const s of stops) s();
   };
@@ -291,11 +288,7 @@ export class RingLoop {
     if (typeof window === 'undefined') return;
     const gen = ++this.generation;
     try {
-      const { audio, started } = tryFilePlayback(
-        AUDIO_PATHS.ringtone,
-        volume,
-        true,
-      );
+      const { audio, started } = tryFilePlayback(AUDIO_PATHS.ringtone, volume, true);
       this.audio = audio;
       void started.then((ok) => {
         if (gen !== this.generation) {

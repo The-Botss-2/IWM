@@ -1,14 +1,4 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Patch,
-  Post,
-  Query,
-  Req,
-} from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query, Req } from '@nestjs/common';
 import type { Request } from 'express';
 import {
   type CreateCommentInput,
@@ -22,10 +12,7 @@ import {
 
 import { CurrentUser, type AuthedUser } from '../common/decorators/current-user.decorator';
 import { RequireAbility } from '../common/decorators/required-ability.decorator';
-import {
-  RequestUserScope,
-  type UserScope,
-} from '../common/decorators/user-scope.decorator';
+import { RequestUserScope, type UserScope } from '../common/decorators/user-scope.decorator';
 import type { RequestExtensions } from '../common/guards/auth.guard';
 import { ZodValidationPipe } from '../common/pipes/zod-validation.pipe';
 import { CommentsService } from './comments.service';
@@ -74,12 +61,7 @@ export class CommentsController {
     @Req() req: Request & RequestExtensions,
     @Param('id', new ZodValidationPipe(cuid)) id: string,
   ) {
-    await this.comments.remove(
-      scope,
-      user.id,
-      req.workspaceMemberships ?? [],
-      id,
-    );
+    await this.comments.remove(scope, user.id, req.workspaceMemberships ?? [], id);
     return { ok: true };
   }
 }

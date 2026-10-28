@@ -89,14 +89,18 @@ export class CrossProcessBus implements OnApplicationBootstrap, OnModuleDestroy 
     try {
       message = JSON.stringify({ o: this.origin, p: payload } satisfies Envelope);
     } catch (err) {
-      this.warnThrottled(`Bus publish dropped topic=${topic.name}: ${(err as Error)?.message ?? 'unserializable'}`);
+      this.warnThrottled(
+        `Bus publish dropped topic=${topic.name}: ${(err as Error)?.message ?? 'unserializable'}`,
+      );
       return;
     }
     let client: Redis;
     try {
       client = this.redis.client;
     } catch (err) {
-      this.warnThrottled(`Bus publish dropped topic=${topic.name}: ${(err as Error)?.message ?? 'no redis'}`);
+      this.warnThrottled(
+        `Bus publish dropped topic=${topic.name}: ${(err as Error)?.message ?? 'no redis'}`,
+      );
       return;
     }
     // While Redis is down ioredis would park every publish in its offline
@@ -107,7 +111,9 @@ export class CrossProcessBus implements OnApplicationBootstrap, OnModuleDestroy 
       return;
     }
     void client.publish(this.prefix(client) + topic.name, message).catch((err: unknown) => {
-      this.warnThrottled(`Bus publish failed topic=${topic.name}: ${(err as Error)?.message ?? 'unknown'}`);
+      this.warnThrottled(
+        `Bus publish failed topic=${topic.name}: ${(err as Error)?.message ?? 'unknown'}`,
+      );
     });
   }
 
@@ -134,9 +140,13 @@ export class CrossProcessBus implements OnApplicationBootstrap, OnModuleDestroy 
     }
     set.add(wrapped);
     if (isNewTopic && this.subscriber) {
-      void this.subscriber.subscribe(this.prefix(this.subscriber) + topic.name).catch((err: unknown) => {
-        this.warnThrottled(`Bus subscribe failed topic=${topic.name}: ${(err as Error)?.message ?? 'unknown'}`);
-      });
+      void this.subscriber
+        .subscribe(this.prefix(this.subscriber) + topic.name)
+        .catch((err: unknown) => {
+          this.warnThrottled(
+            `Bus subscribe failed topic=${topic.name}: ${(err as Error)?.message ?? 'unknown'}`,
+          );
+        });
     }
     return () => {
       set?.delete(wrapped);
@@ -193,7 +203,9 @@ export class CrossProcessBus implements OnApplicationBootstrap, OnModuleDestroy 
       try {
         handler(envelope.p);
       } catch (err) {
-        this.warnThrottled(`Bus handler failed channel=${channel}: ${(err as Error)?.message ?? 'unknown'}`);
+        this.warnThrottled(
+          `Bus handler failed channel=${channel}: ${(err as Error)?.message ?? 'unknown'}`,
+        );
       }
     }
   }

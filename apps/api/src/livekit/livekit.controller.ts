@@ -1,8 +1,5 @@
 import { Body, Controller, Post } from '@nestjs/common';
-import {
-  livekitTokenRequestSchema,
-  type LivekitTokenRequest,
-} from '@botss/shared-types';
+import { livekitTokenRequestSchema, type LivekitTokenRequest } from '@botss/shared-types';
 
 import { CurrentUser, type AuthedUser } from '../common/decorators/current-user.decorator';
 import { SkipPermissions } from '../common/decorators/skip-permissions.decorator';

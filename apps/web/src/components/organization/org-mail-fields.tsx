@@ -42,7 +42,11 @@ export function OrgMailFields({
       <Section title="Outgoing mail (SMTP)">
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-[1fr_120px]">
           <Field label="SMTP host" error={errMsg('smtpHost')}>
-            <input className="input" placeholder="smtp.example.com" {...register(name('smtpHost'))} />
+            <input
+              className="input"
+              placeholder="smtp.example.com"
+              {...register(name('smtpHost'))}
+            />
           </Field>
           <Field label="Port" error={errMsg('smtpPort')}>
             <input
@@ -77,7 +81,11 @@ export function OrgMailFields({
       <Section title="Incoming mail (IMAP)">
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-[1fr_120px]">
           <Field label="IMAP host" error={errMsg('imapHost')}>
-            <input className="input" placeholder="imap.example.com" {...register(name('imapHost'))} />
+            <input
+              className="input"
+              placeholder="imap.example.com"
+              {...register(name('imapHost'))}
+            />
           </Field>
           <Field label="Port" error={errMsg('imapPort')}>
             <input
@@ -123,8 +131,8 @@ export function OrgMailFields({
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <fieldset className="space-y-3 rounded-lg border border-line p-3">
-      <legend className="px-1 text-xs font-semibold text-ink-muted">{title}</legend>
+    <fieldset className="border-line space-y-3 rounded-lg border p-3">
+      <legend className="text-ink-muted px-1 text-xs font-semibold">{title}</legend>
       {children}
     </fieldset>
   );
@@ -143,7 +151,7 @@ function Field({
     <div className="space-y-1.5">
       <label className="label">{label}</label>
       {children}
-      {error ? <p className="text-xs text-state-error">{error}</p> : null}
+      {error ? <p className="text-state-error text-xs">{error}</p> : null}
     </div>
   );
 }
@@ -155,8 +163,8 @@ const Checkbox = forwardRef<
   { label: string } & React.InputHTMLAttributes<HTMLInputElement>
 >(function Checkbox({ label, ...rest }, ref) {
   return (
-    <label className="flex items-center gap-2 text-sm text-ink">
-      <input ref={ref} type="checkbox" className="h-4 w-4 rounded border-line" {...rest} />
+    <label className="text-ink flex items-center gap-2 text-sm">
+      <input ref={ref} type="checkbox" className="border-line h-4 w-4 rounded" {...rest} />
       {label}
     </label>
   );

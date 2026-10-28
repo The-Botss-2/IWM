@@ -9,11 +9,7 @@ import { Button } from '@/components/ui/button';
 import { ConfirmDialog } from '@/components/ui/confirm-dialog';
 import { QueryError } from '@/components/ui/query-error';
 import { Skeleton } from '@/components/ui/skeleton';
-import {
-  useMySessions,
-  useRevokeMySession,
-  useRevokeOtherSessions,
-} from '@/hooks/use-my-sessions';
+import { useMySessions, useRevokeMySession, useRevokeOtherSessions } from '@/hooks/use-my-sessions';
 import { relativeTime } from '@/lib/time';
 
 const MOBILE_OS = new Set(['iOS', 'iPadOS', 'Android']);
@@ -38,7 +34,7 @@ export default function DevicesSettingsPage() {
       <header className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h1 className="text-xl font-semibold">Devices</h1>
-          <p className="mt-1 text-sm text-ink-muted">
+          <p className="text-ink-muted mt-1 text-sm">
             Where you are signed in. Sign out of any device you do not recognize.
           </p>
         </div>
@@ -62,12 +58,12 @@ export default function DevicesSettingsPage() {
           onRetry={() => void sessions.refetch()}
         />
       ) : (
-        <ul className="divide-y divide-line rounded-lg border border-line bg-bg-surface">
+        <ul className="divide-line border-line bg-bg-surface divide-y rounded-lg border">
           {items.map((s) => {
             const Icon = MOBILE_OS.has(s.os) ? Smartphone : Laptop;
             return (
               <li key={s.id} className="flex items-center gap-3 p-4">
-                <Icon className="h-5 w-5 shrink-0 text-ink-muted" aria-hidden="true" />
+                <Icon className="text-ink-muted h-5 w-5 shrink-0" aria-hidden="true" />
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-center gap-2">
                     <span className="text-sm font-medium">
@@ -75,7 +71,7 @@ export default function DevicesSettingsPage() {
                     </span>
                     {s.current ? <Badge>This device</Badge> : null}
                   </div>
-                  <p className="mt-0.5 text-xs text-ink-muted">
+                  <p className="text-ink-muted mt-0.5 text-xs">
                     {s.os}
                     {s.ipAddress ? ` · ${s.ipAddress}` : ''} ·{' '}
                     {s.current
@@ -105,9 +101,7 @@ export default function DevicesSettingsPage() {
         onOpenChange={(next) => !next && setTarget(null)}
         title="Sign out this device"
         description={
-          target
-            ? `${target.device} (${target.browser}) will need to sign in again.`
-            : undefined
+          target ? `${target.device} (${target.browser}) will need to sign in again.` : undefined
         }
         confirmLabel="Sign out"
         variant="destructive"

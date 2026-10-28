@@ -140,23 +140,24 @@ export async function createAuth(
     hooks: {
       // After every sign-in attempt: a thrown APIError in `returned` means the
       // credentials were refused. Only tells the caller; never alters the reply.
-      after: createAuthMiddleware(async (ctx: {
-        path: string;
-        body?: { email?: unknown };
-        context: { returned?: unknown };
-      }) => {
-        if (!env.onSignInFailed || ctx.path !== '/sign-in/email') return;
-        try {
-          const returned = ctx.context.returned;
-          const failed =
-            returned instanceof Error ||
-            (returned instanceof Response && !returned.ok);
-          const email = ctx.body?.email;
-          if (failed && typeof email === 'string') env.onSignInFailed(email);
-        } catch {
-          // Observation only.
-        }
-      }),
+      after: createAuthMiddleware(
+        async (ctx: {
+          path: string;
+          body?: { email?: unknown };
+          context: { returned?: unknown };
+        }) => {
+          if (!env.onSignInFailed || ctx.path !== '/sign-in/email') return;
+          try {
+            const returned = ctx.context.returned;
+            const failed =
+              returned instanceof Error || (returned instanceof Response && !returned.ok);
+            const email = ctx.body?.email;
+            if (failed && typeof email === 'string') env.onSignInFailed(email);
+          } catch {
+            // Observation only.
+          }
+        },
+      ),
     },
     verification: {
       modelName: 'VerificationToken',

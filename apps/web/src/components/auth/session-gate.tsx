@@ -48,7 +48,8 @@ export function SessionGate({ children }: { children: ReactNode }) {
     // other tab) is never touched.
     if (data.support) {
       const stored = readSupportWorkspace();
-      const valid = stored !== null && data.workspaceMemberships.some((m) => m.workspaceId === stored);
+      const valid =
+        stored !== null && data.workspaceMemberships.some((m) => m.workspaceId === stored);
       if (!valid) writeSupportWorkspace(data.currentWorkspaceId ?? null);
       return;
     }
@@ -119,8 +120,8 @@ export function SessionGate({ children }: { children: ReactNode }) {
       return (
         <div className="grid min-h-screen place-items-center px-4">
           <div className="flex max-w-sm flex-col items-center gap-3 text-center">
-            <p className="text-sm font-medium text-ink">Can&apos;t reach the server</p>
-            <p className="text-sm text-ink-muted">
+            <p className="text-ink text-sm font-medium">Can&apos;t reach the server</p>
+            <p className="text-ink-muted text-sm">
               You are still signed in. Check your connection, then try again.
             </p>
             <Button onClick={() => void session.refetch()} disabled={session.isFetching}>
@@ -146,7 +147,7 @@ function ReconnectingPill() {
   return (
     <div
       role="status"
-      className="pointer-events-none fixed bottom-4 left-1/2 z-50 -translate-x-1/2 rounded-full border border-line bg-bg-surface px-3 py-1.5 text-xs font-medium text-ink-muted shadow-soft"
+      className="border-line bg-bg-surface text-ink-muted shadow-soft pointer-events-none fixed bottom-4 left-1/2 z-50 -translate-x-1/2 rounded-full border px-3 py-1.5 text-xs font-medium"
     >
       Reconnecting
     </div>

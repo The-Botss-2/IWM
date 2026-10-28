@@ -74,7 +74,7 @@ export function ContextMenu({ position, items, onClose, ariaLabel }: Props) {
       role="menu"
       aria-label={ariaLabel ?? 'Actions'}
       style={{ top: y, left: x }}
-      className="fixed z-50 min-w-[200px] rounded-lg border border-line bg-white py-1.5 shadow-popover"
+      className="border-line shadow-popover fixed z-50 min-w-[200px] rounded-lg border bg-white py-1.5"
     >
       {items.map((item) => (
         <button
@@ -89,16 +89,16 @@ export function ContextMenu({ position, items, onClose, ariaLabel }: Props) {
           }}
           className={cn(
             'flex w-full items-center gap-2 whitespace-nowrap px-3 py-2 text-left text-sm transition-colors',
-            'focus-visible:outline-none focus-visible:bg-bg-subtle',
+            'focus-visible:bg-bg-subtle focus-visible:outline-none',
             item.disabled
-              ? 'cursor-not-allowed text-ink-disabled'
+              ? 'text-ink-disabled cursor-not-allowed'
               : item.destructive
                 ? 'text-state-error hover:bg-tint-error'
                 : 'text-ink hover:bg-bg-subtle',
           )}
         >
           {item.icon ? (
-            <span className="grid h-4 w-4 shrink-0 place-items-center text-ink-muted">
+            <span className="text-ink-muted grid h-4 w-4 shrink-0 place-items-center">
               {item.icon}
             </span>
           ) : null}

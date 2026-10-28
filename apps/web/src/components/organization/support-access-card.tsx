@@ -64,32 +64,31 @@ export function SupportAccessCard() {
   const items = grants.data?.items ?? [];
 
   return (
-    <section className="space-y-5 rounded-lg border border-line bg-bg-surface p-5">
+    <section className="border-line bg-bg-surface space-y-5 rounded-lg border p-5">
       <header className="flex items-start gap-3">
-        <LifeBuoy className="mt-0.5 h-5 w-5 shrink-0 text-brand-orange" aria-hidden />
+        <LifeBuoy className="text-brand-orange mt-0.5 h-5 w-5 shrink-0" aria-hidden />
         <div>
-          <h2 className="text-lg font-semibold text-ink">Support access</h2>
-          <p className="mt-1 text-sm text-ink-muted">
-            Let the platform support team look around your organization to help
-            with a problem. Access is read only, ends by itself, and you can
-            revoke it at any time. Every page they open is recorded in your{' '}
-            <Link href="/admin/audit-log" className="font-medium text-brand-blue hover:underline">
+          <h2 className="text-ink text-lg font-semibold">Support access</h2>
+          <p className="text-ink-muted mt-1 text-sm">
+            Let the platform support team look around your organization to help with a problem.
+            Access is read only, ends by itself, and you can revoke it at any time. Every page they
+            open is recorded in your{' '}
+            <Link href="/admin/audit-log" className="text-brand-blue font-medium hover:underline">
               audit log
             </Link>
             .
           </p>
-          <p className="mt-1 text-sm text-ink-muted">
-            Support can&apos;t open mail, chat, notifications, calls, todos or
-            payroll. Files open through a link that is recorded too and stops
-            working when access ends; a file that isn&apos;t stored in your
-            workspaces shows as unavailable.
+          <p className="text-ink-muted mt-1 text-sm">
+            Support can&apos;t open mail, chat, notifications, calls, todos or payroll. Files open
+            through a link that is recorded too and stops working when access ends; a file that
+            isn&apos;t stored in your workspaces shows as unavailable.
           </p>
         </div>
       </header>
 
       <form className="space-y-4" onSubmit={submit} noValidate>
         <fieldset className="space-y-2">
-          <legend className="text-sm font-medium text-ink">How long</legend>
+          <legend className="text-ink text-sm font-medium">How long</legend>
           <div className="flex flex-wrap gap-2" role="radiogroup">
             {SUPPORT_GRANT_CHOICES.map((c) => (
               <label
@@ -141,7 +140,7 @@ export function SupportAccessCard() {
         </div>
 
         {formError ? (
-          <p role="alert" className="text-sm text-state-error">
+          <p role="alert" className="text-state-error text-sm">
             {formError}
           </p>
         ) : null}
@@ -155,10 +154,10 @@ export function SupportAccessCard() {
 
       <div className="space-y-2">
         <div className="flex items-center justify-between gap-2">
-          <h3 className="text-sm font-semibold text-ink">Grants</h3>
+          <h3 className="text-ink text-sm font-semibold">Grants</h3>
           <Link
             href="/admin/audit-log"
-            className="inline-flex items-center gap-1 text-xs font-medium text-brand-blue hover:underline"
+            className="text-brand-blue inline-flex items-center gap-1 text-xs font-medium hover:underline"
           >
             <History className="h-3.5 w-3.5" aria-hidden />
             See support activity
@@ -169,35 +168,41 @@ export function SupportAccessCard() {
             <Loader size="sm" label="Loading" />
           </div>
         ) : grants.isError && !grants.data ? (
-          <QueryError message="Couldn't load support grants." onRetry={() => void grants.refetch()} />
+          <QueryError
+            message="Couldn't load support grants."
+            onRetry={() => void grants.refetch()}
+          />
         ) : items.length === 0 ? (
-          <p className="rounded-md border border-line bg-bg-subtle px-3 py-4 text-center text-xs text-ink-muted">
+          <p className="border-line bg-bg-subtle text-ink-muted rounded-md border px-3 py-4 text-center text-xs">
             Support has never had access to this organization.
           </p>
         ) : (
-          <ul className="divide-y divide-line rounded-md border border-line">
+          <ul className="divide-line border-line divide-y rounded-md border">
             {items.map((g) => (
-              <li key={g.id} className="flex flex-wrap items-center justify-between gap-3 px-3 py-2.5">
+              <li
+                key={g.id}
+                className="flex flex-wrap items-center justify-between gap-3 px-3 py-2.5"
+              >
                 <div className="min-w-0 space-y-0.5">
                   <div className="flex flex-wrap items-center gap-2">
                     <Badge tone={g.status === 'ACTIVE' ? 'warning' : 'neutral'}>
                       {SUPPORT_GRANT_STATUS_LABEL[g.status]}
                     </Badge>
-                    <span className="text-sm text-ink">
+                    <span className="text-ink text-sm">
                       {g.status === 'ACTIVE' ? 'Ends ' : 'Ended '}
                       <span title={absoluteTime(g.revokedAt ?? g.expiresAt)}>
                         {absoluteTime(g.revokedAt ?? g.expiresAt)}
                       </span>
                     </span>
                   </div>
-                  <p className="text-xs text-ink-muted">
+                  <p className="text-ink-muted text-xs">
                     Granted by {g.grantedBy?.name || g.grantedBy?.email || 'a former member'}{' '}
                     <span title={absoluteTime(g.createdAt)}>{relativeTime(g.createdAt)}</span>
                     {g.revokedAt
                       ? `, revoked by ${g.revokedBy?.name || g.revokedBy?.email || 'a former member'}`
                       : ''}
                   </p>
-                  {g.reason ? <p className="text-xs text-ink-muted">Note: {g.reason}</p> : null}
+                  {g.reason ? <p className="text-ink-muted text-xs">Note: {g.reason}</p> : null}
                 </div>
                 {g.status === 'ACTIVE' ? (
                   <Button

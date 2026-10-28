@@ -80,9 +80,9 @@ export function MilestoneTable({
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <p className="text-sm text-ink-muted">
-          Payment stages. Link one to a sprint or a set of tasks and it flips to
-          Delivered on its own when that work finishes.
+        <p className="text-ink-muted text-sm">
+          Payment stages. Link one to a sprint or a set of tasks and it flips to Delivered on its
+          own when that work finishes.
         </p>
         {canEdit ? (
           <Button size="sm" onClick={() => setAdding(true)}>
@@ -92,14 +92,14 @@ export function MilestoneTable({
       </div>
 
       {contract.milestones.length === 0 ? (
-        <div className="rounded-md border border-dashed border-line bg-bg-surface p-8 text-center text-sm text-ink-muted">
+        <div className="border-line bg-bg-surface text-ink-muted rounded-md border border-dashed p-8 text-center text-sm">
           No milestones yet.
         </div>
       ) : (
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="border-b border-line text-left text-xs uppercase tracking-wide text-ink-muted">
+              <tr className="border-line text-ink-muted border-b text-left text-xs uppercase tracking-wide">
                 <th className="px-3 py-2 font-medium">Milestone</th>
                 <th className="px-3 py-2 font-medium">Linked work</th>
                 <th className="px-3 py-2 font-medium">Due</th>
@@ -112,16 +112,16 @@ export function MilestoneTable({
             </thead>
             <tbody>
               {contract.milestones.map((m, index) => (
-                <tr key={m.id} className="border-b border-line last:border-0 hover:bg-bg-subtle">
+                <tr key={m.id} className="border-line hover:bg-bg-subtle border-b last:border-0">
                   <td className="px-3 py-2 font-medium">{m.title}</td>
-                  <td className="px-3 py-2 text-xs text-ink-muted">
+                  <td className="text-ink-muted px-3 py-2 text-xs">
                     {m.sprint
                       ? `Sprint: ${m.sprint.name}`
                       : m.tasks.length > 0
                         ? `${m.tasks.length} task${m.tasks.length === 1 ? '' : 's'}`
                         : 'Manual'}
                   </td>
-                  <td className="px-3 py-2 whitespace-nowrap text-ink-muted">
+                  <td className="text-ink-muted whitespace-nowrap px-3 py-2">
                     {m.dueDate ? new Date(m.dueDate).toLocaleDateString() : '-'}
                   </td>
                   <td className="px-3 py-2 text-right tabular-nums">
@@ -208,11 +208,7 @@ export function MilestoneTable({
                         </Button>
                       ) : null}
                       {m.paymentStatus !== 'PAID' ? (
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => onRecordPayment(m.id)}
-                        >
+                        <Button variant="ghost" size="sm" onClick={() => onRecordPayment(m.id)}>
                           Pay
                         </Button>
                       ) : null}
@@ -235,22 +231,14 @@ export function MilestoneTable({
         </div>
       )}
 
-      <MilestoneDialog
-        open={adding}
-        onOpenChange={setAdding}
-        contract={contract}
-      />
+      <MilestoneDialog open={adding} onOpenChange={setAdding} contract={contract} />
       <MilestoneDialog
         open={!!editingMilestone}
         onOpenChange={(o) => !o && setEditingMilestone(null)}
         contract={contract}
         existing={editingMilestone}
       />
-      <LinkWorkDialog
-        milestone={linking}
-        contract={contract}
-        onClose={() => setLinking(null)}
-      />
+      <LinkWorkDialog milestone={linking} contract={contract} onClose={() => setLinking(null)} />
       <ConfirmDialog
         open={!!confirming}
         onOpenChange={(o) => !o && setConfirming(null)}
@@ -391,7 +379,7 @@ function MilestoneDialog({
                   ))}
                 </SelectContent>
               </Select>
-              <p className="mt-1 text-xs text-ink-muted">
+              <p className="text-ink-muted mt-1 text-xs">
                 Payment status follows the payments recorded and is not set here.
               </p>
             </div>
@@ -460,8 +448,8 @@ function LinkWorkDialog({
           <DialogHeader>
             <DialogTitle>Link project work</DialogTitle>
             <DialogDescription>
-              This contract is not attached to a project, so there is no sprint
-              or task to link. Attach a project to the contract first.
+              This contract is not attached to a project, so there is no sprint or task to link.
+              Attach a project to the contract first.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
@@ -477,10 +465,7 @@ function LinkWorkDialog({
   // Linked tasks first (they may not match the search), then the results.
   const pinned = (milestone?.tasks ?? []).filter((t) => taskIds.includes(t.id));
   const pinnedIds = new Set(pinned.map((t) => t.id));
-  const taskOptions = [
-    ...pinned,
-    ...(tasks.data?.items ?? []).filter((t) => !pinnedIds.has(t.id)),
-  ];
+  const taskOptions = [...pinned, ...(tasks.data?.items ?? []).filter((t) => !pinnedIds.has(t.id))];
 
   return (
     <Dialog open={!!milestone} onOpenChange={(o) => !o && onClose()}>
@@ -488,8 +473,8 @@ function LinkWorkDialog({
         <DialogHeader>
           <DialogTitle>Link project work</DialogTitle>
           <DialogDescription>
-            {milestone?.title} becomes Delivered automatically when the linked
-            sprint completes, or when every linked task is done.
+            {milestone?.title} becomes Delivered automatically when the linked sprint completes, or
+            when every linked task is done.
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-4">
@@ -510,12 +495,12 @@ function LinkWorkDialog({
             </div>
           </div>
           {sprintId ? (
-            <p className="text-xs text-ink-muted">
+            <p className="text-ink-muted text-xs">
               A linked sprint decides delivery; tasks are not used.
             </p>
           ) : (
             <fieldset className="space-y-2">
-              <legend className="text-sm font-medium text-ink">Tasks</legend>
+              <legend className="text-ink text-sm font-medium">Tasks</legend>
               <Input
                 value={taskQuery}
                 onChange={(e) => setTaskQuery(e.target.value)}
@@ -532,7 +517,9 @@ function LinkWorkDialog({
                         checked={taskIds.includes(t.id)}
                         onCheckedChange={(v) =>
                           setTaskIds((ids) =>
-                            v === true ? [...ids.filter((x) => x !== t.id), t.id] : ids.filter((x) => x !== t.id),
+                            v === true
+                              ? [...ids.filter((x) => x !== t.id), t.id]
+                              : ids.filter((x) => x !== t.id),
                           )
                         }
                       />
@@ -543,10 +530,10 @@ function LinkWorkDialog({
                   );
                 })}
                 {taskOptions.length === 0 && !tasks.isLoading ? (
-                  <li className="text-sm text-ink-muted">No tasks found.</li>
+                  <li className="text-ink-muted text-sm">No tasks found.</li>
                 ) : null}
               </ul>
-              <p className="text-xs text-ink-muted">
+              <p className="text-ink-muted text-xs">
                 {taskIds.length === 0
                   ? 'No tasks linked - mark it delivered by hand.'
                   : `${taskIds.length} task${taskIds.length === 1 ? '' : 's'} linked.`}

@@ -70,10 +70,12 @@ export default function PortalDocumentPage({
                 {glyph}
               </span>
             ) : null}
-            <h1 className="text-2xl font-semibold text-ink sm:text-3xl">{documentTitle(d.title)}</h1>
-            <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-sm text-ink-muted">
+            <h1 className="text-ink text-2xl font-semibold sm:text-3xl">
+              {documentTitle(d.title)}
+            </h1>
+            <div className="text-ink-muted flex flex-wrap items-center gap-x-3 gap-y-1.5 text-sm">
               <span>
-                By <span className="font-medium text-ink">{d.authorName}</span>
+                By <span className="text-ink font-medium">{d.authorName}</span>
               </span>
               <span>
                 Updated <time dateTime={isoDate(d.updatedAt)}>{formatDate(d.updatedAt)}</time>
@@ -82,11 +84,11 @@ export default function PortalDocumentPage({
             </div>
           </header>
           {html === null ? (
-            <p className="text-sm text-ink-muted">
+            <p className="text-ink-muted text-sm">
               This document can&apos;t be displayed here. Ask the person who shared it for a copy.
             </p>
           ) : html === '' ? (
-            <p className="text-sm text-ink-muted">This document is empty.</p>
+            <p className="text-ink-muted text-sm">This document is empty.</p>
           ) : (
             // Own horizontal scroller: a table whose columns staff resized
             // carries fixed inline widths wider than a phone, and the

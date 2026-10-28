@@ -119,20 +119,56 @@ export function TopBar() {
 
   const inlineItems: NavItem[] = [
     { key: 'home', href: '/home', label: 'Home', icon: Home, prefkey: 'home' },
-    { key: 'dashboard', href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard, prefkey: 'dashboard' },
-    { key: 'projects', href: '/projects', label: 'Projects', icon: FolderKanban, prefkey: 'projects' },
+    {
+      key: 'dashboard',
+      href: '/dashboard',
+      label: 'Dashboard',
+      icon: LayoutDashboard,
+      prefkey: 'dashboard',
+    },
+    {
+      key: 'projects',
+      href: '/projects',
+      label: 'Projects',
+      icon: FolderKanban,
+      prefkey: 'projects',
+    },
     { key: 'mail', href: '/mail', label: 'Mail', icon: Mail, prefkey: 'mail' },
     { key: 'chat', href: '/chat', label: 'Chat', icon: MessageSquare, prefkey: 'chat' },
     { key: 'todo', href: '/todo', label: 'Todos', icon: CheckSquare, prefkey: 'todo' },
   ];
 
   const moreItems: NavItem[] = [
-    { key: 'calendar', href: '/calendar', label: 'Calendar', icon: CalendarDays, prefkey: 'calendar' },
-    { key: 'timesheets', href: '/timesheets', label: 'Timesheets', icon: Clock, prefkey: 'timesheets' },
+    {
+      key: 'calendar',
+      href: '/calendar',
+      label: 'Calendar',
+      icon: CalendarDays,
+      prefkey: 'calendar',
+    },
+    {
+      key: 'timesheets',
+      href: '/timesheets',
+      label: 'Timesheets',
+      icon: Clock,
+      prefkey: 'timesheets',
+    },
     { key: 'leads', href: '/leads', label: 'Leads', icon: UserPlus, prefkey: 'projects' },
     { key: 'clients', href: '/clients', label: 'Clients', icon: Users, prefkey: 'projects' },
-    { key: 'financials', href: '/financials', label: 'Financials', icon: Wallet, prefkey: 'financials' },
-    { key: 'documents', href: '/documents', label: 'Documents', icon: FileText, prefkey: 'projects' },
+    {
+      key: 'financials',
+      href: '/financials',
+      label: 'Financials',
+      icon: Wallet,
+      prefkey: 'financials',
+    },
+    {
+      key: 'documents',
+      href: '/documents',
+      label: 'Documents',
+      icon: FileText,
+      prefkey: 'projects',
+    },
   ];
 
   // Leads and Clients are gated independently: a user can be assigned clients
@@ -144,13 +180,12 @@ export function TopBar() {
     ...(inSupport ? { mail: false, chat: false } : {}),
   };
   const isAllowed = (i: NavItem): boolean =>
-    (!i.prefkey || nav.isVisible(i.prefkey)) &&
-    (roleVisible[i.key] ?? true);
+    (!i.prefkey || nav.isVisible(i.prefkey)) && (roleVisible[i.key] ?? true);
   const visibleInline = inlineItems.filter(isAllowed);
   const visibleMore = moreItems.filter(isAllowed);
 
   return (
-    <header className="sticky top-0 z-20 flex h-16 items-center justify-between gap-3 bg-bg-app px-4 sm:px-6">
+    <header className="bg-bg-app sticky top-0 z-20 flex h-16 items-center justify-between gap-3 px-4 sm:px-6">
       {/* Left: brand mark. Mobile shows the icon-only variant so the wide
           wordmark doesn't crowd the centered nav pill on narrow screens;
           tablet/desktop (sm and up) get the full wordmark from
@@ -159,24 +194,16 @@ export function TopBar() {
       <Link
         href="/home"
         aria-label="Home"
-        className="rounded focus-visible:outline-none focus-visible:shadow-focus"
+        className="focus-visible:shadow-focus rounded focus-visible:outline-none"
       >
-        <Logo
-          variant="icon"
-          size="sm"
-          className="sm:hidden"
-        />
-        <Logo
-          variant="full"
-          size="sm"
-          className="hidden sm:inline-block"
-        />
+        <Logo variant="icon" size="sm" className="sm:hidden" />
+        <Logo variant="full" size="sm" className="hidden sm:inline-block" />
       </Link>
 
       {/* Center: pill nav */}
       <nav
         aria-label="Primary"
-        className="hidden md:flex items-center gap-1 rounded-full bg-brand-gradient px-3 py-1.5 shadow-pill"
+        className="bg-brand-gradient shadow-pill hidden items-center gap-1 rounded-full px-3 py-1.5 md:flex"
       >
         {visibleInline.map((item) => (
           <PillNavItem
@@ -189,12 +216,7 @@ export function TopBar() {
         ))}
         {visibleMore.length > 0 ? <MoreMenu items={visibleMore} isActive={isActive} /> : null}
         {isAdmin && nav.isVisible('admin') ? (
-          <PillNavItem
-            href="/admin"
-            active={isActive('/admin')}
-            label="Admin"
-            icon={ShieldCheck}
-          />
+          <PillNavItem href="/admin" active={isActive('/admin')} label="Admin" icon={ShieldCheck} />
         ) : null}
         {isHr ? (
           <PillNavItem
@@ -211,13 +233,13 @@ export function TopBar() {
         <button
           type="button"
           onClick={() => router.push('/select-workspace')}
-          className="hidden h-9 items-center gap-2 rounded-full border border-line bg-white px-3 text-sm transition-all hover:border-line-strong focus-visible:outline-none focus-visible:shadow-focus sm:inline-flex"
+          className="border-line hover:border-line-strong focus-visible:shadow-focus hidden h-9 items-center gap-2 rounded-full border bg-white px-3 text-sm transition-all focus-visible:outline-none sm:inline-flex"
           title="Switch workspace"
         >
-          <span className="hidden text-brand-gradient font-medium md:inline">
+          <span className="text-brand-gradient hidden font-medium md:inline">
             {workspace.data?.name ?? 'Workspace'}
           </span>
-          <ChevronDown className="h-3.5 w-3.5 text-ink-muted" />
+          <ChevronDown className="text-ink-muted h-3.5 w-3.5" />
         </button>
 
         <NotificationBell />
@@ -227,8 +249,8 @@ export function TopBar() {
           aria-label="Download desktop app"
           title="Download desktop app"
           className={cn(
-            'grid h-9 w-9 place-items-center rounded-full text-ink-muted transition-all hover:bg-white hover:text-ink hover:shadow-soft',
-            isActive('/download') && 'bg-white text-ink shadow-soft',
+            'text-ink-muted hover:text-ink hover:shadow-soft grid h-9 w-9 place-items-center rounded-full transition-all hover:bg-white',
+            isActive('/download') && 'text-ink shadow-soft bg-white',
           )}
         >
           <Download className="h-4 w-4" />
@@ -240,8 +262,8 @@ export function TopBar() {
             aria-label="Settings"
             title="Settings"
             className={cn(
-              'grid h-9 w-9 place-items-center rounded-full text-ink-muted transition-all hover:bg-white hover:text-ink hover:shadow-soft',
-              isActive('/settings') && 'bg-white text-ink shadow-soft',
+              'text-ink-muted hover:text-ink hover:shadow-soft grid h-9 w-9 place-items-center rounded-full transition-all hover:bg-white',
+              isActive('/settings') && 'text-ink shadow-soft bg-white',
             )}
           >
             <Settings className="h-4 w-4" />
@@ -260,7 +282,7 @@ export function TopBar() {
           onClick={onSignOut}
           aria-label="Sign out"
           title="Sign out"
-          className="hidden h-9 w-9 place-items-center rounded-full text-ink-muted transition-all hover:bg-white hover:text-state-error hover:shadow-soft sm:grid"
+          className="text-ink-muted hover:text-state-error hover:shadow-soft hidden h-9 w-9 place-items-center rounded-full transition-all hover:bg-white sm:grid"
         >
           <LogOut className="h-4 w-4" />
         </button>
@@ -269,7 +291,7 @@ export function TopBar() {
       {/* Mobile pill (slim) */}
       <nav
         aria-label="Primary mobile"
-        className="md:hidden absolute left-1/2 top-3 -translate-x-1/2 items-center gap-1 rounded-full bg-brand-gradient px-2 py-1 shadow-pill flex"
+        className="bg-brand-gradient shadow-pill absolute left-1/2 top-3 flex -translate-x-1/2 items-center gap-1 rounded-full px-2 py-1 md:hidden"
       >
         {visibleInline.slice(0, 3).map((item) => (
           <PillNavItem
@@ -314,9 +336,9 @@ function PillNavItem({
     <Link
       href={href}
       className={cn(
-        'inline-flex items-center gap-1.5 rounded-full text-[13px] font-medium transition-all duration-200 select-none',
+        'inline-flex select-none items-center gap-1.5 rounded-full text-[13px] font-medium transition-all duration-200',
         compact ? 'px-2 py-1' : 'px-3 py-1.5',
-        'text-white/85 hover:text-white hover:bg-white/10',
+        'text-white/85 hover:bg-white/10 hover:text-white',
         'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60',
         active && 'bg-white/[0.18] text-white shadow-[inset_0_0_0_1px_rgba(255,255,255,0.15)]',
       )}
@@ -332,7 +354,12 @@ function MoreMenu({
   isActive,
   compact = false,
 }: {
-  items: Array<{ key: string; href: string; label: string; icon: ComponentType<{ className?: string }> }>;
+  items: Array<{
+    key: string;
+    href: string;
+    label: string;
+    icon: ComponentType<{ className?: string }>;
+  }>;
   isActive: (href: string) => boolean;
   compact?: boolean;
 }) {
@@ -347,9 +374,9 @@ function MoreMenu({
         aria-haspopup="menu"
         aria-expanded={open}
         className={cn(
-          'inline-flex items-center gap-1 rounded-full text-[13px] font-medium transition-all duration-200 select-none',
+          'inline-flex select-none items-center gap-1 rounded-full text-[13px] font-medium transition-all duration-200',
           compact ? 'px-2 py-1' : 'px-3 py-1.5',
-          'text-white/85 hover:text-white hover:bg-white/10',
+          'text-white/85 hover:bg-white/10 hover:text-white',
           'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60',
           anyActive && 'bg-white/[0.18] text-white',
         )}
@@ -360,7 +387,7 @@ function MoreMenu({
       {open ? (
         <div
           role="menu"
-          className="absolute right-0 z-30 mt-2 w-56 rounded-lg border border-line bg-white py-1.5 shadow-popover"
+          className="border-line shadow-popover absolute right-0 z-30 mt-2 w-56 rounded-lg border bg-white py-1.5"
         >
           {items.map((item) => {
             const Icon = item.icon;
@@ -377,7 +404,7 @@ function MoreMenu({
                   itemActive ? 'bg-bg-subtle text-ink font-medium' : 'text-ink hover:bg-bg-subtle',
                 )}
               >
-                <Icon className="h-4 w-4 text-ink-muted" />
+                <Icon className="text-ink-muted h-4 w-4" />
                 {item.label}
               </Link>
             );
@@ -410,7 +437,7 @@ function UserMenu({
         aria-haspopup="menu"
         aria-expanded={open}
         aria-label="Account menu"
-        className="flex h-9 items-center gap-2 rounded-full hover:shadow-soft focus-visible:outline-none focus-visible:shadow-focus transition-all"
+        className="hover:shadow-soft focus-visible:shadow-focus flex h-9 items-center gap-2 rounded-full transition-all focus-visible:outline-none"
       >
         <UserAvatar size="md" name={name || email} image={image} online />
       </button>
@@ -418,30 +445,28 @@ function UserMenu({
       {open ? (
         <div
           role="menu"
-          className="absolute right-0 z-30 mt-2 w-60 rounded-lg border border-line bg-white py-1.5 shadow-popover"
+          className="border-line shadow-popover absolute right-0 z-30 mt-2 w-60 rounded-lg border bg-white py-1.5"
         >
-          <div className="border-b border-line px-3 py-2.5">
-            <div className="truncate text-sm font-semibold text-ink">
-              {name || 'Account'}
-            </div>
-            <div className="truncate text-xs text-ink-muted">{email}</div>
+          <div className="border-line border-b px-3 py-2.5">
+            <div className="text-ink truncate text-sm font-semibold">{name || 'Account'}</div>
+            <div className="text-ink-muted truncate text-xs">{email}</div>
           </div>
           <Link
             href="/settings"
             role="menuitem"
             onMouseDown={(e) => e.preventDefault()}
-            className="flex items-center gap-2 px-3 py-2 text-sm text-ink hover:bg-bg-subtle"
+            className="text-ink hover:bg-bg-subtle flex items-center gap-2 px-3 py-2 text-sm"
           >
-            <Settings className="h-3.5 w-3.5 text-ink-muted" />
+            <Settings className="text-ink-muted h-3.5 w-3.5" />
             Settings
           </Link>
           <Link
             href="/dashboard"
             role="menuitem"
             onMouseDown={(e) => e.preventDefault()}
-            className="flex items-center gap-2 px-3 py-2 text-sm text-ink hover:bg-bg-subtle"
+            className="text-ink hover:bg-bg-subtle flex items-center gap-2 px-3 py-2 text-sm"
           >
-            <Bell className="h-3.5 w-3.5 text-ink-muted" />
+            <Bell className="text-ink-muted h-3.5 w-3.5" />
             Dashboard
           </Link>
           <button
@@ -449,7 +474,7 @@ function UserMenu({
             role="menuitem"
             onMouseDown={(e) => e.preventDefault()}
             onClick={onSignOut}
-            className="flex w-full items-center gap-2 px-3 py-2 text-left text-sm text-state-error hover:bg-tint-error"
+            className="text-state-error hover:bg-tint-error flex w-full items-center gap-2 px-3 py-2 text-left text-sm"
           >
             <LogOut className="h-3.5 w-3.5" />
             Sign out

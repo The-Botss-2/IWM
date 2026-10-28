@@ -14,5 +14,5 @@ export default function DeveloperLayout({ children }: { children: ReactNode }) {
   if (process.env.NODE_ENV === 'production') {
     notFound();
   }
-  return <div className="min-h-screen bg-bg-subtle">{children}</div>;
+  return <div className="bg-bg-subtle min-h-screen">{children}</div>;
 }

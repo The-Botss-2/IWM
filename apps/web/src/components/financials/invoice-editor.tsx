@@ -176,15 +176,19 @@ export function InvoiceEditor({
     setCurrency(prefill?.currency ?? s?.defaultCurrency ?? 'USD');
     setDueAt(addDays(new Date(), s?.defaultDueDays ?? 14));
     if (prefill?.description || prefill?.amount) {
-      setLines([newLine({ description: prefill.description ?? '', unitPrice: prefill.amount ?? '' })]);
+      setLines([
+        newLine({ description: prefill.description ?? '', unitPrice: prefill.amount ?? '' }),
+      ]);
     }
     setHydrated(true);
   }, [hydrated, invoiceId, invoice, settings.isLoading, settings.data, prefill]);
 
-  const markDirty = <T,>(setter: (v: T) => void) => (v: T) => {
-    setter(v);
-    setDirty(true);
-  };
+  const markDirty =
+    <T,>(setter: (v: T) => void) =>
+    (v: T) => {
+      setter(v);
+      setDirty(true);
+    };
 
   const totals = useMemo(() => computeInvoiceTotals(lines), [lines]);
 
@@ -210,7 +214,19 @@ export function InvoiceEditor({
       terms: terms.trim() ? terms : null,
       footer: footer.trim() ? footer : null,
     }),
-    [invoiceId, templateKey, clientId, projectId, currency, issuedAt, dueAt, lines, notes, terms, footer],
+    [
+      invoiceId,
+      templateKey,
+      clientId,
+      projectId,
+      currency,
+      issuedAt,
+      dueAt,
+      lines,
+      notes,
+      terms,
+      footer,
+    ],
   );
   const debouncedPreviewInput = useDebouncedValue(previewInput, 400);
   const preview = useInvoicePreview(debouncedPreviewInput, hydrated);
@@ -327,7 +343,7 @@ export function InvoiceEditor({
   if (invoiceId && existing.isLoading) return <PageLoader label="Loading invoice" />;
   if (invoiceId && existing.isError) {
     return (
-      <div className="mx-auto max-w-lg p-8 text-center text-sm text-ink-muted">
+      <div className="text-ink-muted mx-auto max-w-lg p-8 text-center text-sm">
         Couldn&apos;t load this invoice.{' '}
         <Link href="/financials?tab=invoices" className="underline">
           Back to invoices
@@ -349,10 +365,10 @@ export function InvoiceEditor({
             </Link>
           </Button>
           <div className="min-w-0">
-            <h1 className="truncate text-xl font-semibold text-ink">
+            <h1 className="text-ink truncate text-xl font-semibold">
               {invoice ? invoice.number : 'New invoice'}
             </h1>
-            <p className="text-xs text-ink-muted">
+            <p className="text-ink-muted text-xs">
               {invoice ? statusLabel(invoice.status) : 'Draft, not saved yet'}
               {dirty && !readOnly ? ' · Unsaved changes' : ''}
             </p>
@@ -361,16 +377,29 @@ export function InvoiceEditor({
         <div className="flex flex-wrap items-center gap-2">
           {invoice && !dirty ? <InvoiceStatusMenu invoice={invoice} /> : null}
           {invoice && invoice.status === 'DRAFT' ? (
-            <Button variant="ghost" onClick={() => setConfirmDelete(true)} disabled={remove.isPending}>
+            <Button
+              variant="ghost"
+              onClick={() => setConfirmDelete(true)}
+              disabled={remove.isPending}
+            >
               <Trash2 className="h-4 w-4" /> Delete
             </Button>
           ) : null}
-          <Button variant="secondary" onClick={() => void download()} disabled={pdf.isPending || busy}>
-            {pdf.isPending ? <Loader size="xs" label="Generating PDF" /> : <Download className="h-4 w-4" />}
+          <Button
+            variant="secondary"
+            onClick={() => void download()}
+            disabled={pdf.isPending || busy}
+          >
+            {pdf.isPending ? (
+              <Loader size="xs" label="Generating PDF" />
+            ) : (
+              <Download className="h-4 w-4" />
+            )}
             Download PDF
           </Button>
           <Button variant="secondary" onClick={() => void openSend()} disabled={busy || !clientId}>
-            <Send className="h-4 w-4" /> {invoice && invoice.status !== 'DRAFT' ? 'Send again' : 'Send'}
+            <Send className="h-4 w-4" />{' '}
+            {invoice && invoice.status !== 'DRAFT' ? 'Send again' : 'Send'}
           </Button>
           {!readOnly ? (
             <Button onClick={() => void save()} disabled={busy}>
@@ -381,15 +410,15 @@ export function InvoiceEditor({
       </header>
 
       {readOnly ? (
-        <div className="rounded-md border border-line bg-bg-subtle px-4 py-3 text-sm text-ink-muted">
-          This invoice has been sent, so its contents are locked. Record payments from the Payments tab,
-          or cancel it and raise a new one to change it.
+        <div className="border-line bg-bg-subtle text-ink-muted rounded-md border px-4 py-3 text-sm">
+          This invoice has been sent, so its contents are locked. Record payments from the Payments
+          tab, or cancel it and raise a new one to change it.
         </div>
       ) : null}
 
       <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
         <fieldset disabled={readOnly} className="min-w-0 space-y-5">
-          <section className="space-y-4 rounded-lg border border-line bg-bg-surface p-4">
+          <section className="border-line bg-bg-surface space-y-4 rounded-lg border p-4">
             <div className="grid gap-4 sm:grid-cols-2">
               <Field label="Client">
                 <Combobox
@@ -413,7 +442,11 @@ export function InvoiceEditor({
             </div>
             <div className="grid gap-4 sm:grid-cols-3">
               <Field label="Issued">
-                <DatePicker value={issuedAt} onChange={markDirty(setIssuedAt)} disabled={readOnly} />
+                <DatePicker
+                  value={issuedAt}
+                  onChange={markDirty(setIssuedAt)}
+                  disabled={readOnly}
+                />
               </Field>
               <Field label="Due">
                 <DatePicker value={dueAt} onChange={markDirty(setDueAt)} disabled={readOnly} />
@@ -434,14 +467,20 @@ export function InvoiceEditor({
               </Field>
             </div>
             <Field label="Template">
-              <Select value={templateKey} onValueChange={markDirty(setTemplateKey)} disabled={readOnly}>
+              <Select
+                value={templateKey}
+                onValueChange={markDirty(setTemplateKey)}
+                disabled={readOnly}
+              >
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value={DEFAULT_TEMPLATE}>
                     Organization default
-                    {templates.data ? ` (${templateName(templateItems, templates.data.defaultKey)})` : ''}
+                    {templates.data
+                      ? ` (${templateName(templateItems, templates.data.defaultKey)})`
+                      : ''}
                   </SelectItem>
                   {templateItems.map((t) => (
                     <SelectItem key={t.key} value={t.key}>
@@ -453,14 +492,14 @@ export function InvoiceEditor({
             </Field>
           </section>
 
-          <section className="space-y-3 rounded-lg border border-line bg-bg-surface p-4">
+          <section className="border-line bg-bg-surface space-y-3 rounded-lg border p-4">
             <div className="flex items-center justify-between">
-              <h2 className="text-sm font-semibold text-ink">Line items</h2>
-              <span className="text-xs text-ink-muted">Tax and discount are percentages</span>
+              <h2 className="text-ink text-sm font-semibold">Line items</h2>
+              <span className="text-ink-muted text-xs">Tax and discount are percentages</span>
             </div>
             <div className="space-y-3">
               {lines.map((line, index) => (
-                <div key={line.key} className="rounded-md border border-line p-3">
+                <div key={line.key} className="border-line rounded-md border p-3">
                   <div className="flex items-start gap-2">
                     <Textarea
                       aria-label={`Line ${index + 1} description`}
@@ -508,8 +547,8 @@ export function InvoiceEditor({
                       onChange={(v) => updateLine(line.key, { discountRate: v })}
                     />
                     <div className="col-span-2 flex flex-col justify-end sm:col-span-1">
-                      <span className="text-xs text-ink-muted">Amount</span>
-                      <span className="truncate text-sm font-semibold tabular-nums text-ink">
+                      <span className="text-ink-muted text-xs">Amount</span>
+                      <span className="text-ink truncate text-sm font-semibold tabular-nums">
                         {formatCurrency(totals.lines[index] ?? '0', currency)}
                       </span>
                     </div>
@@ -531,29 +570,35 @@ export function InvoiceEditor({
               </Button>
             ) : null}
 
-            <dl className="ml-auto grid w-full max-w-xs grid-cols-2 gap-y-1 border-t border-line pt-3 text-sm">
+            <dl className="border-line ml-auto grid w-full max-w-xs grid-cols-2 gap-y-1 border-t pt-3 text-sm">
               <dt className="text-ink-muted">Subtotal</dt>
-              <dd className="text-right tabular-nums">{formatCurrency(totals.subtotal, currency)}</dd>
+              <dd className="text-right tabular-nums">
+                {formatCurrency(totals.subtotal, currency)}
+              </dd>
               {Number(totals.discount) > 0 ? (
                 <>
                   <dt className="text-ink-muted">Discount</dt>
-                  <dd className="text-right tabular-nums">-{formatCurrency(totals.discount, currency)}</dd>
+                  <dd className="text-right tabular-nums">
+                    -{formatCurrency(totals.discount, currency)}
+                  </dd>
                 </>
               ) : null}
               {Number(totals.tax) > 0 ? (
                 <>
                   <dt className="text-ink-muted">Tax</dt>
-                  <dd className="text-right tabular-nums">{formatCurrency(totals.tax, currency)}</dd>
+                  <dd className="text-right tabular-nums">
+                    {formatCurrency(totals.tax, currency)}
+                  </dd>
                 </>
               ) : null}
-              <dt className="font-semibold text-ink">Total</dt>
-              <dd className="text-right font-semibold tabular-nums text-ink">
+              <dt className="text-ink font-semibold">Total</dt>
+              <dd className="text-ink text-right font-semibold tabular-nums">
                 {formatCurrency(totals.total, currency)}
               </dd>
             </dl>
           </section>
 
-          <section className="space-y-4 rounded-lg border border-line bg-bg-surface p-4">
+          <section className="border-line bg-bg-surface space-y-4 rounded-lg border p-4">
             <Field label="Notes">
               <Textarea
                 rows={3}
@@ -567,7 +612,9 @@ export function InvoiceEditor({
                 rows={2}
                 value={terms}
                 onChange={(e) => markDirty(setTerms)(e.target.value)}
-                placeholder={settings.data?.paymentTerms ?? 'Leave empty to use the organization terms.'}
+                placeholder={
+                  settings.data?.paymentTerms ?? 'Leave empty to use the organization terms.'
+                }
               />
             </Field>
             <Field label="Footer">
@@ -577,7 +624,7 @@ export function InvoiceEditor({
                 placeholder={settings.data?.footer ?? 'Leave empty to use the organization footer.'}
               />
             </Field>
-            <p className="text-xs text-ink-muted">
+            <p className="text-ink-muted text-xs">
               Company name, logo, address and bank details come from{' '}
               <Link href="/settings/invoicing" className="underline">
                 invoice settings
@@ -586,22 +633,22 @@ export function InvoiceEditor({
             </p>
           </section>
 
-          {error ? <p className="text-sm text-state-error">{error}</p> : null}
+          {error ? <p className="text-state-error text-sm">{error}</p> : null}
         </fieldset>
 
         <section className="min-w-0 xl:sticky xl:top-4 xl:self-start">
           <div className="mb-2 flex items-center justify-between">
-            <h2 className="text-sm font-semibold text-ink">Preview</h2>
+            <h2 className="text-ink text-sm font-semibold">Preview</h2>
             {preview.isFetching ? <Loader size="xs" label="Updating preview" /> : null}
           </div>
           <div
             className={cn(
-              'overflow-hidden rounded-lg border border-line bg-white shadow-soft',
+              'border-line shadow-soft overflow-hidden rounded-lg border bg-white',
               preview.isError && 'border-state-error',
             )}
           >
             {preview.isError ? (
-              <div className="p-6 text-sm text-state-error">
+              <div className="text-state-error p-6 text-sm">
                 Couldn&apos;t render the preview. Check the template, then try again.
               </div>
             ) : preview.data ? (
@@ -684,7 +731,7 @@ function NumberField({
 }) {
   return (
     <label className="flex min-w-0 flex-col gap-1">
-      <span className="text-xs text-ink-muted">{label}</span>
+      <span className="text-ink-muted text-xs">{label}</span>
       <Input
         inputMode="decimal"
         value={value}

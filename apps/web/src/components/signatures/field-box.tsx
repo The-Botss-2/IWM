@@ -126,7 +126,7 @@ export function FieldBox({
             onRemove();
           }}
           aria-label={`Remove ${label}`}
-          className="absolute -right-2.5 -top-2.5 grid h-5 w-5 place-items-center rounded-full bg-white text-ink shadow ring-1 ring-line hover:bg-tint-error hover:text-state-error"
+          className="text-ink ring-line hover:bg-tint-error hover:text-state-error absolute -right-2.5 -top-2.5 grid h-5 w-5 place-items-center rounded-full bg-white shadow ring-1"
         >
           <X className="h-3 w-3" />
         </button>

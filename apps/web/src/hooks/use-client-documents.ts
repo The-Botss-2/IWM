@@ -14,8 +14,7 @@ import { useCreateDocument } from './use-documents';
  * projects, or shared with it. Kept outside the ['clients'] prefix: client
  * edits cancel every ['clients'] query, which would strand a first load.
  */
-const clientDocumentsKey = (clientId: string) =>
-  ['client-hub', clientId, 'documents'] as const;
+const clientDocumentsKey = (clientId: string) => ['client-hub', clientId, 'documents'] as const;
 
 export function useClientDocuments(clientId: string) {
   return useQuery({
@@ -84,7 +83,9 @@ export function useCreateClientDocument(clientId: string, clientName: string) {
     },
     onSuccess: (result) => {
       if (result.shareError) {
-        toastErrorMessage(`"${result.document.title}" was created and filed under ${clientName}, but it couldn't be shared with them: ${result.shareError} Use "Share with client" on the document to try again`);
+        toastErrorMessage(
+          `"${result.document.title}" was created and filed under ${clientName}, but it couldn't be shared with them: ${result.shareError} Use "Share with client" on the document to try again`,
+        );
       } else {
         toast.success(
           result.shared
@@ -114,7 +115,9 @@ export function useSetClientDocumentShare(clientId: string) {
       if (previous) {
         qc.setQueryData<ClientDocumentList>(key, {
           ...previous,
-          items: previous.items.map((d) => (d.id === docId ? { ...d, sharedWithClient: shared } : d)),
+          items: previous.items.map((d) =>
+            d.id === docId ? { ...d, sharedWithClient: shared } : d,
+          ),
         });
       }
       return { previous };

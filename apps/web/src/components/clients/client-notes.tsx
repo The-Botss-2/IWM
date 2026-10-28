@@ -30,8 +30,8 @@ export function ClientNotes({ client }: { client: ClientDetail }) {
 
   return (
     <section className="space-y-2">
-      <h2 className="text-base font-semibold text-ink">Notes</h2>
-      <p className="text-sm text-ink-muted">Saves automatically as you type.</p>
+      <h2 className="text-ink text-base font-semibold">Notes</h2>
+      <p className="text-ink-muted text-sm">Saves automatically as you type.</p>
       <Textarea
         aria-label="Client notes"
         value={notes}

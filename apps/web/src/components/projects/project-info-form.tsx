@@ -68,14 +68,12 @@ export function ProjectInfoForm({ project }: { project: ProjectWithCreator }) {
   return (
     <section
       aria-labelledby="project-info-heading"
-      className="rounded-lg border border-line bg-white p-5"
+      className="border-line rounded-lg border bg-white p-5"
     >
-      <h2 id="project-info-heading" className="text-base font-semibold text-ink">
+      <h2 id="project-info-heading" className="text-ink text-base font-semibold">
         Project info
       </h2>
-      <p className="mt-1 text-sm text-ink-muted">
-        Changes save automatically.
-      </p>
+      <p className="text-ink-muted mt-1 text-sm">Changes save automatically.</p>
       <div className="mt-5 grid grid-cols-1 gap-4 md:grid-cols-2">
         <div className="space-y-1.5">
           <Label htmlFor="project-name">Name</Label>
@@ -114,7 +112,7 @@ export function ProjectInfoForm({ project }: { project: ProjectWithCreator }) {
             aria-describedby="project-key-help"
             className="font-mono"
           />
-          <p id="project-key-help" className="text-xs text-ink-muted">
+          <p id="project-key-help" className="text-ink-muted text-xs">
             Uppercase letters and digits, e.g. <span className="font-mono">BG</span>.
           </p>
         </div>
@@ -193,8 +191,10 @@ export function ProjectInfoForm({ project }: { project: ProjectWithCreator }) {
                 aria-checked={project.color === c}
                 aria-label={`Color ${c}`}
                 onClick={() => save({ color: c })}
-                className={`h-8 w-8 rounded-full border-2 transition focus-visible:outline-none focus-visible:ring-2 focus-visible:shadow-focus ${
-                  project.color === c ? 'border-slate-900' : 'border-transparent hover:border-line-strong'
+                className={`focus-visible:shadow-focus h-8 w-8 rounded-full border-2 transition focus-visible:outline-none focus-visible:ring-2 ${
+                  project.color === c
+                    ? 'border-slate-900'
+                    : 'hover:border-line-strong border-transparent'
                 }`}
                 style={{ backgroundColor: c }}
               />

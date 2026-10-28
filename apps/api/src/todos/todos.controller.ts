@@ -1,13 +1,4 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Patch,
-  Post,
-  Query,
-} from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query } from '@nestjs/common';
 import {
   type CreateTodoInput,
   createTodoSchema,
@@ -60,10 +51,7 @@ export class TodosController {
 
   @Delete(':id')
   @SkipPermissions()
-  remove(
-    @CurrentUser() user: AuthedUser,
-    @Param('id', new ZodValidationPipe(cuid)) id: string,
-  ) {
+  remove(@CurrentUser() user: AuthedUser, @Param('id', new ZodValidationPipe(cuid)) id: string) {
     return this.todos.remove(user.id, id);
   }
 }

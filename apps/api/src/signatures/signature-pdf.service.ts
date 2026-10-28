@@ -1,13 +1,6 @@
 import { Injectable, Logger, UnprocessableEntityException } from '@nestjs/common';
 import { isSafeInlineImage, SIGNATURE_CONSENT_TEXT } from '@botss/shared-types';
-import {
-  degrees,
-  PDFDocument,
-  type PDFFont,
-  type PDFPage,
-  rgb,
-  StandardFonts,
-} from 'pdf-lib';
+import { degrees, PDFDocument, type PDFFont, type PDFPage, rgb, StandardFonts } from 'pdf-lib';
 
 import { FilesService } from '../files/files.service';
 import { GotenbergClient } from '../pdf/gotenberg.client';
@@ -110,7 +103,8 @@ export class SignaturePdfService {
         throw new UnprocessableEntityException({
           title: 'Document images are too large',
           status: 422,
-          detail: 'The images in this document add up to more than 20 MB. Shrink them and try again.',
+          detail:
+            'The images in this document add up to more than 20 MB. Shrink them and try again.',
         });
       }
       out.set(row.url, `data:${row.mimeType};base64,${obj.body.toString('base64')}`);
@@ -168,7 +162,9 @@ export class SignaturePdfService {
 
     // One embedded image per signer, reused across that signer's fields.
     const images = await Promise.all(
-      args.signers.map((s) => (s.signaturePng ? pdf.embedPng(s.signaturePng) : Promise.resolve(null))),
+      args.signers.map((s) =>
+        s.signaturePng ? pdf.embedPng(s.signaturePng) : Promise.resolve(null),
+      ),
     );
 
     const pages = pdf.getPages();
@@ -263,7 +259,13 @@ export class SignaturePdfService {
     };
     const write = (
       text: string,
-      opts: { size?: number; f?: PDFFont; color?: ReturnType<typeof rgb>; indent?: number; gap?: number } = {},
+      opts: {
+        size?: number;
+        f?: PDFFont;
+        color?: ReturnType<typeof rgb>;
+        indent?: number;
+        gap?: number;
+      } = {},
     ) => {
       const size = opts.size ?? 9.5;
       const f = opts.f ?? font;

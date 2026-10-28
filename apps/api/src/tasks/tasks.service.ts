@@ -42,10 +42,7 @@ export class TasksService {
    * project. Prevents assigning work to a user in another tenant (the task
    * doesn't leak to them, but it pollutes data and surfaces their identity).
    */
-  private async assertAssigneeInOrg(
-    projectId: string,
-    assigneeId: string,
-  ): Promise<void> {
+  private async assertAssigneeInOrg(projectId: string, assigneeId: string): Promise<void> {
     const [proj, assignee] = await Promise.all([
       this.prisma.client.project.findUnique({
         where: { id: projectId },
@@ -220,7 +217,9 @@ export class TasksService {
       },
     });
 
-    console.log(`[TasksService] create: success, id=${created.id}, title=${created.title}, projectId=${created.projectId}, status=${created.status}`);
+    console.log(
+      `[TasksService] create: success, id=${created.id}, title=${created.title}, projectId=${created.projectId}, status=${created.status}`,
+    );
 
     // Notify the assignee (unless they assigned themselves).
     if (input.assigneeId && input.assigneeId !== userId) {
@@ -464,9 +463,7 @@ export class TasksService {
       const now = new Date();
       const toDone = accessible.filter((t) => t.status !== 'DONE' && op.status === 'DONE');
       const fromDone = accessible.filter((t) => t.status === 'DONE' && op.status !== 'DONE');
-      const sameSide = accessible.filter(
-        (t) => (t.status === 'DONE') === (op.status === 'DONE'),
-      );
+      const sameSide = accessible.filter((t) => (t.status === 'DONE') === (op.status === 'DONE'));
       if (toDone.length > 0) {
         await tx.task.updateMany({
           where: { id: { in: toDone.map((t) => t.id) } },
@@ -510,9 +507,11 @@ export class TasksService {
     // task in another workspace/org can't be resurrected by guessing its id.
     // findFirst + includeDeleted bypasses the soft-delete read filter while
     // still applying the project access constraint (mirrors get()).
-    const existing = await (this.prisma.client.task.findFirst as unknown as (
-      args: unknown,
-    ) => Promise<{ id: string; status: 'BACKLOG' | 'CANCELLED' | string } | null>)({
+    const existing = await (
+      this.prisma.client.task.findFirst as unknown as (
+        args: unknown,
+      ) => Promise<{ id: string; status: 'BACKLOG' | 'CANCELLED' | string } | null>
+    )({
       where: { id, project: this.projectAccessFilter(scope) },
       includeDeleted: true,
     });
@@ -542,7 +541,8 @@ export function assertMayDeleteTask(
   throw new ForbiddenException({
     title: 'Forbidden',
     status: 403,
-    detail: 'Only the person who created this task, a project lead, or someone allowed to delete any task can delete it.',
+    detail:
+      'Only the person who created this task, a project lead, or someone allowed to delete any task can delete it.',
     code: 'insufficient_permissions',
   });
 }

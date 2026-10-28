@@ -32,7 +32,12 @@ import {
   useTopResults,
   type SearchSort,
 } from '@/hooks/use-search';
-import { formatSearchQuery, hasSearchFilters, highlightSegments, parseSearchQuery } from '@/lib/search-query';
+import {
+  formatSearchQuery,
+  hasSearchFilters,
+  highlightSegments,
+  parseSearchQuery,
+} from '@/lib/search-query';
 import { relativeTime } from '@/lib/time';
 import { cn } from '@/lib/utils';
 
@@ -54,10 +59,21 @@ const KIND_TABS: { kind: SearchResultKind; label: string }[] = [
 
 const TABS: { kind: Tab; label: string }[] = [{ kind: 'all', label: 'All' }, ...KIND_TABS];
 
-const KIND_LABEL = Object.fromEntries(KIND_TABS.map((t) => [t.kind, t.label])) as Record<SearchResultKind, string>;
+const KIND_LABEL = Object.fromEntries(KIND_TABS.map((t) => [t.kind, t.label])) as Record<
+  SearchResultKind,
+  string
+>;
 
 /** Tabs where from / in / date filters apply. */
-const FILTERABLE = new Set<Tab>(['all', 'chat_message', 'file', 'workspace_file', 'mail', 'task', 'document']);
+const FILTERABLE = new Set<Tab>([
+  'all',
+  'chat_message',
+  'file',
+  'workspace_file',
+  'mail',
+  'task',
+  'document',
+]);
 
 /** Tabs that offer the `has:file` chip. */
 const HAS_FILE_TABS = new Set<Tab>(['all', 'chat_message', 'mail']);
@@ -100,7 +116,11 @@ function SearchPageInner() {
   );
 
   const counts = useSearchCounts(filters, !unresolved);
-  const results = useSearchResults(tab === 'all' ? 'chat_message' : tab, filters, tab !== 'all' && !unresolved);
+  const results = useSearchResults(
+    tab === 'all' ? 'chat_message' : tab,
+    filters,
+    tab !== 'all' && !unresolved,
+  );
   const top = useTopResults(filters, tab === 'all' && !unresolved);
 
   function navigate(nextQuery: string, nextTab: Tab = tab, nextSort: SearchSort = sort) {
@@ -118,7 +138,9 @@ function SearchPageInner() {
   async function openResult(r: SearchResult) {
     if (r.kind === 'person') {
       // Failure is toasted by useCreateChatRoom's onError; just don't navigate.
-      const room = await createRoom.mutateAsync({ type: 'DM', participantUserIds: [r.id] }).catch(() => null);
+      const room = await createRoom
+        .mutateAsync({ type: 'DM', participantUserIds: [r.id] })
+        .catch(() => null);
       if (room) router.push(`/chat/${room.id}`);
       return;
     }
@@ -150,12 +172,15 @@ function SearchPageInner() {
         className="relative"
         role="search"
       >
-        <SearchIcon className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-disabled" aria-hidden />
+        <SearchIcon
+          className="text-ink-disabled pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2"
+          aria-hidden
+        />
         <Input
           autoFocus
           value={box}
           onChange={(e) => setBox(e.target.value)}
-          placeholder='Search messages, files, people and more. Try: invoice from:@sara in:#finance has:file'
+          placeholder="Search messages, files, people and more. Try: invoice from:@sara in:#finance has:file"
           className="h-11 pl-9"
           aria-label="Search"
         />
@@ -210,7 +235,7 @@ function SearchPageInner() {
               aria-pressed={parsed.has === 'file'}
               className={cn(
                 'flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs transition',
-                'focus-visible:outline-none focus-visible:ring-2 focus-visible:shadow-focus',
+                'focus-visible:shadow-focus focus-visible:outline-none focus-visible:ring-2',
                 parsed.has === 'file'
                   ? 'border-ink bg-ink text-bg-surface'
                   : 'border-line text-ink-muted hover:bg-bg-subtle',
@@ -224,7 +249,14 @@ function SearchPageInner() {
               variant="ghost"
               size="sm"
               onClick={() =>
-                setFilter({ from: null, in: null, inDm: null, has: null, after: null, before: null })
+                setFilter({
+                  from: null,
+                  in: null,
+                  inDm: null,
+                  has: null,
+                  after: null,
+                  before: null,
+                })
               }
             >
               <X className="h-4 w-4" /> Clear filters
@@ -245,13 +277,18 @@ function SearchPageInner() {
               aria-current={active ? 'page' : undefined}
               className={cn(
                 'flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1.5 text-sm transition',
-                'focus-visible:outline-none focus-visible:ring-2 focus-visible:shadow-focus',
+                'focus-visible:shadow-focus focus-visible:outline-none focus-visible:ring-2',
                 active ? 'bg-ink text-bg-surface' : 'text-ink-muted hover:bg-bg-subtle',
               )}
             >
               {t.label}
               {count !== undefined ? (
-                <span className={cn('text-xs tabular-nums', active ? 'opacity-80' : 'text-ink-disabled')}>
+                <span
+                  className={cn(
+                    'text-xs tabular-nums',
+                    active ? 'opacity-80' : 'text-ink-disabled',
+                  )}
+                >
                   {count > SEARCH_COUNT_CAP ? `${SEARCH_COUNT_CAP}+` : count}
                 </span>
               ) : null}
@@ -261,7 +298,11 @@ function SearchPageInner() {
       </nav>
 
       {!tooShort && !unresolved ? (
-        <div className="flex items-center justify-end gap-1 text-xs" role="group" aria-label="Sort results">
+        <div
+          className="flex items-center justify-end gap-1 text-xs"
+          role="group"
+          aria-label="Sort results"
+        >
           {(
             [
               ['relevance', 'Most relevant'],
@@ -275,8 +316,10 @@ function SearchPageInner() {
               aria-pressed={sort === value}
               className={cn(
                 'rounded-md px-2 py-1 transition',
-                'focus-visible:outline-none focus-visible:ring-2 focus-visible:shadow-focus',
-                sort === value ? 'bg-bg-subtle font-medium text-ink' : 'text-ink-muted hover:text-ink',
+                'focus-visible:shadow-focus focus-visible:outline-none focus-visible:ring-2',
+                sort === value
+                  ? 'bg-bg-subtle text-ink font-medium'
+                  : 'text-ink-muted hover:text-ink',
               )}
             >
               {label}
@@ -314,30 +357,30 @@ function SearchPageInner() {
           }
         />
       ) : (
-        <ul className="divide-y divide-line overflow-hidden rounded-lg border border-line bg-bg-surface">
+        <ul className="divide-line border-line bg-bg-surface divide-y overflow-hidden rounded-lg border">
           {items.map((r) => (
             <li key={`${r.kind}-${r.id}`}>
               <button
                 type="button"
                 onClick={() => void openResult(r)}
-                className="flex w-full items-start gap-3 px-4 py-3 text-left transition hover:bg-bg-subtle focus-visible:bg-bg-subtle focus-visible:outline-none"
+                className="hover:bg-bg-subtle focus-visible:bg-bg-subtle flex w-full items-start gap-3 px-4 py-3 text-left transition focus-visible:outline-none"
               >
-                <span className="mt-0.5 text-ink-disabled">{iconFor(r.kind)}</span>
+                <span className="text-ink-disabled mt-0.5">{iconFor(r.kind)}</span>
                 <span className="min-w-0 flex-1">
                   {tab === 'all' ? (
-                    <span className="mb-0.5 block text-[11px] uppercase tracking-wide text-ink-disabled">
+                    <span className="text-ink-disabled mb-0.5 block text-[11px] uppercase tracking-wide">
                       {KIND_LABEL[r.kind]}
                     </span>
                   ) : null}
-                  <span className="block truncate text-sm font-medium text-ink">
+                  <span className="text-ink block truncate text-sm font-medium">
                     <Highlight text={r.title} term={parsed.text} />
                   </span>
                   {r.snippet && r.snippet !== r.title ? (
-                    <span className="mt-0.5 line-clamp-2 block text-sm text-ink-muted">
+                    <span className="text-ink-muted mt-0.5 line-clamp-2 block text-sm">
                       <Highlight text={r.snippet} term={parsed.text} />
                     </span>
                   ) : null}
-                  <span className="mt-1 flex flex-wrap items-center gap-x-2 text-xs text-ink-disabled">
+                  <span className="text-ink-disabled mt-1 flex flex-wrap items-center gap-x-2 text-xs">
                     {r.context ? <span>{r.context}</span> : null}
                     {r.actorName ? <span>{r.actorName}</span> : null}
                     {r.at ? <span>{relativeTime(r.at)}</span> : null}
@@ -367,10 +410,15 @@ function SearchPageInner() {
           {kindsWithHits.map((t) => {
             const count = counts.data?.[t.kind];
             return (
-              <Button key={t.kind} variant="secondary" size="sm" onClick={() => navigate(urlQuery, t.kind)}>
+              <Button
+                key={t.kind}
+                variant="secondary"
+                size="sm"
+                onClick={() => navigate(urlQuery, t.kind)}
+              >
                 See all in {t.label}
                 {count !== undefined ? (
-                  <span className="tabular-nums text-ink-disabled">
+                  <span className="text-ink-disabled tabular-nums">
                     {count > SEARCH_COUNT_CAP ? `${SEARCH_COUNT_CAP}+` : count}
                   </span>
                 ) : null}
@@ -388,7 +436,7 @@ function Highlight({ text, term }: { text: string; term: string }) {
     <>
       {highlightSegments(text, term).map((seg, i) =>
         seg.match ? (
-          <mark key={i} className="rounded-sm bg-brand-50 px-0.5 text-ink">
+          <mark key={i} className="bg-brand-50 text-ink rounded-sm px-0.5">
             {seg.value}
           </mark>
         ) : (
@@ -399,11 +447,19 @@ function Highlight({ text, term }: { text: string; term: string }) {
   );
 }
 
-function EmptyState({ title, body, action }: { title: string; body: string; action?: React.ReactNode }) {
+function EmptyState({
+  title,
+  body,
+  action,
+}: {
+  title: string;
+  body: string;
+  action?: React.ReactNode;
+}) {
   return (
-    <div className="flex flex-col items-center gap-2 rounded-lg border border-dashed border-line bg-bg-surface px-6 py-12 text-center">
-      <p className="text-sm font-medium text-ink">{title}</p>
-      <p className="max-w-md text-sm text-ink-muted">{body}</p>
+    <div className="border-line bg-bg-surface flex flex-col items-center gap-2 rounded-lg border border-dashed px-6 py-12 text-center">
+      <p className="text-ink text-sm font-medium">{title}</p>
+      <p className="text-ink-muted max-w-md text-sm">{body}</p>
       {action}
     </div>
   );

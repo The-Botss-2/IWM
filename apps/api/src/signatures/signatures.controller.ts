@@ -1,15 +1,4 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Post,
-  Put,
-  Query,
-  Req,
-  Res,
-} from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, Query, Req, Res } from '@nestjs/common';
 import type { Request, Response } from 'express';
 import {
   cancelSignatureRequestSchema,
@@ -33,7 +22,11 @@ import { ZodValidationPipe } from '../common/pipes/zod-validation.pipe';
 import { sendPdf } from './send-pdf';
 import { type SignatureActor, SignaturesService } from './signatures.service';
 
-function actorOf(req: Request & RequestExtensions, workspaceId: string, userId: string): SignatureActor {
+function actorOf(
+  req: Request & RequestExtensions,
+  workspaceId: string,
+  userId: string,
+): SignatureActor {
   const role = (req.workspaceMemberships ?? []).find((m) => m.workspaceId === workspaceId)?.role;
   return { userId, workspaceId, workspaceRole: role };
 }
@@ -155,7 +148,11 @@ export class SignaturesController {
     @Param('id', new ZodValidationPipe(cuid)) id: string,
     @Res() res: Response,
   ): Promise<void> {
-    sendPdf(res, await this.signatures.sourceFile(actorOf(req, workspaceId, user.id), id), 'inline');
+    sendPdf(
+      res,
+      await this.signatures.sourceFile(actorOf(req, workspaceId, user.id), id),
+      'inline',
+    );
   }
 
   @Get(':id/signed-file')
@@ -167,6 +164,10 @@ export class SignaturesController {
     @Param('id', new ZodValidationPipe(cuid)) id: string,
     @Res() res: Response,
   ): Promise<void> {
-    sendPdf(res, await this.signatures.signedFile(actorOf(req, workspaceId, user.id), id), 'attachment');
+    sendPdf(
+      res,
+      await this.signatures.signedFile(actorOf(req, workspaceId, user.id), id),
+      'attachment',
+    );
   }
 }

@@ -12,7 +12,14 @@ export interface BankTransferRow {
   net: string;
 }
 
-const HEADER = ['Name', 'Account title', 'Bank', 'Account number / IBAN', 'Amount (PKR)', 'Reference'];
+const HEADER = [
+  'Name',
+  'Account title',
+  'Bank',
+  'Account number / IBAN',
+  'Amount (PKR)',
+  'Reference',
+];
 
 /**
  * Rows with a zero net are left out: there is nothing to transfer. Lines end

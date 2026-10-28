@@ -64,9 +64,7 @@ export const paymentSchema = z.object({
 export type Payment = z.infer<typeof paymentSchema>;
 
 export const paymentWithSourceSchema = paymentSchema.extend({
-  paymentSource: z
-    .object({ id: cuid, name: z.string(), kind: z.string() })
-    .nullable(),
+  paymentSource: z.object({ id: cuid, name: z.string(), kind: z.string() }).nullable(),
   recordedBy: z.object({ id: cuid, name: z.string() }).nullable(),
   contract: z.object({ id: cuid, title: z.string() }).nullable(),
   milestone: z.object({ id: cuid, title: z.string() }).nullable(),

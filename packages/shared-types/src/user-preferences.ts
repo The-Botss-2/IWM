@@ -36,9 +36,7 @@ export type AppNavLayout = z.infer<typeof AppNavLayout>;
 
 /** Gradient preset ids are a client-side catalogue (`GRADIENT_PRESETS`); the
  *  server only bounds the shape so an unknown id falls back to the default. */
-const presetId = z
-  .string()
-  .regex(/^[a-z][a-z0-9-]{0,39}$/, 'Must be a lowercase preset id.');
+const presetId = z.string().regex(/^[a-z][a-z0-9-]{0,39}$/, 'Must be a lowercase preset id.');
 
 /** Navigation destination id from the web nav registry (`home`, `projects`, ...). */
 export const navDestinationId = z
@@ -109,9 +107,7 @@ function pickValid<S extends z.ZodRawShape>(
  */
 export function parseStoredUserPreferences(raw: unknown): UserPreferences {
   const doc =
-    raw && typeof raw === 'object' && !Array.isArray(raw)
-      ? (raw as Record<string, unknown>)
-      : {};
+    raw && typeof raw === 'object' && !Array.isArray(raw) ? (raw as Record<string, unknown>) : {};
   const out: UserPreferences = {};
 
   const appearance = pickValid(appearancePreferencesSchema.shape, doc.appearance);

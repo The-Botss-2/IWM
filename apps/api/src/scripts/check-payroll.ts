@@ -48,13 +48,19 @@ import {
 } from '../payroll/payroll-import';
 import { ROOT_ORG_ID } from '../organizations/organizations.constants';
 import type { InvoiceRenderService } from '../invoices/invoice-render.service';
-import { buildPayslipViewModel, payslipExtras, PayslipRenderService } from '../payroll/payslip-render.service';
+import {
+  buildPayslipViewModel,
+  payslipExtras,
+  PayslipRenderService,
+} from '../payroll/payslip-render.service';
 
 function throwsCode(fn: () => unknown, code: string, label: string): void {
   try {
     fn();
   } catch (err) {
-    const res = (err as { getResponse?: () => unknown }).getResponse?.() as { code?: string } | undefined;
+    const res = (err as { getResponse?: () => unknown }).getResponse?.() as
+      | { code?: string }
+      | undefined;
     assert.equal(res?.code, code, `${label}: wrong error code`);
     return;
   }
@@ -63,14 +69,24 @@ function throwsCode(fn: () => unknown, code: string, label: string): void {
 
 function mathChecks(): void {
   assert.equal(parseAmount('150000', 'Salary').toFixed(2), '150000.00');
-  assert.equal(parseAmount('1,250.505', 'Salary').toFixed(2), '1250.51', 'commas stripped, half-up');
+  assert.equal(
+    parseAmount('1,250.505', 'Salary').toFixed(2),
+    '1250.51',
+    'commas stripped, half-up',
+  );
   assert.equal(parseAmount(99.994, 'Salary').toFixed(2), '99.99');
   assert.equal(parseAmount('', 'Bonus').toFixed(2), '0.00', 'empty means zero');
   throwsCode(() => parseAmount('abc', 'Salary'), 'payroll_invalid_amount', 'letters');
   throwsCode(() => parseAmount('-5', 'Salary'), 'payroll_invalid_amount', 'negative');
   throwsCode(() => parseAmount('1000000000000', 'Salary'), 'payroll_invalid_amount', 'too large');
 
-  const line = (salary: string, bonus: string, commission: string, deduction: string, tax: string) => ({
+  const line = (
+    salary: string,
+    bonus: string,
+    commission: string,
+    deduction: string,
+    tax: string,
+  ) => ({
     salary: new D(salary),
     bonus: new D(bonus),
     commission: new D(commission),
@@ -83,11 +99,26 @@ function mathChecks(): void {
     '107500.25',
     'commission adds, tax subtracts',
   );
-  assert.equal(computeNet(line('100', '0', '0', '60', '40')).toFixed(2), '0.00', 'zero net allowed');
-  throwsCode(() => computeNet(line('100', '0', '0', '100', '0.01')), 'payroll_negative_net', 'negative net');
+  assert.equal(
+    computeNet(line('100', '0', '0', '60', '40')).toFixed(2),
+    '0.00',
+    'zero net allowed',
+  );
+  throwsCode(
+    () => computeNet(line('100', '0', '0', '100', '0.01')),
+    'payroll_negative_net',
+    'negative net',
+  );
 
   const totals = runTotals([
-    { salary: '100000.00', bonus: '5000.00', commission: '2000.00', deduction: '0.00', tax: '1500.00', net: '105500.00' },
+    {
+      salary: '100000.00',
+      bonus: '5000.00',
+      commission: '2000.00',
+      deduction: '0.00',
+      tax: '1500.00',
+      net: '105500.00',
+    },
     {
       salary: new D('80000.10'),
       bonus: new D('0'),
@@ -119,11 +150,46 @@ function mathChecks(): void {
     { employeeName: 'Ali', net: new D('1000.00') },
     { employeeName: 'Sara', net: new D('2500.50') },
   ];
-  assert.ok(expensesMatchLines([{ vendor: 'Ali', amount: '1000' }, { vendor: 'Sara', amount: new D('2500.5') }], lines));
-  assert.ok(!expensesMatchLines([{ vendor: 'Sara', amount: '2500.50' }, { vendor: 'Ali', amount: '1000.00' }], lines), 'swapped order');
+  assert.ok(
+    expensesMatchLines(
+      [
+        { vendor: 'Ali', amount: '1000' },
+        { vendor: 'Sara', amount: new D('2500.5') },
+      ],
+      lines,
+    ),
+  );
+  assert.ok(
+    !expensesMatchLines(
+      [
+        { vendor: 'Sara', amount: '2500.50' },
+        { vendor: 'Ali', amount: '1000.00' },
+      ],
+      lines,
+    ),
+    'swapped order',
+  );
   assert.ok(!expensesMatchLines([{ vendor: 'Ali', amount: '1000.00' }], lines), 'missing row');
-  assert.ok(!expensesMatchLines([{ vendor: 'Ali', amount: '1000.00' }, { vendor: 'Sara', amount: '2500.51' }], lines), 'amount differs');
-  assert.ok(!expensesMatchLines([{ vendor: 'Ali', amount: '1000.00' }, { vendor: null, amount: '2500.50' }], lines), 'vendor lost');
+  assert.ok(
+    !expensesMatchLines(
+      [
+        { vendor: 'Ali', amount: '1000.00' },
+        { vendor: 'Sara', amount: '2500.51' },
+      ],
+      lines,
+    ),
+    'amount differs',
+  );
+  assert.ok(
+    !expensesMatchLines(
+      [
+        { vendor: 'Ali', amount: '1000.00' },
+        { vendor: null, amount: '2500.50' },
+      ],
+      lines,
+    ),
+    'vendor lost',
+  );
   assert.ok(expensesMatchLines([], []), 'nothing to pay');
   console.log('payroll math ok');
 }
@@ -131,9 +197,27 @@ function mathChecks(): void {
 function csvChecks(): void {
   const csv = buildBankTransferCsv(
     [
-      { employeeName: 'Ayesha Khan', accountTitle: 'Ayesha Khan', bankName: 'Meezan', accountNumber: 'PK36MEZN0001', net: '150000.00' },
-      { employeeName: 'Unpaid Person', accountTitle: null, bankName: null, accountNumber: null, net: '0.00' },
-      { employeeName: '=HYPERLINK("http://evil")', accountTitle: 'Doe, John', bankName: '@SUM(A1)', accountNumber: '-123', net: '1.00' },
+      {
+        employeeName: 'Ayesha Khan',
+        accountTitle: 'Ayesha Khan',
+        bankName: 'Meezan',
+        accountNumber: 'PK36MEZN0001',
+        net: '150000.00',
+      },
+      {
+        employeeName: 'Unpaid Person',
+        accountTitle: null,
+        bankName: null,
+        accountNumber: null,
+        net: '0.00',
+      },
+      {
+        employeeName: '=HYPERLINK("http://evil")',
+        accountTitle: 'Doe, John',
+        bankName: '@SUM(A1)',
+        accountNumber: '-123',
+        net: '1.00',
+      },
     ],
     'Salary Sep 2026',
   );
@@ -158,7 +242,11 @@ async function payslipChecks(): Promise<void> {
   // The root organization's signatory comes from the environment; unset means none.
   delete process.env.PAYSLIP_SIGNATORY_NAME;
   delete process.env.PAYSLIP_SIGNATORY_TITLE;
-  assert.equal(payslipExtras(ROOT_ORG_ID).signatory, null, 'no signatory when PAYSLIP_SIGNATORY_NAME is unset');
+  assert.equal(
+    payslipExtras(ROOT_ORG_ID).signatory,
+    null,
+    'no signatory when PAYSLIP_SIGNATORY_NAME is unset',
+  );
   process.env.PAYSLIP_SIGNATORY_NAME = 'Jane Doe';
   process.env.PAYSLIP_SIGNATORY_TITLE = 'CEO';
   const dir = path.resolve(__dirname, '..', '..', 'payslip-templates', 'default');
@@ -200,7 +288,11 @@ async function payslipChecks(): Promise<void> {
     new Date('2026-09-30T00:00:00Z'),
   );
   const own = payslipExtras(ROOT_ORG_ID);
-  const html = template.render({ ...vm, assets: { logo: true, stamp: true }, signatory: own.signatory });
+  const html = template.render({
+    ...vm,
+    assets: { logo: true, stamp: true },
+    signatory: own.signatory,
+  });
   for (const expected of [
     'SALARY SLIP',
     'September 2026',
@@ -231,8 +323,22 @@ async function payslipChecks(): Promise<void> {
   // Every row shows, as "PKR 0" when zero; a cash salary has no bank lines.
   const cash = template.render({
     ...vm,
-    amounts: { ...vm.amounts, bonus: '0.00', commission: '0.00', deduction: '0.00', tax: '0.00', net: '150000.50', salary: '150000.50' },
-    employee: { ...vm.employee, cnic: null, dateOfJoining: null, paymentMethod: 'Cash', isBankTransfer: false },
+    amounts: {
+      ...vm.amounts,
+      bonus: '0.00',
+      commission: '0.00',
+      deduction: '0.00',
+      tax: '0.00',
+      net: '150000.50',
+      salary: '150000.50',
+    },
+    employee: {
+      ...vm.employee,
+      cnic: null,
+      dateOfJoining: null,
+      paymentMethod: 'Cash',
+      isBankTransfer: false,
+    },
     bonusNote: null,
     deductionNote: null,
     assets: { logo: false, stamp: false },
@@ -243,7 +349,10 @@ async function payslipChecks(): Promise<void> {
   }
   assert.ok(cash.includes('PKR 0<'), 'zero amounts read PKR 0');
   assert.ok(cash.includes('PKR 150,000.50<'), 'paisa are never rounded away');
-  assert.ok(!cash.includes('PK36MEZN0001234567') && !cash.includes('Meezan'), 'no bank lines for a cash salary');
+  assert.ok(
+    !cash.includes('PK36MEZN0001234567') && !cash.includes('Meezan'),
+    'no bank lines for a cash salary',
+  );
   assert.ok(cash.includes('Cash'), 'payment method shown');
   // Any other organization (anyone can sign up) never gets the operator's
   // signature, stamp or logo.
@@ -251,7 +360,10 @@ async function payslipChecks(): Promise<void> {
   assert.equal(other.own, false);
   assert.equal(other.signatory, null, 'no signatory for another organization');
   assert.equal(own.own, true);
-  assert.ok(!cash.includes('asset-stamp') && !cash.includes('Jane Doe'), 'no stamp or signatory without them');
+  assert.ok(
+    !cash.includes('asset-stamp') && !cash.includes('Jane Doe'),
+    'no stamp or signatory without them',
+  );
 
   // The gate itself, through the real document renderer (it reads the
   // template folder's logo.png and stamp.png).
@@ -261,7 +373,12 @@ async function payslipChecks(): Promise<void> {
     assert.ok(ours.includes(expected), `the root organization's payslip has ${expected}`);
   }
   const theirs = await renderer.renderDocument([vm], 'org_someone_else');
-  for (const forbidden of ['data:image/png', 'class="stamp asset-stamp"', 'class="logo asset-logo"', 'Jane Doe']) {
+  for (const forbidden of [
+    'data:image/png',
+    'class="stamp asset-stamp"',
+    'class="logo asset-logo"',
+    'Jane Doe',
+  ]) {
     assert.ok(!theirs.includes(forbidden), `another organization's payslip has no ${forbidden}`);
   }
 
@@ -276,7 +393,14 @@ async function payslipChecks(): Promise<void> {
     },
   } as unknown as InvoiceRenderService);
   const run = { year: 2026, month: 9, paidAt: new Date('2026-09-30T00:00:00Z') };
-  const slip = { ...vm.amounts, ...vm.employee, employeeName: 'Ayesha <Khan>', paymentMethod: 'BANK_TRANSFER' as const, bonusNote: null, deductionNote: null };
+  const slip = {
+    ...vm.amounts,
+    ...vm.employee,
+    employeeName: 'Ayesha <Khan>',
+    paymentMethod: 'BANK_TRANSFER' as const,
+    bonusNote: null,
+    deductionNote: null,
+  };
   const fresh = await counting.viewModels('ws1', run, [slip]);
   assert.equal(lookups, 1, 'no company supplied: one lookup');
   const reused = await counting.viewModels('ws1', run, [slip], company);
@@ -289,7 +413,10 @@ async function payslipChecks(): Promise<void> {
 
 function permissionChecks(): void {
   const ws = 'ws1';
-  const ability = (systemRole: 'EMPLOYEE' | 'FINANCE' | 'ADMIN' | 'SUPER_ADMIN' | 'HR', role: 'OWNER' | 'MEMBER') =>
+  const ability = (
+    systemRole: 'EMPLOYEE' | 'FINANCE' | 'ADMIN' | 'SUPER_ADMIN' | 'HR',
+    role: 'OWNER' | 'MEMBER',
+  ) =>
     defineAbilityFor({
       userId: 'u1',
       systemRole,
@@ -353,27 +480,55 @@ function importChecks(): void {
   const row = (n: number, cells: Record<string, string>) => ({ row: n, basic: '100000', ...cells });
   const plan = planImport({
     rows: [
-      row(2, { name: 'A. Khan', email: 'AYESHA@example.com', month: 'Sep 2026', tax: '5,000', commission: 'PKR 2,000' }),
+      row(2, {
+        name: 'A. Khan',
+        email: 'AYESHA@example.com',
+        month: 'Sep 2026',
+        tax: '5,000',
+        commission: 'PKR 2,000',
+      }),
       row(3, { cnic: '3520211111111', name: '', month: 'September 2026' }),
-      row(4, { name: 'Omar Farooq', email: 'omar@example.com', doj: '01/03/2024', paymentMethod: 'Cash', month: '09/2026' }),
+      row(4, {
+        name: 'Omar Farooq',
+        email: 'omar@example.com',
+        doj: '01/03/2024',
+        paymentMethod: 'Cash',
+        month: '09/2026',
+      }),
       row(5, { name: 'Zainab Cook', cnic: '35202-2222222-2' }),
       row(6, { name: 'Sara Ali', email: 'sara@example.com' }),
       row(7, { name: 'Ayesha Khan', email: 'ayesha@example.com' }),
-      row(8, { name: 'Bad Row', basic: '', cnic: '123', paymentMethod: 'crypto', email: 'nope', month: 'Aug 2026' }),
+      row(8, {
+        name: 'Bad Row',
+        basic: '',
+        cnic: '123',
+        paymentMethod: 'crypto',
+        email: 'nope',
+        month: 'Aug 2026',
+      }),
       row(9, { name: 'Too Much', deduction: '90000', tax: '20000' }),
     ],
     target: null,
     roster,
     staff,
     // Ayesha's line this month already has a bonus and a deduction.
-    inRun: new Map([['e1', { bonus: new D('1000'), commission: new D('0'), deduction: new D('500'), tax: new D('0') }]]),
+    inRun: new Map([
+      [
+        'e1',
+        { bonus: new D('1000'), commission: new D('0'), deduction: new D('500'), tax: new D('0') },
+      ],
+    ]),
     runStatus: 'DRAFT',
   });
   assert.equal(plan.year, 2026, 'month most rows name');
   assert.equal(plan.month, 9);
   assert.deepEqual(plan.errors, []);
   const [ayesha, bilal, omar, zainab, sara, dupe, bad, tooMuch] = plan.rows;
-  assert.deepEqual(ayesha!.target, { match: 'ON_PAYROLL', employeeId: 'e1' }, 'email match, any case');
+  assert.deepEqual(
+    ayesha!.target,
+    { match: 'ON_PAYROLL', employeeId: 'e1' },
+    'email match, any case',
+  );
   assert.equal(ayesha!.matchedBy, 'email');
   assert.equal(ayesha!.inRun, true);
   assert.equal(
@@ -382,19 +537,43 @@ function importChecks(): void {
     'amount labels and commas read; blank bonus and deduction keep the saved line',
   );
   assert.equal(ayesha!.values!.bonus, undefined, 'blank bonus is left for the saved line');
-  assert.deepEqual(bilal!.target, { match: 'ON_PAYROLL', employeeId: 'e2' }, 'CNIC match without a name');
+  assert.deepEqual(
+    bilal!.target,
+    { match: 'ON_PAYROLL', employeeId: 'e2' },
+    'CNIC match without a name',
+  );
   assert.equal(bilal!.name, 'Bilal Driver', 'name filled from payroll');
-  assert.deepEqual(omar!.target, { match: 'PLATFORM_USER', userId: 'u2' }, 'staff added to payroll');
+  assert.deepEqual(
+    omar!.target,
+    { match: 'PLATFORM_USER', userId: 'u2' },
+    'staff added to payroll',
+  );
   assert.equal(omar!.values!.paymentMethod, 'CASH');
   assert.equal(omar!.values!.dateOfJoining!.toISOString().slice(0, 10), '2024-03-01');
   assert.deepEqual(zainab!.target, { match: 'NEW_PERSON' }, 'unknown person is new');
-  assert.deepEqual(sara!.target, { match: 'ON_PAYROLL', employeeId: 'e3' }, 'account email finds the roster row');
+  assert.deepEqual(
+    sara!.target,
+    { match: 'ON_PAYROLL', employeeId: 'e3' },
+    'account email finds the roster row',
+  );
   assert.ok(dupe!.errors.includes('Same person as row 2.'), 'duplicate person caught');
   assert.equal(bad!.values, null);
-  for (const fragment of ['Basic salary is empty', 'CNIC must have 13 digits', 'Payment method', 'is not an email', 'Month is Aug 2026']) {
-    assert.ok(bad!.errors.some((e) => e.includes(fragment)), `bad row reports: ${fragment}`);
+  for (const fragment of [
+    'Basic salary is empty',
+    'CNIC must have 13 digits',
+    'Payment method',
+    'is not an email',
+    'Month is Aug 2026',
+  ]) {
+    assert.ok(
+      bad!.errors.some((e) => e.includes(fragment)),
+      `bad row reports: ${fragment}`,
+    );
   }
-  assert.ok(tooMuch!.errors.some((e) => e.includes('larger than basic')), 'negative net refused');
+  assert.ok(
+    tooMuch!.errors.some((e) => e.includes('larger than basic')),
+    'negative net refused',
+  );
 
   const mixed = planImport({
     rows: [row(2, { name: 'X', month: 'Sep 2026' }), row(3, { name: 'Y', month: 'Oct 2026' })],
@@ -416,7 +595,10 @@ function importChecks(): void {
   });
   assert.ok(paid.errors[0]!.includes('already paid'), 'a paid run is refused');
   const twins = planImport({
-    rows: [row(2, { name: 'Muhammad Ali' }), row(3, { name: 'Muhammad Ali', cnic: '35202-3333333-3' })],
+    rows: [
+      row(2, { name: 'Muhammad Ali' }),
+      row(3, { name: 'Muhammad Ali', cnic: '35202-3333333-3' }),
+    ],
     target: { year: 2026, month: 9 },
     roster: [
       { id: 'm1', userId: null, name: 'Muhammad Ali', email: null, cnic: '35202-3333333-3' },
@@ -428,7 +610,11 @@ function importChecks(): void {
   });
   assert.equal(twins.rows[0]!.target, null, 'an ambiguous name is never guessed');
   assert.ok(twins.rows[0]!.errors[0]!.includes('More than one person'));
-  assert.deepEqual(twins.rows[1]!.target, { match: 'ON_PAYROLL', employeeId: 'm1' }, 'CNIC settles it');
+  assert.deepEqual(
+    twins.rows[1]!.target,
+    { match: 'ON_PAYROLL', employeeId: 'm1' },
+    'CNIC settles it',
+  );
   // A second staff member with an existing payroll person's name.
   const namesake = planImport({
     rows: [
@@ -447,7 +633,10 @@ function importChecks(): void {
     { match: 'PLATFORM_USER', userId: 'u4' },
     'a staff email beats a name match',
   );
-  assert.ok(namesake.rows[1]!.errors[0]!.includes('More than one person'), 'payroll + staff namesakes are ambiguous');
+  assert.ok(
+    namesake.rows[1]!.errors[0]!.includes('More than one person'),
+    'payroll + staff namesakes are ambiguous',
+  );
   assert.equal(namesake.rows[2]!.target, null, 'same name, different CNIC is not matched');
   assert.ok(namesake.rows[2]!.errors[0]!.includes('CNIC is different'));
   const crossed = planImport({
@@ -458,7 +647,10 @@ function importChecks(): void {
     inRun: new Map(),
     runStatus: null,
   });
-  assert.ok(crossed.rows[0]!.errors[0]!.includes('belongs to Bilal Driver'), 'email and CNIC of two people');
+  assert.ok(
+    crossed.rows[0]!.errors[0]!.includes('belongs to Bilal Driver'),
+    'email and CNIC of two people',
+  );
   const borrowedEmail = planImport({
     rows: [
       row(2, { name: 'Bilal Driver', cnic: '35202-1111111-1', email: 'omar@example.com' }),
@@ -471,8 +663,15 @@ function importChecks(): void {
     runStatus: null,
   });
   for (const r of borrowedEmail.rows) {
-    assert.equal(r.target, null, `row ${r.row}: a staff member's email never becomes someone else's payslip address`);
-    assert.ok(r.errors.some((e) => e.includes('belongs to')), `row ${r.row}: reported`);
+    assert.equal(
+      r.target,
+      null,
+      `row ${r.row}: a staff member's email never becomes someone else's payslip address`,
+    );
+    assert.ok(
+      r.errors.some((e) => e.includes('belongs to')),
+      `row ${r.row}: reported`,
+    );
   }
   console.log('payroll import ok');
 }

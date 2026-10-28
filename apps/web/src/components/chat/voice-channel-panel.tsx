@@ -17,10 +17,7 @@ import { ScreenShareQualityMenu } from '@/components/chat/screen-share-quality-m
 import { UserAvatar } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { useFullscreen } from '@/hooks/use-fullscreen';
-import {
-  useLivekitRoom,
-  type LivekitParticipantView,
-} from '@/hooks/use-livekit-room';
+import { useLivekitRoom, type LivekitParticipantView } from '@/hooks/use-livekit-room';
 import { cn } from '@/lib/utils';
 
 interface Props {
@@ -61,18 +58,16 @@ export function VoiceChannelPanel({ roomId, channelName }: Props) {
   return (
     <section
       aria-label={`Voice channel ${channelName}`}
-      className="border-b border-line bg-white p-3"
+      className="border-line border-b bg-white p-3"
     >
       <div className="flex items-center justify-between gap-3">
-        <div className="min-w-0 flex items-center gap-2">
-          <span className="grid h-9 w-9 place-items-center rounded-full bg-bg-subtle text-ink-muted">
+        <div className="flex min-w-0 items-center gap-2">
+          <span className="bg-bg-subtle text-ink-muted grid h-9 w-9 place-items-center rounded-full">
             <Volume2 className="h-4 w-4" aria-hidden />
           </span>
           <div className="min-w-0">
-            <div className="truncate text-sm font-semibold text-ink">
-              {channelName}
-            </div>
-            <div className="text-xs text-ink-muted">
+            <div className="text-ink truncate text-sm font-semibold">{channelName}</div>
+            <div className="text-ink-muted text-xs">
               {joined
                 ? `${lk.participants.length} connected`
                 : connecting
@@ -85,9 +80,7 @@ export function VoiceChannelPanel({ roomId, channelName }: Props) {
         {!joined ? (
           <Button
             type="button"
-            onClick={() =>
-              void lk.connect({ kind: 'voice-channel', roomId, withVideo: false })
-            }
+            onClick={() => void lk.connect({ kind: 'voice-channel', roomId, withVideo: false })}
             disabled={connecting}
             className="bg-brand-teal hover:bg-emerald-700"
           >
@@ -102,26 +95,24 @@ export function VoiceChannelPanel({ roomId, channelName }: Props) {
               size="icon"
               aria-label={lk.micEnabled ? 'Mute' : 'Unmute'}
               onClick={lk.toggleMic}
-              className="h-9 w-9 min-h-0 min-w-0 rounded-full bg-bg-subtle hover:bg-line"
+              className="bg-bg-subtle hover:bg-line h-9 min-h-0 w-9 min-w-0 rounded-full"
             >
               {lk.micEnabled ? (
                 <Mic className="h-4 w-4" />
               ) : (
-                <MicOff className="h-4 w-4 text-state-error" />
+                <MicOff className="text-state-error h-4 w-4" />
               )}
             </Button>
             <Button
               type="button"
               variant="ghost"
               size="icon"
-              aria-label={
-                lk.screenShareEnabled ? 'Stop screen share' : 'Share your screen'
-              }
+              aria-label={lk.screenShareEnabled ? 'Stop screen share' : 'Share your screen'}
               onClick={lk.toggleScreenShare}
               className={cn(
-                'h-9 w-9 min-h-0 min-w-0 rounded-full',
+                'h-9 min-h-0 w-9 min-w-0 rounded-full',
                 lk.screenShareEnabled
-                  ? 'bg-brand-gradient text-white shadow-soft'
+                  ? 'bg-brand-gradient shadow-soft text-white'
                   : 'bg-bg-subtle hover:bg-line',
               )}
             >
@@ -142,7 +133,7 @@ export function VoiceChannelPanel({ roomId, channelName }: Props) {
               size="icon"
               aria-label="Leave voice channel"
               onClick={() => void lk.disconnect()}
-              className="h-9 w-9 min-h-0 min-w-0 rounded-full bg-state-error text-white hover:bg-state-error"
+              className="bg-state-error hover:bg-state-error h-9 min-h-0 w-9 min-w-0 rounded-full text-white"
             >
               <PhoneOff className="h-4 w-4" />
             </Button>
@@ -151,36 +142,27 @@ export function VoiceChannelPanel({ roomId, channelName }: Props) {
       </div>
 
       {joined && lk.participants.length > 0 ? (
-        <ul
-          className="mt-3 flex flex-wrap gap-2"
-          role="list"
-          aria-label="Connected participants"
-        >
+        <ul className="mt-3 flex flex-wrap gap-2" role="list" aria-label="Connected participants">
           {lk.participants.map((p) => (
             <li
               key={p.identity}
               className={cn(
-                'flex items-center gap-2 rounded-full bg-bg-subtle px-2 py-1 text-xs',
-                p.isSpeaking && 'bg-tint-info ring-1 ring-brand-teal',
+                'bg-bg-subtle flex items-center gap-2 rounded-full px-2 py-1 text-xs',
+                p.isSpeaking && 'bg-tint-info ring-brand-teal ring-1',
               )}
             >
               <UserAvatar size="sm" name={p.name} image={null} />
-              <span className="font-medium text-ink">
+              <span className="text-ink font-medium">
                 {p.name}
-                {p.isLocal ? <span className="ml-1 text-ink-disabled">(you)</span> : null}
+                {p.isLocal ? <span className="text-ink-disabled ml-1">(you)</span> : null}
               </span>
               {p.screenSharing ? (
-                <Monitor
-                  className="h-3 w-3 text-brand-teal"
-                  aria-label="Sharing screen"
-                />
+                <Monitor className="text-brand-teal h-3 w-3" aria-label="Sharing screen" />
               ) : null}
               {p.audioMuted ? (
-                <MicOff className="h-3 w-3 text-state-error" aria-label="Muted" />
+                <MicOff className="text-state-error h-3 w-3" aria-label="Muted" />
               ) : null}
-              {!p.isLocal && p.audioTrack ? (
-                <ParticipantAudioSink track={p.audioTrack} />
-              ) : null}
+              {!p.isLocal && p.audioTrack ? <ParticipantAudioSink track={p.audioTrack} /> : null}
             </li>
           ))}
         </ul>
@@ -196,21 +178,14 @@ export function VoiceChannelPanel({ roomId, channelName }: Props) {
         ? lk.participants
             .filter((p) => p.screenSharing)
             .map((presenter) => (
-              <ScreenShareTile
-                key={`share-${presenter.identity}`}
-                participant={presenter}
-              />
+              <ScreenShareTile key={`share-${presenter.identity}`} participant={presenter} />
             ))
         : null}
     </section>
   );
 }
 
-function ScreenShareTile({
-  participant,
-}: {
-  participant: LivekitParticipantView;
-}) {
+function ScreenShareTile({ participant }: { participant: LivekitParticipantView }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const { isFullscreen, toggle } = useFullscreen(containerRef);
@@ -227,11 +202,11 @@ function ScreenShareTile({
   return (
     <div
       ref={containerRef}
-      className="mt-3 flex flex-col overflow-hidden rounded-lg bg-[#0F0F1A] ring-1 ring-line"
+      className="ring-line mt-3 flex flex-col overflow-hidden rounded-lg bg-[#0F0F1A] ring-1"
     >
       <div className="flex items-center justify-between gap-2 px-3 py-1.5 text-xs text-white">
         <span className="flex items-center gap-2">
-          <Monitor className="h-3.5 w-3.5 text-brand-teal" aria-hidden />
+          <Monitor className="text-brand-teal h-3.5 w-3.5" aria-hidden />
           <span>
             {participant.isLocal
               ? 'You are sharing your screen'

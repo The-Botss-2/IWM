@@ -22,9 +22,7 @@ const workspaceMembersForProjectKey = (projectId: string) =>
  */
 export function useWorkspaceMembers(projectId?: string) {
   return useQuery({
-    queryKey: projectId
-      ? workspaceMembersForProjectKey(projectId)
-      : workspaceMembersKey,
+    queryKey: projectId ? workspaceMembersForProjectKey(projectId) : workspaceMembersKey,
     queryFn: () =>
       projectId
         ? getApi().workspaces.membersForProject(projectId)
@@ -43,15 +41,12 @@ export function useInviteWorkspaceMember() {
     mutationFn: (input: InviteMemberInput) => getApi().workspaces.inviteCurrentMember(input),
     onSuccess: (result: InviteMemberResponse) => {
       // Append the new (or freshly attached) membership row optimistically.
-      qc.setQueryData<WorkspaceMembershipWithUser[] | undefined>(
-        workspaceMembersKey,
-        (prev) => {
-          if (!prev) return [result.membership];
-          // De-duplicate by membership id (Resend reuses the same row).
-          const without = prev.filter((m) => m.id !== result.membership.id);
-          return [...without, result.membership];
-        },
-      );
+      qc.setQueryData<WorkspaceMembershipWithUser[] | undefined>(workspaceMembersKey, (prev) => {
+        if (!prev) return [result.membership];
+        // De-duplicate by membership id (Resend reuses the same row).
+        const without = prev.filter((m) => m.id !== result.membership.id);
+        return [...without, result.membership];
+      });
     },
   });
 }
@@ -68,11 +63,7 @@ export function useUpdateWorkspaceMember() {
       if (prev) {
         qc.setQueryData<WorkspaceMembershipWithUser[]>(
           workspaceMembersKey,
-          prev.map((m) =>
-            m.id === id
-              ? { ...m, role: input.role, updatedAt: new Date() }
-              : m,
-          ),
+          prev.map((m) => (m.id === id ? { ...m, role: input.role, updatedAt: new Date() } : m)),
         );
       }
       return { prev };
@@ -115,8 +106,7 @@ export function useRevokeInvitation() {
   const qc = useQueryClient();
   return useMutation({
     meta: { errorTitle: "Couldn't revoke invitation" },
-    mutationFn: (membershipId: string) =>
-      getApi().workspaces.revokeInvitation(membershipId),
+    mutationFn: (membershipId: string) => getApi().workspaces.revokeInvitation(membershipId),
     onMutate: async (id) => {
       await qc.cancelQueries({ queryKey: workspaceMembersKey });
       const prev = qc.getQueryData<WorkspaceMembershipWithUser[]>(workspaceMembersKey);
@@ -142,7 +132,6 @@ export function useRevokeInvitation() {
 export function useResendInvitation() {
   return useMutation({
     meta: { errorTitle: "Couldn't resend invitation" },
-    mutationFn: (membershipId: string) =>
-      getApi().workspaces.resendInvitation(membershipId),
+    mutationFn: (membershipId: string) => getApi().workspaces.resendInvitation(membershipId),
   });
 }

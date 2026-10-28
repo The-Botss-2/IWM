@@ -13,12 +13,7 @@ import {
   Trash2,
 } from 'lucide-react';
 import Link from 'next/link';
-import {
-  useEffect,
-  useMemo,
-  useState,
-  type FormEvent,
-} from 'react';
+import { useEffect, useMemo, useState, type FormEvent } from 'react';
 import type { TimeEntryWithMeta } from '@botss/shared-types';
 
 import { ShareToChatDialog } from '@/components/chat/share-to-chat-dialog';
@@ -95,9 +90,7 @@ export default function TimesheetsPage() {
   // Stop / Pause / Resume controls live inside ActiveTimerBanner - the
   // parent no longer needs to forward mutations down by prop.
   const remove = useDeleteTimeEntry();
-  const [shareTarget, setShareTarget] = useState<
-    { id: string; label: string } | null
-  >(null);
+  const [shareTarget, setShareTarget] = useState<{ id: string; label: string } | null>(null);
   const [editTarget, setEditTarget] = useState<TimeEntryWithMeta | null>(null);
 
   const runningEntry = running.data?.items[0] ?? null;
@@ -106,8 +99,8 @@ export default function TimesheetsPage() {
     <div className="mx-auto h-[var(--app-content-h,calc(100vh-4rem))] w-full max-w-6xl overflow-y-auto px-4 py-6 sm:px-6">
       <header className="mb-6 flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-semibold text-ink">Timesheets</h1>
-          <p className="mt-0.5 text-sm text-ink-muted">
+          <h1 className="text-ink text-2xl font-semibold">Timesheets</h1>
+          <p className="text-ink-muted mt-0.5 text-sm">
             Track time per project and task. Manual entries are billable by default.
           </p>
         </div>
@@ -129,15 +122,9 @@ export default function TimesheetsPage() {
         </div>
       </header>
 
-      {runningEntry ? (
-        <ActiveTimerBanner entry={runningEntry} />
-      ) : (
-        <StartTimerCard />
-      )}
+      {runningEntry ? <ActiveTimerBanner entry={runningEntry} /> : <StartTimerCard />}
 
-      {manualOpen ? (
-        <ManualEntryForm onClose={() => setManualOpen(false)} />
-      ) : null}
+      {manualOpen ? <ManualEntryForm onClose={() => setManualOpen(false)} /> : null}
 
       <section className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1fr)_280px]">
         <WeeklyTable
@@ -197,10 +184,7 @@ export default function TimesheetsPage() {
       ) : null}
 
       {editTarget ? (
-        <EditTimeEntryDialog
-          entry={editTarget}
-          onClose={() => setEditTarget(null)}
-        />
+        <EditTimeEntryDialog entry={editTarget} onClose={() => setEditTarget(null)} />
       ) : null}
     </div>
   );
@@ -240,9 +224,7 @@ function ActiveTimerBanner({ entry }: { entry: TimeEntryWithMeta }) {
     <div
       className={cn(
         'flex flex-wrap items-center justify-between gap-3 rounded-lg border px-4 py-3 transition-colors',
-        isPaused
-          ? 'border-brand-orange/30 bg-tint-warning'
-          : 'border-brand-teal/30 bg-tint-info',
+        isPaused ? 'border-brand-orange/30 bg-tint-warning' : 'border-brand-teal/30 bg-tint-info',
       )}
     >
       <div className="min-w-0">
@@ -255,12 +237,10 @@ function ActiveTimerBanner({ entry }: { entry: TimeEntryWithMeta }) {
           {isPaused ? <Pause className="h-3 w-3" /> : <Play className="h-3 w-3" />}
           {isPaused ? 'Timer paused' : 'Timer running'}
         </div>
-        <div className="mt-0.5 truncate text-sm font-medium text-ink">{label}</div>
-        <div className="mt-0.5 text-xs text-ink-muted">
+        <div className="text-ink mt-0.5 truncate text-sm font-medium">{label}</div>
+        <div className="text-ink-muted mt-0.5 text-xs">
           Since {fmtTime(entry.startTime)} · {fmtMinutes(netMinutes)} elapsed
-          {entry.accumulatedPauseMin > 0
-            ? ` · ${entry.accumulatedPauseMin}m paused`
-            : ''}
+          {entry.accumulatedPauseMin > 0 ? ` · ${entry.accumulatedPauseMin}m paused` : ''}
         </div>
       </div>
       <div className="flex items-center gap-2">
@@ -337,11 +317,7 @@ function StartTimerCard() {
           : projectName
             ? { projectLabel: projectName }
             : {}),
-        ...(matchedTask
-          ? { taskId: matchedTask.id }
-          : taskTitle
-            ? { taskLabel: taskTitle }
-            : {}),
+        ...(matchedTask ? { taskId: matchedTask.id } : taskTitle ? { taskLabel: taskTitle } : {}),
         ...(description.trim() ? { description: description.trim() } : {}),
         billable,
       },
@@ -357,9 +333,9 @@ function StartTimerCard() {
   }
 
   return (
-    <div className="rounded-lg border border-line bg-white p-4">
-      <div className="mb-3 flex items-center gap-2 text-sm font-semibold text-ink">
-        <Pause className="h-4 w-4 text-ink-muted" />
+    <div className="border-line rounded-lg border bg-white p-4">
+      <div className="text-ink mb-3 flex items-center gap-2 text-sm font-semibold">
+        <Pause className="text-ink-muted h-4 w-4" />
         No timer running
       </div>
       <div className="grid gap-3 sm:grid-cols-[1fr_1fr_2fr_auto] sm:items-end">
@@ -416,7 +392,7 @@ function StartTimerCard() {
           Start
         </Button>
       </div>
-      <label className="mt-3 inline-flex items-center gap-2 text-xs text-ink-muted">
+      <label className="text-ink-muted mt-3 inline-flex items-center gap-2 text-xs">
         <input
           type="checkbox"
           checked={billable}
@@ -475,11 +451,7 @@ function ManualEntryForm({ onClose }: { onClose: () => void }) {
           : projectName
             ? { projectLabel: projectName }
             : {}),
-        ...(matchedTask
-          ? { taskId: matchedTask.id }
-          : taskTitle
-            ? { taskLabel: taskTitle }
-            : {}),
+        ...(matchedTask ? { taskId: matchedTask.id } : taskTitle ? { taskLabel: taskTitle } : {}),
         ...(description.trim() ? { description: description.trim() } : {}),
       },
       {
@@ -493,11 +465,8 @@ function ManualEntryForm({ onClose }: { onClose: () => void }) {
   }
 
   return (
-    <form
-      onSubmit={submit}
-      className="mt-4 rounded-lg border border-line bg-white p-4"
-    >
-      <h2 className="mb-3 text-sm font-semibold text-ink">Manual entry</h2>
+    <form onSubmit={submit} className="border-line mt-4 rounded-lg border bg-white p-4">
+      <h2 className="text-ink mb-3 text-sm font-semibold">Manual entry</h2>
       <div className="grid gap-3 sm:grid-cols-4">
         <div className="space-y-1">
           <Label htmlFor="manual-date">Date</Label>
@@ -519,12 +488,7 @@ function ManualEntryForm({ onClose }: { onClose: () => void }) {
         </div>
         <div className="space-y-1">
           <Label htmlFor="manual-to">To</Label>
-          <Input
-            id="manual-to"
-            type="time"
-            value={to}
-            onChange={(e) => setTo(e.target.value)}
-          />
+          <Input id="manual-to" type="time" value={to} onChange={(e) => setTo(e.target.value)} />
         </div>
         <div className="space-y-1">
           <Label htmlFor="manual-project">Project</Label>
@@ -575,7 +539,7 @@ function ManualEntryForm({ onClose }: { onClose: () => void }) {
         </div>
       </div>
       <div className="mt-3 flex items-center justify-between">
-        <label className="inline-flex items-center gap-2 text-xs text-ink-muted">
+        <label className="text-ink-muted inline-flex items-center gap-2 text-xs">
           <input
             type="checkbox"
             checked={billable}
@@ -640,37 +604,27 @@ function WeeklyTable({
   }, [days, entries]);
   const totalMin = entries.reduce((acc, e) => acc + (e.durationMin ?? 0), 0);
   return (
-    <section className="rounded-lg border border-line bg-white">
-      <header className="flex flex-wrap items-center justify-between gap-2 border-b border-line px-4 py-3">
+    <section className="border-line rounded-lg border bg-white">
+      <header className="border-line flex flex-wrap items-center justify-between gap-2 border-b px-4 py-3">
         <div className="flex items-center gap-1">
-          <Button
-            size="icon"
-            variant="ghost"
-            aria-label="Previous week"
-            onClick={onPrev}
-          >
+          <Button size="icon" variant="ghost" aria-label="Previous week" onClick={onPrev}>
             <ChevronLeft className="h-4 w-4" />
           </Button>
           <Button size="sm" variant="secondary" onClick={onToday}>
             This week
           </Button>
-          <Button
-            size="icon"
-            variant="ghost"
-            aria-label="Next week"
-            onClick={onNext}
-          >
+          <Button size="icon" variant="ghost" aria-label="Next week" onClick={onNext}>
             <ChevronRight className="h-4 w-4" />
           </Button>
-          <span className="ml-2 text-sm font-medium text-ink">
+          <span className="text-ink ml-2 text-sm font-medium">
             {fmtRange(weekStart, addDays(weekEnd, -1))}
           </span>
         </div>
-        <span className="text-xs text-ink-muted">
-          Total: <span className="font-semibold text-ink">{fmtMinutes(totalMin)}</span>
+        <span className="text-ink-muted text-xs">
+          Total: <span className="text-ink font-semibold">{fmtMinutes(totalMin)}</span>
         </span>
       </header>
-      <div className="divide-y divide-line">
+      <div className="divide-line divide-y">
         {loading ? (
           <div className="flex justify-center p-6">
             <Loader size="sm" label="Loading" />
@@ -686,21 +640,21 @@ function WeeklyTable({
             return (
               <div key={d.toDateString()} className="px-4 py-3">
                 <div className="mb-2 flex items-center justify-between">
-                  <div className="text-xs font-semibold uppercase tracking-wide text-ink-muted">
+                  <div className="text-ink-muted text-xs font-semibold uppercase tracking-wide">
                     {fmtDay(d)}
                   </div>
-                  <div className="text-xs text-ink-muted">
+                  <div className="text-ink-muted text-xs">
                     {dayTotal > 0 ? fmtMinutes(dayTotal) : '-'}
                   </div>
                 </div>
                 {list.length === 0 ? (
-                  <p className="text-xs text-ink-disabled">No entries.</p>
+                  <p className="text-ink-disabled text-xs">No entries.</p>
                 ) : (
                   <ul className="space-y-1.5" role="list">
                     {list.map((e) => (
                       <li
                         key={e.id}
-                        className="group flex items-center gap-3 rounded-md border border-line px-3 py-1.5 hover:border-line"
+                        className="border-line hover:border-line group flex items-center gap-3 rounded-md border px-3 py-1.5"
                       >
                         <span
                           className="h-2.5 w-2.5 shrink-0 rounded-full"
@@ -710,7 +664,7 @@ function WeeklyTable({
                           aria-hidden
                         />
                         <div className="min-w-0 flex-1">
-                          <div className="truncate text-sm font-medium text-ink">
+                          <div className="text-ink truncate text-sm font-medium">
                             {e.task?.title ||
                               e.taskLabel ||
                               e.project?.name ||
@@ -719,21 +673,18 @@ function WeeklyTable({
                               'Tracked time'}
                           </div>
                           {e.description && (e.task || e.project) ? (
-                            <div className="truncate text-xs text-ink-muted">
-                              {e.description}
-                            </div>
+                            <div className="text-ink-muted truncate text-xs">{e.description}</div>
                           ) : null}
-                          <div className="text-[11px] text-ink-muted">
-                            {fmtTime(e.startTime)}–
-                            {e.endTime ? fmtTime(e.endTime) : 'running'}
+                          <div className="text-ink-muted text-[11px]">
+                            {fmtTime(e.startTime)}–{e.endTime ? fmtTime(e.endTime) : 'running'}
                             {!e.billable ? (
-                              <span className="ml-1 rounded bg-bg-subtle px-1 text-ink-muted">
+                              <span className="bg-bg-subtle text-ink-muted ml-1 rounded px-1">
                                 non-billable
                               </span>
                             ) : null}
                           </div>
                         </div>
-                        <span className="shrink-0 text-xs font-medium text-ink">
+                        <span className="text-ink shrink-0 text-xs font-medium">
                           {e.durationMin != null ? fmtMinutes(e.durationMin) : '…'}
                         </span>
                         <Button
@@ -741,7 +692,7 @@ function WeeklyTable({
                           size="icon"
                           aria-label="Edit entry"
                           onClick={() => onEdit(e)}
-                          className="h-7 w-7 text-ink-disabled opacity-0 transition group-hover:opacity-100 hover:text-ink"
+                          className="text-ink-disabled hover:text-ink h-7 w-7 opacity-0 transition group-hover:opacity-100"
                         >
                           <Pencil className="h-3.5 w-3.5" />
                         </Button>
@@ -760,7 +711,7 @@ function WeeklyTable({
                                 'Tracked time',
                             )
                           }
-                          className="h-7 w-7 text-ink-disabled opacity-0 transition group-hover:opacity-100 hover:text-brand-teal"
+                          className="text-ink-disabled hover:text-brand-teal h-7 w-7 opacity-0 transition group-hover:opacity-100"
                         >
                           <Send className="h-3.5 w-3.5" />
                         </Button>
@@ -769,7 +720,7 @@ function WeeklyTable({
                           size="icon"
                           aria-label="Delete entry"
                           onClick={() => onDelete(e.id)}
-                          className="h-7 w-7 text-ink-disabled opacity-0 transition group-hover:opacity-100 hover:text-state-error"
+                          className="text-ink-disabled hover:text-state-error h-7 w-7 opacity-0 transition group-hover:opacity-100"
                         >
                           <Trash2 className="h-3.5 w-3.5" />
                         </Button>
@@ -794,17 +745,20 @@ function SummarySidebar({
   onRetry,
 }: {
   totalMinutes: number;
-  byProject: { projectId: string | null; projectName: string | null; projectColor: string | null; totalMinutes: number }[];
+  byProject: {
+    projectId: string | null;
+    projectName: string | null;
+    projectColor: string | null;
+    totalMinutes: number;
+  }[];
   loading: boolean;
   error: boolean;
   onRetry: () => void;
 }) {
   return (
-    <aside className="rounded-lg border border-line bg-white p-4">
-      <h2 className="mb-3 text-sm font-semibold text-ink">This week</h2>
-      <div className="mb-4 text-2xl font-semibold text-ink">
-        {fmtMinutes(totalMinutes)}
-      </div>
+    <aside className="border-line rounded-lg border bg-white p-4">
+      <h2 className="text-ink mb-3 text-sm font-semibold">This week</h2>
+      <div className="text-ink mb-4 text-2xl font-semibold">{fmtMinutes(totalMinutes)}</div>
       {loading ? (
         <div className="flex justify-center">
           <Loader size="sm" label="Loading" />
@@ -812,16 +766,12 @@ function SummarySidebar({
       ) : error ? (
         <QueryError onRetry={onRetry} />
       ) : byProject.length === 0 ? (
-        <p className="text-xs text-ink-muted">
-          No tracked time yet. Start a timer to get going.
-        </p>
+        <p className="text-ink-muted text-xs">No tracked time yet. Start a timer to get going.</p>
       ) : (
         <ul className="space-y-2" role="list">
           {byProject.map((row) => {
             const pct =
-              totalMinutes === 0
-                ? 0
-                : Math.round((row.totalMinutes / totalMinutes) * 100);
+              totalMinutes === 0 ? 0 : Math.round((row.totalMinutes / totalMinutes) * 100);
             return (
               <li key={row.projectId ?? '__none__'}>
                 <div className="mb-1 flex items-baseline justify-between gap-2 text-xs">
@@ -833,7 +783,7 @@ function SummarySidebar({
                       }}
                       aria-hidden
                     />
-                    <span className="truncate font-medium text-ink">
+                    <span className="text-ink truncate font-medium">
                       {row.projectName ?? 'No project'}
                     </span>
                   </span>
@@ -841,7 +791,7 @@ function SummarySidebar({
                     {fmtMinutes(row.totalMinutes)} · {pct}%
                   </span>
                 </div>
-                <div className="h-1.5 overflow-hidden rounded-full bg-bg-subtle">
+                <div className="bg-bg-subtle h-1.5 overflow-hidden rounded-full">
                   <div
                     className={cn('h-1.5 rounded-full')}
                     style={{
@@ -879,16 +829,10 @@ function EditTimeEntryDialog({
   const isoDay = entry.startTime.toISOString().slice(0, 10);
   const initialTo = entry.endTime ?? entry.startTime;
   const [date, setDate] = useState(isoDay);
-  const [from, setFrom] = useState(
-    entry.startTime.toTimeString().slice(0, 5),
-  );
+  const [from, setFrom] = useState(entry.startTime.toTimeString().slice(0, 5));
   const [to, setTo] = useState(initialTo.toTimeString().slice(0, 5));
-  const [projectInput, setProjectInput] = useState(
-    entry.project?.name ?? entry.projectLabel ?? '',
-  );
-  const [taskInput, setTaskInput] = useState(
-    entry.task?.title ?? entry.taskLabel ?? '',
-  );
+  const [projectInput, setProjectInput] = useState(entry.project?.name ?? entry.projectLabel ?? '');
+  const [taskInput, setTaskInput] = useState(entry.task?.title ?? entry.taskLabel ?? '');
   const [description, setDescription] = useState(entry.description ?? '');
   const [billable, setBillable] = useState(entry.billable);
 
@@ -926,11 +870,7 @@ function EditTimeEntryDialog({
           // Mutually-exclusive project + task: pass the FK if matched,
           // otherwise the label, otherwise explicitly null to clear.
           projectId: matchedProject ? matchedProject.id : null,
-          projectLabel: matchedProject
-            ? null
-            : projectName === ''
-              ? null
-              : projectName,
+          projectLabel: matchedProject ? null : projectName === '' ? null : projectName,
           taskId: matchedTask ? matchedTask.id : null,
           taskLabel: matchedTask ? null : taskTitle === '' ? null : taskTitle,
         },
@@ -946,7 +886,12 @@ function EditTimeEntryDialog({
   }
 
   return (
-    <Dialog open onOpenChange={(next) => { if (!next) onClose(); }}>
+    <Dialog
+      open
+      onOpenChange={(next) => {
+        if (!next) onClose();
+      }}
+    >
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>Edit time entry</DialogTitle>
@@ -975,12 +920,7 @@ function EditTimeEntryDialog({
           </div>
           <div className="space-y-1">
             <Label htmlFor="edit-to">To</Label>
-            <Input
-              id="edit-to"
-              type="time"
-              value={to}
-              onChange={(e) => setTo(e.target.value)}
-            />
+            <Input id="edit-to" type="time" value={to} onChange={(e) => setTo(e.target.value)} />
           </div>
           <div className="space-y-1 sm:col-span-2">
             <Label htmlFor="edit-project">Project</Label>
@@ -1029,7 +969,7 @@ function EditTimeEntryDialog({
               placeholder="What did you work on?"
             />
           </div>
-          <label className="inline-flex items-center gap-2 text-xs text-ink-muted sm:col-span-2">
+          <label className="text-ink-muted inline-flex items-center gap-2 text-xs sm:col-span-2">
             <input
               type="checkbox"
               checked={billable}
@@ -1039,12 +979,7 @@ function EditTimeEntryDialog({
             Billable
           </label>
           <DialogFooter className="sm:col-span-4">
-            <Button
-              type="button"
-              variant="secondary"
-              onClick={onClose}
-              disabled={update.isPending}
-            >
+            <Button type="button" variant="secondary" onClick={onClose} disabled={update.isPending}>
               Cancel
             </Button>
             <Button type="submit" disabled={update.isPending}>
@@ -1084,21 +1019,14 @@ function buildEntryRange(
 }
 
 /** Case-insensitive exact-name match against an option list. */
-function matchByName<T extends { id: string; name: string }>(
-  list: T[],
-  typed: string,
-): T | null {
+function matchByName<T extends { id: string; name: string }>(list: T[], typed: string): T | null {
   const t = typed.trim().toLowerCase();
   if (!t) return null;
   return list.find((p) => p.name.toLowerCase() === t) ?? null;
 }
 
-function matchByTitle<T extends { id: string; title: string }>(
-  list: T[],
-  typed: string,
-): T | null {
+function matchByTitle<T extends { id: string; title: string }>(list: T[], typed: string): T | null {
   const t = typed.trim().toLowerCase();
   if (!t) return null;
   return list.find((p) => p.title.toLowerCase() === t) ?? null;
 }
-

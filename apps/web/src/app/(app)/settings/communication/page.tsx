@@ -40,10 +40,7 @@ import {
   type ChatTheme,
 } from '@/lib/chat-prefs';
 import { adminRoomLabel } from '@/lib/chat-room-label';
-import {
-  playMessageBlip,
-  playRingtoneOnce,
-} from '@/lib/chat-sounds';
+import { playMessageBlip, playRingtoneOnce } from '@/lib/chat-sounds';
 import { absoluteTime, relativeTime } from '@/lib/time';
 import { toast } from '@/lib/toast';
 import { cn } from '@/lib/utils';
@@ -62,8 +59,8 @@ export default function CommunicationSettingsPage() {
     return (
       <div className="space-y-6">
         <header>
-          <h2 className="text-lg font-semibold text-ink">Communication</h2>
-          <p className="mt-0.5 text-sm text-ink-muted">
+          <h2 className="text-ink text-lg font-semibold">Communication</h2>
+          <p className="text-ink-muted mt-0.5 text-sm">
             Personalize how chats sound and look on this device.
           </p>
         </header>
@@ -75,13 +72,16 @@ export default function CommunicationSettingsPage() {
   return (
     <div className="space-y-6">
       <header>
-        <h2 className="text-lg font-semibold text-ink">Communication</h2>
-        <p className="mt-0.5 text-sm text-ink-muted">
+        <h2 className="text-ink text-lg font-semibold">Communication</h2>
+        <p className="text-ink-muted mt-0.5 text-sm">
           Personalize your chat experience, or manage workspace rooms.
         </p>
       </header>
 
-      <nav className="inline-flex rounded-md border border-line bg-bg-surface p-0.5" aria-label="Communication tabs">
+      <nav
+        className="border-line bg-bg-surface inline-flex rounded-md border p-0.5"
+        aria-label="Communication tabs"
+      >
         <TabButton active={tab === 'preferences'} onClick={() => setTab('preferences')}>
           Preferences
         </TabButton>
@@ -111,9 +111,7 @@ function TabButton({
       aria-pressed={active}
       className={cn(
         'rounded px-3 py-1.5 text-sm transition-colors',
-        active
-          ? 'bg-brand-50 text-brand-700'
-          : 'text-ink-muted hover:bg-bg-subtle',
+        active ? 'bg-brand-50 text-brand-700' : 'text-ink-muted hover:bg-bg-subtle',
       )}
     >
       {children}
@@ -146,9 +144,9 @@ function PreferencesPanel() {
 
   return (
     <div className="space-y-6">
-      <section className="rounded-lg border border-line bg-bg-surface p-5">
-        <div className="mb-3 flex items-center gap-2 text-sm font-semibold text-ink">
-          <Palette className="h-4 w-4 text-ink-muted" /> Appearance
+      <section className="border-line bg-bg-surface rounded-lg border p-5">
+        <div className="text-ink mb-3 flex items-center gap-2 text-sm font-semibold">
+          <Palette className="text-ink-muted h-4 w-4" /> Appearance
         </div>
 
         <div className="space-y-5">
@@ -187,13 +185,13 @@ function PreferencesPanel() {
                   style={{ backgroundColor: bg.value }}
                 />
               ))}
-              <label className="ml-2 inline-flex items-center gap-1 text-xs text-ink-muted">
+              <label className="text-ink-muted ml-2 inline-flex items-center gap-1 text-xs">
                 Custom
                 <input
                   type="color"
                   value={appearance.backgroundColor}
                   onChange={onColorPick}
-                  className="h-7 w-9 cursor-pointer rounded-md border border-line bg-bg-surface p-0"
+                  className="border-line bg-bg-surface h-7 w-9 cursor-pointer rounded-md border p-0"
                 />
               </label>
             </div>
@@ -201,7 +199,7 @@ function PreferencesPanel() {
 
           <div className="space-y-2">
             <Label className="inline-flex items-center gap-1.5">
-              <Type className="h-3.5 w-3.5 text-ink-muted" /> Font size
+              <Type className="text-ink-muted h-3.5 w-3.5" /> Font size
             </Label>
             <div className="flex gap-2">
               {FONT_SIZES.map((s) => (
@@ -227,12 +225,12 @@ function PreferencesPanel() {
         </div>
       </section>
 
-      <section className="rounded-lg border border-line bg-bg-surface p-5">
-        <div className="mb-3 flex items-center gap-2 text-sm font-semibold text-ink">
+      <section className="border-line bg-bg-surface rounded-lg border p-5">
+        <div className="text-ink mb-3 flex items-center gap-2 text-sm font-semibold">
           {notifications.doNotDisturb ? (
-            <BellOff className="h-4 w-4 text-ink-muted" />
+            <BellOff className="text-ink-muted h-4 w-4" />
           ) : (
-            <Bell className="h-4 w-4 text-ink-muted" />
+            <Bell className="text-ink-muted h-4 w-4" />
           )}
           Notifications
         </div>
@@ -267,12 +265,10 @@ function PreferencesPanel() {
                 max={1}
                 step={0.05}
                 value={notifications.volume}
-                onChange={(e) =>
-                  setChatNotifications({ volume: Number(e.target.value) })
-                }
+                onChange={(e) => setChatNotifications({ volume: Number(e.target.value) })}
                 className="flex-1 accent-emerald-600"
               />
-              <span className="w-10 text-right text-xs text-ink-muted">
+              <span className="text-ink-muted w-10 text-right text-xs">
                 {Math.round(notifications.volume * 100)}%
               </span>
             </div>
@@ -346,13 +342,13 @@ function ToggleRow({
   return (
     <label
       className={cn(
-        'flex items-start justify-between gap-3 rounded-md border border-line px-3 py-2.5',
+        'border-line flex items-start justify-between gap-3 rounded-md border px-3 py-2.5',
         disabled ? 'opacity-60' : '',
       )}
     >
       <div className="min-w-0">
-        <div className="text-sm font-medium text-ink">{label}</div>
-        <div className="text-xs text-ink-muted">{description}</div>
+        <div className="text-ink text-sm font-medium">{label}</div>
+        <div className="text-ink-muted text-xs">{description}</div>
       </div>
       <input
         type="checkbox"
@@ -369,10 +365,8 @@ function PreviewBubble() {
   const appearance = useChatAppearance();
   const isDark = appearance.theme === 'dark';
   return (
-    <div className="rounded-md border border-line p-3">
-      <div className="mb-2 text-[11px] uppercase tracking-wide text-ink-muted">
-        Preview
-      </div>
+    <div className="border-line rounded-md border p-3">
+      <div className="text-ink-muted mb-2 text-[11px] uppercase tracking-wide">Preview</div>
       <div
         className={cn(
           'flex flex-col gap-2 rounded-lg p-3',
@@ -383,20 +377,18 @@ function PreviewBubble() {
       >
         <div
           className={cn(
-            'self-start max-w-[78%] rounded-xl rounded-bl-sm px-3 py-1.5 shadow-sm ring-1',
+            'max-w-[78%] self-start rounded-xl rounded-bl-sm px-3 py-1.5 shadow-sm ring-1',
             isDark
               ? 'bg-slate-800 text-slate-100 ring-slate-700'
-              : 'bg-white text-ink ring-slate-200',
+              : 'text-ink bg-white ring-slate-200',
           )}
         >
           Hey, how&apos;s the new background looking?
         </div>
         <div
           className={cn(
-            'self-end max-w-[78%] rounded-xl rounded-br-sm px-3 py-1.5 shadow-sm',
-            isDark
-              ? 'bg-brand-teal text-white'
-              : 'bg-[#d9fdd3] text-ink',
+            'max-w-[78%] self-end rounded-xl rounded-br-sm px-3 py-1.5 shadow-sm',
+            isDark ? 'bg-brand-teal text-white' : 'text-ink bg-[#d9fdd3]',
           )}
         >
           Looks great!
@@ -409,9 +401,7 @@ function PreviewBubble() {
 function AdminCommunicationView() {
   const qc = useQueryClient();
   const [search, setSearch] = useState('');
-  const [confirmDelete, setConfirmDelete] = useState<
-    { id: string; label: string } | null
-  >(null);
+  const [confirmDelete, setConfirmDelete] = useState<{ id: string; label: string } | null>(null);
 
   const query = useQuery({
     queryKey: adminRoomsKey,
@@ -466,9 +456,9 @@ function AdminCommunicationView() {
         <StatTile label="Voice channels" value={counts.voiceChannel} icon={Volume2} />
       </section>
 
-      <section className="rounded-lg border border-line bg-bg-surface">
-        <header className="flex items-center justify-between border-b border-line px-4 py-3">
-          <h3 className="text-sm font-semibold text-ink">Rooms</h3>
+      <section className="border-line bg-bg-surface rounded-lg border">
+        <header className="border-line flex items-center justify-between border-b px-4 py-3">
+          <h3 className="text-ink text-sm font-semibold">Rooms</h3>
           <Input
             type="search"
             value={search}
@@ -485,12 +475,12 @@ function AdminCommunicationView() {
           ) : query.isError && !query.data ? (
             <QueryError message="Couldn't load rooms." onRetry={() => void query.refetch()} />
           ) : filtered.length === 0 ? (
-            <p className="px-4 py-8 text-center text-xs text-ink-muted">
+            <p className="text-ink-muted px-4 py-8 text-center text-xs">
               {search.trim() ? 'No rooms match that search.' : 'No rooms yet.'}
             </p>
           ) : (
             <table className="w-full text-sm">
-              <thead className="text-left text-[11px] font-medium uppercase tracking-wide text-ink-muted">
+              <thead className="text-ink-muted text-left text-[11px] font-medium uppercase tracking-wide">
                 <tr>
                   <th className="px-4 py-2">Name</th>
                   <th className="px-4 py-2">Type</th>
@@ -554,29 +544,23 @@ function StatTile({
   icon: typeof MessageSquare;
 }) {
   return (
-    <div className="rounded-lg border border-line bg-bg-surface p-4">
+    <div className="border-line bg-bg-surface rounded-lg border p-4">
       <div className="flex items-center justify-between">
-        <span className="text-xs text-ink-muted">{label}</span>
-        <Icon className="h-4 w-4 text-ink-disabled" aria-hidden />
+        <span className="text-ink-muted text-xs">{label}</span>
+        <Icon className="text-ink-disabled h-4 w-4" aria-hidden />
       </div>
-      <div className="mt-2 text-2xl font-semibold text-ink">{value}</div>
+      <div className="text-ink mt-2 text-2xl font-semibold">{value}</div>
     </div>
   );
 }
 
-function Row({
-  room,
-  onArchive,
-}: {
-  room: ChatRoomSummary;
-  onArchive: () => void;
-}) {
+function Row({ room, onArchive }: { room: ChatRoomSummary; onArchive: () => void }) {
   return (
-    <tr className="border-t border-line">
+    <tr className="border-line border-t">
       <td className="px-4 py-3">
-        <div className="font-medium text-ink">{adminRoomLabel(room)}</div>
+        <div className="text-ink font-medium">{adminRoomLabel(room)}</div>
         {room.lastMessage ? (
-          <div className="mt-0.5 truncate text-xs text-ink-muted">
+          <div className="text-ink-muted mt-0.5 truncate text-xs">
             {room.lastMessage.content ?? '[attachment]'}
           </div>
         ) : null}
@@ -584,13 +568,9 @@ function Row({
       <td className="px-4 py-3">
         <Badge tone="neutral">{roomTypeLabel(room.type)}</Badge>
       </td>
-      <td className="px-4 py-3 text-xs text-ink-muted">
-        {room.participants.length}
-      </td>
-      <td className="px-4 py-3 text-xs text-ink-muted">
-        <span title={absoluteTime(room.updatedAt)}>
-          {relativeTime(room.updatedAt)}
-        </span>
+      <td className="text-ink-muted px-4 py-3 text-xs">{room.participants.length}</td>
+      <td className="text-ink-muted px-4 py-3 text-xs">
+        <span title={absoluteTime(room.updatedAt)}>{relativeTime(room.updatedAt)}</span>
       </td>
       <td className="px-4 py-3 text-right">
         <Button
@@ -598,7 +578,7 @@ function Row({
           size="icon"
           aria-label={`Archive ${adminRoomLabel(room)}`}
           onClick={onArchive}
-          className="h-7 w-7 text-ink-disabled hover:text-state-error"
+          className="text-ink-disabled hover:text-state-error h-7 w-7"
         >
           <Trash2 className="h-4 w-4" />
         </Button>

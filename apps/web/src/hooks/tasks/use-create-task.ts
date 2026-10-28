@@ -27,7 +27,7 @@ export function useCreateTask() {
         image: null,
       };
       const assignee =
-        created.assigneeId == null ? null : findCachedUser(qc, created.assigneeId) ?? null;
+        created.assigneeId == null ? null : (findCachedUser(qc, created.assigneeId) ?? null);
       const taskWithPeople: TaskWithPeople = {
         ...created,
         createdBy: author,

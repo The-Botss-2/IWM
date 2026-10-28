@@ -38,7 +38,8 @@ const update = (over: Partial<Extract<FlagDecision, { kind: 'update' }>>): FlagD
   repushFlagged: null,
   ...over,
 });
-const decide = (row: LocalFlags, flags: string[]) => decideFlags(row, serverFlagsOf(flags), now, GRACE);
+const decide = (row: LocalFlags, flags: string[]) =>
+  decideFlags(row, serverFlagsOf(flags), now, GRACE);
 
 function main(): void {
   assert.deepEqual(serverFlagsOf(['\\Seen', '\\Flagged', '\\Answered']), {
@@ -54,7 +55,10 @@ function main(): void {
     'an unconfirmed read is re-sent, not undone',
   );
   assert.deepEqual(
-    decide(local({ isUnread: true, isStarred: true, seenPendingAt: fiveMin, starredPendingAt: fiveMin }), ['\\Seen']),
+    decide(
+      local({ isUnread: true, isStarred: true, seenPendingAt: fiveMin, starredPendingAt: fiveMin }),
+      ['\\Seen'],
+    ),
     update({ repushSeen: false, repushFlagged: true }),
     'unread + star both re-sent',
   );
@@ -68,8 +72,16 @@ function main(): void {
 
   // Without a pending change the server wins: read on the phone, or marked
   // unread in webmail, shows up here.
-  assert.deepEqual(decide(local({ isUnread: true }), ['\\Seen']), update({ adopt: { isUnread: false } }), 'read elsewhere');
-  assert.deepEqual(decide(local(), []), update({ adopt: { isUnread: true } }), 'marked unread elsewhere');
+  assert.deepEqual(
+    decide(local({ isUnread: true }), ['\\Seen']),
+    update({ adopt: { isUnread: false } }),
+    'read elsewhere',
+  );
+  assert.deepEqual(
+    decide(local(), []),
+    update({ adopt: { isUnread: true } }),
+    'marked unread elsewhere',
+  );
 
   // One flag pending never re-sends the other.
   assert.deepEqual(

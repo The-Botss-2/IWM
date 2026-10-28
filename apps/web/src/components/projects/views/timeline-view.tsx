@@ -182,25 +182,22 @@ export default function TimelineView({
     };
   }, [finishDrag, dayPx]);
 
-  const beginDrag = useCallback(
-    (e: React.PointerEvent, task: TaskWithPeople, mode: DragMode) => {
-      e.preventDefault();
-      const start = (task.startDate ?? task.dueDate) as Date;
-      const end = (task.dueDate ?? task.startDate) as Date;
-      activeDragRef.current = {
-        taskId: task.id,
-        mode,
-        pointerId: e.pointerId,
-        startX: e.clientX,
-        initialStart: startOfDay(start),
-        initialEnd: startOfDay(end),
-        currentStart: startOfDay(start),
-        currentEnd: startOfDay(end),
-        moved: false,
-      };
-    },
-    [],
-  );
+  const beginDrag = useCallback((e: React.PointerEvent, task: TaskWithPeople, mode: DragMode) => {
+    e.preventDefault();
+    const start = (task.startDate ?? task.dueDate) as Date;
+    const end = (task.dueDate ?? task.startDate) as Date;
+    activeDragRef.current = {
+      taskId: task.id,
+      mode,
+      pointerId: e.pointerId,
+      startX: e.clientX,
+      initialStart: startOfDay(start),
+      initialEnd: startOfDay(end),
+      currentStart: startOfDay(start),
+      currentEnd: startOfDay(end),
+      moved: false,
+    };
+  }, []);
 
   // Keyboard rescheduling: focus a bar, then arrow keys move/resize. Each
   // keystroke commits immediately (no batching) - keeps the UX predictable.
@@ -275,9 +272,9 @@ export default function TimelineView({
   }
 
   return (
-    <section className="rounded-lg border border-line bg-white">
-      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-line px-3 py-2">
-        <div className="flex items-center gap-2 text-xs text-ink-muted">
+    <section className="border-line rounded-lg border bg-white">
+      <div className="border-line flex flex-wrap items-center justify-between gap-2 border-b px-3 py-2">
+        <div className="text-ink-muted flex items-center gap-2 text-xs">
           <span className="font-medium uppercase tracking-wide">Timeline</span>
           {data.range ? (
             <span>
@@ -309,7 +306,7 @@ export default function TimelineView({
       </div>
 
       {!data.range ? (
-        <div className="rounded-md border-dashed p-8 text-center text-sm text-ink-muted">
+        <div className="text-ink-muted rounded-md border-dashed p-8 text-center text-sm">
           No tasks with dates yet. Set a due date or start date on a task to plot it here.
         </div>
       ) : (
@@ -326,7 +323,7 @@ export default function TimelineView({
       )}
 
       {data.undated > 0 ? (
-        <p className="border-t border-line px-3 py-2 text-xs text-ink-muted">
+        <p className="border-line text-ink-muted border-t px-3 py-2 text-xs">
           {data.undated} task{data.undated === 1 ? '' : 's'} without dates - hidden.
         </p>
       ) : null}
@@ -358,13 +355,13 @@ function TimelineGrid({
   const todayOffset = differenceInDays(startOfDay(new Date()), minDate) * dayPx;
   return (
     <div className="flex">
-      <div className="w-48 shrink-0 border-r border-line bg-bg-subtle">
-        <div className="h-9 border-b border-line px-3 py-2 text-xs font-medium uppercase tracking-wide text-ink-muted">
+      <div className="border-line bg-bg-subtle w-48 shrink-0 border-r">
+        <div className="border-line text-ink-muted h-9 border-b px-3 py-2 text-xs font-medium uppercase tracking-wide">
           Tasks
         </div>
         {Array.from(byStatus.entries()).map(([status, list]) => (
           <div key={status}>
-            <div className="bg-bg-subtle px-3 py-1 text-xs font-medium text-ink-muted">
+            <div className="bg-bg-subtle text-ink-muted px-3 py-1 text-xs font-medium">
               {status}
             </div>
             {list.map((t) => (
@@ -372,7 +369,7 @@ function TimelineGrid({
                 key={t.id}
                 type="button"
                 onClick={() => onSelectTask?.(t.id)}
-                className="block w-full truncate border-b border-line px-3 py-1.5 text-left text-xs hover:bg-bg-subtle focus-visible:outline-none focus-visible:ring-2 focus-visible:shadow-focus"
+                className="border-line hover:bg-bg-subtle focus-visible:shadow-focus block w-full truncate border-b px-3 py-1.5 text-left text-xs focus-visible:outline-none focus-visible:ring-2"
                 title={t.title}
               >
                 {t.title}
@@ -387,7 +384,7 @@ function TimelineGrid({
           <DayHeader minDate={minDate} totalDays={totalDays} dayPx={dayPx} />
           {Array.from(byStatus.entries()).map(([status, list]) => (
             <div key={status}>
-              <div className="h-6 bg-bg-subtle" />
+              <div className="bg-bg-subtle h-6" />
               {list.map((t) => (
                 <TaskRow
                   key={t.id}
@@ -404,7 +401,7 @@ function TimelineGrid({
           ))}
           {todayOffset >= 0 && todayOffset <= totalDays * dayPx ? (
             <div
-              className="pointer-events-none absolute top-9 bottom-0 w-px bg-[#EAF0FC]0"
+              className="bg-[#EAF0FC]0 pointer-events-none absolute bottom-0 top-9 w-px"
               style={{ left: todayOffset }}
               aria-hidden
             />
@@ -428,23 +425,21 @@ function DayHeader({
   // collide. Day=Mondays, Week=Mondays, Month=first-of-month only.
   const labelEvery = dayPx >= 28 ? 'mondays' : dayPx >= 14 ? 'mondays' : 'months';
   return (
-    <div className="flex h-9 border-b border-line">
+    <div className="border-line flex h-9 border-b">
       {Array.from({ length: totalDays }).map((_, i) => {
         const d = addDays(minDate, i);
-        const showLabel =
-          labelEvery === 'months' ? d.getDate() === 1 : d.getDay() === 1;
-        const labelText =
-          labelEvery === 'months' ? format(d, 'MMM yyyy') : format(d, 'd MMM');
+        const showLabel = labelEvery === 'months' ? d.getDate() === 1 : d.getDay() === 1;
+        const labelText = labelEvery === 'months' ? format(d, 'MMM yyyy') : format(d, 'd MMM');
         return (
           <div
             key={i}
-            className={`relative shrink-0 border-l border-line text-xs ${
+            className={`border-line relative shrink-0 border-l text-xs ${
               d.getDay() === 0 || d.getDay() === 6 ? 'bg-bg-subtle' : ''
             }`}
             style={{ width: dayPx }}
           >
             {showLabel ? (
-              <span className="absolute left-1 top-1 whitespace-nowrap text-[10px] text-ink-muted">
+              <span className="text-ink-muted absolute left-1 top-1 whitespace-nowrap text-[10px]">
                 {labelText}
               </span>
             ) : null}
@@ -498,14 +493,14 @@ function TaskRow({
 
   if (onlyDue) {
     return (
-      <div className="relative h-7 border-b border-line">
+      <div className="border-line relative h-7 border-b">
         <button
           type="button"
           aria-label={`${task.title} - due ${format(end, 'd MMM')}. Drag to reschedule.`}
           onPointerDown={(e) => handlePointerDown(e, 'move')}
           onClick={handleClick}
           onKeyDown={onKeyDown}
-          className="absolute top-1 h-5 w-5 rotate-45 bg-purple-500 cursor-grab focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/60"
+          className="focus-visible:ring-brand-500/60 absolute top-1 h-5 w-5 rotate-45 cursor-grab bg-purple-500 focus-visible:outline-none focus-visible:ring-2"
           style={{ left: left - 8, touchAction: 'none' }}
           title={`${task.title} · due ${format(end, 'd MMM')}`}
         />
@@ -513,7 +508,7 @@ function TaskRow({
     );
   }
   return (
-    <div className="relative h-7 border-b border-line">
+    <div className="border-line relative h-7 border-b">
       <div
         role="button"
         tabIndex={0}
@@ -525,8 +520,8 @@ function TaskRow({
         onClick={handleClick}
         onKeyDown={onKeyDown}
         className={cn(
-          'group absolute top-1 h-5 rounded bg-[#EAF0FC]0/80 px-1.5 text-[10px] leading-5 text-white',
-          'cursor-grab active:cursor-grabbing focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80',
+          'bg-[#EAF0FC]0/80 group absolute top-1 h-5 rounded px-1.5 text-[10px] leading-5 text-white',
+          'cursor-grab focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 active:cursor-grabbing',
         )}
         style={{ left, width, touchAction: 'none' }}
         title={`${task.title} · ${format(start, 'd MMM')} → ${format(end, 'd MMM')}`}

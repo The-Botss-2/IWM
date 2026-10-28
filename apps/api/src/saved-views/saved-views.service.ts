@@ -1,8 +1,5 @@
 import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
-import type {
-  CreateSavedViewInput,
-  UpdateSavedViewInput,
-} from '@botss/shared-types';
+import type { CreateSavedViewInput, UpdateSavedViewInput } from '@botss/shared-types';
 
 import type { UserScope } from '../common/decorators/user-scope.decorator';
 import { projectAccessWhere } from '../common/project-access';

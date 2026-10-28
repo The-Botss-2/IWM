@@ -12,8 +12,8 @@ export default function WorkspaceSettingsPage() {
   return (
     <div className="space-y-6">
       <header>
-        <h2 className="text-lg font-semibold text-ink">Workspace</h2>
-        <p className="text-sm text-ink-muted">
+        <h2 className="text-ink text-lg font-semibold">Workspace</h2>
+        <p className="text-ink-muted text-sm">
           Manage workspace info, members, and pending invitations.
         </p>
       </header>
@@ -24,7 +24,7 @@ export default function WorkspaceSettingsPage() {
           <Skeleton className="h-64" />
         </div>
       ) : workspace.isError || !workspace.data ? (
-        <div className="text-sm text-state-error">Couldn&apos;t load workspace.</div>
+        <div className="text-state-error text-sm">Couldn&apos;t load workspace.</div>
       ) : (
         <>
           <WorkspaceInfoForm workspace={workspace.data} />

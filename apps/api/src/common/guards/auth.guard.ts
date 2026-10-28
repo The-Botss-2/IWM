@@ -48,7 +48,7 @@ import { IS_PUBLIC_KEY } from '../decorators/public.decorator';
 @Injectable()
 export class AuthGuard implements CanActivate {
   private readonly logger = new Logger(AuthGuard.name);
-  
+
   constructor(
     private readonly reflector: Reflector,
     private readonly authService: AuthService,
@@ -60,7 +60,9 @@ export class AuthGuard implements CanActivate {
   async canActivate(ctx: ExecutionContext): Promise<boolean> {
     if (!this.reflector || !this.authService) {
       const logger = new Logger('AuthGuard');
-      logger.error('Critical dependencies (Reflector or AuthService) are missing in AuthGuard. Failing safe to unauthorized.');
+      logger.error(
+        'Critical dependencies (Reflector or AuthService) are missing in AuthGuard. Failing safe to unauthorized.',
+      );
       throw new UnauthorizedException('Authentication system is currently unavailable.');
     }
 
@@ -72,13 +74,15 @@ export class AuthGuard implements CanActivate {
 
     const req = ctx.switchToHttp().getRequest<Request & RequestExtensions>();
     const session = await this.authService.getSessionFromRequest(req);
-    
+
     if (!session) {
       // Never log raw headers here - they include the session Cookie and
       // would let anyone with log access replay a live session. Method + path
       // is enough to debug an unauthenticated request. The query string is
       // left out too: it can carry a support token (`?st=`).
-      this.logger.warn(`No session for ${req.method} ${supportAccessPath(req.originalUrl ?? req.url)}`);
+      this.logger.warn(
+        `No session for ${req.method} ${supportAccessPath(req.originalUrl ?? req.url)}`,
+      );
       throw new UnauthorizedException({
         title: 'Unauthorized',
         status: 401,
@@ -161,11 +165,7 @@ export class AuthGuard implements CanActivate {
         // First authenticated request for this user - bootstrap a personal
         // workspace, then re-read context (bypassing the cache) to pick up
         // the new membership.
-        await this.authService.ensureBootstrapWorkspace(
-          req.user.id,
-          req.user.name,
-          req.user.email,
-        );
+        await this.authService.ensureBootstrapWorkspace(req.user.id, req.user.name, req.user.email);
         context = await this.authService.resolveRequestContext(req.user.id, wsId, { fresh: true });
       }
     } catch (err) {
@@ -175,7 +175,9 @@ export class AuthGuard implements CanActivate {
       throw contextUnavailable();
     }
     const sessionContext = context.session;
-    this.logger.debug(`Resolved session context for user ${req.user.id}: workspaceId=${sessionContext.currentWorkspaceId}`);
+    this.logger.debug(
+      `Resolved session context for user ${req.user.id}: workspaceId=${sessionContext.currentWorkspaceId}`,
+    );
 
     req.workspaceId = sessionContext.currentWorkspaceId;
     req.workspaceMemberships = sessionContext.workspaceMemberships;
@@ -202,9 +204,10 @@ export class AuthGuard implements CanActivate {
   ): string | string[] | undefined {
     const header = req.headers[SUPPORT_TOKEN_HEADER];
     if (header !== undefined) return header;
-    const fromQuery = this.reflector.getAllAndOverride<boolean | undefined>(SUPPORT_TOKEN_QUERY_KEY, [
-      ctx.getHandler(),
-    ]);
+    const fromQuery = this.reflector.getAllAndOverride<boolean | undefined>(
+      SUPPORT_TOKEN_QUERY_KEY,
+      [ctx.getHandler()],
+    );
     if (!fromQuery) return undefined;
     const value = (req.query as Record<string, unknown> | undefined)?.[SUPPORT_TOKEN_QUERY_PARAM];
     if (value === undefined) return undefined;
@@ -313,7 +316,10 @@ export class AuthGuard implements CanActivate {
     };
     req.sessionId = session.session.id;
     req.workspaceId = workspaceId;
-    req.workspaceMemberships = support.workspaceIds.map((id) => ({ workspaceId: id, role: 'VIEWER' }));
+    req.workspaceMemberships = support.workspaceIds.map((id) => ({
+      workspaceId: id,
+      role: 'VIEWER',
+    }));
     req.projectMemberships = [];
     req.permissions = permissions;
     req.support = {
@@ -382,8 +388,7 @@ function organizationSuspended(): UnauthorizedException {
   return new UnauthorizedException({
     title: 'Organization suspended',
     status: 401,
-    detail:
-      'Your organization is archived or suspended. Contact your administrator.',
+    detail: 'Your organization is archived or suspended. Contact your administrator.',
     code: 'organization-suspended',
   });
 }

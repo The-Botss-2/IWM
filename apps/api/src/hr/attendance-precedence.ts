@@ -39,9 +39,13 @@ export const ATTENDANCE_LOCK_TX_TIMEOUT_MS = 30_000;
  * short queries, and a single key cannot deadlock. Call it first in the
  * transaction.
  */
-export async function lockAttendanceLeaveWrites(tx: Pick<AttendanceTx, '$executeRaw'>): Promise<void> {
+export async function lockAttendanceLeaveWrites(
+  tx: Pick<AttendanceTx, '$executeRaw'>,
+): Promise<void> {
   // pg_advisory_xact_lock returns void, which $queryRaw cannot deserialize.
-  await tx.$executeRaw(Prisma.sql`SELECT pg_advisory_xact_lock(hashtext(${ATTENDANCE_LEAVE_LOCK}))`);
+  await tx.$executeRaw(
+    Prisma.sql`SELECT pg_advisory_xact_lock(hashtext(${ATTENDANCE_LEAVE_LOCK}))`,
+  );
 }
 
 /**

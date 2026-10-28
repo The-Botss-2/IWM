@@ -28,11 +28,7 @@ import type { Reflector } from '@nestjs/core';
 import { ChatService } from '../chat/chat.service';
 import { ClientPortalService } from '../clients/client-portal.service';
 import { WorkspaceRoleGuard } from '../common/guards/workspace-role.guard';
-import {
-  invalidReference,
-  orgWorkspaceMembership,
-  requireTenantRef,
-} from '../common/tenant-scope';
+import { invalidReference, orgWorkspaceMembership, requireTenantRef } from '../common/tenant-scope';
 import { ExpensesService } from '../finance/expenses.service';
 import { MilestonesService } from '../finance/milestones.service';
 import { paymentSourceForWorkspace } from '../finance/payment-source-ref';
@@ -103,7 +99,11 @@ const TASKS: Record<string, { workspaceId: string; projectId: string }> = {
 };
 const SOURCES: Record<string, string> = { [SOURCE_A]: ORG_A, [SOURCE_B]: ORG_B };
 const FILES: Record<string, string> = { [FILE_A]: WS_A, [FILE_B]: WS_B };
-const PROJECTS: Record<string, string> = { [PROJECT_A]: WS_A, [PROJECT_A2]: WS_A, [PROJECT_B]: WS_B };
+const PROJECTS: Record<string, string> = {
+  [PROJECT_A]: WS_A,
+  [PROJECT_A2]: WS_A,
+  [PROJECT_B]: WS_B,
+};
 const GOALS: Record<string, string> = { [GOAL_A]: WS_A, [GOAL_A2]: WS_A, [GOAL_B]: WS_B };
 
 /** Leftover memberships: USER_A still belongs to WS_B (moved between orgs). */
@@ -149,7 +149,13 @@ function fakePrisma(opts: Opts = {}) {
         const org = USER_ORG[args.where.id];
         return org === undefined
           ? null
-          : { id: args.where.id, email: `${args.where.id}@example.test`, name: 'N', accountType: 'STAFF', organizationId: org };
+          : {
+              id: args.where.id,
+              email: `${args.where.id}@example.test`,
+              name: 'N',
+              accountType: 'STAFF',
+              organizationId: org,
+            };
       },
       findFirst: async (args: { where: { id: string } }) => {
         log('user.findFirst', args.where);
@@ -207,7 +213,8 @@ function fakePrisma(opts: Opts = {}) {
         log('sprint.findFirst', args.where);
         const s = SPRINTS[args.where['id'] as string];
         if (!s || s.workspaceId !== orgOf(args.where)) return null;
-        if (args.where['projectId'] !== undefined && args.where['projectId'] !== s.projectId) return null;
+        if (args.where['projectId'] !== undefined && args.where['projectId'] !== s.projectId)
+          return null;
         return { id: args.where['id'] };
       },
     },
@@ -258,14 +265,23 @@ function fakePrisma(opts: Opts = {}) {
     },
     customFieldValue: { upsert: write('customFieldValue.upsert') },
     lead: {
-      findFirst: async () => ({ id: LEAD, name: 'L', company: null, email: null, phone: null, assigneeId: null }),
+      findFirst: async () => ({
+        id: LEAD,
+        name: 'L',
+        company: null,
+        email: null,
+        phone: null,
+        assigneeId: null,
+      }),
       update: write('lead.update'),
     },
     mailMessage: {
       findFirst: async (args: { where: { id: string; account: { userId: string } } }) => {
         log('mailMessage.findFirst', args.where);
         // MAIL_MSG_B lives in USER_B's mailbox.
-        return args.where.id === MAIL_MSG_B && args.where.account.userId === USER_B ? { id: MAIL_MSG_B } : null;
+        return args.where.id === MAIL_MSG_B && args.where.account.userId === USER_B
+          ? { id: MAIL_MSG_B }
+          : null;
       },
     },
     mailOutbox: { create: write('mailOutbox.create') },
@@ -296,7 +312,13 @@ function fakePrisma(opts: Opts = {}) {
     },
     payrollItem: { findUnique: async () => null },
     expense: {
-      findFirst: async () => ({ id: EXPENSE, workspaceId: WS_A, amount: 1, currency: 'USD', fxRate: 1 }),
+      findFirst: async () => ({
+        id: EXPENSE,
+        workspaceId: WS_A,
+        amount: 1,
+        currency: 'USD',
+        fxRate: 1,
+      }),
       create: write('expense.create'),
       update: write('expense.update'),
     },
@@ -349,7 +371,12 @@ function fakePrisma(opts: Opts = {}) {
     },
     mailAccount: {
       findFirst: write('mailAccount.findFirst'),
-      findUnique: async () => ({ id: 'cmmailacct', userId: USER_A, deletedAt: null, status: 'ACTIVE' }),
+      findUnique: async () => ({
+        id: 'cmmailacct',
+        userId: USER_A,
+        deletedAt: null,
+        status: 'ACTIVE',
+      }),
       create: write('mailAccount.create'),
       deleteMany: write('mailAccount.deleteMany'),
     },
@@ -362,7 +389,10 @@ function fakePrisma(opts: Opts = {}) {
       }),
       create: write('client.create'),
     },
-    clientContact: { findFirst: write('clientContact.findFirst'), create: write('clientContact.create') },
+    clientContact: {
+      findFirst: write('clientContact.findFirst'),
+      create: write('clientContact.create'),
+    },
     $transaction: async (fn: (tx: unknown) => Promise<unknown>) => fn(client),
   };
   const raw = {
@@ -377,11 +407,20 @@ function fakePrisma(opts: Opts = {}) {
   return { prisma: { client, raw } as unknown as PrismaService, seen, writes };
 }
 
-const scopeA = { userId: USER_A, currentWorkspaceId: WS_A, workspaceIds: [WS_A], projectIds: [] } as never;
-const badRequest = (code: string) => (err: unknown): boolean =>
-  err instanceof BadRequestException && (err.getResponse() as { code?: string }).code === code;
-const conflict = (code: string) => (err: unknown): boolean =>
-  err instanceof ConflictException && (err.getResponse() as { code?: string }).code === code;
+const scopeA = {
+  userId: USER_A,
+  currentWorkspaceId: WS_A,
+  workspaceIds: [WS_A],
+  projectIds: [],
+} as never;
+const badRequest =
+  (code: string) =>
+  (err: unknown): boolean =>
+    err instanceof BadRequestException && (err.getResponse() as { code?: string }).code === code;
+const conflict =
+  (code: string) =>
+  (err: unknown): boolean =>
+    err instanceof ConflictException && (err.getResponse() as { code?: string }).code === code;
 const forbidden = (err: unknown): boolean => err instanceof ForbiddenException;
 const notFound = (err: unknown): boolean => err instanceof NotFoundException;
 const log2 = (seen: Record<string, Where[]>, key: string, where: Where): void => {
@@ -396,16 +435,40 @@ const lastWhere = (seen: Record<string, Where[]>, key: string): Where => {
 async function main(): Promise<void> {
   // --- helpers ----------------------------------------------------------------
   {
-    assert.equal(requireTenantRef({ id: 'x' }, 'thing', 'invalid_thing').id, 'x', 'row passes through');
-    assert.throws(() => requireTenantRef(null, 'thing', 'invalid_thing'), badRequest('invalid_thing'), 'null -> 400');
-    assert.throws(() => requireTenantRef(undefined, 'thing', 'invalid_thing'), badRequest('invalid_thing'), 'undefined -> 400');
+    assert.equal(
+      requireTenantRef({ id: 'x' }, 'thing', 'invalid_thing').id,
+      'x',
+      'row passes through',
+    );
+    assert.throws(
+      () => requireTenantRef(null, 'thing', 'invalid_thing'),
+      badRequest('invalid_thing'),
+      'null -> 400',
+    );
+    assert.throws(
+      () => requireTenantRef(undefined, 'thing', 'invalid_thing'),
+      badRequest('invalid_thing'),
+      'undefined -> 400',
+    );
     const err = invalidReference('sprint', 'invalid_sprint');
     assert.ok(err instanceof BadRequestException, 'invalidReference is a 400');
-    assert.equal((err.getResponse() as { title?: string }).title, 'Invalid sprint', 'title names the thing');
+    assert.equal(
+      (err.getResponse() as { title?: string }).title,
+      'Invalid sprint',
+      'title names the thing',
+    );
 
     const { prisma, seen } = fakePrisma();
-    assert.equal(await orgWorkspaceMembership(prisma, USER_NOORG, WS_A), null, 'org-less user has no membership');
-    assert.equal(seen['workspaceMembership.findFirst'], undefined, 'org-less user never reaches the query');
+    assert.equal(
+      await orgWorkspaceMembership(prisma, USER_NOORG, WS_A),
+      null,
+      'org-less user has no membership',
+    );
+    assert.equal(
+      seen['workspaceMembership.findFirst'],
+      undefined,
+      'org-less user never reaches the query',
+    );
     const own = await orgWorkspaceMembership(prisma, USER_A, WS_A);
     assert.equal(own?.role, 'MEMBER', 'own-org membership found');
     assert.deepEqual(
@@ -413,11 +476,19 @@ async function main(): Promise<void> {
       { workspaceId: WS_A, userId: USER_A, workspace: { organizationId: ORG_A } },
       'membership filtered by the user org',
     );
-    assert.equal(await orgWorkspaceMembership(prisma, USER_A, WS_B), null, 'leftover other-org membership is none');
+    assert.equal(
+      await orgWorkspaceMembership(prisma, USER_A, WS_B),
+      null,
+      'leftover other-org membership is none',
+    );
 
     const src = await paymentSourceForWorkspace(prisma, WS_A, SOURCE_A);
     assert.equal(src.id, SOURCE_A, 'own-org source found');
-    assert.equal(lastWhere(seen, 'paymentSource.findFirst')['organizationId'], ORG_A, 'source filtered by workspace org');
+    assert.equal(
+      lastWhere(seen, 'paymentSource.findFirst')['organizationId'],
+      ORG_A,
+      'source filtered by workspace org',
+    );
     await assert.rejects(
       paymentSourceForWorkspace(prisma, WS_A, SOURCE_B),
       badRequest('invalid_payment_source'),
@@ -472,22 +543,30 @@ async function main(): Promise<void> {
     await new MilestonesService(okMs.prisma, {} as never)
       .linkWork(scopeA, MILESTONE, { sprintId: SPRINT_A } as never)
       .catch(() => undefined);
-    assert.ok(okMs.writes.includes('contractMilestone.update'), 'linkWork with an own sprint writes');
+    assert.ok(
+      okMs.writes.includes('contractMilestone.update'),
+      'linkWork with an own sprint writes',
+    );
 
     // A contract with a project also pins the sprint to that project.
     const proj = fakePrisma();
-    (proj.prisma.client as unknown as { contract: { findFirst: unknown } }).contract.findFirst = async () => ({
-      id: CONTRACT,
-      workspaceId: WS_A,
-      projectId: PROJECT_A,
-    });
+    (proj.prisma.client as unknown as { contract: { findFirst: unknown } }).contract.findFirst =
+      async () => ({
+        id: CONTRACT,
+        workspaceId: WS_A,
+        projectId: PROJECT_A,
+      });
     const scoped = new MilestonesService(proj.prisma, {} as never);
     await assert.rejects(
       scoped.create(scopeA, CONTRACT, { sprintId: SPRINT_A2 } as never),
       badRequest('invalid_sprint'),
       'sprint of a sibling project refused',
     );
-    assert.equal(lastWhere(proj.seen, 'sprint.findFirst')['projectId'], PROJECT_A, 'sprint pinned to the contract project');
+    assert.equal(
+      lastWhere(proj.seen, 'sprint.findFirst')['projectId'],
+      PROJECT_A,
+      'sprint pinned to the contract project',
+    );
     assert.deepEqual(proj.writes, [], 'refused sprint writes nothing');
   }
 
@@ -506,7 +585,11 @@ async function main(): Promise<void> {
       badRequest('invalid_receipt'),
       'create: other-workspace receipt',
     );
-    assert.equal(lastWhere(seen, 'fileObject.findFirst')['workspaceId'], WS_A, 'receipt pinned to the workspace');
+    assert.equal(
+      lastWhere(seen, 'fileObject.findFirst')['workspaceId'],
+      WS_A,
+      'receipt pinned to the workspace',
+    );
     await assert.rejects(
       expenses.update(scopeA, EXPENSE, { paymentSourceId: SOURCE_B } as never),
       badRequest('invalid_payment_source'),
@@ -542,7 +625,11 @@ async function main(): Promise<void> {
       badRequest('invalid_payment_source'),
       'create: other-org payment source',
     );
-    assert.equal(lastWhere(seen, 'paymentSource.findFirst')['organizationId'], ORG_A, 'source pinned to workspace org');
+    assert.equal(
+      lastWhere(seen, 'paymentSource.findFirst')['organizationId'],
+      ORG_A,
+      'source pinned to workspace org',
+    );
     await assert.rejects(
       payments.update(scopeA, PAYMENT, { paymentSourceId: SOURCE_B } as never),
       badRequest('invalid_payment_source'),
@@ -589,7 +676,12 @@ async function main(): Promise<void> {
     await assert.rejects(
       chat2.createRoom(
         USER_A,
-        { type: 'TEXT_CHANNEL', name: 'general', workspaceId: WS_A, participantUserIds: [USER_B] } as never,
+        {
+          type: 'TEXT_CHANNEL',
+          name: 'general',
+          workspaceId: WS_A,
+          participantUserIds: [USER_B],
+        } as never,
         WS_A,
       ),
       forbidden,
@@ -603,7 +695,11 @@ async function main(): Promise<void> {
     const { prisma, writes } = fakePrisma();
     const goals = new GoalsService(prisma, {} as never);
     await assert.rejects(
-      goals.create(scopeA, PROJECT_A, { title: 'g', ownerId: USER_A, parentGoalId: GOAL_B } as never),
+      goals.create(scopeA, PROJECT_A, {
+        title: 'g',
+        ownerId: USER_A,
+        parentGoalId: GOAL_B,
+      } as never),
       badRequest('invalid_parent_goal'),
       'create: parent in another workspace',
     );
@@ -664,12 +760,11 @@ async function main(): Promise<void> {
     // Timesheets: the project lookup is pinned to the caller org, so USER_A's
     // leftover membership of WS_B does not make PROJECT_B reachable.
     const ts = fakePrisma();
-    (ts.prisma.client as unknown as { project: { findFirst: unknown } }).project.findFirst = async (args: {
-      where: { workspace: { organizationId: string } };
-    }) => {
-      log2(ts.seen, 'project.findFirst', args.where);
-      return args.where.workspace.organizationId === ORG_B ? { id: PROJECT_B } : null;
-    };
+    (ts.prisma.client as unknown as { project: { findFirst: unknown } }).project.findFirst =
+      async (args: { where: { workspace: { organizationId: string } } }) => {
+        log2(ts.seen, 'project.findFirst', args.where);
+        return args.where.workspace.organizationId === ORG_B ? { id: PROJECT_B } : null;
+      };
     const timesheets = new TimesheetsService(ts.prisma);
     const entry = { projectId: PROJECT_B, startTime: new Date(0), endTime: new Date(60_000) };
     await assert.rejects(
@@ -687,7 +782,13 @@ async function main(): Promise<void> {
     // Lead conversion: the new client's assignee must be in the org.
     const lead = fakePrisma();
     const leads = new LeadsService(lead.prisma, {} as never, {} as never);
-    const salesActor = { userId: USER_A, workspaceId: WS_A, fullAccess: true, fullLeads: true, fullClients: true } as never;
+    const salesActor = {
+      userId: USER_A,
+      workspaceId: WS_A,
+      fullAccess: true,
+      fullLeads: true,
+      fullClients: true,
+    } as never;
     await assert.rejects(
       leads.convert(salesActor, LEAD, { newClient: { name: 'Acme', assigneeId: USER_B } } as never),
       (e: unknown) => e instanceof BadRequestException,
@@ -697,7 +798,12 @@ async function main(): Promise<void> {
 
     // Mail: a reply target must sit in one of the sender's own mailboxes.
     const mailFake = fakePrisma();
-    const mailSend = new MailSendService(mailFake.prisma, {} as never, {} as never, { add: async () => ({}) } as never);
+    const mailSend = new MailSendService(
+      mailFake.prisma,
+      {} as never,
+      {} as never,
+      { add: async () => ({}) } as never,
+    );
     await assert.rejects(
       mailSend.enqueue(USER_A, {
         accountId: 'cmmailacct',
@@ -715,11 +821,19 @@ async function main(): Promise<void> {
     const cf = fakePrisma();
     const fields = new CustomFieldsService(cf.prisma);
     await assert.rejects(
-      fields.setValue(scopeA, { can: () => true } as never, { definitionId: DEFINITION, entityId: PROJECT_B, value: 'x' } as never),
+      fields.setValue(
+        scopeA,
+        { can: () => true } as never,
+        { definitionId: DEFINITION, entityId: PROJECT_B, value: 'x' } as never,
+      ),
       badRequest('invalid_entity'),
       'custom-field value on a project of another workspace refused',
     );
-    assert.equal(lastWhere(cf.seen, 'project.findFirst')['workspaceId'], WS_A, 'entity lookup pinned to the workspace');
+    assert.equal(
+      lastWhere(cf.seen, 'project.findFirst')['workspaceId'],
+      WS_A,
+      'entity lookup pinned to the workspace',
+    );
     assert.deepEqual(cf.writes, [], 'refused custom-field value writes nothing');
   }
 
@@ -728,13 +842,14 @@ async function main(): Promise<void> {
     const { prisma, seen } = fakePrisma({});
     const config = { get: () => 'x' };
     // The fake room is a public text channel of WS_B.
-    (prisma.client as unknown as { chatRoom: { findFirst: unknown } }).chatRoom.findFirst = async () => ({
-      id: ROOM,
-      type: 'TEXT_CHANNEL',
-      isPrivate: false,
-      workspaceId: WS_B,
-      participants: [],
-    });
+    (prisma.client as unknown as { chatRoom: { findFirst: unknown } }).chatRoom.findFirst =
+      async () => ({
+        id: ROOM,
+        type: 'TEXT_CHANNEL',
+        isPrivate: false,
+        workspaceId: WS_B,
+        participants: [],
+      });
     const livekit = new LivekitService(prisma, config as never);
     await assert.rejects(
       livekit.mintToken(USER_A, { roomId: ROOM, kind: 'call' } as never),
@@ -775,7 +890,11 @@ async function main(): Promise<void> {
       ORG_A,
       'guard fallback filtered by the caller org',
     );
-    await assert.rejects(guard.canActivate(ctxFor(WS_A)), forbidden, 'own-org MEMBER lacks the ADMIN role');
+    await assert.rejects(
+      guard.canActivate(ctxFor(WS_A)),
+      forbidden,
+      'own-org MEMBER lacks the ADMIN role',
+    );
     assert.equal(
       await guard.canActivate(ctxFor(WS_A, [{ workspaceId: WS_A, role: 'ADMIN' }])),
       true,
@@ -789,14 +908,22 @@ async function main(): Promise<void> {
     const workspaces = new WorkspacesService(prisma, {} as never, {} as never, {} as never);
     const query = { page: 1, pageSize: 20 } as never;
     await workspaces.listForUser(USER_A, query);
-    assert.equal(lastWhere(seen, 'workspace.findMany')['organizationId'], ORG_A, 'list pinned to the caller org');
+    assert.equal(
+      lastWhere(seen, 'workspace.findMany')['organizationId'],
+      ORG_A,
+      'list pinned to the caller org',
+    );
     await workspaces.listForUser(USER_NOORG, query);
     assert.notEqual(
       lastWhere(seen, 'workspace.findMany')['organizationId'],
       ROOT_ORG_ID,
       'org-less list never falls back to the root org',
     );
-    assert.equal(lastWhere(seen, 'workspace.findMany')['organizationId'], '__none__', 'org-less list matches nothing');
+    assert.equal(
+      lastWhere(seen, 'workspace.findMany')['organizationId'],
+      '__none__',
+      'org-less list matches nothing',
+    );
     await assert.rejects(
       workspaces.create(USER_NOORG, { name: 'W', slug: 'w' } as never),
       forbidden,
@@ -826,11 +953,19 @@ async function main(): Promise<void> {
         cpanelCalls += 1;
       },
     };
-    const mail = new MailAccountsService(prisma, {} as never, {} as never, cpanel as never, {} as never, {} as never);
+    const mail = new MailAccountsService(
+      prisma,
+      {} as never,
+      {} as never,
+      cpanel as never,
+      {} as never,
+      {} as never,
+    );
     await assert.rejects(
       mail.selfSetup(WS_A, USER_A, 'password-123'),
       (e: unknown) =>
-        e instanceof ForbiddenException && (e.getResponse() as { code?: string }).code === 'cpanel-platform-only',
+        e instanceof ForbiddenException &&
+        (e.getResponse() as { code?: string }).code === 'cpanel-platform-only',
       'tenant user refused with cpanel-platform-only',
     );
     assert.equal(cpanelCalls, 0, 'refused tenant user never touches cPanel');
@@ -858,7 +993,10 @@ async function main(): Promise<void> {
         {} as never,
         {} as never,
       );
-      return { run: svc.invite(actor, CLIENT_ID, { email: 'Person@Example.test' } as never), writes };
+      return {
+        run: svc.invite(actor, CLIENT_ID, { email: 'Person@Example.test' } as never),
+        writes,
+      };
     };
     const row = (extra: Record<string, unknown>) => ({
       id: 'cmexisting',
@@ -875,14 +1013,22 @@ async function main(): Promise<void> {
     assert.deepEqual(r.writes, [], 'same-org refusal writes nothing');
 
     r = await invite(row({ organizationId: ORG_B }));
-    await assert.rejects(r.run, conflict('email-unavailable'), 'other-org staff account is generic');
+    await assert.rejects(
+      r.run,
+      conflict('email-unavailable'),
+      'other-org staff account is generic',
+    );
     assert.deepEqual(r.writes, [], 'other-org staff refusal writes nothing');
 
     r = await invite(row({ organizationId: null }));
     await assert.rejects(r.run, conflict('email-unavailable'), 'org-less staff account is generic');
 
     r = await invite(row({ accountType: 'CLIENT', organizationId: ORG_B, deletedAt: new Date() }));
-    await assert.rejects(r.run, conflict('email-unavailable'), 'disabled account elsewhere is generic');
+    await assert.rejects(
+      r.run,
+      conflict('email-unavailable'),
+      'disabled account elsewhere is generic',
+    );
     assert.deepEqual(r.writes, [], 'disabled-account refusal writes nothing');
   }
 

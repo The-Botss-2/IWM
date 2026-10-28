@@ -64,8 +64,7 @@ self.addEventListener('push', (event) => {
 
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
-  const targetUrl =
-    (event.notification.data && event.notification.data.url) || '/';
+  const targetUrl = (event.notification.data && event.notification.data.url) || '/';
   const absoluteUrl = new URL(targetUrl, self.location.origin).href;
 
   event.waitUntil(

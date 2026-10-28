@@ -7,5 +7,5 @@ import type { ReactNode } from 'react';
  * have nothing meaningful to point at.
  */
 export default function WorkspaceBootstrapLayout({ children }: { children: ReactNode }) {
-  return <div className="min-h-screen bg-bg-subtle">{children}</div>;
+  return <div className="bg-bg-subtle min-h-screen">{children}</div>;
 }

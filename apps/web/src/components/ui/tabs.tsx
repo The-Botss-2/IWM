@@ -16,7 +16,7 @@ export const TabsList = forwardRef<
       ref={ref}
       className={cn(
         'inline-flex items-center gap-1 overflow-x-auto whitespace-nowrap',
-        'border-b border-line',
+        'border-line border-b',
         className,
       )}
       {...rest}
@@ -34,12 +34,12 @@ export const TabsTrigger = forwardRef<
       className={cn(
         'relative inline-flex shrink-0 items-center gap-2 whitespace-nowrap px-3 py-2.5 text-sm font-medium',
         'text-ink-muted hover:text-ink',
-        'focus-visible:outline-none focus-visible:shadow-focus rounded-t-md',
+        'focus-visible:shadow-focus rounded-t-md focus-visible:outline-none',
         // Animated gradient underline for active state, drawn with a pseudo
         // element via after:* so we get the gradient bar (Tailwind's default
         // border-bottom can't render a gradient).
         'after:absolute after:bottom-0 after:left-2 after:right-2 after:h-[2px] after:rounded-full',
-        'after:bg-transparent data-[state=active]:after:bg-brand-gradient',
+        'data-[state=active]:after:bg-brand-gradient after:bg-transparent',
         'data-[state=active]:text-ink',
         'transition-colors duration-200',
         className,

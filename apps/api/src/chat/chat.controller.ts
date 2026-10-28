@@ -59,10 +59,7 @@ export class ChatController {
 
   @Get('rooms')
   @SkipPermissions()
-  listRooms(
-    @CurrentUser() user: AuthedUser,
-    @CurrentWorkspaceId() workspaceId: string,
-  ) {
+  listRooms(@CurrentUser() user: AuthedUser, @CurrentWorkspaceId() workspaceId: string) {
     return this.chat.listRoomsForUser(user.id, workspaceId);
   }
 
@@ -144,11 +141,7 @@ export class ChatController {
     @Param('roomId', new ZodValidationPipe(cuid)) roomId: string,
     @Param('userId', new ZodValidationPipe(cuid)) targetUserId: string,
   ) {
-    const { systemMessage } = await this.chat.removeParticipant(
-      user.id,
-      roomId,
-      targetUserId,
-    );
+    const { systemMessage } = await this.chat.removeParticipant(user.id, roomId, targetUserId);
     await this.broadcastSystemMessage(roomId, systemMessage);
     // After the "removed" message, so the removed person still sees it.
     this.gateway.evictFromRoom(targetUserId, roomId);
@@ -366,10 +359,7 @@ export class ChatController {
 
   @Get('admin/rooms')
   @SkipPermissions()
-  async adminListRooms(
-    @CurrentUser() user: AuthedUser,
-    @CurrentWorkspaceId() workspaceId: string,
-  ) {
+  async adminListRooms(@CurrentUser() user: AuthedUser, @CurrentWorkspaceId() workspaceId: string) {
     await this.admin.assertAdmin(user.id);
     return this.chat.listAdminRoomsForWorkspace(workspaceId, {
       systemRole: user.systemRole,
@@ -434,11 +424,7 @@ export class ChatController {
     @Body(new ZodValidationPipe(forwardChatMessagesBodySchema))
     body: ForwardChatMessagesBody,
   ) {
-    const messages = await this.chat.forwardMessages(
-      user.id,
-      body.messageIds,
-      body.targetRoomId,
-    );
+    const messages = await this.chat.forwardMessages(user.id, body.messageIds, body.targetRoomId);
     for (const message of messages) {
       try {
         await this.gateway.broadcastNewMessage({

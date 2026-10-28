@@ -6,10 +6,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import type { BillingModel, ContractWithMilestones } from '@botss/shared-types';
 
 import { BaseCurrencyNotice } from '@/components/financials/base-currency-notice';
-import {
-  BILLING_MODEL_OPTIONS,
-  billingModelLabel,
-} from '@/components/financials/finance-badges';
+import { BILLING_MODEL_OPTIONS, billingModelLabel } from '@/components/financials/finance-badges';
 import { Button } from '@/components/ui/button';
 import { Combobox } from '@/components/ui/combobox';
 import { DatePicker } from '@/components/ui/date-picker';
@@ -200,7 +197,9 @@ export function ContractFormDialog({
           nextCurrency: next,
           currentRate: fxRateToBase,
           baseCurrency,
-          ...(existing ? { stored: { currency: existing.currency, rate: existing.fxRateToBase } } : {}),
+          ...(existing
+            ? { stored: { currency: existing.currency, rate: existing.fxRateToBase } }
+            : {}),
         }),
       );
     }
@@ -297,7 +296,7 @@ export function ContractFormDialog({
                 placeholder="Select a project…"
                 clearable
               />
-              <p className="mt-1 text-xs text-ink-muted">
+              <p className="text-ink-muted mt-1 text-xs">
                 No project yet?{' '}
                 <Link href="/projects" className="underline">
                   Create one first
@@ -375,14 +374,13 @@ export function ContractFormDialog({
                 aria-describedby={rateError ? 'contract-fx-error' : undefined}
               />
               {rateError ? (
-                <p id="contract-fx-error" className="mt-1 text-xs text-state-error">
+                <p id="contract-fx-error" className="text-state-error mt-1 text-xs">
                   {rateError}
                 </p>
               ) : null}
-              <p className="mt-1 text-xs text-ink-muted">
-                Booked once, now. Outstanding is reported at this rate; money
-                actually received is converted at whatever rate applied on the
-                day it landed.
+              <p className="text-ink-muted mt-1 text-xs">
+                Booked once, now. Outstanding is reported at this rate; money actually received is
+                converted at whatever rate applied on the day it landed.
               </p>
             </Field>
           ) : null}
@@ -400,7 +398,7 @@ export function ContractFormDialog({
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <Label>Milestones</Label>
-                <span className="text-xs text-ink-muted">
+                <span className="text-ink-muted text-xs">
                   Total {formatCurrency(milestoneTotal, currency)}
                 </span>
               </div>
@@ -477,7 +475,7 @@ export function ContractFormDialog({
             />
           </Field>
 
-          {error ? <p className="text-sm text-state-error">{error}</p> : null}
+          {error ? <p className="text-state-error text-sm">{error}</p> : null}
         </div>
 
         <BaseCurrencyNotice base={base} />

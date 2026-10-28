@@ -1,6 +1,16 @@
 'use client';
 
-import { ChevronLeft, FolderOpen, Loader2, Mail, PanelLeftClose, PanelLeftOpen, Pencil, Sparkles, X } from 'lucide-react';
+import {
+  ChevronLeft,
+  FolderOpen,
+  Loader2,
+  Mail,
+  PanelLeftClose,
+  PanelLeftOpen,
+  Pencil,
+  Sparkles,
+  X,
+} from 'lucide-react';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -8,10 +18,7 @@ import type { MailFolder, MailMessage } from '@botss/shared-types';
 
 import type { ComposePrefill } from '@/components/mail/compose-mail-dialog';
 import { FolderList } from '@/components/mail/folder-list';
-import {
-  NavPanelPortal,
-  useNavPanelAvailable,
-} from '@/components/shell/nav-panel-slot';
+import { NavPanelPortal, useNavPanelAvailable } from '@/components/shell/nav-panel-slot';
 import { MessageList } from '@/components/mail/message-list';
 import { MessageReader } from '@/components/mail/message-reader';
 import { SelfSetupMailboxDialog } from '@/components/mail/self-setup-mailbox-dialog';
@@ -100,18 +107,13 @@ export default function MailPage() {
   const [folderSidebarCollapsed, setFolderSidebarCollapsed] = useState(false);
   useEffect(() => {
     if (typeof window === 'undefined') return;
-    setFolderSidebarCollapsed(
-      window.localStorage.getItem('mail.folderSidebar.collapsed') === '1',
-    );
+    setFolderSidebarCollapsed(window.localStorage.getItem('mail.folderSidebar.collapsed') === '1');
   }, []);
   const toggleFolderSidebar = useCallback(() => {
     setFolderSidebarCollapsed((prev) => {
       const next = !prev;
       if (typeof window !== 'undefined') {
-        window.localStorage.setItem(
-          'mail.folderSidebar.collapsed',
-          next ? '1' : '0',
-        );
+        window.localStorage.setItem('mail.folderSidebar.collapsed', next ? '1' : '0');
       }
       return next;
     });
@@ -297,13 +299,18 @@ export default function MailPage() {
   const onComposeClick = useCallback(() => openCompose(null), [openCompose]);
 
   if (accounts.isLoading) {
-    return <PageLoader label="Loading mail" className="min-h-[var(--app-content-h,calc(100vh-4rem))]" />;
+    return (
+      <PageLoader label="Loading mail" className="min-h-[var(--app-content-h,calc(100vh-4rem))]" />
+    );
   }
 
   if (accounts.isError && !accounts.data) {
     return (
       <div className="p-4">
-        <QueryError message="Couldn't load mail accounts." onRetry={() => void accounts.refetch()} />
+        <QueryError
+          message="Couldn't load mail accounts."
+          onRetry={() => void accounts.refetch()}
+        />
       </div>
     );
   }
@@ -331,18 +338,15 @@ export default function MailPage() {
     // user it's happening rather than nudging them to "check settings".
     const stillConnecting = connectingAccounts.length > 0;
     return (
-      <AccountNotReadyState
-        stillConnecting={stillConnecting}
-        isOnCpanelDomain={isOnCpanelDomain}
-      />
+      <AccountNotReadyState stillConnecting={stillConnecting} isOnCpanelDomain={isOnCpanelDomain} />
     );
   }
 
   const folderPane = (
     <>
-      <div className="flex items-center justify-between border-b border-line px-2 py-2">
+      <div className="border-line flex items-center justify-between border-b px-2 py-2">
         {!folderSidebarCollapsed || inNavPanel ? (
-          <span className="px-2 text-xs font-semibold uppercase tracking-wide text-ink-muted">
+          <span className="text-ink-muted px-2 text-xs font-semibold uppercase tracking-wide">
             Mail
           </span>
         ) : (
@@ -355,7 +359,7 @@ export default function MailPage() {
           size="icon"
           aria-label="Close folders"
           onClick={() => setMobileFoldersOpen(false)}
-          className="h-7 w-7 min-h-0 min-w-0 text-ink-muted hover:text-ink md:hidden"
+          className="text-ink-muted hover:text-ink h-7 min-h-0 w-7 min-w-0 md:hidden"
         >
           <X className="h-4 w-4" aria-hidden />
         </Button>
@@ -366,11 +370,9 @@ export default function MailPage() {
             type="button"
             variant="ghost"
             size="icon"
-            aria-label={
-              folderSidebarCollapsed ? 'Expand folder list' : 'Collapse folder list'
-            }
+            aria-label={folderSidebarCollapsed ? 'Expand folder list' : 'Collapse folder list'}
             onClick={toggleFolderSidebar}
-            className="hidden h-7 w-7 min-h-0 min-w-0 text-ink-muted hover:text-ink md:inline-flex"
+            className="text-ink-muted hover:text-ink hidden h-7 min-h-0 w-7 min-w-0 md:inline-flex"
           >
             {folderSidebarCollapsed ? (
               <PanelLeftOpen className="h-4 w-4" aria-hidden />
@@ -426,9 +428,9 @@ export default function MailPage() {
       ) : (
         <aside
           className={cn(
-            'min-h-0 overflow-hidden border-r border-line bg-white md:flex md:flex-col',
+            'border-line min-h-0 overflow-hidden border-r bg-white md:flex md:flex-col',
             // Phone: fixed off-canvas drawer, slides in when open.
-            'fixed inset-y-0 left-0 z-40 flex w-[260px] max-w-[80%] flex-col shadow-soft-lg transition-transform duration-200 md:static md:z-auto md:w-auto md:max-w-none md:shadow-none md:transition-none',
+            'shadow-soft-lg fixed inset-y-0 left-0 z-40 flex w-[260px] max-w-[80%] flex-col transition-transform duration-200 md:static md:z-auto md:w-auto md:max-w-none md:shadow-none md:transition-none',
             mobileFoldersOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0',
           )}
         >
@@ -442,7 +444,7 @@ export default function MailPage() {
           the single-column case. */}
       <section
         className={cn(
-          'min-h-0 flex-col overflow-hidden border-r border-line bg-bg-app md:flex',
+          'border-line bg-bg-app min-h-0 flex-col overflow-hidden border-r md:flex',
           selectedMessageId ? 'hidden md:flex' : 'flex',
         )}
         aria-label="Message list"
@@ -450,13 +452,13 @@ export default function MailPage() {
         {/* Phone-only bar to open the folder drawer. The folder column is
             hidden below md, so without this there's no way to switch folders
             on a phone. Hidden at md+ where the folder column is visible. */}
-        <div className="flex items-center gap-2 border-b border-line bg-white px-3 py-2 md:hidden">
+        <div className="border-line flex items-center gap-2 border-b bg-white px-3 py-2 md:hidden">
           <Button
             type="button"
             variant="ghost"
             size="sm"
             onClick={() => setMobileFoldersOpen(true)}
-            className="h-8 px-2 text-sm text-ink-muted hover:text-ink"
+            className="text-ink-muted hover:text-ink h-8 px-2 text-sm"
           >
             <FolderOpen className="h-4 w-4" aria-hidden />
             {selectedFolderLabel}
@@ -473,7 +475,7 @@ export default function MailPage() {
             onClose={onCloseReader}
           />
         ) : (
-          <div className="grid flex-1 place-items-center text-xs text-ink-muted">
+          <div className="text-ink-muted grid flex-1 place-items-center text-xs">
             Pick an account.
           </div>
         )}
@@ -496,7 +498,7 @@ export default function MailPage() {
           <button
             type="button"
             onClick={() => setSelectedMessageId(null)}
-            className="md:hidden inline-flex items-center gap-2 border-b border-line bg-white px-4 py-2 text-sm text-ink-muted hover:text-ink"
+            className="border-line text-ink-muted hover:text-ink inline-flex items-center gap-2 border-b bg-white px-4 py-2 text-sm md:hidden"
           >
             <ChevronLeft className="h-4 w-4" aria-hidden />
             Back to list
@@ -538,15 +540,13 @@ function EmptyAccountsState({
   if (isOnCpanelDomain) {
     return (
       <div className="mx-auto max-w-md px-6 py-16 text-center">
-        <span className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-brand-gradient text-white shadow-soft">
+        <span className="bg-brand-gradient shadow-soft mx-auto grid h-14 w-14 place-items-center rounded-full text-white">
           <Sparkles className="h-6 w-6" aria-hidden />
         </span>
-        <h2 className="mt-4 text-lg font-semibold text-ink">
-          Set up your mailbox in one click
-        </h2>
-        <p className="mt-1 text-sm text-ink-muted">
-          We&apos;ll provision your inbox automatically. Just choose a password
-          for both this app and your webmail - no IMAP or SMTP details to copy.
+        <h2 className="text-ink mt-4 text-lg font-semibold">Set up your mailbox in one click</h2>
+        <p className="text-ink-muted mt-1 text-sm">
+          We&apos;ll provision your inbox automatically. Just choose a password for both this app
+          and your webmail - no IMAP or SMTP details to copy.
         </p>
         <Button className="mt-4" onClick={onSelfSetup}>
           <Sparkles className="h-4 w-4" />
@@ -557,19 +557,17 @@ function EmptyAccountsState({
   }
   return (
     <div className="mx-auto max-w-md px-6 py-16 text-center">
-      <span className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-brand-50 text-brand-700">
+      <span className="bg-brand-50 text-brand-700 mx-auto grid h-14 w-14 place-items-center rounded-full">
         <Mail className="h-6 w-6" aria-hidden />
       </span>
-      <h2 className="mt-4 text-lg font-semibold text-ink">
-        Connect a mailbox to start
-      </h2>
-      <p className="mt-1 text-sm text-ink-muted">
-        Add your IMAP and SMTP credentials in settings. Once verified, you
-        can read and send mail from inside the app.
+      <h2 className="text-ink mt-4 text-lg font-semibold">Connect a mailbox to start</h2>
+      <p className="text-ink-muted mt-1 text-sm">
+        Add your IMAP and SMTP credentials in settings. Once verified, you can read and send mail
+        from inside the app.
       </p>
       <Link
         href="/settings/mail"
-        className="mt-4 inline-flex items-center gap-2 rounded-full bg-brand-gradient px-5 py-2 text-sm font-medium text-white shadow-soft hover:shadow-soft-lg transition-all focus-visible:outline-none focus-visible:shadow-focus"
+        className="bg-brand-gradient shadow-soft hover:shadow-soft-lg focus-visible:shadow-focus mt-4 inline-flex items-center gap-2 rounded-full px-5 py-2 text-sm font-medium text-white transition-all focus-visible:outline-none"
       >
         <Pencil className="h-4 w-4" />
         Go to Mail accounts
@@ -593,36 +591,31 @@ function AccountNotReadyState({
   if (stillConnecting) {
     return (
       <div className="mx-auto max-w-md px-6 py-16 text-center">
-        <span className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-brand-gradient text-white shadow-soft">
+        <span className="bg-brand-gradient shadow-soft mx-auto grid h-14 w-14 place-items-center rounded-full text-white">
           <Loader2 className="h-6 w-6 animate-spin" aria-hidden />
         </span>
-        <h2 className="mt-4 text-lg font-semibold text-ink">
-          Setting up your mailbox…
-        </h2>
-        <p className="mt-1 text-sm text-ink-muted">
-          Connecting to your mail server. This usually takes just a few
-          seconds. Your inbox will appear here as soon as the connection
-          is verified.
+        <h2 className="text-ink mt-4 text-lg font-semibold">Setting up your mailbox…</h2>
+        <p className="text-ink-muted mt-1 text-sm">
+          Connecting to your mail server. This usually takes just a few seconds. Your inbox will
+          appear here as soon as the connection is verified.
         </p>
       </div>
     );
   }
   return (
     <div className="mx-auto max-w-md px-6 py-16 text-center">
-      <span className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-tint-warning text-brand-orange">
+      <span className="bg-tint-warning text-brand-orange mx-auto grid h-14 w-14 place-items-center rounded-full">
         <Mail className="h-6 w-6" aria-hidden />
       </span>
-      <h2 className="mt-4 text-lg font-semibold text-ink">
-        Mailbox connection failed
-      </h2>
-      <p className="mt-1 text-sm text-ink-muted">
+      <h2 className="text-ink mt-4 text-lg font-semibold">Mailbox connection failed</h2>
+      <p className="text-ink-muted mt-1 text-sm">
         {isOnCpanelDomain
           ? 'Your mailbox is configured but the mail server rejected the credentials. Reset your password from Mail accounts to fix this.'
           : 'Your mail server rejected the saved credentials. Open Mail accounts to update the password or settings.'}
       </p>
       <Link
         href="/settings/mail"
-        className="mt-4 inline-flex items-center gap-2 rounded-full bg-brand-gradient px-5 py-2 text-sm font-medium text-white shadow-soft hover:shadow-soft-lg transition-all focus-visible:outline-none focus-visible:shadow-focus"
+        className="bg-brand-gradient shadow-soft hover:shadow-soft-lg focus-visible:shadow-focus mt-4 inline-flex items-center gap-2 rounded-full px-5 py-2 text-sm font-medium text-white transition-all focus-visible:outline-none"
       >
         Open mail accounts
       </Link>
@@ -636,6 +629,9 @@ function quoteBody(message: MailMessage): string {
     : message.fromAddress;
   const date = new Date(message.receivedAt).toLocaleString();
   const text = message.bodyText ?? '';
-  const lines = text.split('\n').map((l) => `> ${l}`).join('\n');
+  const lines = text
+    .split('\n')
+    .map((l) => `> ${l}`)
+    .join('\n');
   return `On ${date}, ${sender} wrote:\n${lines}`;
 }

@@ -7,10 +7,11 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
   private readonly logger = new Logger(RedisService.name);
   private _client?: Redis;
 
-  constructor(private readonly configService: ConfigService) { }
+  constructor(private readonly configService: ConfigService) {}
 
   async onModuleInit(): Promise<void> {
-    const url = this.configService?.get('REDIS_URL') ?? process.env.REDIS_URL ?? 'redis://localhost:6379';
+    const url =
+      this.configService?.get('REDIS_URL') ?? process.env.REDIS_URL ?? 'redis://localhost:6379';
 
     this._client = new IORedis(url, {
       maxRetriesPerRequest: null,

@@ -140,21 +140,24 @@ async function main(): Promise<void> {
       {
         module: RoleProbeModule,
         imports: [ScheduleModule.forRoot(scheduleOptionsForRole(role))],
-      providers: [
-        Probe,
-        { provide: AttendanceCronService, useValue: new AttendanceCronService(noDb as never) },
-        {
-          provide: TimesheetWarningCronService,
-          useValue: new TimesheetWarningCronService(noDb as never),
-        },
-        { provide: LeadFollowupCronService, useValue: new LeadFollowupCronService(noDb as never) },
-        {
-          provide: ImapIdleService,
-          // Role 'api' here so its boot refresh never runs; this part only
-          // looks at which @Interval timers the scheduler mounts.
-          useValue: new ImapIdleService(fakePrisma as never, {} as never, {} as never, 'api'),
-        },
-      ],
+        providers: [
+          Probe,
+          { provide: AttendanceCronService, useValue: new AttendanceCronService(noDb as never) },
+          {
+            provide: TimesheetWarningCronService,
+            useValue: new TimesheetWarningCronService(noDb as never),
+          },
+          {
+            provide: LeadFollowupCronService,
+            useValue: new LeadFollowupCronService(noDb as never),
+          },
+          {
+            provide: ImapIdleService,
+            // Role 'api' here so its boot refresh never runs; this part only
+            // looks at which @Interval timers the scheduler mounts.
+            useValue: new ImapIdleService(fakePrisma as never, {} as never, {} as never, 'api'),
+          },
+        ],
       },
       { logger: false },
     );
@@ -186,7 +189,11 @@ async function main(): Promise<void> {
     const explorer = { register: () => void registered++ };
     const moduleRef = { get: () => bullExtraOptionsForRole(role) };
     new BullRegistrar(moduleRef as never, explorer as never).onModuleInit();
-    assert.equal(registered, runsBackgroundWork(role) ? 1 : 0, `${role}: BullMQ worker registration`);
+    assert.equal(
+      registered,
+      runsBackgroundWork(role) ? 1 : 0,
+      `${role}: BullMQ worker registration`,
+    );
   }
   console.log('  ok  BullMQ @Processor workers: registered in all + worker, never in api');
 
@@ -296,26 +303,55 @@ async function main(): Promise<void> {
     const sent = sampleNotification();
     workerEvents.publishNotification(sent);
     workerEvents.publishSessionsRevoked(['u1', 'u2']);
-    workerMail.emit({ kind: 'folder-updated', userId: 'u1', accountId: 'a1', folderId: 'f1', inserted: 2 });
-    workerMail.emit({ kind: 'folder-updated', userId: 'other', accountId: 'a2', folderId: 'f2', inserted: 1 });
+    workerMail.emit({
+      kind: 'folder-updated',
+      userId: 'u1',
+      accountId: 'a1',
+      folderId: 'f1',
+      inserted: 2,
+    });
+    workerMail.emit({
+      kind: 'folder-updated',
+      userId: 'other',
+      accountId: 'a2',
+      folderId: 'f2',
+      inserted: 1,
+    });
     const push = {
       userIds: ['u1'],
-      payload: { title: 'Hi', body: 'There', type: 'generic' as const, url: '/inbox', pushId: 'p1' },
+      payload: {
+        title: 'Hi',
+        body: 'There',
+        type: 'generic' as const,
+        url: '/inbox',
+        pushId: 'p1',
+      },
     };
     workerEvents.publishPush(push);
     await tick();
 
     assert.equal(wire.length, 5, 'worker published every event to Redis');
-    for (const w of wire) assert.ok(w.channel.startsWith(busChannelPrefix(1)), 'channel carries the db');
-    assert.notEqual(busChannelPrefix(0), busChannelPrefix(1), 'staging and production never share channels');
+    for (const w of wire)
+      assert.ok(w.channel.startsWith(busChannelPrefix(1)), 'channel carries the db');
+    assert.notEqual(
+      busChannelPrefix(0),
+      busChannelPrefix(1),
+      'staging and production never share channels',
+    );
 
     for (const w of wire) apiBus.dispatch(w.channel, w.message);
     // A message from another Redis db's environment is ignored.
-    apiBus.dispatch(wire[0]!.channel.replace(busChannelPrefix(1), busChannelPrefix(0)), wire[0]!.message);
+    apiBus.dispatch(
+      wire[0]!.channel.replace(busChannelPrefix(1), busChannelPrefix(0)),
+      wire[0]!.message,
+    );
     await tick();
     assert.equal(notifications.length, 1);
     assert.deepEqual(notifications[0], sent, 'notification arrives with the same shape');
-    assert.ok(notifications[0]!.notification.createdAt instanceof Date, 'createdAt revived as a Date');
+    assert.ok(
+      notifications[0]!.notification.createdAt instanceof Date,
+      'createdAt revived as a Date',
+    );
     assert.deepEqual(revoked, [['u1', 'u2']]);
     assert.deepEqual(mail, [
       { kind: 'folder-updated', userId: 'u1', accountId: 'a1', folderId: 'f1', inserted: 2 },
@@ -358,7 +394,9 @@ async function main(): Promise<void> {
         },
       },
     } as unknown as RedisService;
-    new RealtimeEventsService(new CrossProcessBus(down, 'worker')).publishNotification(sampleNotification());
+    new RealtimeEventsService(new CrossProcessBus(down, 'worker')).publishNotification(
+      sampleNotification(),
+    );
     await tick();
     assert.equal(calls, 0, 'no publish while Redis is not ready');
   }
@@ -421,7 +459,12 @@ async function main(): Promise<void> {
     // With a server (api / all) the gateway emits directly, nothing on Redis.
     const allWire: Published[] = [];
     const allBus = new CrossProcessBus(fakeRedis(0, allWire), 'all');
-    const allGateway = new ChatGateway({} as never, chat as never, new RealtimeEventsService(allBus), allBus);
+    const allGateway = new ChatGateway(
+      {} as never,
+      chat as never,
+      new RealtimeEventsService(allBus),
+      allBus,
+    );
     const direct: string[] = [];
     (allGateway as unknown as { server: unknown }).server = {
       to: () => ({ emit: (event: string) => void direct.push(event) }),
@@ -527,7 +570,11 @@ async function main(): Promise<void> {
       others = [presenceMember('all', 'h', 8)];
       await worker.beat();
       await worker.beat();
-      assert.deepEqual(kills, [[process.pid, 'SIGTERM']], 'worker stops once when a ROLE=all appears');
+      assert.deepEqual(
+        kills,
+        [[process.pid, 'SIGTERM']],
+        'worker stops once when a ROLE=all appears',
+      );
       assert.equal(worker.errors.length, 1);
     } finally {
       process.kill = realKill;
@@ -560,7 +607,9 @@ async function main(): Promise<void> {
     for (let i = 0; i < 5; i++) await all.beat();
     assert.equal(all.errors.length, 0, 'ROLE=all alone logs nothing');
   }
-  console.log('  ok  presence: a running worker stops next to ROLE=all; api warns without a worker');
+  console.log(
+    '  ok  presence: a running worker stops next to ROLE=all; api warns without a worker',
+  );
 
   assert.equal(parseWorkerHealthPort(undefined), 4100);
   assert.equal(parseWorkerHealthPort('4101'), 4101);
@@ -609,7 +658,11 @@ async function main(): Promise<void> {
         prisma: { raw: { $queryRaw: async () => [{ ok: 1 }] } } as never,
         redis: { client: { ping: async () => 'PONG' } } as never,
       };
-      assert.equal((await fetch(`${base}/health/ready`)).status, 200, 'ready once the context exists');
+      assert.equal(
+        (await fetch(`${base}/health/ready`)).status,
+        200,
+        'ready once the context exists',
+      );
     } finally {
       await new Promise((r) => booting.close(r));
     }
@@ -638,7 +691,9 @@ async function main(): Promise<void> {
       `${report.role}: AppModule ScheduleModule options`,
     );
   }
-  console.log('  ok  real QueueModule + AppModule options: api has no workers/crons; all and unset have both');
+  console.log(
+    '  ok  real QueueModule + AppModule options: api has no workers/crons; all and unset have both',
+  );
 
   console.log('\nprocess role checks passed');
 }
@@ -657,11 +712,12 @@ async function childReport(role: ProcessRole | undefined): Promise<ChildReport> 
   const env: NodeJS.ProcessEnv = { ...process.env, [CHILD_FLAG]: '1' };
   if (role === undefined) delete env.ROLE;
   else env.ROLE = role;
-  const { stdout } = await promisify(execFile)(
-    process.execPath,
-    ['--import', 'tsx', __filename],
-    { cwd: resolve(__dirname, '../..'), env, timeout: 180_000, maxBuffer: 16 * 1024 * 1024 },
-  );
+  const { stdout } = await promisify(execFile)(process.execPath, ['--import', 'tsx', __filename], {
+    cwd: resolve(__dirname, '../..'),
+    env,
+    timeout: 180_000,
+    maxBuffer: 16 * 1024 * 1024,
+  });
   const line = stdout.split(/\r?\n/).find((l) => l.startsWith(REPORT_PREFIX));
   assert.ok(line, `child ROLE=${role ?? '(unset)'} printed no report:\n${stdout}`);
   return JSON.parse(line.slice(REPORT_PREFIX.length)) as ChildReport;

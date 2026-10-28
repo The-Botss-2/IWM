@@ -115,7 +115,12 @@ async function run(
 ) {
   const fake = fakePrisma();
   const service = new SearchService(fake.prisma);
-  const res = await service.search(scope(opts.scope), actor(opts.actor), ORG_A, query({ ...q, kind }));
+  const res = await service.search(
+    scope(opts.scope),
+    actor(opts.actor),
+    ORG_A,
+    query({ ...q, kind }),
+  );
   return { ...fake, res };
 }
 
@@ -142,7 +147,10 @@ async function main(): Promise<void> {
       Object.keys(FTS_EXPRESSIONS).length,
       'one fts index per FTS expression',
     );
-    assert.ok(!/DROP|ALTER TABLE/i.test(migration.replace(/^--.*$/gm, '')), 'migration is index-only');
+    assert.ok(
+      !/DROP|ALTER TABLE/i.test(migration.replace(/^--.*$/gm, '')),
+      'migration is index-only',
+    );
   }
 
   // --- (b) tsquery building ---------------------------------------------------
@@ -156,14 +164,26 @@ async function main(): Promise<void> {
     assert.equal(negatedTsQuery('invoice -draft -"old plan"'), 'draft | (old <-> plan)');
     assert.ok(!toPrefixTsQuery('² -draft')!.includes('!'), 'no negation in the positive query');
     // Excluded words still spend the 8-word budget.
-    assert.equal(toPrefixTsQuery('-aa -bb -cc -dd -ee -ff -gg -hh zz'), null, 'budget spent on exclusions');
+    assert.equal(
+      toPrefixTsQuery('-aa -bb -cc -dd -ee -ff -gg -hh zz'),
+      null,
+      'budget spent on exclusions',
+    );
     // Case is left to to_tsquery, which lower-cases with the database's rules
     // (the same ones to_tsvector used); JS lower-casing breaks Turkish İ.
     assert.equal(toPrefixTsQuery('Invoice'), 'Invoice:*', 'case left to Postgres');
-    assert.equal(toPrefixTsQuery('İş İstanbul'), 'İş:* & İstanbul:*', 'Turkish dotted İ kept as typed');
+    assert.equal(
+      toPrefixTsQuery('İş İstanbul'),
+      'İş:* & İstanbul:*',
+      'Turkish dotted İ kept as typed',
+    );
     assert.ok(!toPrefixTsQuery('İş İstanbul')!.includes('\u0307'), 'no JS-lowered i + U+0307');
     // Combining marks stay inside their word (decomposed é, i + U+0307).
-    assert.equal(toPrefixTsQuery('cafe\u0301 menu'), 'cafe\u0301:* & menu:*', 'decomposed accent: one word');
+    assert.equal(
+      toPrefixTsQuery('cafe\u0301 menu'),
+      'cafe\u0301:* & menu:*',
+      'decomposed accent: one word',
+    );
     assert.equal(toPrefixTsQuery('i\u0307stanbul'), 'i\u0307stanbul:*', 'i + U+0307: one word');
     assert.equal(toPrefixTsQuery('\u0301'), null, 'a lone mark is not a word');
     assert.equal(toPrefixTsQuery('\u0301ab'), 'ab:*', 'a leading mark is dropped');
@@ -171,13 +191,21 @@ async function main(): Promise<void> {
     // found after a Turkish 'İ' still points at the right place.
     assert.equal(lowerSameLength('İstanbul ABC'), 'İstanbul abc');
     assert.equal(lowerSameLength('İstanbul').length, 'İstanbul'.length);
-    assert.deepEqual(searchTokens('Invoice İş'), ['invoice', 'İş'], 'snippet tokens: length-preserving lower case');
+    assert.deepEqual(
+      searchTokens('Invoice İş'),
+      ['invoice', 'İş'],
+      'snippet tokens: length-preserving lower case',
+    );
     assert.equal(
       snippetAround('İİİİ İstanbul ofisi raporu', ['ofisi'], 3),
       '...ul ofisi ra...',
       'snippet window stays aligned after İ',
     );
-    assert.equal(snippetAround('Ofisi İstanbul', ['istanbul'], 50), 'Ofisi İstanbul', 'no false match on JS-lowered İ');
+    assert.equal(
+      snippetAround('Ofisi İstanbul', ['istanbul'], 50),
+      'Ofisi İstanbul',
+      'no false match on JS-lowered İ',
+    );
     // tsquery syntax typed by the user never survives.
     const hostile = toPrefixTsQuery(`ab&cd | ef!gh:(ij)' kl:*`);
     assert.equal(hostile, 'ab:* & cd:* & ef:* & gh:* & ij:* & kl:*');
@@ -208,7 +236,10 @@ async function main(): Promise<void> {
     assert.ok(s.values.includes(WS_A), `${kind}: binds the scope workspace`);
     assert.ok(!s.values.includes(WS_B), `${kind}: never another workspace`);
     assert.ok(flat(s).includes('"deletedAt" IS NULL'), `${kind}: soft-delete filter`);
-    assert.ok(flat(s).includes("to_tsquery('simple'::regconfig, $"), `${kind}: tsquery is a bound param`);
+    assert.ok(
+      flat(s).includes("to_tsquery('simple'::regconfig, $"),
+      `${kind}: tsquery is a bound param`,
+    );
     assert.ok(s.values.includes('zqxleak:*'), `${kind}: prefix tsquery bound`);
     assert.ok(s.values.includes('%zqxleak%'), `${kind}: ILIKE pattern bound`);
   }
@@ -224,10 +255,17 @@ async function main(): Promise<void> {
     // Workspace files reached through a task comment: every hop is live.
     const { sql } = await run('workspace_file', { q: 'zqxleak' });
     const text = flat(sql[0]!);
-    for (const hop of ['cm."deletedAt" IS NULL', 'tk."deletedAt" IS NULL', 'p."deletedAt" IS NULL']) {
+    for (const hop of [
+      'cm."deletedAt" IS NULL',
+      'tk."deletedAt" IS NULL',
+      'p."deletedAt" IS NULL',
+    ]) {
       assert.ok(text.includes(hop), `workspace_file: ${hop}`);
     }
-    assert.ok(text.includes('"SignatureRequest"') && text.includes('"SignatureSigner"'), 'signature files excluded');
+    assert.ok(
+      text.includes('"SignatureRequest"') && text.includes('"SignatureSigner"'),
+      'signature files excluded',
+    );
   }
 
   {
@@ -240,13 +278,19 @@ async function main(): Promise<void> {
       'document project label: visibility-gated on pn',
     );
     const admin = await run('document', { q: 'zqxleak' }, { scope: { seesEveryProject: true } });
-    assert.ok(flat(admin.sql[0]!).includes('pn."deletedAt" IS NULL AND TRUE'), 'seesEveryProject: label ungated');
+    assert.ok(
+      flat(admin.sql[0]!).includes('pn."deletedAt" IS NULL AND TRUE'),
+      'seesEveryProject: label ungated',
+    );
   }
 
   // --- (d) per-user access rules ----------------------------------------------
   {
     const member = await run('document', { q: 'zqxleak' });
-    assert.ok(flat(member.sql[0]!).includes('EXISTS (SELECT 1 FROM "DocumentAccess"'), 'non-admin: DocumentAccess gate');
+    assert.ok(
+      flat(member.sql[0]!).includes('EXISTS (SELECT 1 FROM "DocumentAccess"'),
+      'non-admin: DocumentAccess gate',
+    );
     assert.ok(member.sql[0]!.values.includes(USER), 'non-admin: binds the caller');
     const admin = await run('document', { q: 'zqxleak' }, { scope: { workspaceRole: 'ADMIN' } });
     assert.ok(!flat(admin.sql[0]!).includes('"DocumentAccess"'), 'admin: no access gate');
@@ -263,7 +307,10 @@ async function main(): Promise<void> {
     assert.ok(!flat(finance.sql[0]!).includes('"assigneeId"'), 'client: finance sees all');
     // Holding only the clients grant must not widen leads.
     const clientsOnly = await run('lead', { q: 'zqxleak' }, { actor: { fullClients: true } });
-    assert.ok(flat(clientsOnly.sql[0]!).includes('l."assigneeId" = $'), 'lead: clients grant is not leads');
+    assert.ok(
+      flat(clientsOnly.sql[0]!).includes('l."assigneeId" = $'),
+      'lead: clients grant is not leads',
+    );
   }
 
   // --- (e) chat scope ---------------------------------------------------------
@@ -292,21 +339,37 @@ async function main(): Promise<void> {
     }
 
     const all = await run('chat_message', { q: 'zqxleak' });
-    assert.deepEqual(all.sql[0]!.values.find(Array.isArray), [ROOM_A1, ROOM_A2], 'every allowed room');
+    assert.deepEqual(
+      all.sql[0]!.values.find(Array.isArray),
+      [ROOM_A1, ROOM_A2],
+      'every allowed room',
+    );
 
     const files = await run('file', { q: 'zqxleak', roomId: ROOM_B });
     assert.equal(files.sql.length, 0, 'chat files: same room rule');
 
     const hasFile = await run('chat_message', { q: '', has: 'file' });
-    assert.ok(flat(hasFile.sql[0]!).includes('EXISTS (SELECT 1 FROM "ChatRoomAttachment"'), 'has:file');
+    assert.ok(
+      flat(hasFile.sql[0]!).includes('EXISTS (SELECT 1 FROM "ChatRoomAttachment"'),
+      'has:file',
+    );
     assert.ok(!flat(hasFile.sql[0]!).includes('to_tsquery'), 'filter-only: no text predicate');
     const hasLink = await run('chat_message', { q: 'zqx', has: 'link' });
     assert.ok(flat(hasLink.sql[0]!).includes("m.content ~* 'https?://'"), 'has:link');
 
     const nullOrg = fakePrisma();
-    await new SearchService(nullOrg.prisma).search(scope(), actor(), null, query({ q: 'zqx', kind: 'chat_message' }));
+    await new SearchService(nullOrg.prisma).search(
+      scope(),
+      actor(),
+      null,
+      query({ q: 'zqx', kind: 'chat_message' }),
+    );
     const nullRoom = nullOrg.seen['chatRoomParticipant']![0]!['room'] as { OR: Where[] };
-    assert.deepEqual(nullRoom.OR, [{ workspaceId: null }], 'no organization: workspace rooms excluded');
+    assert.deepEqual(
+      nullRoom.OR,
+      [{ workspaceId: null }],
+      'no organization: workspace rooms excluded',
+    );
   }
 
   // --- (f) PRIVATE project gate -----------------------------------------------
@@ -329,7 +392,10 @@ async function main(): Promise<void> {
 
   // --- query schema + hard filters --------------------------------------------
   {
-    assert.ok(!searchQuerySchema.safeParse({ q: 'a' }).success, 'one character, no filter: rejected');
+    assert.ok(
+      !searchQuerySchema.safeParse({ q: 'a' }).success,
+      'one character, no filter: rejected',
+    );
     assert.ok(!searchQuerySchema.safeParse({}).success, 'empty: rejected');
     assert.ok(searchQuerySchema.safeParse({ has: 'file' }).success, 'filter-only: accepted');
     assert.equal(query({ q: 'ab' }).sort, 'relevance', 'relevance by default');
@@ -359,11 +425,19 @@ async function main(): Promise<void> {
     // newest title-prefix matches, never every matching row.
     assert.ok(rel.startsWith('WITH matched AS MATERIALIZED ('), 'text match evaluated once');
     // Ties on `at` break by id, so page 2 sees the same pool as page 1.
-    assert.ok(rel.includes('cand AS ( (SELECT id FROM matched ORDER BY at DESC, id DESC LIMIT $'), 'candidate pool');
-    assert.ok(relevance.sql[0]!.values.includes(1051), 'pool covers the deepest page (MAX_OFFSET + 51)');
+    assert.ok(
+      rel.includes('cand AS ( (SELECT id FROM matched ORDER BY at DESC, id DESC LIMIT $'),
+      'candidate pool',
+    );
+    assert.ok(
+      relevance.sql[0]!.values.includes(1051),
+      'pool covers the deepest page (MAX_OFFSET + 51)',
+    );
     assert.ok(
       rel.includes('b."title" ILIKE $') &&
-        rel.includes('UNION (SELECT id FROM matched WHERE title_prefix ORDER BY at DESC, id DESC LIMIT $') &&
+        rel.includes(
+          'UNION (SELECT id FROM matched WHERE title_prefix ORDER BY at DESC, id DESC LIMIT $',
+        ) &&
         relevance.sql[0]!.values.includes('zqx%'),
       'title-prefix pool',
     );
@@ -374,7 +448,10 @@ async function main(): Promise<void> {
 
     // No text: newest first, no ranking.
     const filterOnly = await run('chat_message', { q: '', has: 'file' });
-    assert.ok(flat(filterOnly.sql[0]!).includes('ORDER BY at DESC, id DESC'), 'filter-only: by date');
+    assert.ok(
+      flat(filterOnly.sql[0]!).includes('ORDER BY at DESC, id DESC'),
+      'filter-only: by date',
+    );
     assert.ok(!flat(filterOnly.sql[0]!).includes('WITH matched'), 'filter-only: no ranking pool');
     // Messages have no title: no title pool.
     const msg = await run('chat_message', { q: 'zqx' });
@@ -386,7 +463,11 @@ async function main(): Promise<void> {
     assert.ok(!short.sql[0]!.values.includes('%ab%'), 'short text: no ILIKE scan');
 
     // `-word` reaches the Prisma kinds too.
-    assert.deepEqual(textMatch('invoice -draft -"old copy"')!.negWords, ['draft', 'old copy'], 'negWords');
+    assert.deepEqual(
+      textMatch('invoice -draft -"old copy"')!.negWords,
+      ['draft', 'old copy'],
+      'negWords',
+    );
     // One entry per excluded chunk: an address is not split into "com".
     assert.deepEqual(negatedWords('x -a@b.com'), ['a@b.com'], 'excluded address kept whole');
     assert.deepEqual(negatedWords('x -noreply@acme.com'), ['noreply@acme.com']);
@@ -439,7 +520,11 @@ async function main(): Promise<void> {
       'people: name / email exclusion',
     );
     const plainMail = await run('mail', { q: 'invoice' });
-    assert.deepEqual(plainMail.seen['mailMessage']![0]!['AND'], [], 'no exclusions: no extra mail clauses');
+    assert.deepEqual(
+      plainMail.seen['mailMessage']![0]!['AND'],
+      [],
+      'no exclusions: no extra mail clauses',
+    );
 
     // Mail has:file maps to hasAttachments.
     const mail = await run('mail', { q: 'zqx', has: 'file' });
@@ -448,7 +533,10 @@ async function main(): Promise<void> {
     // Counts wrap each query in a capped count.
     const counts = await run('task', { q: 'zqx', counts: 'true' });
     assert.ok(
-      counts.sql.some((s) => flat(s).startsWith('SELECT count(*)::int AS n FROM (') && flat(s).includes('LIMIT $')),
+      counts.sql.some(
+        (s) =>
+          flat(s).startsWith('SELECT count(*)::int AS n FROM (') && flat(s).includes('LIMIT $'),
+      ),
       'capped count',
     );
   }

@@ -94,7 +94,7 @@ function PdfPageView({
 
   return (
     <div
-      className="relative mx-auto overflow-hidden rounded-md bg-white shadow-soft ring-1 ring-line"
+      className="shadow-soft ring-line relative mx-auto overflow-hidden rounded-md bg-white ring-1"
       style={{ width, height: Math.round(width * aspect) }}
       data-page={pageNumber}
       aria-label={`Page ${pageNumber} of ${doc.numPages}`}
@@ -115,7 +115,10 @@ function PdfPageView({
         </div>
       ) : null}
       {/* Hit area for "click to place"; fields sit above it. */}
-      <div data-page-hit className={cn('absolute inset-0', onPageClick ? 'cursor-crosshair' : '')} />
+      <div
+        data-page-hit
+        className={cn('absolute inset-0', onPageClick ? 'cursor-crosshair' : '')}
+      />
       <div className="pointer-events-none absolute inset-0">{overlay}</div>
       <span className="pointer-events-none absolute bottom-1.5 right-2 rounded bg-black/40 px-1.5 py-0.5 text-[10px] font-medium text-white">
         {pageNumber} / {doc.numPages}

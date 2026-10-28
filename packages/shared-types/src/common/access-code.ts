@@ -9,9 +9,7 @@ import { z } from 'zod';
  *    typed on the page. It is the part a forwarded or leaked URL lacks, and
  *    the API locks the link after a few wrong guesses.
  */
-export const linkToken = z
-  .string()
-  .regex(/^[A-Za-z0-9_-]{43}$/, 'Invalid link');
+export const linkToken = z.string().regex(/^[A-Za-z0-9_-]{43}$/, 'Invalid link');
 
 /** Number of wrong codes after which a link is locked. */
 export const MAX_ACCESS_CODE_ATTEMPTS = 5;

@@ -50,17 +50,14 @@ export function BulkActionBar({ projectId, selectedIds, onClear }: Props) {
       <div
         role="region"
         aria-label="Bulk task actions"
-        className="fixed bottom-4 left-1/2 z-40 w-[min(720px,calc(100vw-2rem))] -translate-x-1/2 rounded-lg border border-line bg-white p-2 shadow-xl"
+        className="border-line fixed bottom-4 left-1/2 z-40 w-[min(720px,calc(100vw-2rem))] -translate-x-1/2 rounded-lg border bg-white p-2 shadow-xl"
       >
         <div className="flex flex-wrap items-center gap-2">
-          <span className="rounded-full bg-brand-50 px-2 py-1 text-xs font-semibold text-brand-700">
+          <span className="bg-brand-50 text-brand-700 rounded-full px-2 py-1 text-xs font-semibold">
             {count} selected
           </span>
 
-          <Select
-            value=""
-            onValueChange={(v) => run({ kind: 'status', status: v as TaskStatus })}
-          >
+          <Select value="" onValueChange={(v) => run({ kind: 'status', status: v as TaskStatus })}>
             <SelectTrigger className="h-8 w-[140px] text-xs" aria-label="Move to status">
               <SelectValue placeholder="Move to…" />
             </SelectTrigger>
@@ -92,9 +89,7 @@ export function BulkActionBar({ projectId, selectedIds, onClear }: Props) {
           <div className="w-[200px]">
             <WorkspaceMembersCombobox
               value={null}
-              onChange={(userId) =>
-                run({ kind: 'assignee', assigneeId: userId })
-              }
+              onChange={(userId) => run({ kind: 'assignee', assigneeId: userId })}
               placeholder="Assign to…"
               projectId={projectId}
               clearable

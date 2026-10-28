@@ -92,7 +92,7 @@ export function MarkPaidDialog({
             <PaymentSourceCombobox id="pay-source" value={sourceId} onChange={setSourceId} />
           </div>
           {baseCurrency === null ? (
-            <p className="text-xs text-ink-muted" role="status">
+            <p className="text-ink-muted text-xs" role="status">
               Loading your reporting currency…
             </p>
           ) : null}
@@ -109,11 +109,11 @@ export function MarkPaidDialog({
                 onChange={(e) => setFxRate(e.target.value)}
               />
               {rateInvalid ? (
-                <p id="pay-fx-help" role="alert" className="text-xs text-state-error">
+                <p id="pay-fx-help" role="alert" className="text-state-error text-xs">
                   Enter the rate with a period for decimals, e.g. 0.0036.
                 </p>
               ) : (
-                <p id="pay-fx-help" className="text-xs text-ink-muted">
+                <p id="pay-fx-help" className="text-ink-muted text-xs">
                   Reports are in {baseCurrency}, so each salary is converted at this rate.
                 </p>
               )}
@@ -127,7 +127,9 @@ export function MarkPaidDialog({
           </Button>
           <Button
             onClick={() => void submit()}
-            disabled={!paidAt || baseCurrency === null || pay.isPending || (needsFx && rate === null)}
+            disabled={
+              !paidAt || baseCurrency === null || pay.isPending || (needsFx && rate === null)
+            }
           >
             {pay.isPending ? 'Saving…' : 'Mark as paid'}
           </Button>

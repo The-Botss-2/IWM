@@ -15,10 +15,7 @@ import {
 
 import { CurrentUser, type AuthedUser } from '../common/decorators/current-user.decorator';
 import { RequireAbility } from '../common/decorators/required-ability.decorator';
-import {
-  RequestUserScope,
-  type UserScope,
-} from '../common/decorators/user-scope.decorator';
+import { RequestUserScope, type UserScope } from '../common/decorators/user-scope.decorator';
 import { ZodValidationPipe } from '../common/pipes/zod-validation.pipe';
 import { GoalsService } from './goals.service';
 

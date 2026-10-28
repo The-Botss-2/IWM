@@ -89,9 +89,7 @@ const TYPE_DEFAULT_COLOR: Record<CalendarEventType, string> = {
 export function GlobalCalendarView({ initialDate }: Props) {
   const [cursor, setCursor] = useState<Date>(initialDate ?? new Date());
   const [view, setView] = useState<CalendarViewMode>('month');
-  const [types, setTypes] = useState<Set<CalendarEventType>>(
-    () => new Set(ALL_TYPES),
-  );
+  const [types, setTypes] = useState<Set<CalendarEventType>>(() => new Set(ALL_TYPES));
   const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null);
 
   const range = useMemo(() => {
@@ -120,15 +118,13 @@ export function GlobalCalendarView({ initialDate }: Props) {
 
   return (
     <div className="flex h-full flex-col">
-      <header className="flex flex-wrap items-center justify-between gap-2 border-b border-line bg-white px-4 py-3">
+      <header className="border-line flex flex-wrap items-center justify-between gap-2 border-b bg-white px-4 py-3">
         <div className="flex items-center gap-1">
           <Button
             size="icon"
             variant="ghost"
             aria-label="Previous"
-            onClick={() =>
-              setCursor((d) => (view === 'month' ? addMonths(d, -1) : addDays(d, -7)))
-            }
+            onClick={() => setCursor((d) => (view === 'month' ? addMonths(d, -1) : addDays(d, -7)))}
           >
             <ChevronLeft className="h-4 w-4" />
           </Button>
@@ -139,18 +135,16 @@ export function GlobalCalendarView({ initialDate }: Props) {
             size="icon"
             variant="ghost"
             aria-label="Next"
-            onClick={() =>
-              setCursor((d) => (view === 'month' ? addMonths(d, 1) : addDays(d, 7)))
-            }
+            onClick={() => setCursor((d) => (view === 'month' ? addMonths(d, 1) : addDays(d, 7)))}
           >
             <ChevronRight className="h-4 w-4" />
           </Button>
-          <span className="ml-2 text-sm font-semibold text-ink">
+          <span className="text-ink ml-2 text-sm font-semibold">
             {view === 'month' ? fmtMonthLabel(cursor) : fmtWeekLabel(cursor)}
           </span>
         </div>
         <div className="flex items-center gap-2">
-          <div className="inline-flex rounded-md border border-line bg-white p-0.5 text-xs">
+          <div className="border-line inline-flex rounded-md border bg-white p-0.5 text-xs">
             {(['month', 'week'] as const).map((m) => (
               <button
                 key={m}
@@ -159,9 +153,7 @@ export function GlobalCalendarView({ initialDate }: Props) {
                 onClick={() => setView(m)}
                 className={cn(
                   'rounded px-2.5 py-1 capitalize transition-colors',
-                  view === m
-                    ? 'bg-brand-50 text-brand-700'
-                    : 'text-ink-muted hover:text-ink',
+                  view === m ? 'bg-brand-50 text-brand-700' : 'text-ink-muted hover:text-ink',
                 )}
               >
                 {m}
@@ -180,16 +172,12 @@ export function GlobalCalendarView({ initialDate }: Props) {
                   onClick={() => toggleType(t)}
                   aria-pressed={active}
                   className={cn(
-                    'whitespace-nowrap inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] transition',
+                    'inline-flex items-center gap-1 whitespace-nowrap rounded-full border px-2 py-0.5 text-[11px] transition',
                     active
                       ? 'border-transparent text-white'
-                      : 'border-line bg-white text-ink-muted',
+                      : 'border-line text-ink-muted bg-white',
                   )}
-                  style={
-                    active
-                      ? { backgroundColor: TYPE_DEFAULT_COLOR[t] }
-                      : undefined
-                  }
+                  style={active ? { backgroundColor: TYPE_DEFAULT_COLOR[t] } : undefined}
                 >
                   <Icon className="h-3 w-3" aria-hidden />
                   {TYPE_LABEL[t]}
@@ -200,33 +188,26 @@ export function GlobalCalendarView({ initialDate }: Props) {
         </div>
       </header>
 
-      <div className="flex-1 overflow-y-auto bg-bg-subtle">
+      <div className="bg-bg-subtle flex-1 overflow-y-auto">
         {view === 'month' ? (
           <MonthGrid
             cursor={cursor}
             events={events}
             onSelect={setSelectedEvent}
-            onTodoToggle={(id, done) =>
-              updateTodo.mutate({ id, input: { done } })
-            }
+            onTodoToggle={(id, done) => updateTodo.mutate({ id, input: { done } })}
           />
         ) : (
           <WeekGrid
             cursor={cursor}
             events={events}
             onSelect={setSelectedEvent}
-            onTodoToggle={(id, done) =>
-              updateTodo.mutate({ id, input: { done } })
-            }
+            onTodoToggle={(id, done) => updateTodo.mutate({ id, input: { done } })}
           />
         )}
       </div>
 
       {selectedEvent ? (
-        <EventDetailModal
-          event={selectedEvent}
-          onClose={() => setSelectedEvent(null)}
-        />
+        <EventDetailModal event={selectedEvent} onClose={() => setSelectedEvent(null)} />
       ) : null}
     </div>
   );
@@ -264,11 +245,11 @@ function MonthGrid({
 
   return (
     <div className="p-3">
-      <div className="grid grid-cols-7 gap-px overflow-hidden rounded-lg border border-line bg-line">
+      <div className="border-line bg-line grid grid-cols-7 gap-px overflow-hidden rounded-lg border">
         {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((d) => (
           <div
             key={d}
-            className="bg-bg-subtle px-2 py-1 text-[10px] font-semibold uppercase tracking-wide text-ink-muted"
+            className="bg-bg-subtle text-ink-muted px-2 py-1 text-[10px] font-semibold uppercase tracking-wide"
           >
             {d}
           </div>
@@ -289,9 +270,7 @@ function MonthGrid({
                 <span
                   className={cn(
                     'inline-flex h-5 w-5 items-center justify-center rounded-full text-[11px]',
-                    isToday
-                      ? 'bg-brand-600 font-semibold text-white'
-                      : 'text-ink',
+                    isToday ? 'bg-brand-600 font-semibold text-white' : 'text-ink',
                   )}
                 >
                   {day.getDate()}
@@ -307,9 +286,7 @@ function MonthGrid({
                   />
                 ))}
                 {list.length > 4 ? (
-                  <li className="text-[10px] text-ink-muted">
-                    +{list.length - 4} more
-                  </li>
+                  <li className="text-ink-muted text-[10px]">+{list.length - 4} more</li>
                 ) : null}
               </ul>
             </div>
@@ -348,22 +325,20 @@ function WeekGrid({
   }, [events]);
   const today = new Date();
   return (
-    <div className="grid grid-cols-7 gap-px bg-line p-3">
+    <div className="bg-line grid grid-cols-7 gap-px p-3">
       {days.map((d) => {
         const list = eventsByDay.get(d.toDateString()) ?? [];
         const isToday = sameDay(d, today);
         return (
           <div key={d.toDateString()} className="min-h-[400px] bg-white p-2">
             <div className="mb-2 text-center">
-              <div className="text-[10px] font-semibold uppercase tracking-wide text-ink-muted">
+              <div className="text-ink-muted text-[10px] font-semibold uppercase tracking-wide">
                 {d.toLocaleDateString(undefined, { weekday: 'short' })}
               </div>
               <div
                 className={cn(
                   'mx-auto mt-0.5 inline-flex h-7 w-7 items-center justify-center rounded-full text-sm font-semibold',
-                  isToday
-                    ? 'bg-brand-600 text-white'
-                    : 'text-ink',
+                  isToday ? 'bg-brand-600 text-white' : 'text-ink',
                 )}
               >
                 {d.getDate()}
@@ -380,7 +355,7 @@ function WeekGrid({
                 />
               ))}
               {list.length === 0 ? (
-                <li className="text-[11px] text-ink-disabled">No events</li>
+                <li className="text-ink-disabled text-[11px]">No events</li>
               ) : null}
             </ul>
           </div>
@@ -406,7 +381,7 @@ function EventChip({
     const done = (event.meta as { done?: boolean }).done === true;
     const todoId = (event.meta as { todoId?: string }).todoId ?? '';
     return (
-      <li className="flex items-center gap-1.5 rounded px-1 py-0.5 text-[11px] hover:bg-bg-subtle">
+      <li className="hover:bg-bg-subtle flex items-center gap-1.5 rounded px-1 py-0.5 text-[11px]">
         <input
           type="checkbox"
           checked={done}
@@ -450,32 +425,26 @@ function EventChip({
   );
 }
 
-function EventDetailModal({
-  event,
-  onClose,
-}: {
-  event: CalendarEvent;
-  onClose: () => void;
-}) {
+function EventDetailModal({ event, onClose }: { event: CalendarEvent; onClose: () => void }) {
   return (
     <div
       role="dialog"
       aria-label="Event details"
-      className="fixed inset-0 z-40 grid place-items-center bg-ink/40 p-4"
+      className="bg-ink/40 fixed inset-0 z-40 grid place-items-center p-4"
       onClick={onClose}
     >
       <div
-        className="w-[min(420px,90vw)] rounded-lg border border-line bg-white p-4 shadow-lg"
+        className="border-line w-[min(420px,90vw)] rounded-lg border bg-white p-4 shadow-lg"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="mb-2 flex items-baseline justify-between gap-2">
-          <h2 className="text-base font-semibold text-ink">{event.title}</h2>
-          <span className="whitespace-nowrap rounded-full bg-bg-subtle px-2 py-0.5 text-[10px] uppercase tracking-wide text-ink-muted">
+          <h2 className="text-ink text-base font-semibold">{event.title}</h2>
+          <span className="bg-bg-subtle text-ink-muted whitespace-nowrap rounded-full px-2 py-0.5 text-[10px] uppercase tracking-wide">
             {event.type}
           </span>
         </div>
-        <div className="space-y-2 text-sm text-ink">
-          <div className="text-xs text-ink-muted">
+        <div className="text-ink space-y-2 text-sm">
+          <div className="text-ink-muted text-xs">
             {absoluteTime(event.start)}
             {event.end ? ` → ${absoluteTime(event.end)}` : ''}
           </div>
@@ -490,11 +459,11 @@ function EventDetailModal({
             </div>
           ) : null}
           {event.type === 'task' ? (
-            <dl className="grid grid-cols-2 gap-1 text-xs text-ink-muted">
+            <dl className="text-ink-muted grid grid-cols-2 gap-1 text-xs">
               {Object.entries(event.meta).map(([k, v]) =>
                 k === 'taskId' ? null : (
                   <div key={k} className="contents">
-                    <dt className="uppercase tracking-wide text-ink-disabled">{k}</dt>
+                    <dt className="text-ink-disabled uppercase tracking-wide">{k}</dt>
                     <dd className="text-ink">{String(v ?? '-')}</dd>
                   </div>
                 ),
@@ -506,7 +475,7 @@ function EventDetailModal({
           {event.type === 'task' && event.projectId ? (
             <Link
               href={`/projects/${event.projectId}`}
-              className="rounded-md border border-line px-3 py-1.5 text-xs font-medium text-ink hover:bg-bg-subtle"
+              className="border-line text-ink hover:bg-bg-subtle rounded-md border px-3 py-1.5 text-xs font-medium"
             >
               Open project
             </Link>
@@ -514,7 +483,7 @@ function EventDetailModal({
           {event.type === 'todo' ? (
             <Link
               href="/todo"
-              className="rounded-md border border-line px-3 py-1.5 text-xs font-medium text-ink hover:bg-bg-subtle"
+              className="border-line text-ink hover:bg-bg-subtle rounded-md border px-3 py-1.5 text-xs font-medium"
             >
               Open todos
             </Link>
@@ -522,7 +491,7 @@ function EventDetailModal({
           {event.type === 'time' ? (
             <Link
               href="/timesheets"
-              className="rounded-md border border-line px-3 py-1.5 text-xs font-medium text-ink hover:bg-bg-subtle"
+              className="border-line text-ink hover:bg-bg-subtle rounded-md border px-3 py-1.5 text-xs font-medium"
             >
               Open timesheets
             </Link>

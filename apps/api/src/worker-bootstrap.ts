@@ -64,9 +64,7 @@ export async function bootstrapWorker(logLevels: LogLevel[]): Promise<void> {
     throw err;
   }
 
-  logger.log(
-    `Worker running. Health at http://127.0.0.1:${healthPort}/health and /health/ready`,
-  );
+  logger.log(`Worker running. Health at http://127.0.0.1:${healthPort}/health and /health/ready`);
   logger.log(`Log levels enabled: ${logLevels.join(', ')}`);
 
   if (typeof process.send === 'function') {

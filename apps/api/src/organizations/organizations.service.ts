@@ -77,25 +77,24 @@ export class OrganizationsService {
       throw new ForbiddenException({
         title: 'Root organization protected',
         status: 403,
-        detail: 'The Botss root organization cannot be suspended, deleted, or modified through this endpoint.',
+        detail:
+          'The Botss root organization cannot be suspended, deleted, or modified through this endpoint.',
       });
     }
   }
 
-  private map(
-    row: {
-      id: string;
-      name: string;
-      slug: string;
-      emailDomain: string | null;
-      isRoot: boolean;
-      isActive: boolean;
-      featureFlags: unknown;
-      createdAt: Date;
-      updatedAt: Date;
-      deletedAt: Date | null;
-    },
-  ): Organization {
+  private map(row: {
+    id: string;
+    name: string;
+    slug: string;
+    emailDomain: string | null;
+    isRoot: boolean;
+    isActive: boolean;
+    featureFlags: unknown;
+    createdAt: Date;
+    updatedAt: Date;
+    deletedAt: Date | null;
+  }): Organization {
     return {
       id: row.id,
       name: row.name,
@@ -118,82 +117,80 @@ export class OrganizationsService {
     // otherwise hide them by default.
     const [rows, memberCounts, workspaceCounts, acceptedCounts, storage, mailConfigs] =
       await Promise.all([
-      (this.prisma.client.organization as unknown as {
-        findMany: (args: unknown) => Promise<
-          Array<{
-            id: string;
-            name: string;
-            slug: string;
-            emailDomain: string | null;
-            isRoot: boolean;
-            isActive: boolean;
-            featureFlags: unknown;
-            createdAt: Date;
-            updatedAt: Date;
-            deletedAt: Date | null;
-          }>
-        >;
-      }).findMany({
-        orderBy: [{ isRoot: 'desc' }, { name: 'asc' }],
-        includeDeleted: true,
-      }),
-      this.prisma.client.user.groupBy({
-        by: ['organizationId'],
-        _count: { _all: true },
-        where: { organizationId: { not: null }, deletedAt: null },
-      }),
-      this.prisma.client.workspace.groupBy({
-        by: ['organizationId'],
-        _count: { _all: true },
-        // Workspace.organizationId is NOT NULL since the
-        // 20260525190100_workspace_organization_required migration, so the
-        // legacy `{ not: null }` filter is gone.
-        where: { deletedAt: null },
-      }),
-      // "Accepted" = has a credential Account row. Group by organizationId
-      // so we can detect "this tenant has at least one signed-in user".
-      // Used to drive the Pending badge: a tenant with zero accepted
-      // users is still waiting on its first sign-in.
-      this.prisma.client.user.groupBy({
-        by: ['organizationId'],
-        _count: { _all: true },
-        where: {
-          organizationId: { not: null },
-          deletedAt: null,
-          accounts: { some: { providerId: 'credential' } },
-        },
-      }),
-      // Usage only: total bytes of live files per org. Never file names.
-      // `prisma.raw` has no soft-delete extension, so `deletedAt` is manual.
-      this.prisma.raw.$queryRaw<Array<{ organizationId: string; bytes: bigint | null }>>`
+        (
+          this.prisma.client.organization as unknown as {
+            findMany: (args: unknown) => Promise<
+              Array<{
+                id: string;
+                name: string;
+                slug: string;
+                emailDomain: string | null;
+                isRoot: boolean;
+                isActive: boolean;
+                featureFlags: unknown;
+                createdAt: Date;
+                updatedAt: Date;
+                deletedAt: Date | null;
+              }>
+            >;
+          }
+        ).findMany({
+          orderBy: [{ isRoot: 'desc' }, { name: 'asc' }],
+          includeDeleted: true,
+        }),
+        this.prisma.client.user.groupBy({
+          by: ['organizationId'],
+          _count: { _all: true },
+          where: { organizationId: { not: null }, deletedAt: null },
+        }),
+        this.prisma.client.workspace.groupBy({
+          by: ['organizationId'],
+          _count: { _all: true },
+          // Workspace.organizationId is NOT NULL since the
+          // 20260525190100_workspace_organization_required migration, so the
+          // legacy `{ not: null }` filter is gone.
+          where: { deletedAt: null },
+        }),
+        // "Accepted" = has a credential Account row. Group by organizationId
+        // so we can detect "this tenant has at least one signed-in user".
+        // Used to drive the Pending badge: a tenant with zero accepted
+        // users is still waiting on its first sign-in.
+        this.prisma.client.user.groupBy({
+          by: ['organizationId'],
+          _count: { _all: true },
+          where: {
+            organizationId: { not: null },
+            deletedAt: null,
+            accounts: { some: { providerId: 'credential' } },
+          },
+        }),
+        // Usage only: total bytes of live files per org. Never file names.
+        // `prisma.raw` has no soft-delete extension, so `deletedAt` is manual.
+        this.prisma.raw.$queryRaw<Array<{ organizationId: string; bytes: bigint | null }>>`
         SELECT w."organizationId" AS "organizationId", SUM(f."sizeBytes")::bigint AS bytes
         FROM "FileObject" f
         JOIN "Workspace" w ON w."id" = f."workspaceId"
         WHERE f."deletedAt" IS NULL
         GROUP BY w."organizationId"
       `,
-      // Whether mail is set up, never the settings themselves: an org's mail
-      // server config is its own admins' business.
-      this.prisma.client.organizationMailConfig.findMany({
-        select: { organizationId: true },
-      }),
-    ]);
+        // Whether mail is set up, never the settings themselves: an org's mail
+        // server config is its own admins' business.
+        this.prisma.client.organizationMailConfig.findMany({
+          select: { organizationId: true },
+        }),
+      ]);
     const storageByOrg = new Map<string, number>(
       storage.map((r) => [r.organizationId, Number(r.bytes ?? 0)]),
     );
     const mailConfigured = new Set(mailConfigs.map((c) => c.organizationId));
     const memberByOrg = new Map<string, number>(
-      memberCounts.flatMap((r) =>
-        r.organizationId ? [[r.organizationId, r._count._all]] : [],
-      ),
+      memberCounts.flatMap((r) => (r.organizationId ? [[r.organizationId, r._count._all]] : [])),
     );
     const wsByOrg = new Map<string, number>(
       workspaceCounts.map((r) => [r.organizationId, r._count._all]),
     );
     const acceptedByOrg = new Map<string, number>(
-      acceptedCounts.flatMap((r) =>
-        r.organizationId ? [[r.organizationId, r._count._all]] : [],
-      ),
+      acceptedCounts.flatMap((r) => (r.organizationId ? [[r.organizationId, r._count._all]] : [])),
     );
     const items: OrganizationSummary[] = rows.map((r) => {
       const members = memberByOrg.get(r.id) ?? 0;
@@ -301,9 +298,7 @@ export class OrganizationsService {
     // A tiny race window remains where a workspace with the chosen slug
     // gets created between this lookup and our insert; the outer P2002
     // catch handles it identically to an org-slug collision.
-    const workspaceSlug = firstOwner
-      ? await this.allocateWorkspaceSlug(input.slug)
-      : null;
+    const workspaceSlug = firstOwner ? await this.allocateWorkspaceSlug(input.slug) : null;
 
     type TxResult = {
       org: {
@@ -337,8 +332,7 @@ export class OrganizationsService {
 
         if (!firstOwner || !workspaceSlug) return { org };
 
-        const ownerName =
-          firstOwner.name ?? firstOwner.email.split('@')[0] ?? firstOwner.email;
+        const ownerName = firstOwner.name ?? firstOwner.email.split('@')[0] ?? firstOwner.email;
         const user = await tx.user.create({
           data: {
             email: firstOwner.email,
@@ -372,10 +366,7 @@ export class OrganizationsService {
         };
       });
     } catch (err) {
-      if (
-        err instanceof Prisma.PrismaClientKnownRequestError &&
-        err.code === 'P2002'
-      ) {
+      if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2002') {
         throw new ConflictException({
           title: 'Duplicate organization',
           status: 409,
@@ -522,10 +513,7 @@ export class OrganizationsService {
   }
 
   /** Upsert the caller's own org mail config. */
-  async upsertMailConfigForUser(
-    userId: string,
-    input: UpsertOrganizationMailConfigInput,
-  ) {
+  async upsertMailConfigForUser(userId: string, input: UpsertOrganizationMailConfigInput) {
     const orgId = await this.resolveAdminOrgId(userId);
     return this.upsertMailConfig(orgId, input);
   }
@@ -547,8 +535,7 @@ export class OrganizationsService {
     // createOrganizationSchema requires slug.min(2): pad degenerate names.
     const base = slugified.length >= 2 ? slugified : 'org';
     for (let attempt = 0; attempt < 5; attempt += 1) {
-      const candidate =
-        attempt === 0 ? base : `${base}-${randomBytes(2).toString('hex')}`;
+      const candidate = attempt === 0 ? base : `${base}-${randomBytes(2).toString('hex')}`;
       if (candidate === ROOT_ORG_SLUG || candidate === ROOT_ORG_ID) continue;
       const clash = await this.prisma.raw.organization.findUnique({
         where: { slug: candidate },
@@ -631,10 +618,7 @@ export class OrganizationsService {
       assertNotClientAccount(existingUser.accountType);
       // Hard block: identity belongs to another tenant. Re-binding would
       // silently collapse the cross-org wall.
-      if (
-        existingUser.organizationId &&
-        existingUser.organizationId !== orgId
-      ) {
+      if (existingUser.organizationId && existingUser.organizationId !== orgId) {
         throw new ConflictException({
           title: 'Email already in use',
           status: 409,
@@ -647,18 +631,17 @@ export class OrganizationsService {
       // Is there a workspace they could still OWN inside this org? Only
       // memberships pointing at workspaces in *this* org count - cross-org
       // rows have already been dropped server-side by the scope guard.
-      const existingOwnerMembership =
-        await this.prisma.client.workspaceMembership.findFirst({
-          where: {
-            userId: existingUser.id,
-            role: 'OWNER',
-            workspace: { organizationId: orgId, deletedAt: null },
-          },
-          select: {
-            workspaceId: true,
-            workspace: { select: { id: true, name: true } },
-          },
-        });
+      const existingOwnerMembership = await this.prisma.client.workspaceMembership.findFirst({
+        where: {
+          userId: existingUser.id,
+          role: 'OWNER',
+          workspace: { organizationId: orgId, deletedAt: null },
+        },
+        select: {
+          workspaceId: true,
+          workspace: { select: { id: true, name: true } },
+        },
+      });
 
       // Case A: pending owner with the original OWNER membership intact ->
       // standard resend (reissue token + email).
@@ -760,8 +743,7 @@ export class OrganizationsService {
         // Already onboarded; no need to email a "set password" link. Just
         // hand back the workspace + an "open the app" URL so the admin
         // can pass it along if they want.
-        const appUrl =
-          this.config.get<string>('PUBLIC_APP_URL') ?? 'http://localhost:3000';
+        const appUrl = this.config.get<string>('PUBLIC_APP_URL') ?? 'http://localhost:3000';
         await this.auditLog.emit({
           organizationId: orgId,
           actorUserId: actorUserId ?? null,
@@ -937,8 +919,7 @@ export class OrganizationsService {
    */
   private async allocateWorkspaceSlug(base: string): Promise<string> {
     for (let attempt = 0; attempt < 5; attempt += 1) {
-      const candidate =
-        attempt === 0 ? base : `${base}-${randomBytes(2).toString('hex')}`;
+      const candidate = attempt === 0 ? base : `${base}-${randomBytes(2).toString('hex')}`;
       const clash = await this.prisma.client.workspace.findUnique({
         where: { slug: candidate },
         select: { id: true },
@@ -961,8 +942,7 @@ export class OrganizationsService {
     workspaceId: string;
     userId: string;
   }): Promise<{ url: string; code: string }> {
-    const appUrl =
-      this.config.get<string>('PUBLIC_APP_URL') ?? 'http://localhost:3000';
+    const appUrl = this.config.get<string>('PUBLIC_APP_URL') ?? 'http://localhost:3000';
     return issueWorkspaceInvitation(this.prisma, appUrl, args);
   }
 
@@ -994,10 +974,7 @@ export class OrganizationsService {
       });
       return this.map(row);
     } catch (err) {
-      if (
-        err instanceof Prisma.PrismaClientKnownRequestError &&
-        err.code === 'P2025'
-      ) {
+      if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2025') {
         throw new NotFoundException({ title: 'Organization not found', status: 404 });
       }
       throw err;
@@ -1068,12 +1045,14 @@ export class OrganizationsService {
    *  `includeDeleted` to bypass the soft-delete read filter. */
   async restore(orgId: string, actorUserId?: string): Promise<Organization> {
     this.assertNotRoot(orgId);
-    const row = await (this.prisma.client.organization as unknown as {
-      findFirst: (args: unknown) => Promise<{
-        id: string;
-        deletedAt: Date | null;
-      } | null>;
-    }).findFirst({ where: { id: orgId }, includeDeleted: true });
+    const row = await (
+      this.prisma.client.organization as unknown as {
+        findFirst: (args: unknown) => Promise<{
+          id: string;
+          deletedAt: Date | null;
+        } | null>;
+      }
+    ).findFirst({ where: { id: orgId }, includeDeleted: true });
     if (!row) {
       throw new NotFoundException({ title: 'Organization not found', status: 404 });
     }
@@ -1109,10 +1088,7 @@ export class OrganizationsService {
    * the org itself). Anything not enumerated here will trip a FK violation
    * and abort the transaction - which is what we want.
    */
-  async hardDelete(
-    orgId: string,
-    actorUserId?: string,
-  ): Promise<{ ok: true; mode: 'hard' }> {
+  async hardDelete(orgId: string, actorUserId?: string): Promise<{ ok: true; mode: 'hard' }> {
     this.assertNotRoot(orgId);
     // Everyone whose sessions the purge deletes; their sockets are closed
     // once the transaction has committed.
@@ -1123,88 +1099,90 @@ export class OrganizationsService {
     // consistent with the deletes that follow. A purge is not a person's
     // mass delete, so security alerts do not count its deletes (the raw
     // client bypasses the soft-delete hook today; this keeps it so).
-    await withoutDeleteCounting(() => this.prisma.raw.$transaction(
-      async (tx) => {
-        const org = await tx.organization.findFirst({
-          where: { id: orgId },
-        });
-        if (!org) {
-          throw new NotFoundException({
-            title: 'Organization not found',
-            status: 404,
+    await withoutDeleteCounting(() =>
+      this.prisma.raw.$transaction(
+        async (tx) => {
+          const org = await tx.organization.findFirst({
+            where: { id: orgId },
           });
-        }
-        purgedName = org.name;
-        const workspaces = await tx.workspace.findMany({
-          where: { organizationId: orgId },
-          select: { id: true },
-        });
-        const users = await tx.user.findMany({
-          where: { organizationId: orgId },
-          select: { id: true },
-        });
-        const workspaceIds = workspaces.map((w) => w.id);
-        const userIds = users.map((u) => u.id);
+          if (!org) {
+            throw new NotFoundException({
+              title: 'Organization not found',
+              status: 404,
+            });
+          }
+          purgedName = org.name;
+          const workspaces = await tx.workspace.findMany({
+            where: { organizationId: orgId },
+            select: { id: true },
+          });
+          const users = await tx.user.findMany({
+            where: { organizationId: orgId },
+            select: { id: true },
+          });
+          const workspaceIds = workspaces.map((w) => w.id);
+          const userIds = users.map((u) => u.id);
 
-        // Pre-clear session + credential rows so deleted users can't sign
-        // back in even if a fragment of cascade falls behind.
-        await tx.session.deleteMany({ where: { userId: { in: userIds } } });
-        await tx.account.deleteMany({ where: { userId: { in: userIds } } });
-        revoked.push(...userIds);
+          // Pre-clear session + credential rows so deleted users can't sign
+          // back in even if a fragment of cascade falls behind.
+          await tx.session.deleteMany({ where: { userId: { in: userIds } } });
+          await tx.account.deleteMany({ where: { userId: { in: userIds } } });
+          revoked.push(...userIds);
 
-        // Client-portal people reach this org only through its clients'
-        // contacts and carry no organizationId, so the user sweep above
-        // misses them. Note them now - the contacts cascade away with the
-        // workspaces below.
-        const portalContacts = await tx.clientContact.findMany({
-          where: { client: { workspace: { organizationId: orgId } } },
-          select: { userId: true },
-        });
-        const portalUserIds = [...new Set(portalContacts.map((c) => c.userId))];
-
-        // Drop the workspaces - `onDelete: Cascade` on Project, Lead, Client,
-        // Document, FileObject, etc. takes care of the per-workspace trees.
-        await tx.workspace.deleteMany({ where: { id: { in: workspaceIds } } });
-
-        // Portal accounts left with no client anywhere else go with the org.
-        if (portalUserIds.length > 0) {
-          const remaining = await tx.clientContact.findMany({
-            where: { userId: { in: portalUserIds } },
+          // Client-portal people reach this org only through its clients'
+          // contacts and carry no organizationId, so the user sweep above
+          // misses them. Note them now - the contacts cascade away with the
+          // workspaces below.
+          const portalContacts = await tx.clientContact.findMany({
+            where: { client: { workspace: { organizationId: orgId } } },
             select: { userId: true },
           });
-          const keep = new Set(remaining.map((c) => c.userId));
-          const orphaned = portalUserIds.filter((id) => !keep.has(id));
-          if (orphaned.length > 0) {
-            revoked.push(...orphaned);
-            await tx.session.deleteMany({ where: { userId: { in: orphaned } } });
-            await tx.account.deleteMany({ where: { userId: { in: orphaned } } });
-            await tx.user.deleteMany({ where: { id: { in: orphaned }, accountType: 'CLIENT' } });
+          const portalUserIds = [...new Set(portalContacts.map((c) => c.userId))];
+
+          // Drop the workspaces - `onDelete: Cascade` on Project, Lead, Client,
+          // Document, FileObject, etc. takes care of the per-workspace trees.
+          await tx.workspace.deleteMany({ where: { id: { in: workspaceIds } } });
+
+          // Portal accounts left with no client anywhere else go with the org.
+          if (portalUserIds.length > 0) {
+            const remaining = await tx.clientContact.findMany({
+              where: { userId: { in: portalUserIds } },
+              select: { userId: true },
+            });
+            const keep = new Set(remaining.map((c) => c.userId));
+            const orphaned = portalUserIds.filter((id) => !keep.has(id));
+            if (orphaned.length > 0) {
+              revoked.push(...orphaned);
+              await tx.session.deleteMany({ where: { userId: { in: orphaned } } });
+              await tx.account.deleteMany({ where: { userId: { in: orphaned } } });
+              await tx.user.deleteMany({ where: { id: { in: orphaned }, accountType: 'CLIENT' } });
+            }
           }
-        }
 
-        // User-keyed rows that don't cascade from Workspace: Attendance,
-        // Leave, TimeEntry, Todo, Notifications. Drop them via the user id
-        // set so nothing dangles.
-        await tx.attendance.deleteMany({ where: { userId: { in: userIds } } });
-        await tx.leave.deleteMany({ where: { userId: { in: userIds } } });
-        await tx.timeEntry.deleteMany({ where: { userId: { in: userIds } } });
-        await tx.todo.deleteMany({ where: { userId: { in: userIds } } });
-        await tx.notification.deleteMany({ where: { userId: { in: userIds } } });
-        await tx.mailAccount.deleteMany({ where: { userId: { in: userIds } } });
+          // User-keyed rows that don't cascade from Workspace: Attendance,
+          // Leave, TimeEntry, Todo, Notifications. Drop them via the user id
+          // set so nothing dangles.
+          await tx.attendance.deleteMany({ where: { userId: { in: userIds } } });
+          await tx.leave.deleteMany({ where: { userId: { in: userIds } } });
+          await tx.timeEntry.deleteMany({ where: { userId: { in: userIds } } });
+          await tx.todo.deleteMany({ where: { userId: { in: userIds } } });
+          await tx.notification.deleteMany({ where: { userId: { in: userIds } } });
+          await tx.mailAccount.deleteMany({ where: { userId: { in: userIds } } });
 
-        // Now the users - finally - and the org-level mail config.
-        await tx.organizationMailConfig.deleteMany({
-          where: { organizationId: orgId },
-        });
-        await tx.user.deleteMany({ where: { id: { in: userIds } } });
+          // Now the users - finally - and the org-level mail config.
+          await tx.organizationMailConfig.deleteMany({
+            where: { organizationId: orgId },
+          });
+          await tx.user.deleteMany({ where: { id: { in: userIds } } });
 
-        // The org itself. Use the raw client because the soft-delete
-        // extension would otherwise convert `delete` into an `update`,
-        // leaving the tombstone we explicitly want gone.
-        await tx.organization.delete({ where: { id: orgId } });
-      },
-      { timeout: 30_000 },
-    ));
+          // The org itself. Use the raw client because the soft-delete
+          // extension would otherwise convert `delete` into an `update`,
+          // leaving the tombstone we explicitly want gone.
+          await tx.organization.delete({ where: { id: orgId } });
+        },
+        { timeout: 30_000 },
+      ),
+    );
     this.realtime?.publishSessionsRevoked(revoked);
     // Audit emit happens AFTER cascade - but the org row itself is now
     // gone, so we use the root org as the home for this final tombstone
@@ -1254,10 +1232,7 @@ export class OrganizationsService {
    * this call, are immediately encrypted, and are never logged or echoed
    * back in any response.
    */
-  async upsertMailConfig(
-    orgId: string,
-    input: UpsertOrganizationMailConfigInput,
-  ) {
+  async upsertMailConfig(orgId: string, input: UpsertOrganizationMailConfigInput) {
     await this.getById(orgId);
     const existing = await this.prisma.client.organizationMailConfig.findUnique({
       where: { organizationId: orgId },
@@ -1266,18 +1241,13 @@ export class OrganizationsService {
       throw new BadRequestException({
         title: 'Initial save requires both passwords',
         status: 400,
-        detail:
-          'When configuring mail for the first time, provide both SMTP and IMAP passwords.',
+        detail: 'When configuring mail for the first time, provide both SMTP and IMAP passwords.',
       });
     }
     const smtpPasswordCt =
-      input.smtpPassword !== undefined
-        ? encrypt(input.smtpPassword)
-        : existing!.smtpPasswordCt;
+      input.smtpPassword !== undefined ? encrypt(input.smtpPassword) : existing!.smtpPasswordCt;
     const imapPasswordCt =
-      input.imapPassword !== undefined
-        ? encrypt(input.imapPassword)
-        : existing!.imapPasswordCt;
+      input.imapPassword !== undefined ? encrypt(input.imapPassword) : existing!.imapPasswordCt;
     const row = await this.prisma.client.organizationMailConfig.upsert({
       where: { organizationId: orgId },
       create: {
@@ -1315,9 +1285,7 @@ export class OrganizationsService {
    * Used by the mail transport builder. Returns DECRYPTED credentials in
    * memory only - never persist, never log, never include in a response.
    */
-  async resolveDecryptedMailConfig(
-    orgId: string,
-  ): Promise<DecryptedMailConfig | null> {
+  async resolveDecryptedMailConfig(orgId: string): Promise<DecryptedMailConfig | null> {
     const row = await this.prisma.client.organizationMailConfig.findUnique({
       where: { organizationId: orgId },
     });

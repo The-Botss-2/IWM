@@ -99,14 +99,10 @@ export class TimesheetsResource {
   }
 
   adminAttendance(args: AdminAttendanceArgs): Promise<AdminAttendanceResponse> {
-    return this.http.get(
-      '/timesheets/admin/attendance',
-      adminAttendanceResponseSchema,
-      {
-        from: args.from.toISOString(),
-        to: args.to.toISOString(),
-      },
-    );
+    return this.http.get('/timesheets/admin/attendance', adminAttendanceResponseSchema, {
+      from: args.from.toISOString(),
+      to: args.to.toISOString(),
+    });
   }
 }
 

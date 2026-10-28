@@ -23,10 +23,7 @@ export type PortalRouteAudience = 'client-only' | 'both';
  * and no workspace.
  */
 export const PortalRoute = (audience: PortalRouteAudience = 'client-only') =>
-  applyDecorators(
-    SetMetadata(PORTAL_ROUTE_KEY, audience),
-    SetMetadata(SKIP_PERMISSIONS_KEY, true),
-  );
+  applyDecorators(SetMetadata(PORTAL_ROUTE_KEY, audience), SetMetadata(SKIP_PERMISSIONS_KEY, true));
 
 /**
  * The boundary decision AuthGuard applies, kept pure so it can be checked

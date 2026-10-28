@@ -26,13 +26,12 @@
     "apps/mobile": {
       "entry": ["app/**/*.tsx"],
       "project": ["app/**/*.tsx", "lib/**/*.ts"],
-      "ignoreDependencies": [
-        "@babel/core",
-        "react-dom",
-        "expo-updates",
-        "@expo/metro-config"
-      ],
-      "ignoreUnresolved": ["babel-preset-expo", "expo-asset/tools/hashAssetFiles", "metro-minify-terser"]
+      "ignoreDependencies": ["@babel/core", "react-dom", "expo-updates", "@expo/metro-config"],
+      "ignoreUnresolved": [
+        "babel-preset-expo",
+        "expo-asset/tools/hashAssetFiles",
+        "metro-minify-terser"
+      ]
     },
     "packages/database": {
       "entry": ["src/index.ts", "prisma/*.ts"],

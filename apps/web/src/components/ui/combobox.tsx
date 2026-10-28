@@ -57,7 +57,7 @@ export function Combobox({
           aria-expanded={open}
           disabled={disabled}
           className={cn(
-            'w-full justify-between font-normal h-10',
+            'h-10 w-full justify-between font-normal',
             !selected && 'text-ink-disabled',
             triggerClassName,
           )}
@@ -66,7 +66,7 @@ export function Combobox({
             {selected?.leading}
             <span className="truncate">{selected ? selected.label : placeholder}</span>
           </span>
-          <ChevronsUpDown className="h-4 w-4 opacity-60 shrink-0" />
+          <ChevronsUpDown className="h-4 w-4 shrink-0 opacity-60" />
         </Button>
       </PopoverTrigger>
       <PopoverContent
@@ -74,14 +74,14 @@ export function Combobox({
         align="start"
       >
         <Command className="max-h-72 overflow-hidden rounded-md" loop>
-          <div className="border-b border-line px-2">
+          <div className="border-line border-b px-2">
             <CommandInput
               placeholder={searchPlaceholder}
-              className="flex h-10 w-full bg-transparent py-2 text-sm outline-none placeholder:text-ink-disabled"
+              className="placeholder:text-ink-disabled flex h-10 w-full bg-transparent py-2 text-sm outline-none"
             />
           </div>
           <CommandList className="max-h-60 overflow-auto p-1">
-            <CommandEmpty className="px-2 py-3 text-center text-sm text-ink-muted">
+            <CommandEmpty className="text-ink-muted px-2 py-3 text-center text-sm">
               {emptyText}
             </CommandEmpty>
             {clearable ? (
@@ -92,7 +92,7 @@ export function Combobox({
                     onChange(null);
                     setOpen(false);
                   }}
-                  className="flex cursor-pointer items-center gap-2 rounded px-2 py-1.5 text-sm aria-selected:bg-bg-subtle"
+                  className="aria-selected:bg-bg-subtle flex cursor-pointer items-center gap-2 rounded px-2 py-1.5 text-sm"
                 >
                   <span className="text-ink-muted">{clearLabel}</span>
                 </CommandItem>
@@ -107,13 +107,13 @@ export function Combobox({
                     onChange(option.value);
                     setOpen(false);
                   }}
-                  className="flex cursor-pointer items-center gap-2 rounded px-2 py-1.5 text-sm aria-selected:bg-bg-subtle"
+                  className="aria-selected:bg-bg-subtle flex cursor-pointer items-center gap-2 rounded px-2 py-1.5 text-sm"
                 >
                   {option.leading}
                   <span className="flex min-w-0 flex-1 flex-col">
                     <span className="text-ink">{option.label}</span>
                     {option.description ? (
-                      <span className="text-xs text-ink-muted">{option.description}</span>
+                      <span className="text-ink-muted text-xs">{option.description}</span>
                     ) : null}
                   </span>
                   <Check

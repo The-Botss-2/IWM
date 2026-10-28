@@ -80,7 +80,13 @@ interface Store {
   users: Row[];
   requests: Row[];
   blocks: Row[];
-  rooms: Array<{ id: string; type: string; participants: Array<{ id: string; userId: string; role: string }>; workspaceId: null; createdById: string | null }>;
+  rooms: Array<{
+    id: string;
+    type: string;
+    participants: Array<{ id: string; userId: string; role: string }>;
+    workspaceId: null;
+    createdById: string | null;
+  }>;
   messages: Row[];
 }
 
@@ -200,8 +206,6 @@ function fakePrisma(store: Store) {
     },
   };
 
-
-
   // Rooms: `participants` (some) over participant rows whose `user` is
   // evaluated like a user; `workspace` never matches (fake rooms have none).
   const participantRelations: Relations = {
@@ -240,7 +244,13 @@ function fakePrisma(store: Store) {
         userId: p.userId,
         role: p.role,
         joinedAt: now,
-        user: { id: u['id'], name: u['name'], email: u['email'], image: null, organizationId: u['organizationId'] },
+        user: {
+          id: u['id'],
+          name: u['name'],
+          email: u['email'],
+          image: null,
+          organizationId: u['organizationId'],
+        },
       };
     }),
   });
@@ -268,7 +278,9 @@ function fakePrisma(store: Store) {
         const key = where['requesterId_recipientEmail'] as Where | undefined;
         const row = key
           ? store.requests.find(
-              (r) => r['requesterId'] === key['requesterId'] && r['recipientEmail'] === key['recipientEmail'],
+              (r) =>
+                r['requesterId'] === key['requesterId'] &&
+                r['recipientEmail'] === key['recipientEmail'],
             )
           : store.requests.find((r) => r['id'] === where['id']);
         if (!row) return null;
@@ -311,7 +323,7 @@ function fakePrisma(store: Store) {
         for (const [k, v] of Object.entries(data)) {
           row[k] =
             v && typeof v === 'object' && 'increment' in (v as Row)
-              ? (row[k] as number) + ((v as { increment: number }).increment)
+              ? (row[k] as number) + (v as { increment: number }).increment
               : v;
         }
         return row;
@@ -330,7 +342,8 @@ function fakePrisma(store: Store) {
         const key = where['blockerId_blockedUserId'] as Where;
         return (
           store.blocks.find(
-            (b) => b['blockerId'] === key['blockerId'] && b['blockedUserId'] === key['blockedUserId'],
+            (b) =>
+              b['blockerId'] === key['blockerId'] && b['blockedUserId'] === key['blockedUserId'],
           ) ?? null
         );
       },
@@ -342,7 +355,9 @@ function fakePrisma(store: Store) {
         log.push('chatRequestBlock.upsert');
         writes.push('chatRequestBlock.upsert');
         const found = store.blocks.find(
-          (b) => b['blockerId'] === create['blockerId'] && b['blockedUserId'] === create['blockedUserId'],
+          (b) =>
+            b['blockerId'] === create['blockerId'] &&
+            b['blockedUserId'] === create['blockedUserId'],
         );
         const row = found ?? { id: `cmblock${nextId++}`, createdAt: new Date(), ...create };
         if (!found) store.blocks.push(row);
@@ -365,18 +380,28 @@ function fakePrisma(store: Store) {
       },
       findMany: async ({ where }: { where: Where }) => {
         log.push('chatRoom.findMany');
-        return store.rooms.filter((r) => matches(r as unknown as Row, where, roomRelations)).map(roomRow);
+        return store.rooms
+          .filter((r) => matches(r as unknown as Row, where, roomRelations))
+          .map(roomRow);
       },
       create: async ({ data }: { data: Row }) => {
         log.push('chatRoom.create');
         writes.push('chatRoom.create');
-        const parts = ((data['participants'] as Row)['createMany'] as { data: Array<{ userId: string; role: string }> }).data;
+        const parts = (
+          (data['participants'] as Row)['createMany'] as {
+            data: Array<{ userId: string; role: string }>;
+          }
+        ).data;
         const room = {
           id: `cmnewroom${String(nextId++).padStart(16, '0')}`,
           type: data['type'] as string,
           workspaceId: null,
           createdById: (data['createdById'] as string) ?? null,
-          participants: parts.map((p, i) => ({ id: `cmpart${i}${nextId}`, userId: p.userId, role: p.role })),
+          participants: parts.map((p, i) => ({
+            id: `cmpart${i}${nextId}`,
+            userId: p.userId,
+            role: p.role,
+          })),
         };
         store.rooms.push(room);
         return roomRow(room);
@@ -480,14 +505,20 @@ function build(store: Store) {
   return { ...fp, chat, requests, emitted };
 }
 
-const flushImmediates = () => new Promise<void>((resolve) => setImmediate(() => setImmediate(resolve)));
+const flushImmediates = () =>
+  new Promise<void>((resolve) => setImmediate(() => setImmediate(resolve)));
 
 const status =
   (code: number) =>
   (err: unknown): boolean =>
     err instanceof HttpException && err.getStatus() === code;
 
-const senderCaller = { id: SENDER, name: 'Sender', email: `${SENDER}@example.test`, organizationId: ORG_A };
+const senderCaller = {
+  id: SENDER,
+  name: 'Sender',
+  email: `${SENDER}@example.test`,
+  organizationId: ORG_A,
+};
 const meCaller = { id: ME, name: 'Me', email: MY_EMAIL, organizationId: ORG_B };
 
 async function main(): Promise<void> {
@@ -508,13 +539,21 @@ async function main(): Promise<void> {
     const unknownLog = [...unknown.log];
 
     assert.ok(!knownLog.some((q) => q.startsWith('user.')), 'send reads no user before answering');
-    assert.deepEqual(knownLog, ['chatRequest.findUnique', 'chatRequest.create'], 'one read + one write');
+    assert.deepEqual(
+      knownLog,
+      ['chatRequest.findUnique', 'chatRequest.create'],
+      'one read + one write',
+    );
     assert.deepEqual(unknownLog, knownLog, 'known and unknown address: same queries');
     const normalize = (r: typeof resKnown) => ({
       ...r,
       request: { ...r.request, email: '<email>', sentAt: '<sentAt>' },
     });
-    assert.deepEqual(normalize(resKnown), normalize(resUnknown), 'known and unknown: same response');
+    assert.deepEqual(
+      normalize(resKnown),
+      normalize(resUnknown),
+      'known and unknown: same response',
+    );
     assert.equal(resKnown.notice, CHAT_REQUEST_SENT_NOTICE);
     assert.equal(resKnown.request.state, 'SENT');
 
@@ -528,13 +567,20 @@ async function main(): Promise<void> {
     // A repeat send while pending is one read + one write too, and silent.
     known.log.length = 0;
     await known.requests.send(senderCaller, { email: MY_EMAIL, message: 'again' });
-    assert.deepEqual(known.log, ['chatRequest.findUnique', 'chatRequest.update'], 'repeat: read + write');
+    assert.deepEqual(
+      known.log,
+      ['chatRequest.findUnique', 'chatRequest.update'],
+      'repeat: read + write',
+    );
     await flushImmediates();
     assert.equal(known.emitted.length, 1, 'a fresh pending request is not re-delivered');
 
     // Org-less callers are refused on the caller alone.
     await assert.rejects(
-      known.requests.send({ ...senderCaller, organizationId: null }, { email: MY_EMAIL, message: 'x' }),
+      known.requests.send(
+        { ...senderCaller, organizationId: null },
+        { email: MY_EMAIL, message: 'x' },
+      ),
       (err: unknown) => err instanceof ForbiddenException,
       'org-less caller is a 403',
     );
@@ -776,7 +822,12 @@ async function main(): Promise<void> {
       store.blocks.some((b) => b['blockerId'] === ME && b['blockedUserId'] === REQ_OK),
       'block recorded',
     );
-    const reqCaller = { id: REQ_OK, name: 'R', email: `${REQ_OK}@example.test`, organizationId: ORG_A };
+    const reqCaller = {
+      id: REQ_OK,
+      name: 'R',
+      email: `${REQ_OK}@example.test`,
+      organizationId: ORG_A,
+    };
     const outgoing = await t.requests.listOutgoing(reqCaller);
     assert.equal(outgoing.items[0]!.state, 'SENT', 'a decline still reads as sent');
 
@@ -839,9 +890,17 @@ async function main(): Promise<void> {
     });
     assert.deepEqual(normA(declinedA), normA(unknownA), 'A: declined address == unknown address');
     assert.deepEqual(normA(expiredA), normA(unknownA), 'A: expired address == unknown address');
-    assert.equal(declinedA.store.requests[0]!['status'], 'DECLINED', 'A: still declined underneath');
+    assert.equal(
+      declinedA.store.requests[0]!['status'],
+      'DECLINED',
+      'A: still declined underneath',
+    );
     assert.equal(declinedA.emitted.length, 0, 'A: inside the cool-down, nothing is delivered');
-    assert.equal(expiredA.emitted.length, 1, 'A: an expired, never-declined request is re-delivered');
+    assert.equal(
+      expiredA.emitted.length,
+      1,
+      'A: an expired, never-declined request is re-delivered',
+    );
 
     // B: declined day 1, cancel + resend day 10 (quiet), resend day 35.
     const declinedB = await sendWith(
@@ -927,7 +986,10 @@ async function main(): Promise<void> {
       deletedAt: null,
       attachments: [],
     });
-    store.messages.push(msg('cmmsgfromme00000000000000', ME), msg('cmmsgfromsender0000000000', SENDER));
+    store.messages.push(
+      msg('cmmsgfromme00000000000000', ME),
+      msg('cmmsgfromsender0000000000', SENDER),
+    );
     const t = build(store);
 
     await assert.rejects(

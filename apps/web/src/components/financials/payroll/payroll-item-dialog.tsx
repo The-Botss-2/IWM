@@ -169,7 +169,7 @@ export function PayrollItemDialog({
             />
           </div>
 
-          <div className="flex items-baseline justify-between rounded-md bg-bg-subtle px-3 py-2">
+          <div className="bg-bg-subtle flex items-baseline justify-between rounded-md px-3 py-2">
             <span className="text-sm font-medium">Net pay</span>
             <span className="text-base font-semibold tabular-nums">
               {net === null ? '-' : formatCurrency(net, PAYROLL_CURRENCY)}
@@ -177,7 +177,7 @@ export function PayrollItemDialog({
           </div>
 
           {error ? (
-            <p role="alert" className="text-sm text-state-error">
+            <p role="alert" className="text-state-error text-sm">
               {error}
             </p>
           ) : null}

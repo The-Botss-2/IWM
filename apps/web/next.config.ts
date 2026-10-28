@@ -27,11 +27,7 @@ const config: NextConfig = {
   // by NestJS), `module` / `import` condition → src/index.ts (TS source, used by
   // bundlers). `transpilePackages` tells Next's SWC pipeline to compile that TS
   // source so React Refresh works correctly in dev.
-  transpilePackages: [
-    '@botss/api-client',
-    '@botss/auth',
-    '@botss/shared-types',
-  ],
+  transpilePackages: ['@botss/api-client', '@botss/auth', '@botss/shared-types'],
   // The TS source uses NodeNext-style `import { x } from './foo.js'` paths.
   // Webpack needs to know that `.js` import specifiers should resolve to `.ts`
   // files when running through Next's transpilation pipeline.

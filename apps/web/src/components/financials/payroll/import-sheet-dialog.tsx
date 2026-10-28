@@ -2,7 +2,11 @@
 
 import { Download, FileUp } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
-import type { PayrollImportPreview, PayrollImportPreviewRow, PayrollImportRow } from '@botss/shared-types';
+import type {
+  PayrollImportPreview,
+  PayrollImportPreviewRow,
+  PayrollImportRow,
+} from '@botss/shared-types';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -78,12 +82,17 @@ export function ImportSheetDialog({
     // eslint-disable-next-line react-hooks/exhaustive-deps -- reset once per open
   }, [open]);
 
-  async function check(sheetRows: PayrollImportRow[], chosen: { year: number; month: number } | null) {
+  async function check(
+    sheetRows: PayrollImportRow[],
+    chosen: { year: number; month: number } | null,
+  ) {
     try {
       const result = await previewImport.mutateAsync({ rows: sheetRows, ...(chosen ?? {}) });
       setPreview(result);
       setPeriod(
-        result.year !== null && result.month !== null ? { year: result.year, month: result.month } : chosen,
+        result.year !== null && result.month !== null
+          ? { year: result.year, month: result.month }
+          : chosen,
       );
     } catch {
       setPreview(null);
@@ -138,7 +147,11 @@ export function ImportSheetDialog({
 
   const badRows = preview?.rows.filter((r) => r.errors.length > 0).length ?? 0;
   const canImport =
-    !!preview && !!period && preview.errors.length === 0 && badRows === 0 && preview.rows.length > 0;
+    !!preview &&
+    !!period &&
+    preview.errors.length === 0 &&
+    badRows === 0 &&
+    preview.rows.length > 0;
   const now = new Date();
   // Until a month is known, the selects show placeholders, so picking the
   // current month still counts as a choice.
@@ -150,21 +163,27 @@ export function ImportSheetDialog({
         <DialogHeader>
           <DialogTitle>Import payroll sheet</DialogTitle>
           <DialogDescription>
-            A CSV or Excel (.xlsx) file with one person per row. People are matched to payroll by email, CNIC
-            or name; anyone new is added, with or without a platform account.
+            A CSV or Excel (.xlsx) file with one person per row. People are matched to payroll by
+            email, CNIC or name; anyone new is added, with or without a platform account.
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4">
-          <div className="rounded-md border border-line bg-bg-subtle px-3 py-2 text-xs text-ink-muted">
+          <div className="border-line bg-bg-subtle text-ink-muted rounded-md border px-3 py-2 text-xs">
             <p>
               Columns:{' '}
-              <span className="font-mono text-ink">{PAYROLL_SHEET_COLUMNS.slice(0, 12).join(', ')}</span>
-              . Bank columns (<span className="font-mono">{PAYROLL_SHEET_COLUMNS.slice(12).join(', ')}</span>)
-              are optional. Only <span className="font-mono">name</span> and{' '}
-              <span className="font-mono">basic</span> are required; a blank cell keeps what is saved.
+              <span className="text-ink font-mono">
+                {PAYROLL_SHEET_COLUMNS.slice(0, 12).join(', ')}
+              </span>
+              . Bank columns (
+              <span className="font-mono">{PAYROLL_SHEET_COLUMNS.slice(12).join(', ')}</span>) are
+              optional. Only <span className="font-mono">name</span> and{' '}
+              <span className="font-mono">basic</span> are required; a blank cell keeps what is
+              saved.
             </p>
-            <p className="mt-1">Dates are day first (DD/MM/YYYY). Payment method is bank transfer, cash or cheque.</p>
+            <p className="mt-1">
+              Dates are day first (DD/MM/YYYY). Payment method is bank transfer, cash or cheque.
+            </p>
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
@@ -176,7 +195,11 @@ export function ImportSheetDialog({
               id="payroll-sheet-file"
               onChange={(e) => void onFile(e.target.files?.[0])}
             />
-            <Button variant="secondary" onClick={() => fileInput.current?.click()} disabled={reading}>
+            <Button
+              variant="secondary"
+              onClick={() => fileInput.current?.click()}
+              disabled={reading}
+            >
               <FileUp className="h-4 w-4" />
               {fileName ? 'Choose another file' : 'Choose file'}
             </Button>
@@ -184,14 +207,14 @@ export function ImportSheetDialog({
               <Download className="h-4 w-4" /> Template
             </Button>
             {fileName ? (
-              <span className="min-w-0 truncate text-sm text-ink-muted" title={fileName}>
+              <span className="text-ink-muted min-w-0 truncate text-sm" title={fileName}>
                 {fileName}
               </span>
             ) : null}
           </div>
 
           {readError ? (
-            <p role="alert" className="text-sm text-state-error">
+            <p role="alert" className="text-state-error text-sm">
               {readError}
             </p>
           ) : null}
@@ -209,7 +232,9 @@ export function ImportSheetDialog({
                   <Label htmlFor="import-month">Month</Label>
                   <Select
                     value={period ? String(period.month) : undefined}
-                    onValueChange={(v) => pickPeriod({ year: period?.year ?? fallback.year, month: Number(v) })}
+                    onValueChange={(v) =>
+                      pickPeriod({ year: period?.year ?? fallback.year, month: Number(v) })
+                    }
                   >
                     <SelectTrigger id="import-month" className="w-40">
                       <SelectValue placeholder="Month" />
@@ -227,7 +252,9 @@ export function ImportSheetDialog({
                   <Label htmlFor="import-year">Year</Label>
                   <Select
                     value={period ? String(period.year) : undefined}
-                    onValueChange={(v) => pickPeriod({ year: Number(v), month: period?.month ?? fallback.month })}
+                    onValueChange={(v) =>
+                      pickPeriod({ year: Number(v), month: period?.month ?? fallback.month })
+                    }
                   >
                     <SelectTrigger id="import-year" className="w-28">
                       <SelectValue placeholder="Year" />
@@ -242,7 +269,7 @@ export function ImportSheetDialog({
                   </Select>
                 </div>
                 {preview && period ? (
-                  <p className="pb-2 text-sm text-ink-muted">
+                  <p className="text-ink-muted pb-2 text-sm">
                     {preview.run
                       ? `Updates the ${payrollPeriod(period.year, period.month)} run.`
                       : `Creates the ${payrollPeriod(period.year, period.month)} run.`}
@@ -254,7 +281,7 @@ export function ImportSheetDialog({
               {preview ? (
                 <>
                   {preview.errors.map((e) => (
-                    <p key={e} role="alert" className="text-sm text-state-error">
+                    <p key={e} role="alert" className="text-state-error text-sm">
                       {e}
                     </p>
                   ))}
@@ -270,20 +297,20 @@ export function ImportSheetDialog({
                     ) : null}
                   </p>
                   {preview.notInSheet > 0 ? (
-                    <p className="text-xs text-ink-muted">
+                    <p className="text-ink-muted text-xs">
                       {preview.notInSheet === 1
                         ? '1 person already in this run is not in the sheet and stays as they are.'
                         : `${preview.notInSheet} people already in this run are not in the sheet and stay as they are.`}
                     </p>
                   ) : null}
                   {ignored.length > 0 ? (
-                    <p className="text-xs text-ink-muted">Ignored columns: {ignored.join(', ')}</p>
+                    <p className="text-ink-muted text-xs">Ignored columns: {ignored.join(', ')}</p>
                   ) : null}
 
-                  <div className="max-h-80 overflow-auto rounded-md border border-line">
+                  <div className="border-line max-h-80 overflow-auto rounded-md border">
                     <table className="w-full text-sm">
-                      <thead className="sticky top-0 bg-bg-surface">
-                        <tr className="border-b border-line text-left text-xs uppercase tracking-wide text-ink-muted">
+                      <thead className="bg-bg-surface sticky top-0">
+                        <tr className="border-line text-ink-muted border-b text-left text-xs uppercase tracking-wide">
                           <th className="px-2 py-2 font-medium">Row</th>
                           <th className="px-2 py-2 font-medium">Name</th>
                           <th className="px-2 py-2 font-medium">Match</th>
@@ -292,12 +319,12 @@ export function ImportSheetDialog({
                       </thead>
                       <tbody>
                         {preview.rows.map((r) => (
-                          <tr key={r.row} className="border-b border-line align-top last:border-0">
-                            <td className="px-2 py-2 tabular-nums text-ink-muted">{r.row}</td>
+                          <tr key={r.row} className="border-line border-b align-top last:border-0">
+                            <td className="text-ink-muted px-2 py-2 tabular-nums">{r.row}</td>
                             <td className="px-2 py-2">
                               <span className="font-medium">{r.name || '-'}</span>
                               {r.errors.length > 0 ? (
-                                <ul className="mt-1 space-y-0.5 text-xs text-state-error">
+                                <ul className="text-state-error mt-1 space-y-0.5 text-xs">
                                   {r.errors.map((e) => (
                                     <li key={e}>{e}</li>
                                   ))}
@@ -308,7 +335,9 @@ export function ImportSheetDialog({
                               {r.match ? (
                                 <Badge tone={r.match === 'NEW_PERSON' ? 'warning' : 'neutral'}>
                                   {MATCH_LABELS[r.match]}
-                                  {r.match === 'ON_PAYROLL' && r.matchedBy ? ` (${r.matchedBy})` : ''}
+                                  {r.match === 'ON_PAYROLL' && r.matchedBy
+                                    ? ` (${r.matchedBy})`
+                                    : ''}
                                 </Badge>
                               ) : (
                                 '-'
@@ -332,7 +361,10 @@ export function ImportSheetDialog({
           <Button variant="secondary" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
-          <Button onClick={() => void submit()} disabled={!canImport || importSheet.isPending || previewImport.isPending}>
+          <Button
+            onClick={() => void submit()}
+            disabled={!canImport || importSheet.isPending || previewImport.isPending}
+          >
             {importSheet.isPending
               ? 'Importing…'
               : preview && canImport

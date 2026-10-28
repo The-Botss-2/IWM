@@ -15,13 +15,7 @@ type CallContextValue = ReturnType<typeof useWhatsAppCall>;
 
 const CallContext = createContext<CallContextValue | null>(null);
 
-export function CallProvider({
-  userId,
-  children,
-}: {
-  userId: string;
-  children: ReactNode;
-}) {
+export function CallProvider({ userId, children }: { userId: string; children: ReactNode }) {
   const call = useWhatsAppCall(userId);
   return <CallContext.Provider value={call}>{children}</CallContext.Provider>;
 }

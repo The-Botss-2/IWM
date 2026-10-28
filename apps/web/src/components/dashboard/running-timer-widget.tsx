@@ -9,12 +9,7 @@ import { Button } from '@/components/ui/button';
 import { Loader } from '@/components/ui/loader';
 import { QueryError } from '@/components/ui/query-error';
 import { useAppActivity } from '@/hooks/use-app-activity';
-import {
-  usePauseTimer,
-  useResumeTimer,
-  useStopTimer,
-  useTimesheets,
-} from '@/hooks/use-timesheets';
+import { usePauseTimer, useResumeTimer, useStopTimer, useTimesheets } from '@/hooks/use-timesheets';
 import { cn } from '@/lib/utils';
 
 function fmt(min: number): string {
@@ -40,9 +35,7 @@ function elapsedNetMinutes(
   now: number,
 ): number {
   const gross = Math.max(0, Math.floor((now - startTime.getTime()) / 60_000));
-  const openPause = pausedAt
-    ? Math.max(0, Math.floor((now - pausedAt.getTime()) / 60_000))
-    : 0;
+  const openPause = pausedAt ? Math.max(0, Math.floor((now - pausedAt.getTime()) / 60_000)) : 0;
   return Math.max(0, gross - accumulatedPauseMin - openPause);
 }
 
@@ -76,12 +69,7 @@ export function RunningTimerWidget() {
   }, [entry, now]);
 
   return (
-    <WidgetShell
-      id="widget-running-timer"
-      title="Running Timer"
-      icon={Play}
-      linkHref="/timesheets"
-    >
+    <WidgetShell id="widget-running-timer" title="Running Timer" icon={Play} linkHref="/timesheets">
       {isLoading ? (
         <div className="flex justify-center">
           <Loader size="sm" label="Loading" />
@@ -97,11 +85,8 @@ export function RunningTimerWidget() {
         </div>
       ) : (
         <div className="space-y-2">
-          <div className="text-sm font-medium text-ink">
-            {entry.task?.title ||
-              entry.project?.name ||
-              entry.description ||
-              'Tracked time'}
+          <div className="text-ink text-sm font-medium">
+            {entry.task?.title || entry.project?.name || entry.description || 'Tracked time'}
           </div>
           <div
             className={cn(
@@ -111,13 +96,13 @@ export function RunningTimerWidget() {
           >
             {fmt(elapsed)}
             {isPaused ? (
-              <span className="ml-2 align-middle text-[10px] uppercase tracking-wide text-brand-orange">
+              <span className="text-brand-orange ml-2 align-middle text-[10px] uppercase tracking-wide">
                 Paused
               </span>
             ) : null}
           </div>
           {entry.project ? (
-            <div className="inline-flex items-center gap-1 text-xs text-ink-muted">
+            <div className="text-ink-muted inline-flex items-center gap-1 text-xs">
               <span
                 className="h-2 w-2 rounded-full"
                 style={{ backgroundColor: entry.project.color ?? '#94a3b8' }}

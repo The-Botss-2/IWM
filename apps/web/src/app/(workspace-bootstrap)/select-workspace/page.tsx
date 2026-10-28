@@ -8,12 +8,7 @@ import type { CreateWorkspaceInput } from '@botss/shared-types';
 
 import { Logo } from '@/components/branding/logo';
 import { Button } from '@/components/ui/button';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { PageLoader } from '@/components/ui/loader';
@@ -96,21 +91,21 @@ export default function SelectWorkspacePage() {
       </div>
 
       <header className="mb-6 text-center">
-        <h1 className="text-2xl font-semibold text-ink">Pick a workspace</h1>
-        <p className="mt-1 text-sm text-ink-muted">
+        <h1 className="text-ink text-2xl font-semibold">Pick a workspace</h1>
+        <p className="text-ink-muted mt-1 text-sm">
           Choose which workspace to open. You can switch later from the sidebar.
         </p>
       </header>
 
       {session.isLoading || workspaces.isLoading ? (
-        <div className="rounded-md border border-line bg-bg-surface">
+        <div className="border-line bg-bg-surface rounded-md border">
           <PageLoader label="Loading workspaces" className="min-h-[12rem]" />
         </div>
       ) : workspaces.isError && !workspaces.data ? (
         <QueryError message="Couldn't load workspaces." onRetry={() => void workspaces.refetch()} />
       ) : items.length === 0 ? (
-        <div className="rounded-md border border-dashed border-line-strong bg-bg-surface p-8 text-center">
-          <p className="text-sm text-ink-muted">You aren&apos;t a member of any workspace yet.</p>
+        <div className="border-line-strong bg-bg-surface rounded-md border border-dashed p-8 text-center">
+          <p className="text-ink-muted text-sm">You aren&apos;t a member of any workspace yet.</p>
           <Button className="mt-4" onClick={() => setCreateOpen(true)}>
             Create your first workspace
           </Button>
@@ -124,21 +119,19 @@ export default function SelectWorkspacePage() {
                 <button
                   type="button"
                   onClick={() => continueWith(ws.id)}
-                  className="flex w-full items-center gap-4 rounded-md border border-line bg-bg-surface p-4 text-left transition hover:border-brand-purple/40 hover:bg-brand-50/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:shadow-focus"
+                  className="border-line bg-bg-surface hover:border-brand-purple/40 hover:bg-brand-50/40 focus-visible:shadow-focus flex w-full items-center gap-4 rounded-md border p-4 text-left transition focus-visible:outline-none focus-visible:ring-2"
                 >
-                  <div className="grid h-10 w-10 shrink-0 place-items-center rounded-md bg-brand-50 text-sm font-bold text-brand-700">
+                  <div className="bg-brand-50 text-brand-700 grid h-10 w-10 shrink-0 place-items-center rounded-md text-sm font-bold">
                     {(ws.name?.[0] ?? '?').toUpperCase()}
                   </div>
                   <div className="min-w-0 flex-1">
-                    <div className="truncate text-sm font-semibold text-ink">
-                      {ws.name}
-                    </div>
-                    <div className="truncate text-xs text-ink-muted">
+                    <div className="text-ink truncate text-sm font-semibold">{ws.name}</div>
+                    <div className="text-ink-muted truncate text-xs">
                       /{ws.slug}
                       {membership ? ` · ${membership.role.toLowerCase()}` : null}
                     </div>
                   </div>
-                  <span className="text-xs font-medium text-brand-700">Open →</span>
+                  <span className="text-brand-700 text-xs font-medium">Open →</span>
                 </button>
               </li>
             );
@@ -150,7 +143,7 @@ export default function SelectWorkspacePage() {
         <Button variant="ghost" onClick={() => setCreateOpen(true)}>
           + Create workspace
         </Button>
-        <div className="flex items-center gap-4 text-xs text-ink-muted">
+        <div className="text-ink-muted flex items-center gap-4 text-xs">
           <Link href="/settings/workspace" className="hover:text-ink">
             Workspace settings
           </Link>
@@ -230,7 +223,9 @@ function CreateWorkspaceDialog({
               onChange={(e) => setSlug(e.target.value.replace(/[^a-z0-9-]+/gi, '-').toLowerCase())}
               placeholder="acme"
             />
-            <p className="text-xs text-ink-muted">Used in URLs. Letters, numbers, and dashes only.</p>
+            <p className="text-ink-muted text-xs">
+              Used in URLs. Letters, numbers, and dashes only.
+            </p>
           </div>
           <div className="flex justify-end gap-2 pt-2">
             <Button variant="ghost" type="button" onClick={() => onOpenChange(false)}>

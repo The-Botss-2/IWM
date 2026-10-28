@@ -82,8 +82,14 @@ async function main(): Promise<void> {
   const from = new Date('2026-10-01T00:00:00.000Z');
   const to = new Date('2026-10-31T23:59:59.999Z');
   const iso = { from: from.toISOString(), to: to.toISOString() };
-  assert.deepEqual(clauses(iso), [{ dueDate: { gte: from, lte: to } }], 'dateField defaults to due');
-  assert.deepEqual(clauses({ ...iso, dateField: 'created' }), [{ createdAt: { gte: from, lte: to } }]);
+  assert.deepEqual(
+    clauses(iso),
+    [{ dueDate: { gte: from, lte: to } }],
+    'dateField defaults to due',
+  );
+  assert.deepEqual(clauses({ ...iso, dateField: 'created' }), [
+    { createdAt: { gte: from, lte: to } },
+  ]);
   assert.deepEqual(clauses({ ...iso, dateField: 'completed' }), [
     {
       OR: [
@@ -92,7 +98,9 @@ async function main(): Promise<void> {
       ],
     },
   ]);
-  assert.deepEqual(clauses({ from: iso.from, dateField: 'created' }), [{ createdAt: { gte: from } }]);
+  assert.deepEqual(clauses({ from: iso.from, dateField: 'created' }), [
+    { createdAt: { gte: from } },
+  ]);
   assert.deepEqual(clauses({ to: iso.to }), [{ dueDate: { lte: to } }]);
 
   // --- everything composes with AND, nothing overwritten ----------------------
@@ -126,11 +134,7 @@ async function main(): Promise<void> {
   };
   // The service only touches prisma.client.task here; the other collaborators
   // are unused by `list`.
-  const service = new TasksService(
-    prisma as never,
-    {} as never,
-    {} as never,
-  );
+  const service = new TasksService(prisma as never, {} as never, {} as never);
   const scope: UserScope = {
     userId: ME,
     workspaceIds: ['cmw0000000000000000000001'],
@@ -145,7 +149,9 @@ async function main(): Promise<void> {
     AND: [{ assigneeId: null }, { dueDate: { gte: from, lte: to } }],
   });
   await service.list(scope, parse({}));
-  assert.deepEqual(captured[1], { project: { workspaceId: { in: ['cmw0000000000000000000001'] } } });
+  assert.deepEqual(captured[1], {
+    project: { workspaceId: { in: ['cmw0000000000000000000001'] } },
+  });
 
   console.log('task list filter checks passed');
 }

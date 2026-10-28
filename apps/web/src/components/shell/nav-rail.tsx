@@ -44,10 +44,7 @@ import {
 
 import { useSessionContext } from '@/components/auth/session-gate';
 import { Logo } from '@/components/branding/logo';
-import {
-  NavPanelOutlet,
-  useNavPanelClaimed,
-} from '@/components/shell/nav-panel-slot';
+import { NavPanelOutlet, useNavPanelClaimed } from '@/components/shell/nav-panel-slot';
 import { roomTitle } from '@/lib/chat-room-label';
 import { NotificationBell } from '@/components/shell/notification-bell';
 import { UserAvatar } from '@/components/ui/avatar';
@@ -200,7 +197,7 @@ export function NavRailShell({ children }: { children: ReactNode }) {
     // `--app-content-h`: see AppChrome. The rail puts no bar above the page
     // on lg, so a full-bleed page gets the whole viewport; below lg the 52px
     // mobile header comes off the top.
-    <div className="flex h-screen overflow-hidden bg-bg-app text-ink [--app-content-h:calc(100vh-52px)] lg:[--app-content-h:100vh]">
+    <div className="bg-bg-app text-ink flex h-screen overflow-hidden [--app-content-h:calc(100vh-52px)] lg:[--app-content-h:100vh]">
       {/* Desktop chrome. Below lg it collapses into the drawer below, because
           68 + 250 of fixed chrome leaves nothing for the page on a phone. */}
       <div className="hidden lg:flex">
@@ -219,7 +216,7 @@ export function NavRailShell({ children }: { children: ReactNode }) {
             onClick={() => setDrawerOpen(false)}
             className="absolute inset-0 bg-black/50"
           />
-          <div className="relative flex animate-in slide-in-from-left duration-200">
+          <div className="animate-in slide-in-from-left relative flex duration-200">
             <IconRail />
             <ContextSidebar onClose={() => setDrawerOpen(false)} />
           </div>
@@ -229,14 +226,14 @@ export function NavRailShell({ children }: { children: ReactNode }) {
       <div className="flex min-w-0 flex-1 flex-col">
         {/* Mobile header - the only way to reach navigation below lg. */}
         <header
-          className="flex shrink-0 items-center gap-2 border-b border-line px-3 lg:hidden"
+          className="border-line flex shrink-0 items-center gap-2 border-b px-3 lg:hidden"
           style={{ height: 52 }}
         >
           <button
             type="button"
             onClick={() => setDrawerOpen(true)}
             aria-label="Open navigation"
-            className="grid h-9 w-9 place-items-center rounded-lg text-ink-muted hover:bg-bg-subtle hover:text-ink focus-visible:outline-none focus-visible:shadow-focus"
+            className="text-ink-muted hover:bg-bg-subtle hover:text-ink focus-visible:shadow-focus grid h-9 w-9 place-items-center rounded-lg focus-visible:outline-none"
           >
             <Menu className="h-5 w-5" />
           </button>
@@ -300,12 +297,10 @@ function IconRail({
     ...(inSupport ? { mail: false, chat: false } : {}),
   };
   const entries = RAIL.filter(
-    (r) =>
-      (!r.prefkey || nav.isVisible(r.prefkey)) && (roleVisible[r.key] ?? true),
+    (r) => (!r.prefkey || nav.isVisible(r.prefkey)) && (roleVisible[r.key] ?? true),
   );
 
-  const active = (r: RailEntry): boolean =>
-    matchesSection(pathname, r.href, r.match);
+  const active = (r: RailEntry): boolean => matchesSection(pathname, r.href, r.match);
 
   return (
     <nav
@@ -387,9 +382,7 @@ function IconRail({
 
       <button
         type="button"
-        onClick={() =>
-          setAppAppearance({ navPanelCollapsed: !navPanelCollapsed })
-        }
+        onClick={() => setAppAppearance({ navPanelCollapsed: !navPanelCollapsed })}
         aria-label={navPanelCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
         aria-pressed={navPanelCollapsed}
         title={navPanelCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
@@ -545,9 +538,7 @@ function ContextSidebar({
         >
           <Search className="h-3.5 w-3.5 shrink-0" />
           <span className="flex-1 truncate text-left">Search or jump to</span>
-          <kbd className="rounded bg-white/[0.08] px-1 py-0.5 font-mono text-[9.5px]">
-            ⌘K
-          </kbd>
+          <kbd className="rounded bg-white/[0.08] px-1 py-0.5 font-mono text-[9.5px]">⌘K</kbd>
         </button>
       </div>
 
@@ -719,8 +710,7 @@ function GroupList({ groups }: { groups: SidebarGroup[] }) {
                 active={
                   it.tab != null
                     ? pathname === it.href.split('?')[0] &&
-                      (currentTab === it.tab ||
-                        (currentTab == null && it.tabIsDefault === true))
+                      (currentTab === it.tab || (currentTab == null && it.tabIsDefault === true))
                     : it.exact
                       ? pathname === it.href.split('?')[0]
                       : matchesSection(pathname, it.href)
@@ -849,9 +839,7 @@ function staticGroups(section: Section): SidebarGroup[] {
       },
       {
         title: 'Setup',
-        items: [
-          { label: 'Payment sources', href: tab('sources'), icon: Wallet, tab: 'sources' },
-        ],
+        items: [{ label: 'Payment sources', href: tab('sources'), icon: Wallet, tab: 'sources' }],
         empty: '',
       },
     ];
@@ -933,16 +921,10 @@ function openCommandPalette(): void {
   );
 }
 
-function matchesSection(
-  pathname: string | null,
-  href: string,
-  extra?: string[],
-): boolean {
+function matchesSection(pathname: string | null, href: string, extra?: string[]): boolean {
   if (!pathname) return false;
   const candidates = [href, ...(extra ?? [])];
-  return candidates.some((c) =>
-    c === '/home' ? pathname === '/home' : pathname.startsWith(c),
-  );
+  return candidates.some((c) => (c === '/home' ? pathname === '/home' : pathname.startsWith(c)));
 }
 
 function sectionFor(pathname: string | null): Section {

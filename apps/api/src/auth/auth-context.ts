@@ -201,7 +201,8 @@ export function buildAuthContext(
         organizationId: user.organizationId,
         accountType: user.accountType,
         orgInactive:
-          !!user.organization && (user.organization.deleted || user.organization.isActive === false),
+          !!user.organization &&
+          (user.organization.deleted || user.organization.isActive === false),
         userDisabled: user.deleted,
       }
     : {
@@ -243,7 +244,9 @@ export function buildAuthContext(
   let permissions: EffectivePermissions = { company: [], workspace: [] };
   if (user) {
     const overrides = rows.overrides.filter(
-      (o) => o.workspaceId === null || (currentWorkspaceId !== null && o.workspaceId === currentWorkspaceId),
+      (o) =>
+        o.workspaceId === null ||
+        (currentWorkspaceId !== null && o.workspaceId === currentWorkspaceId),
     );
     const liveRole = (
       r: AuthContextCustomRole | null,
@@ -253,7 +256,7 @@ export function buildAuthContext(
         ? r.permissions
         : null;
     const membership = currentWorkspaceId
-      ? rows.workspaceMemberships.find((m) => m.workspaceId === currentWorkspaceId) ?? null
+      ? (rows.workspaceMemberships.find((m) => m.workspaceId === currentWorkspaceId) ?? null)
       : null;
     permissions = {
       company: resolveCompanyPermissions({

@@ -95,7 +95,7 @@ export default function DocumentsPage() {
         <div className="relative">
           <Search
             aria-hidden
-            className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-muted"
+            className="text-ink-muted pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2"
           />
           <input
             type="search"
@@ -113,7 +113,7 @@ export default function DocumentsPage() {
         ) : documents.isError ? (
           <QueryError onRetry={() => void documents.refetch()} />
         ) : documents.data?.items.length === 0 ? (
-          <div className="px-3 py-6 text-center text-xs text-ink-muted">
+          <div className="text-ink-muted px-3 py-6 text-center text-xs">
             {debouncedSearch.trim() ? 'No documents match.' : 'No documents yet.'}
           </div>
         ) : (
@@ -131,10 +131,13 @@ export default function DocumentsPage() {
                   <div className="flex items-center gap-2">
                     <span className="truncate font-medium">{d.title}</span>
                     {d.publicSlug ? (
-                      <Globe className="h-3 w-3 shrink-0 text-brand-600" aria-label="Shared publicly" />
+                      <Globe
+                        className="text-brand-600 h-3 w-3 shrink-0"
+                        aria-label="Shared publicly"
+                      />
                     ) : null}
                   </div>
-                  <div className="text-[11px] text-ink-muted">{d.visibility}</div>
+                  <div className="text-ink-muted text-[11px]">{d.visibility}</div>
                 </button>
                 <Can I="delete" a="Document">
                   <button
@@ -142,7 +145,7 @@ export default function DocumentsPage() {
                     aria-label={`Delete ${d.title || 'Untitled'}`}
                     onClick={() => deleteDoc(d.id, d.title)}
                     disabled={del.isPending}
-                    className="absolute right-1.5 top-1/2 grid h-7 w-7 -translate-y-1/2 place-items-center rounded-md text-ink-muted opacity-0 transition hover:bg-tint-error hover:text-state-error focus-visible:opacity-100 group-hover:opacity-100"
+                    className="text-ink-muted hover:bg-tint-error hover:text-state-error absolute right-1.5 top-1/2 grid h-7 w-7 -translate-y-1/2 place-items-center rounded-md opacity-0 transition focus-visible:opacity-100 group-hover:opacity-100"
                   >
                     <Trash2 className="h-3.5 w-3.5" aria-hidden />
                   </button>
@@ -159,7 +162,7 @@ export default function DocumentsPage() {
             {!canEdit ? (
               <div
                 role="status"
-                className="flex items-center gap-2 rounded-md border border-brand-orange/30 bg-tint-warning px-3 py-2 text-sm text-brand-orange"
+                className="border-brand-orange/30 bg-tint-warning text-brand-orange flex items-center gap-2 rounded-md border px-3 py-2 text-sm"
               >
                 <Lock className="h-4 w-4" aria-hidden />
                 Read only - you don&apos;t have edit access on this document.
@@ -209,7 +212,7 @@ export default function DocumentsPage() {
                 <Share2 className="h-4 w-4" />
                 {selected.publicSlug ? 'Shared' : 'Share'}
                 {selected.accessGrantCount && selected.accessGrantCount > 0 ? (
-                  <span className="ml-1 inline-flex h-4 min-w-[1rem] items-center justify-center rounded-full bg-brand-50 px-1 text-[10px] font-semibold text-brand-700">
+                  <span className="bg-brand-50 text-brand-700 ml-1 inline-flex h-4 min-w-[1rem] items-center justify-center rounded-full px-1 text-[10px] font-semibold">
                     {selected.accessGrantCount}
                   </span>
                 ) : null}
@@ -238,7 +241,7 @@ export default function DocumentsPage() {
             />
           </>
         ) : (
-          <div className="card p-10 text-center text-sm text-ink-muted">
+          <div className="card text-ink-muted p-10 text-center text-sm">
             Select a document on the left, or create a new one.
           </div>
         )}

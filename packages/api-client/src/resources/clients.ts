@@ -65,7 +65,11 @@ export class ClientsResource {
     clientId: string,
     input: InviteClientContactInput,
   ): Promise<ClientContactLinkResponse> {
-    return this.http.post(`/clients/${clientId}/portal-contacts`, clientContactLinkResponseSchema, input);
+    return this.http.post(
+      `/clients/${clientId}/portal-contacts`,
+      clientContactLinkResponseSchema,
+      input,
+    );
   }
   resendPortalInvite(clientId: string, contactId: string): Promise<ClientContactLinkResponse> {
     return this.http.post(
@@ -86,7 +90,11 @@ export class ClientsResource {
     contactId: string,
     input: UpdateClientContactInput,
   ): Promise<ClientContact> {
-    return this.http.patch(`/clients/${clientId}/portal-contacts/${contactId}`, clientContactSchema, input);
+    return this.http.patch(
+      `/clients/${clientId}/portal-contacts/${contactId}`,
+      clientContactSchema,
+      input,
+    );
   }
   revokePortalContact(clientId: string, contactId: string) {
     return this.http.delete(`/clients/${clientId}/portal-contacts/${contactId}`, okSchema);

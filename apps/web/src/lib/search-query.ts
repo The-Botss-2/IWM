@@ -40,20 +40,23 @@ const EMPTY: ParsedSearch = {
 
 export function parseSearchQuery(input: string): ParsedSearch {
   const result: ParsedSearch = { ...EMPTY };
-  const text = input.replace(MODIFIER, (_match, lead: string, key: string, quoted?: string, bare?: string) => {
-    const raw = (quoted ?? bare ?? '').trim();
-    const k = key.toLowerCase() as 'from' | 'in' | 'has' | 'after' | 'before';
-    if (k === 'from') result.from = raw.replace(/^@/, '') || null;
-    else if (k === 'in') {
-      if (raw.startsWith('@')) result.inDm = raw.slice(1) || null;
-      else result.in = raw.replace(/^#/, '') || null;
-    } else if (k === 'has') {
-      const v = raw.toLowerCase();
-      if (v === 'file' || v === 'files' || v === 'attachment') result.has = 'file';
-      else if (v === 'link' || v === 'links' || v === 'url') result.has = 'link';
-    } else if (ISO_DATE.test(raw)) result[k] = raw;
-    return lead;
-  });
+  const text = input.replace(
+    MODIFIER,
+    (_match, lead: string, key: string, quoted?: string, bare?: string) => {
+      const raw = (quoted ?? bare ?? '').trim();
+      const k = key.toLowerCase() as 'from' | 'in' | 'has' | 'after' | 'before';
+      if (k === 'from') result.from = raw.replace(/^@/, '') || null;
+      else if (k === 'in') {
+        if (raw.startsWith('@')) result.inDm = raw.slice(1) || null;
+        else result.in = raw.replace(/^#/, '') || null;
+      } else if (k === 'has') {
+        const v = raw.toLowerCase();
+        if (v === 'file' || v === 'files' || v === 'attachment') result.has = 'file';
+        else if (v === 'link' || v === 'links' || v === 'url') result.has = 'link';
+      } else if (ISO_DATE.test(raw)) result[k] = raw;
+      return lead;
+    },
+  );
   result.text = text.replace(/\s+/g, ' ').trim();
   return result;
 }

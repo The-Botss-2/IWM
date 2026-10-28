@@ -8,10 +8,7 @@ import {
 } from '@botss/shared-types';
 
 import { getChatNotifications } from '@/lib/chat-prefs';
-import {
-  RingLoop,
-  playMessageBlip,
-} from '@/lib/chat-sounds';
+import { RingLoop, playMessageBlip } from '@/lib/chat-sounds';
 import { chatServerHasFeature, getChatSocket } from '@/lib/chat-socket';
 import type { RoomBumpedPayload } from '@/lib/chat-socket-events';
 import { isDesktop, notifyNative } from '@/lib/desktop-runtime';

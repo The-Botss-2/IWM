@@ -102,15 +102,10 @@ export function NotificationBell({
       actorImage: n.actorImage,
       actorName: n.actorName,
     }));
-    return [...serverItems, ...clientItems]
-      .sort((a, b) => b.createdAt - a.createdAt)
-      .slice(0, 50);
+    return [...serverItems, ...clientItems].sort((a, b) => b.createdAt - a.createdAt).slice(0, 50);
   }, [data, inApp, hiddenServerIds]);
 
-  const unreadCount = useMemo(
-    () => merged.filter((n) => !n.readAt).length,
-    [merged],
-  );
+  const unreadCount = useMemo(() => merged.filter((n) => !n.readAt).length, [merged]);
   const Icon = unreadCount > 0 ? BellRing : Bell;
 
   // Play a soft blip whenever the unread total ticks up. Skip first paint
@@ -216,16 +211,12 @@ export function NotificationBell({
       <PopoverTrigger asChild>
         <button
           type="button"
-          aria-label={
-            unreadCount > 0
-              ? `Notifications, ${unreadCount} unread`
-              : 'Notifications'
-          }
+          aria-label={unreadCount > 0 ? `Notifications, ${unreadCount} unread` : 'Notifications'}
           title="Notifications"
           className={
             variant === 'rail'
               ? 'relative grid h-8 w-8 shrink-0 place-items-center rounded-lg text-[#8A919D] transition-colors hover:bg-white/[0.07] hover:text-[#C9CDD6] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60'
-              : 'relative grid h-9 w-9 place-items-center rounded-full text-ink-muted transition-all hover:bg-bg-surface hover:text-ink hover:shadow-soft focus-visible:outline-none focus-visible:shadow-focus'
+              : 'text-ink-muted hover:bg-bg-surface hover:text-ink hover:shadow-soft focus-visible:shadow-focus relative grid h-9 w-9 place-items-center rounded-full transition-all focus-visible:outline-none'
           }
         >
           <Icon className="h-4 w-4" />
@@ -237,7 +228,7 @@ export function NotificationBell({
                   ? // The rail button is 32px: hang the badge off the corner so
                     // it never covers the bell itself.
                     'absolute -right-1.5 -top-1 inline-flex h-[15px] min-w-[15px] items-center justify-center rounded-lg bg-[#FF4D3D] px-1 text-[9px] font-bold text-white'
-                  : 'absolute right-0.5 top-0.5 inline-flex h-4 min-w-[16px] items-center justify-center rounded-full bg-brand-gradient px-1 text-[10px] font-semibold text-white shadow-sm'
+                  : 'bg-brand-gradient absolute right-0.5 top-0.5 inline-flex h-4 min-w-[16px] items-center justify-center rounded-full px-1 text-[10px] font-semibold text-white shadow-sm'
               }
             >
               {unreadCount > 9 ? '9+' : unreadCount}
@@ -250,8 +241,8 @@ export function NotificationBell({
         side={variant === 'rail' ? 'right' : 'bottom'}
         className="w-[min(380px,calc(100vw-1.5rem))] p-0"
       >
-        <header className="flex items-center justify-between gap-2 border-b border-line px-4 py-3">
-          <span className="text-sm font-semibold text-ink">Notifications</span>
+        <header className="border-line flex items-center justify-between gap-2 border-b px-4 py-3">
+          <span className="text-ink text-sm font-semibold">Notifications</span>
           <div className="flex items-center gap-2">
             {merged.length > 0 ? (
               <button
@@ -260,7 +251,7 @@ export function NotificationBell({
                   setSelectMode((s) => !s);
                   setSelected(new Set());
                 }}
-                className="rounded px-2 py-1 text-[11px] font-medium text-ink-muted hover:text-ink focus-visible:outline-none focus-visible:shadow-focus"
+                className="text-ink-muted hover:text-ink focus-visible:shadow-focus rounded px-2 py-1 text-[11px] font-medium focus-visible:outline-none"
               >
                 {selectMode ? 'Cancel' : 'Select'}
               </button>
@@ -269,9 +260,9 @@ export function NotificationBell({
               <button
                 type="button"
                 onClick={handleMarkAllRead}
-                className="inline-flex items-center gap-1 rounded px-2 py-1 text-xs text-brand-gradient font-medium hover:underline focus-visible:outline-none focus-visible:shadow-focus"
+                className="text-brand-gradient focus-visible:shadow-focus inline-flex items-center gap-1 rounded px-2 py-1 text-xs font-medium hover:underline focus-visible:outline-none"
               >
-                <CheckCheck className="h-3.5 w-3.5 text-brand-purple" />
+                <CheckCheck className="text-brand-purple h-3.5 w-3.5" />
                 Mark all read
               </button>
             ) : null}
@@ -279,18 +270,14 @@ export function NotificationBell({
         </header>
 
         {selectMode ? (
-          <div className="flex items-center justify-between gap-2 border-b border-line bg-bg-subtle px-4 py-2 text-xs text-ink-muted">
-            <span>
-              {selected.size > 0
-                ? `${selected.size} selected`
-                : 'Tap rows to select'}
-            </span>
+          <div className="border-line bg-bg-subtle text-ink-muted flex items-center justify-between gap-2 border-b px-4 py-2 text-xs">
+            <span>{selected.size > 0 ? `${selected.size} selected` : 'Tap rows to select'}</span>
             <div className="flex items-center gap-1">
               <button
                 type="button"
                 disabled={selected.size === 0}
                 onClick={handleClearSelected}
-                className="inline-flex items-center gap-1 rounded px-2 py-1 text-xs font-medium text-state-error hover:bg-tint-error disabled:opacity-40"
+                className="text-state-error hover:bg-tint-error inline-flex items-center gap-1 rounded px-2 py-1 text-xs font-medium disabled:opacity-40"
               >
                 <Trash2 className="h-3.5 w-3.5" />
                 Clear selected
@@ -298,7 +285,7 @@ export function NotificationBell({
               <button
                 type="button"
                 onClick={handleClearAll}
-                className="inline-flex items-center gap-1 rounded px-2 py-1 text-xs font-medium text-ink-muted hover:bg-bg-app hover:text-ink"
+                className="text-ink-muted hover:bg-bg-app hover:text-ink inline-flex items-center gap-1 rounded px-2 py-1 text-xs font-medium"
               >
                 <X className="h-3.5 w-3.5" />
                 Clear all
@@ -307,9 +294,9 @@ export function NotificationBell({
           </div>
         ) : null}
 
-        <ul className="max-h-96 divide-y divide-line overflow-y-auto" role="list">
+        <ul className="divide-line max-h-96 divide-y overflow-y-auto" role="list">
           {merged.length === 0 ? (
-            <li className="px-4 py-10 text-center text-xs text-ink-muted">
+            <li className="text-ink-muted px-4 py-10 text-center text-xs">
               You&rsquo;re all caught up.
             </li>
           ) : (
@@ -387,16 +374,14 @@ function NotificationRow({ row, selectMode, selected, onClick }: RowProps) {
       {row.actorName ? (
         <UserAvatar size="sm" name={row.actorName} image={row.actorImage} />
       ) : (
-        <div className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-bg-subtle text-ink-muted">
+        <div className="bg-bg-subtle text-ink-muted grid h-7 w-7 shrink-0 place-items-center rounded-full">
           <KindIcon className="h-3.5 w-3.5" />
         </div>
       )}
       <div className="min-w-0 flex-1">
-        <p className={cn('text-sm', unread ? 'font-semibold text-ink' : 'text-ink')}>
-          {row.title}
-        </p>
-        <p className="mt-0.5 line-clamp-2 text-xs text-ink-muted">{row.body}</p>
-        <p className="mt-1 text-[11px] text-ink-disabled">
+        <p className={cn('text-sm', unread ? 'text-ink font-semibold' : 'text-ink')}>{row.title}</p>
+        <p className="text-ink-muted mt-0.5 line-clamp-2 text-xs">{row.body}</p>
+        <p className="text-ink-disabled mt-1 text-[11px]">
           {relativeTime(new Date(row.createdAt))}
         </p>
       </div>
@@ -415,13 +400,13 @@ function NotificationRow({ row, selectMode, selected, onClick }: RowProps) {
       <button
         type="button"
         onClick={onClick}
-        className={cn(containerClass, 'text-left focus-visible:outline-none focus-visible:bg-bg-subtle')}
+        className={cn(
+          containerClass,
+          'focus-visible:bg-bg-subtle text-left focus-visible:outline-none',
+        )}
       >
         {unread ? (
-          <span
-            aria-hidden
-            className="absolute left-0 top-0 h-full w-[3px] bg-brand-gradient"
-          />
+          <span aria-hidden className="bg-brand-gradient absolute left-0 top-0 h-full w-[3px]" />
         ) : null}
         {inner}
       </button>
@@ -432,13 +417,10 @@ function NotificationRow({ row, selectMode, selected, onClick }: RowProps) {
     <Link
       href={row.url}
       onClick={onClick}
-      className={cn(containerClass, 'focus-visible:outline-none focus-visible:bg-bg-subtle')}
+      className={cn(containerClass, 'focus-visible:bg-bg-subtle focus-visible:outline-none')}
     >
       {unread ? (
-        <span
-          aria-hidden
-          className="absolute left-0 top-0 h-full w-[3px] bg-brand-gradient"
-        />
+        <span aria-hidden className="bg-brand-gradient absolute left-0 top-0 h-full w-[3px]" />
       ) : null}
       {inner}
     </Link>

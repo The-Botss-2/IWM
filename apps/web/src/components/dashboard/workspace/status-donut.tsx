@@ -2,19 +2,10 @@
 
 import { PieChart as PieIcon } from 'lucide-react';
 import { useMemo } from 'react';
-import {
-  Cell,
-  Pie,
-  PieChart,
-  ResponsiveContainer,
-  Tooltip,
-} from 'recharts';
+import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from 'recharts';
 import type { TaskStatus } from '@botss/shared-types';
 
-import {
-  CATEGORICAL_PALETTE,
-  CHART_COLORS,
-} from '@/components/dashboard/workspace/colors';
+import { CATEGORICAL_PALETTE, CHART_COLORS } from '@/components/dashboard/workspace/colors';
 import { WidgetShell } from '@/components/dashboard/widget-shell';
 import { QueryError } from '@/components/ui/query-error';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -56,11 +47,13 @@ export function StatusDonutWidget() {
       {q.isLoading ? (
         <Skeleton className="h-44 w-full" />
       ) : q.isError && !q.data ? (
-        <QueryError compact message="Couldn't load task statuses." onRetry={() => void q.refetch()} />
+        <QueryError
+          compact
+          message="Couldn't load task statuses."
+          onRetry={() => void q.refetch()}
+        />
       ) : data.length === 0 ? (
-        <div className="grid h-44 place-items-center text-xs text-ink-muted">
-          No tasks yet.
-        </div>
+        <div className="text-ink-muted grid h-44 place-items-center text-xs">No tasks yet.</div>
       ) : (
         <div className="flex flex-col items-center gap-3 sm:flex-row">
           <div className="relative h-40 w-40 shrink-0">
@@ -93,30 +86,22 @@ export function StatusDonutWidget() {
                   formatter={(v, _n, item) => {
                     const n = typeof v === 'number' ? v : Number(v);
                     const label = (item.payload as { label?: string } | undefined)?.label ?? '';
-                    return [
-                      `${n} (${total ? Math.round((n / total) * 100) : 0}%)`,
-                      label,
-                    ];
+                    return [`${n} (${total ? Math.round((n / total) * 100) : 0}%)`, label];
                   }}
                 />
               </PieChart>
             </ResponsiveContainer>
             <div className="pointer-events-none absolute inset-0 grid place-items-center">
               <div className="text-center">
-                <div className="text-2xl font-bold text-ink">{total}</div>
-                <div className="text-[10px] uppercase tracking-wide text-ink-muted">
-                  tasks
-                </div>
+                <div className="text-ink text-2xl font-bold">{total}</div>
+                <div className="text-ink-muted text-[10px] uppercase tracking-wide">tasks</div>
               </div>
             </div>
           </div>
           <ul className="flex-1 space-y-1.5" role="list">
             {data.map((d) => (
-              <li
-                key={d.status}
-                className="flex items-center justify-between gap-2 text-xs"
-              >
-                <span className="inline-flex items-center gap-1.5 text-ink">
+              <li key={d.status} className="flex items-center justify-between gap-2 text-xs">
+                <span className="text-ink inline-flex items-center gap-1.5">
                   <span
                     aria-hidden
                     className="h-2 w-2 rounded-full"
@@ -124,7 +109,7 @@ export function StatusDonutWidget() {
                   />
                   {d.label}
                 </span>
-                <span className="font-medium text-ink">{d.value}</span>
+                <span className="text-ink font-medium">{d.value}</span>
               </li>
             ))}
           </ul>

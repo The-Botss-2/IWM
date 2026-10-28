@@ -1,7 +1,4 @@
-import {
-  ForbiddenException,
-  ServiceUnavailableException,
-} from '@nestjs/common';
+import { ForbiddenException, ServiceUnavailableException } from '@nestjs/common';
 
 /**
  * Pure rules and RFC 7807 problems for support sessions. The details are
@@ -44,7 +41,8 @@ export function supportAccessPath(
   let path = cut === -1 ? raw : raw.slice(0, cut);
   if (params) {
     for (const [name, value] of Object.entries(params)) {
-      if (!SECRET_PARAM_NAMES.has(name.toLowerCase()) || typeof value !== 'string' || !value) continue;
+      if (!SECRET_PARAM_NAMES.has(name.toLowerCase()) || typeof value !== 'string' || !value)
+        continue;
       const encoded = encodeURIComponent(value);
       path = path
         .split('/')
@@ -111,11 +109,17 @@ export function isSupportExcludedPath(
   const full = normalizeRoutePath(path);
   const relative = base !== '/' && underPrefix(full, base) ? full.slice(base.length) || '/' : full;
   const candidates = [relative];
-  const controllers = Array.isArray(controllerPath) ? controllerPath : controllerPath ? [controllerPath] : [];
+  const controllers = Array.isArray(controllerPath)
+    ? controllerPath
+    : controllerPath
+      ? [controllerPath]
+      : [];
   for (const c of controllers) {
     if (typeof c === 'string') candidates.push(normalizeRoutePath(c));
   }
-  return candidates.some((candidate) => SUPPORT_EXCLUDED_PREFIXES.some((prefix) => underPrefix(candidate, prefix)));
+  return candidates.some((candidate) =>
+    SUPPORT_EXCLUDED_PREFIXES.some((prefix) => underPrefix(candidate, prefix)),
+  );
 }
 
 /**
@@ -155,7 +159,8 @@ export function supportSessionInvalid(): ForbiddenException {
   return new ForbiddenException({
     title: 'Support session not valid',
     status: 403,
-    detail: "This support session isn't valid for your sign in. Open it again from the Organizations page.",
+    detail:
+      "This support session isn't valid for your sign in. Open it again from the Organizations page.",
     code: 'support-session-invalid',
   });
 }
@@ -164,7 +169,8 @@ export function supportSessionEnded(): ForbiddenException {
   return new ForbiddenException({
     title: 'Support session ended',
     status: 403,
-    detail: 'This support session has ended because the organization revoked access, the grant expired, or the organization is suspended.',
+    detail:
+      'This support session has ended because the organization revoked access, the grant expired, or the organization is suspended.',
     code: 'support-session-ended',
   });
 }
@@ -182,7 +188,8 @@ export function supportExcluded(): ForbiddenException {
   return new ForbiddenException({
     title: 'Not available in a support session',
     status: 403,
-    detail: 'Mail, chat, notifications, calls and todos are private to each person, so support sessions cannot open them.',
+    detail:
+      'Mail, chat, notifications, calls and todos are private to each person, so support sessions cannot open them.',
     code: 'support-excluded',
   });
 }
@@ -191,7 +198,8 @@ export function supportLogUnavailable(): ServiceUnavailableException {
   return new ServiceUnavailableException({
     title: 'Service temporarily unavailable',
     status: 503,
-    detail: "Couldn't record this request in the organization's audit log, so it was not run. Please try again.",
+    detail:
+      "Couldn't record this request in the organization's audit log, so it was not run. Please try again.",
     code: 'support-log-unavailable',
   });
 }

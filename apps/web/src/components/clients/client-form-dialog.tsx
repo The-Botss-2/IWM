@@ -2,11 +2,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-import {
-  ClientStatus,
-  createClientSchema,
-  type CreateClientInput,
-} from '@botss/shared-types';
+import { ClientStatus, createClientSchema, type CreateClientInput } from '@botss/shared-types';
 
 import { useCreateClient } from '@/hooks/use-clients';
 import { toast } from '@/lib/toast';
@@ -33,8 +29,8 @@ export function ClientFormDialog({ onClose }: { onClose: () => void }) {
   };
 
   return (
-    <div className="fixed inset-0 z-30 grid place-items-center bg-ink/40 p-4">
-      <div className="card w-full max-w-md p-6 space-y-4">
+    <div className="bg-ink/40 fixed inset-0 z-30 grid place-items-center p-4">
+      <div className="card w-full max-w-md space-y-4 p-6">
         <h2 className="text-base font-semibold">New client</h2>
         <form className="space-y-3" onSubmit={handleSubmit(onSubmit)}>
           <div>
@@ -43,7 +39,7 @@ export function ClientFormDialog({ onClose }: { onClose: () => void }) {
               <RequiredMark />
             </label>
             <input className="input" {...register('name')} />
-            {errors.name && <p className="text-xs text-state-error mt-1">{errors.name.message}</p>}
+            {errors.name && <p className="text-state-error mt-1 text-xs">{errors.name.message}</p>}
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
@@ -58,11 +54,17 @@ export function ClientFormDialog({ onClose }: { onClose: () => void }) {
           <div>
             <label className="label">Status</label>
             <select className="input" {...register('status')}>
-              {ClientStatus.options.map((s) => <option key={s} value={s}>{s}</option>)}
+              {ClientStatus.options.map((s) => (
+                <option key={s} value={s}>
+                  {s}
+                </option>
+              ))}
             </select>
           </div>
           <div className="flex justify-end gap-2 pt-2">
-            <button type="button" className="btn-secondary" onClick={onClose}>Cancel</button>
+            <button type="button" className="btn-secondary" onClick={onClose}>
+              Cancel
+            </button>
             <button type="submit" className="btn-primary" disabled={isSubmitting}>
               {isSubmitting ? 'Creating…' : 'Create client'}
             </button>
@@ -75,7 +77,7 @@ export function ClientFormDialog({ onClose }: { onClose: () => void }) {
 
 function RequiredMark() {
   return (
-    <span className="ml-1 text-state-error" aria-label="required">
+    <span className="text-state-error ml-1" aria-label="required">
       *
     </span>
   );

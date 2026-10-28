@@ -104,7 +104,8 @@ function resolveLogLevels(): LogLevel[] {
   const order: LogLevel[] = ['verbose', 'debug', 'log', 'warn', 'error', 'fatal'];
   const fallback: LogLevel = process.env.NODE_ENV === 'production' ? 'log' : 'debug';
   const requested = process.env.LOG_LEVEL?.trim().toLowerCase();
-  const threshold = order.indexOf(requested as LogLevel) === -1 ? fallback : (requested as LogLevel);
+  const threshold =
+    order.indexOf(requested as LogLevel) === -1 ? fallback : (requested as LogLevel);
   return order.slice(order.indexOf(threshold));
 }
 
@@ -219,15 +220,14 @@ async function bootstrap(): Promise<void> {
       } else if (process.env.NODE_ENV !== 'production') {
         // Log rejected origins in dev to help debug "Failed to fetch"
         const logger = new Logger('CORS');
-        logger.warn(`Rejected origin: ${origin}. Allowed: ${Array.from(allowedOrigins).join(', ')}`);
+        logger.warn(
+          `Rejected origin: ${origin}. Allowed: ${Array.from(allowedOrigins).join(', ')}`,
+        );
       }
     }
 
     if (req.method === 'OPTIONS') {
-      res.setHeader(
-        'Access-Control-Allow-Methods',
-        'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
-      );
+      res.setHeader('Access-Control-Allow-Methods', 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS');
       // Return a fixed allow-list rather than reflecting the requested
       // headers verbatim - reflection lets a caller have any header name
       // echoed back into the response.
@@ -427,7 +427,9 @@ async function bootstrap(): Promise<void> {
   await app.listen(port, '0.0.0.0');
 
   logger.log(`API listening on http://0.0.0.0:${port} (reachable at http://127.0.0.1:${port})`);
-  logger.log(`Log levels enabled: ${logLevels.join(', ')} (set LOG_LEVEL=debug to enable debug/verbose)`);
+  logger.log(
+    `Log levels enabled: ${logLevels.join(', ')} (set LOG_LEVEL=debug to enable debug/verbose)`,
+  );
   logger.log(
     `Better Auth at /api/auth/*  |  REST routes at /${process.env.API_BASE_PATH?.replace(/^\//, '') ?? 'api/v1'}/*`,
   );
@@ -440,7 +442,6 @@ async function bootstrap(): Promise<void> {
     process.send('ready');
   }
 }
-
 
 bootstrap().catch((err) => {
   // eslint-disable-next-line no-console

@@ -16,10 +16,10 @@ export function LeaveTable({
   renderActions: (leave: LeaveWithRefs) => ReactNode;
 }) {
   return (
-    <div className="overflow-x-auto rounded-xl bg-white shadow-soft">
+    <div className="shadow-soft overflow-x-auto rounded-xl bg-white">
       <table className="w-full border-collapse text-sm">
         <thead>
-          <tr className="border-b border-line bg-bg-subtle text-left text-xs text-ink-muted">
+          <tr className="border-line bg-bg-subtle text-ink-muted border-b text-left text-xs">
             {showPerson ? <th className="px-3 py-2 font-medium">Person</th> : null}
             <th className="px-3 py-2 font-medium">Type</th>
             <th className="px-3 py-2 font-medium">Dates</th>
@@ -37,31 +37,31 @@ export function LeaveTable({
             const end = new Date(leave.endDate);
             const days = leaveDayCount(start, end);
             return (
-              <tr key={leave.id} className="border-b border-line last:border-b-0 align-top">
+              <tr key={leave.id} className="border-line border-b align-top last:border-b-0">
                 {showPerson ? (
                   <td className="px-3 py-2.5">
                     <div className="flex items-center gap-2">
                       <UserAvatar size="xs" name={leave.user.name} image={leave.user.image} />
-                      <span className="truncate text-ink">{leave.user.name}</span>
+                      <span className="text-ink truncate">{leave.user.name}</span>
                     </div>
                   </td>
                 ) : null}
-                <td className="px-3 py-2.5 text-ink">
+                <td className="text-ink px-3 py-2.5">
                   {LEAVE_TYPE_LABELS[leave.type]}
                   {leave.reason ? (
-                    <p className="mt-0.5 max-w-[280px] whitespace-pre-line break-words text-xs text-ink-muted">
+                    <p className="text-ink-muted mt-0.5 max-w-[280px] whitespace-pre-line break-words text-xs">
                       {leave.reason}
                     </p>
                   ) : null}
                 </td>
-                <td className="whitespace-nowrap px-3 py-2.5 text-ink">
+                <td className="text-ink whitespace-nowrap px-3 py-2.5">
                   {formatLeaveRange(start, end)}
                 </td>
-                <td className="px-3 py-2.5 text-right tabular-nums text-ink">{days}</td>
+                <td className="text-ink px-3 py-2.5 text-right tabular-nums">{days}</td>
                 <td className="px-3 py-2.5">
                   <LeaveStatusBadge status={leave.status} />
                 </td>
-                <td className="px-3 py-2.5 text-ink-muted">
+                <td className="text-ink-muted px-3 py-2.5">
                   {leave.status === 'PENDING' ? '-' : (leave.approvedBy?.name ?? '-')}
                 </td>
                 <td className="px-3 py-2 text-right">

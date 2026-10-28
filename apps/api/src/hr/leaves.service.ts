@@ -38,9 +38,7 @@ export class LeavesService {
     private readonly notifications: NotificationsService,
   ) {}
 
-  private mapRow(
-    row: Prisma.LeaveGetPayload<{ include: typeof LEAVE_INCLUDE }>,
-  ): LeaveWithRefs {
+  private mapRow(row: Prisma.LeaveGetPayload<{ include: typeof LEAVE_INCLUDE }>): LeaveWithRefs {
     return {
       id: row.id,
       userId: row.userId,
@@ -65,10 +63,7 @@ export class LeavesService {
    * tenant - without that check, HR in Org A could pull leaves for any
    * Org B user just by guessing an id.
    */
-  async list(
-    actingUserId: string,
-    query: ListLeavesQuery,
-  ): Promise<LeaveListResponse> {
+  async list(actingUserId: string, query: ListLeavesQuery): Promise<LeaveListResponse> {
     const role = await this.resolveActorRole(actingUserId);
     const where: Prisma.LeaveWhereInput = {};
     if (role.isPrivileged) {
@@ -113,21 +108,18 @@ export class LeavesService {
    * HR / Admin may pass an explicit `userId` to create on behalf of any
    * employee (e.g. when a manager records a verbal sick-leave call-in).
    */
-  async create(
-    actingUserId: string,
-    input: CreateLeaveInput,
-  ): Promise<LeaveWithRefs> {
+  async create(actingUserId: string, input: CreateLeaveInput): Promise<LeaveWithRefs> {
     const role = await this.resolveActorRole(actingUserId);
     const targetUserId =
       input.userId && input.userId !== actingUserId
-        ? (role.isPrivileged
-            ? input.userId
-            : (() => {
-                throw new ForbiddenException({
-                  title: 'Cannot file leave for another user.',
-                  status: 403,
-                });
-              })())
+        ? role.isPrivileged
+          ? input.userId
+          : (() => {
+              throw new ForbiddenException({
+                title: 'Cannot file leave for another user.',
+                status: 403,
+              });
+            })()
         : actingUserId;
     // If the actor is a privileged user filing on someone else's behalf,
     // the target must live inside the actor's org (no SUPER_ADMIN bypass).
@@ -161,8 +153,7 @@ export class LeavesService {
         // HR / Admin creating on someone else's behalf is treated as a
         // pre-approval - saves the round-trip. Self-requests stay PENDING.
         status: role.isPrivileged && targetUserId !== actingUserId ? 'APPROVED' : 'PENDING',
-        approvedById:
-          role.isPrivileged && targetUserId !== actingUserId ? actingUserId : null,
+        approvedById: role.isPrivileged && targetUserId !== actingUserId ? actingUserId : null,
       },
       include: LEAVE_INCLUDE,
     });
@@ -278,11 +269,7 @@ export class LeavesService {
     }
     // Employees can delete their own PENDING requests; once approved /
     // rejected, only HR can remove the audit row.
-    if (
-      !role.isPrivileged &&
-      existing.userId === actingUserId &&
-      existing.status !== 'PENDING'
-    ) {
+    if (!role.isPrivileged && existing.userId === actingUserId && existing.status !== 'PENDING') {
       throw new ForbiddenException({
         title: 'Cannot delete a processed leave request.',
         status: 403,
@@ -345,7 +332,9 @@ export class LeavesService {
    */
   private async resolveActorRole(
     userId: string,
-  ): Promise<{ isPrivileged: true; orgId: string } | { isPrivileged: false; orgId: string | null }> {
+  ): Promise<
+    { isPrivileged: true; orgId: string } | { isPrivileged: false; orgId: string | null }
+  > {
     const u = await this.prisma.client.user.findUnique({
       where: { id: userId },
       select: { organizationId: true },

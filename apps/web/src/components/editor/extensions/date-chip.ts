@@ -25,8 +25,7 @@ export const DateChip = Node.create({
       date: {
         default: null as string | null,
         parseHTML: (el) => el.getAttribute('data-date'),
-        renderHTML: (attrs) =>
-          attrs.date ? { 'data-date': attrs.date as string } : {},
+        renderHTML: (attrs) => (attrs.date ? { 'data-date': attrs.date as string } : {}),
       },
     };
   },

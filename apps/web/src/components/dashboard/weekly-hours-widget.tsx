@@ -48,9 +48,7 @@ export function WeeklyHoursWidget() {
         />
       ) : (
         <div className="space-y-3">
-          <div className="text-2xl font-semibold text-ink">
-            {fmt(data?.totalMinutes ?? 0)}
-          </div>
+          <div className="text-ink text-2xl font-semibold">{fmt(data?.totalMinutes ?? 0)}</div>
           <ul className="space-y-1.5" role="list">
             {rows.slice(0, 5).map((r) => (
               <li
@@ -63,13 +61,9 @@ export function WeeklyHoursWidget() {
                     style={{ backgroundColor: r.projectColor ?? '#94a3b8' }}
                     aria-hidden
                   />
-                  <span className="truncate text-ink">
-                    {r.projectName ?? 'No project'}
-                  </span>
+                  <span className="text-ink truncate">{r.projectName ?? 'No project'}</span>
                 </span>
-                <span className="shrink-0 font-medium text-ink">
-                  {fmt(r.totalMinutes)}
-                </span>
+                <span className="text-ink shrink-0 font-medium">{fmt(r.totalMinutes)}</span>
               </li>
             ))}
           </ul>

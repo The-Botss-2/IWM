@@ -76,7 +76,9 @@ const RUN_INCLUDE = {
     orderBy: { employeeName: 'asc' },
     // The person's current email: lines made before the email snapshot
     // existed have none of their own (see itemEmail).
-    include: { employee: { select: { userId: true, email: true, user: { select: { email: true } } } } },
+    include: {
+      employee: { select: { userId: true, email: true, user: { select: { email: true } } } },
+    },
   },
 } satisfies Prisma.PayrollRunInclude;
 
@@ -172,9 +174,7 @@ export class PayrollService {
         select: { id: true, userId: true },
       }),
     ]);
-    const onRoster = new Map(
-      roster.flatMap((r) => (r.userId ? [[r.userId, r.id] as const] : [])),
-    );
+    const onRoster = new Map(roster.flatMap((r) => (r.userId ? [[r.userId, r.id] as const] : [])));
     return {
       items: users.map((u) => ({
         id: u.id,
@@ -202,7 +202,10 @@ export class PayrollService {
    * Put people on payroll. Someone removed earlier is restored (the row is
    * soft-deleted, so the unique key still holds it) with the new salary.
    */
-  async addEmployees(scope: UserScope, input: AddPayrollEmployeesInput): Promise<PayrollEmployeeList> {
+  async addEmployees(
+    scope: UserScope,
+    input: AddPayrollEmployeesInput,
+  ): Promise<PayrollEmployeeList> {
     const workspaceId = requireWorkspace(scope);
     const organizationId = await this.organizationOf(workspaceId);
     const userIds = [...new Set(input.people.map((p) => p.userId))];
@@ -270,7 +273,7 @@ export class PayrollService {
     const dateOfJoining = clean(input.dateOfJoining);
     const details = defined({
       // A platform user's name comes from their account.
-      name: current.userId ? undefined : clean(input.name) ?? undefined,
+      name: current.userId ? undefined : (clean(input.name) ?? undefined),
       designation: clean(input.designation),
       bankName: clean(input.bankName),
       accountTitle: clean(input.accountTitle),
@@ -281,10 +284,12 @@ export class PayrollService {
           ? undefined
           : email !== null && email.toLowerCase() === current.user?.email.toLowerCase()
             ? null
-            : email?.toLowerCase() ?? null,
+            : (email?.toLowerCase() ?? null),
       cnic: cnic === undefined || cnic === null ? cnic : formatCnic(cnic),
       dateOfJoining:
-        dateOfJoining === undefined || dateOfJoining === null ? dateOfJoining : dayFromIso(dateOfJoining),
+        dateOfJoining === undefined || dateOfJoining === null
+          ? dateOfJoining
+          : dayFromIso(dateOfJoining),
       paymentMethod: input.paymentMethod,
     });
     const row = await this.prisma.client.$transaction(async (tx) => {
@@ -498,7 +503,10 @@ export class PayrollService {
         data: {
           ...amounts,
           net,
-          ...defined({ bonusNote: clean(input.bonusNote), deductionNote: clean(input.deductionNote) }),
+          ...defined({
+            bonusNote: clean(input.bonusNote),
+            deductionNote: clean(input.deductionNote),
+          }),
         },
       });
     });
@@ -617,7 +625,8 @@ export class PayrollService {
           {
             title: 'Payroll not paid',
             status: HttpStatus.INTERNAL_SERVER_ERROR,
-            detail: 'Salary expenses could not be matched to their payroll lines. Nothing was recorded; try again.',
+            detail:
+              'Salary expenses could not be matched to their payroll lines. Nothing was recorded; try again.',
             code: 'payroll_expense_link_failed',
           },
           HttpStatus.INTERNAL_SERVER_ERROR,
@@ -691,7 +700,10 @@ export class PayrollService {
     };
   }
 
-  async allPayslipsPdf(scope: UserScope, runId: string): Promise<{ body: Buffer; filename: string }> {
+  async allPayslipsPdf(
+    scope: UserScope,
+    runId: string,
+  ): Promise<{ body: Buffer; filename: string }> {
     const workspaceId = requireWorkspace(scope);
     const run = await this.requireRun(workspaceId, runId);
     if (run.items.length === 0) {
@@ -706,7 +718,10 @@ export class PayrollService {
     return { body, filename: `payslips-${periodSlug(run.year, run.month)}.pdf` };
   }
 
-  async bankTransferCsv(scope: UserScope, runId: string): Promise<{ body: string; filename: string }> {
+  async bankTransferCsv(
+    scope: UserScope,
+    runId: string,
+  ): Promise<{ body: string; filename: string }> {
     const run = await this.requireRun(requireWorkspace(scope), runId);
     const bankItems = run.items.filter((i) => i.paymentMethod === 'BANK_TRANSFER');
     void this.alerts?.recordExport(scope.userId, bankItems.length);
@@ -783,7 +798,9 @@ export class PayrollService {
         errors: r.errors,
       })),
       errors: plan.errors,
-      notInSheet: run ? run.items.filter((i) => !i.employeeId || !claimed.has(i.employeeId)).length : 0,
+      notInSheet: run
+        ? run.items.filter((i) => !i.employeeId || !claimed.has(i.employeeId)).length
+        : 0,
     };
   }
 
@@ -841,9 +858,18 @@ export class PayrollService {
           // Read under the lock: blank amount cells keep these.
           const lines = await tx.payrollItem.findMany({
             where: { runId: id },
-            select: { id: true, employeeId: true, bonus: true, commission: true, deduction: true, tax: true },
+            select: {
+              id: true,
+              employeeId: true,
+              bonus: true,
+              commission: true,
+              deduction: true,
+              tax: true,
+            },
           });
-          const lineOf = new Map(lines.flatMap((l) => (l.employeeId ? [[l.employeeId, l] as const] : [])));
+          const lineOf = new Map(
+            lines.flatMap((l) => (l.employeeId ? [[l.employeeId, l] as const] : [])),
+          );
 
           // The per-row reads, fetched up front in two queries. Nothing the
           // loop writes changes what they feed (an employee's userId and the
@@ -851,10 +877,18 @@ export class PayrollService {
           // back to the original findUniqueOrThrow, so a missing or
           // soft-deleted record behaves - and fails - exactly as before.
           const onPayrollIds = [
-            ...new Set(plan.rows.flatMap((r) => (r.target?.match === 'ON_PAYROLL' ? [r.target.employeeId] : []))),
+            ...new Set(
+              plan.rows.flatMap((r) =>
+                r.target?.match === 'ON_PAYROLL' ? [r.target.employeeId] : [],
+              ),
+            ),
           ];
           const platformUserIds = [
-            ...new Set(plan.rows.flatMap((r) => (r.target?.match === 'PLATFORM_USER' ? [r.target.userId] : []))),
+            ...new Set(
+              plan.rows.flatMap((r) =>
+                r.target?.match === 'PLATFORM_USER' ? [r.target.userId] : [],
+              ),
+            ),
           ];
           const currentOf = new Map(
             (onPayrollIds.length
@@ -884,7 +918,14 @@ export class PayrollService {
             await tx.payrollItem.createMany({ data: [...pendingLines.values()] });
             const created = await tx.payrollItem.findMany({
               where: { runId: id, employeeId: { in: [...pendingLines.keys()] } },
-              select: { id: true, employeeId: true, bonus: true, commission: true, deduction: true, tax: true },
+              select: {
+                id: true,
+                employeeId: true,
+                bonus: true,
+                commission: true,
+                deduction: true,
+                tax: true,
+              },
             });
             for (const l of created) if (l.employeeId) lineOf.set(l.employeeId, l);
             pendingLines.clear();
@@ -987,7 +1028,10 @@ export class PayrollService {
   ): Promise<{ plan: ImportPlan; run: ImportRun | null }> {
     const organizationId = await this.organizationOf(workspaceId);
     const [rosterRows, staff] = await Promise.all([
-      this.prisma.client.payrollEmployee.findMany({ where: { workspaceId }, include: EMPLOYEE_INCLUDE }),
+      this.prisma.client.payrollEmployee.findMany({
+        where: { workspaceId },
+        include: EMPLOYEE_INCLUDE,
+      }),
       this.prisma.client.user.findMany({
         where: { organizationId, accountType: 'STAFF' },
         select: { id: true, name: true, email: true },
@@ -1010,7 +1054,9 @@ export class PayrollService {
         target,
         roster,
         staff,
-        inRun: new Map(run?.items.flatMap((i) => (i.employeeId ? [[i.employeeId, i] as const] : [])) ?? []),
+        inRun: new Map(
+          run?.items.flatMap((i) => (i.employeeId ? [[i.employeeId, i] as const] : [])) ?? [],
+        ),
         runStatus: run?.status ?? null,
       });
 
@@ -1023,7 +1069,9 @@ export class PayrollService {
       select: {
         id: true,
         status: true,
-        items: { select: { employeeId: true, bonus: true, commission: true, deduction: true, tax: true } },
+        items: {
+          select: { employeeId: true, bonus: true, commission: true, deduction: true, tax: true },
+        },
       },
     });
     return { plan: plan({ year: first.year, month: first.month }, run), run };
@@ -1041,7 +1089,11 @@ export class PayrollService {
    * failed message does not stop the rest. The browser sends a large run in
    * batches through `itemIds`, which keeps every request short.
    */
-  async sendPayslips(scope: UserScope, runId: string, input: SendPayslipsInput): Promise<SendPayslipsResult> {
+  async sendPayslips(
+    scope: UserScope,
+    runId: string,
+    input: SendPayslipsInput,
+  ): Promise<SendPayslipsResult> {
     const workspaceId = requireWorkspace(scope);
     const run = await this.requireRun(workspaceId, runId);
     if (run.status !== 'PAID') {
@@ -1098,54 +1150,56 @@ export class PayrollService {
 
     const results: SendPayslipsResult['results'] = [];
     try {
-      await this.mailer.withSession(
-        { ...smtp, user: from, pass: input.password },
-        async (send) => {
-          for (const item of items) {
-            const to = itemEmail(item);
-            const base = { itemId: item.id, name: item.employeeName, to };
-            if (!to) {
-              results.push({ ...base, status: 'SKIPPED', error: 'No email address' });
-              continue;
-            }
-            try {
-              const pdf = await this.renderPdf(workspaceId, run, [item], brand);
-              const mail = renderPayslipEmail({
-                companyName: company.name,
-                employeeName: item.employeeName,
-                period,
-              });
-              await send({
-                from: { name: company.name, address: from },
-                to,
-                subject: mail.subject,
-                html: mail.html,
-                text: mail.text,
-                attachments: [
-                  {
-                    filename: `payslip-${nameSlug(item.employeeName)}-${periodSlug(run.year, run.month)}.pdf`,
-                    content: pdf,
-                    contentType: 'application/pdf',
-                  },
-                ],
-              });
-            } catch (err) {
-              // A login rejected mid-batch (a host starting to block us) ends
-              // the batch: each further message would be another failed login.
-              if (isAuthFailure(err)) throw err;
-              results.push({ ...base, status: 'FAILED', error: sendFailure(err) });
-              continue;
-            }
-            results.push({ ...base, status: 'SENT', error: null });
-            // The mail is out; failing to record it must not report it as failed.
-            await this.prisma.client.payrollItem
-              .update({ where: { id: item.id }, data: { payslipSentAt: new Date(), payslipSentTo: to } })
-              .catch((err: unknown) =>
-                this.logger.warn(`Payslip ${item.id} sent but not recorded: ${(err as Error).message}`),
-              );
+      await this.mailer.withSession({ ...smtp, user: from, pass: input.password }, async (send) => {
+        for (const item of items) {
+          const to = itemEmail(item);
+          const base = { itemId: item.id, name: item.employeeName, to };
+          if (!to) {
+            results.push({ ...base, status: 'SKIPPED', error: 'No email address' });
+            continue;
           }
-        },
-      );
+          try {
+            const pdf = await this.renderPdf(workspaceId, run, [item], brand);
+            const mail = renderPayslipEmail({
+              companyName: company.name,
+              employeeName: item.employeeName,
+              period,
+            });
+            await send({
+              from: { name: company.name, address: from },
+              to,
+              subject: mail.subject,
+              html: mail.html,
+              text: mail.text,
+              attachments: [
+                {
+                  filename: `payslip-${nameSlug(item.employeeName)}-${periodSlug(run.year, run.month)}.pdf`,
+                  content: pdf,
+                  contentType: 'application/pdf',
+                },
+              ],
+            });
+          } catch (err) {
+            // A login rejected mid-batch (a host starting to block us) ends
+            // the batch: each further message would be another failed login.
+            if (isAuthFailure(err)) throw err;
+            results.push({ ...base, status: 'FAILED', error: sendFailure(err) });
+            continue;
+          }
+          results.push({ ...base, status: 'SENT', error: null });
+          // The mail is out; failing to record it must not report it as failed.
+          await this.prisma.client.payrollItem
+            .update({
+              where: { id: item.id },
+              data: { payslipSentAt: new Date(), payslipSentTo: to },
+            })
+            .catch((err: unknown) =>
+              this.logger.warn(
+                `Payslip ${item.id} sent but not recorded: ${(err as Error).message}`,
+              ),
+            );
+        }
+      });
     } catch (err) {
       throw this.mailLoginError(err, lockKey, from, smtp);
     }
@@ -1191,7 +1245,11 @@ export class PayrollService {
         select: accountSelect,
       }));
     if (account) {
-      return withOverrides({ host: account.smtpHost, port: account.smtpPort, secure: account.smtpSecure });
+      return withOverrides({
+        host: account.smtpHost,
+        port: account.smtpPort,
+        secure: account.smtpSecure,
+      });
     }
     const org = await this.prisma.client.organizationMailConfig.findUnique({
       where: { organizationId },
@@ -1213,7 +1271,9 @@ export class PayrollService {
 
   private assertMailLoginAllowed(key: string, email: string): void {
     const now = Date.now();
-    const recent = (this.mailLoginFailures.get(key) ?? []).filter((t) => now - t < MAIL_LOGIN_WINDOW_MS);
+    const recent = (this.mailLoginFailures.get(key) ?? []).filter(
+      (t) => now - t < MAIL_LOGIN_WINDOW_MS,
+    );
     if (recent.length === 0) this.mailLoginFailures.delete(key);
     else this.mailLoginFailures.set(key, recent);
     if (recent.length >= MAIL_LOGIN_FAILURES) {
@@ -1240,7 +1300,10 @@ export class PayrollService {
   ): HttpException {
     if (err instanceof HttpException) return err;
     if (isAuthFailure(err)) {
-      this.mailLoginFailures.set(lockKey, [...(this.mailLoginFailures.get(lockKey) ?? []), Date.now()]);
+      this.mailLoginFailures.set(lockKey, [
+        ...(this.mailLoginFailures.get(lockKey) ?? []),
+        Date.now(),
+      ]);
       return new BadRequestException({
         title: 'Login failed',
         status: 400,
@@ -1248,7 +1311,9 @@ export class PayrollService {
         code: 'payroll_mail_auth',
       });
     }
-    this.logger.warn(`Payslip mail connect to ${smtp.host}:${smtp.port} failed: ${(err as Error)?.message}`);
+    this.logger.warn(
+      `Payslip mail connect to ${smtp.host}:${smtp.port} failed: ${(err as Error)?.message}`,
+    );
     return new BadRequestException({
       title: "Couldn't connect",
       status: 400,
@@ -1265,12 +1330,17 @@ export class PayrollService {
     return (await this.orgOf(workspaceId)).organizationId;
   }
 
-  private async orgOf(workspaceId: string): Promise<{ organizationId: string; baseCurrency: string }> {
+  private async orgOf(
+    workspaceId: string,
+  ): Promise<{ organizationId: string; baseCurrency: string }> {
     const ws = await this.prisma.client.workspace.findUniqueOrThrow({
       where: { id: workspaceId },
       select: { organizationId: true, organization: { select: { baseCurrency: true } } },
     });
-    return { organizationId: ws.organizationId, baseCurrency: ws.organization?.baseCurrency ?? 'PKR' };
+    return {
+      organizationId: ws.organizationId,
+      baseCurrency: ws.organization?.baseCurrency ?? 'PKR',
+    };
   }
 
   /**
@@ -1415,7 +1485,9 @@ function clean(value: string | null | undefined): string | null | undefined {
 
 /** Drop keys whose value is `undefined`, so an update leaves them alone. */
 function defined<T extends Record<string, unknown>>(fields: T): Partial<T> {
-  return Object.fromEntries(Object.entries(fields).filter(([, v]) => v !== undefined)) as Partial<T>;
+  return Object.fromEntries(
+    Object.entries(fields).filter(([, v]) => v !== undefined),
+  ) as Partial<T>;
 }
 
 /** The roster details a payroll line keeps, frozen at the time it was added. */

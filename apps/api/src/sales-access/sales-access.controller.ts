@@ -1,9 +1,6 @@
 import { Controller, Get } from '@nestjs/common';
 
-import {
-  CurrentSalesActor,
-  type SalesActor,
-} from '../common/decorators/sales-actor.decorator';
+import { CurrentSalesActor, type SalesActor } from '../common/decorators/sales-actor.decorator';
 import { SalesAccessService } from './sales-access.service';
 
 @Controller('sales-access')

@@ -1,11 +1,6 @@
 'use client';
 
-import {
-  keepPreviousData,
-  useMutation,
-  useQuery,
-  useQueryClient,
-} from '@tanstack/react-query';
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import type {
   ListMailMessagesQuery,
   MailFolder,
@@ -22,8 +17,7 @@ import { toast, toastError, toastErrorMessage } from '@/lib/toast';
 
 type FlagOp = 'read' | 'unread' | 'star' | 'unstar';
 
-const mailFoldersKey = (accountId: string) =>
-  ['mail', 'folders', accountId] as const;
+const mailFoldersKey = (accountId: string) => ['mail', 'folders', accountId] as const;
 const mailMessagesKey = (query: Partial<ListMailMessagesQuery>) =>
   ['mail', 'messages', query] as const;
 const mailMessageKey = (id: string) => ['mail', 'message', id] as const;
@@ -96,13 +90,10 @@ const mailRecipientSuggestionsKey = (accountId: string) =>
  * fields. Fetched once per account and filtered natively by the browser as
  * the user types, so no per-keystroke round-trips.
  */
-export function useMailRecipientSuggestions(
-  accountId: string | null | undefined,
-) {
+export function useMailRecipientSuggestions(accountId: string | null | undefined) {
   return useQuery({
     queryKey: mailRecipientSuggestionsKey(accountId ?? '__none__'),
-    queryFn: () =>
-      getApi().mail.recipientSuggestions(accountId as string, { limit: 50 }),
+    queryFn: () => getApi().mail.recipientSuggestions(accountId as string, { limit: 50 }),
     enabled: !!accountId,
     staleTime: 60_000,
     refetchOnWindowFocus: false,
@@ -186,7 +177,9 @@ export function useDownloadMailAttachment() {
     },
     onError: (err) => {
       if (err instanceof FileTooLargeForNativeError) {
-        toastErrorMessage('That attachment is too large to save on this device. Open it on the desktop app instead.');
+        toastErrorMessage(
+          'That attachment is too large to save on this device. Open it on the desktop app instead.',
+        );
         return;
       }
       toastError(err, "Couldn't download that attachment");
@@ -198,8 +191,7 @@ export function useFlagMessage() {
   const qc = useQueryClient();
   return useMutation({
     meta: { errorTitle: "Couldn't update message" },
-    mutationFn: ({ id, op }: { id: string; op: FlagOp }) =>
-      getApi().mail.setFlag(id, op),
+    mutationFn: ({ id, op }: { id: string; op: FlagOp }) => getApi().mail.setFlag(id, op),
     onMutate: async ({ id, op }) => {
       // Cancel in-flight mail queries first. The message list polls every
       // 10 s and the folder list now does too, so without this a refetch
@@ -223,9 +215,7 @@ export function useFlagMessage() {
         if (!data?.items) return;
         qc.setQueryData<MessageList>(key, {
           ...data,
-          items: data.items.map((m) =>
-            m.id === id ? applyFlagListItem(m, op) : m,
-          ),
+          items: data.items.map((m) => (m.id === id ? applyFlagListItem(m, op) : m)),
         });
       });
 
@@ -376,13 +366,7 @@ export function useBulkMoveMessages() {
   const qc = useQueryClient();
   return useMutation({
     meta: { errorTitle: "Couldn't move messages" },
-    mutationFn: ({
-      ids,
-      target,
-    }: {
-      ids: string[];
-      target: MoveMailMessageInput;
-    }) =>
+    mutationFn: ({ ids, target }: { ids: string[]; target: MoveMailMessageInput }) =>
       getApi().mail.bulkMoveMessages({
         ids,
         ...(target.folderId ? { folderId: target.folderId } : {}),
@@ -451,22 +435,16 @@ export function useBulkFlagMessages() {
         if (!data?.items) return;
         qc.setQueryData<MessageList>(key, {
           ...data,
-          items: data.items.map((m) =>
-            idSet.has(m.id) ? applyFlagListItem(m, op) : m,
-          ),
+          items: data.items.map((m) => (idSet.has(m.id) ? applyFlagListItem(m, op) : m)),
         });
       });
       // Patch detail caches for any open messages in the selection.
-      const previousDetails: { id: string; data: MailMessage | undefined }[] =
-        [];
+      const previousDetails: { id: string; data: MailMessage | undefined }[] = [];
       for (const id of ids) {
         const detail = qc.getQueryData<MailMessage>(mailMessageKey(id));
         previousDetails.push({ id, data: detail });
         if (detail) {
-          qc.setQueryData<MailMessage>(
-            mailMessageKey(id),
-            applyFlagDetail(detail, op),
-          );
+          qc.setQueryData<MailMessage>(mailMessageKey(id), applyFlagDetail(detail, op));
         }
       }
       return { previousLists, previousDetails };
@@ -494,8 +472,7 @@ export function useBulkDeleteMessages() {
   const qc = useQueryClient();
   return useMutation({
     meta: { errorTitle: "Couldn't delete messages" },
-    mutationFn: ({ ids }: { ids: string[] }) =>
-      getApi().mail.bulkDeleteMessages({ ids }),
+    mutationFn: ({ ids }: { ids: string[] }) => getApi().mail.bulkDeleteMessages({ ids }),
     onMutate: async ({ ids }) => {
       const idSet = new Set(ids);
       for (const id of ids) rememberRemoved(id);
@@ -520,7 +497,9 @@ export function useBulkDeleteMessages() {
     },
     onSuccess: (res) => {
       if (res.affected === 0) {
-        toastErrorMessage('Nothing was deleted. Only Trash/Spam messages can be permanently removed.');
+        toastErrorMessage(
+          'Nothing was deleted. Only Trash/Spam messages can be permanently removed.',
+        );
       } else {
         const skippedNote = res.skipped > 0 ? ` (${res.skipped} skipped)` : '';
         toast.success(
@@ -551,9 +530,7 @@ export function useMarkFolderAllRead() {
         if (!data?.items) continue;
         qc.setQueryData<MessageList>(key, {
           ...data,
-          items: data.items.map((m) =>
-            m.folderId === folderId ? { ...m, isUnread: false } : m,
-          ),
+          items: data.items.map((m) => (m.folderId === folderId ? { ...m, isUnread: false } : m)),
         });
       }
       // Zero the badge in the same tick as the rows. Previously only the
@@ -567,9 +544,7 @@ export function useMarkFolderAllRead() {
         if (!data?.items) continue;
         qc.setQueryData<{ items: MailFolder[] }>(key, {
           ...data,
-          items: data.items.map((f) =>
-            f.id === folderId ? { ...f, unreadCount: 0 } : f,
-          ),
+          items: data.items.map((f) => (f.id === folderId ? { ...f, unreadCount: 0 } : f)),
         });
       }
       return { lists, folders };

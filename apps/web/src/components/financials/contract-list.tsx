@@ -16,13 +16,7 @@ import { formatCurrency } from '@/lib/money';
  * leads surfaces. Money columns are `tabular-nums` and right-aligned so
  * digits line up down the column - a finance manager scans these vertically.
  */
-export function ContractList({
-  items,
-  loading,
-}: {
-  items: ContractListItem[];
-  loading?: boolean;
-}) {
+export function ContractList({ items, loading }: { items: ContractListItem[]; loading?: boolean }) {
   if (loading) {
     return (
       <div className="space-y-2">
@@ -35,7 +29,7 @@ export function ContractList({
 
   if (items.length === 0) {
     return (
-      <div className="rounded-md border border-dashed border-line bg-bg-surface p-8 text-center text-sm text-ink-muted">
+      <div className="border-line bg-bg-surface text-ink-muted rounded-md border border-dashed p-8 text-center text-sm">
         No contracts yet. Create one to start tracking what a client owes.
       </div>
     );
@@ -47,7 +41,7 @@ export function ContractList({
       <div className="hidden overflow-x-auto md:block">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-line text-left text-xs uppercase tracking-wide text-ink-muted">
+            <tr className="border-line text-ink-muted border-b text-left text-xs uppercase tracking-wide">
               <Th>Contract</Th>
               <Th>Project / client</Th>
               <Th>Model</Th>
@@ -62,7 +56,7 @@ export function ContractList({
             {items.map((c) => {
               const outstanding = Number(c.totalValue) - Number(c.amountPaid);
               return (
-                <tr key={c.id} className="border-b border-line last:border-0 hover:bg-bg-subtle">
+                <tr key={c.id} className="border-line hover:bg-bg-subtle border-b last:border-0">
                   <Td>
                     <Link href={`/financials/${c.id}`} className="font-medium hover:underline">
                       {c.title}
@@ -107,11 +101,11 @@ export function ContractList({
         {items.map((c) => {
           const outstanding = Number(c.totalValue) - Number(c.amountPaid);
           return (
-            <li key={c.id} className="rounded-md border border-line bg-bg-surface p-3">
+            <li key={c.id} className="border-line bg-bg-surface rounded-md border p-3">
               <Link href={`/financials/${c.id}`} className="font-medium hover:underline">
                 {c.title}
               </Link>
-              <p className="mt-0.5 text-xs text-ink-muted">
+              <p className="text-ink-muted mt-0.5 text-xs">
                 {c.project?.name ?? c.client?.name ?? '-'}
               </p>
               <div className="mt-2 flex flex-wrap items-center gap-2">
@@ -142,17 +136,9 @@ export function ContractList({
   );
 }
 
-function Th({
-  children,
-  align = 'left',
-}: {
-  children: React.ReactNode;
-  align?: 'left' | 'right';
-}) {
+function Th({ children, align = 'left' }: { children: React.ReactNode; align?: 'left' | 'right' }) {
   return (
-    <th className={`px-3 py-2 font-medium ${align === 'right' ? 'text-right' : ''}`}>
-      {children}
-    </th>
+    <th className={`px-3 py-2 font-medium ${align === 'right' ? 'text-right' : ''}`}>{children}</th>
   );
 }
 

@@ -1,14 +1,7 @@
 'use client';
 
 import { type Editor, EditorContent, useEditor } from '@tiptap/react';
-import {
-  type ReactElement,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import { type ReactElement, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import { Loader } from '@/components/ui/loader';
 import { cn } from '@/lib/utils';
@@ -17,12 +10,7 @@ import { toastError } from '@/lib/toast';
 import { CustomImage } from './custom-image';
 import { baseExtensions } from './extensions-base';
 import { InlineBubbleMenu } from './inline-bubble-menu';
-import {
-  buildSlashItems,
-  SlashCommand,
-  SlashMenuList,
-  type SlashItem,
-} from './slash-menu';
+import { buildSlashItems, SlashCommand, SlashMenuList, type SlashItem } from './slash-menu';
 import { EditorToolbar } from './toolbar';
 import { useImageUpload } from './use-image-upload';
 
@@ -185,7 +173,7 @@ export function DocumentEditor({ value, onChange, editable = true }: DocumentEdi
   if (!editor) {
     return (
       <div className="card overflow-visible">
-        <div className="h-12 border-b border-line bg-bg-subtle" aria-hidden />
+        <div className="border-line bg-bg-subtle h-12 border-b" aria-hidden />
         <div className="flex min-h-[320px] items-center justify-center p-6">
           <Loader label="Loading editor" />
         </div>
@@ -210,7 +198,7 @@ function FooterBar({ editor }: { editor: Editor }) {
   const characters = editor.storage.characterCount?.characters?.() ?? 0;
   const words = editor.storage.characterCount?.words?.() ?? 0;
   return (
-    <div className="flex items-center justify-end gap-3 border-t border-line bg-bg-subtle/50 px-3 py-1.5 text-[11px] text-ink-muted">
+    <div className="border-line bg-bg-subtle/50 text-ink-muted flex items-center justify-end gap-3 border-t px-3 py-1.5 text-[11px]">
       <span>{words.toLocaleString()} words</span>
       <span>{characters.toLocaleString()} characters</span>
     </div>

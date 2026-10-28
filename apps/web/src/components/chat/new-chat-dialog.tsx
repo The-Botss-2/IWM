@@ -41,13 +41,7 @@ const MODES: { value: DialogMode; label: string; icon: typeof Hash; helper: stri
   { value: 'TEXT_CHANNEL', label: 'Channel', icon: Hash, helper: 'Workspace-wide channel.' },
 ];
 
-export function NewChatDialog({
-  open,
-  onOpenChange,
-  pending,
-  onSubmit,
-  onRequestChat,
-}: Props) {
+export function NewChatDialog({ open, onOpenChange, pending, onSubmit, onRequestChat }: Props) {
   const session = useSessionContext();
   const myId = session.data?.user?.id ?? '';
   const [search, setSearch] = useState('');
@@ -83,13 +77,8 @@ export function NewChatDialog({
 
   const needsName = mode !== 'DM';
   const peerCountOk =
-    mode === 'DM'
-      ? selected.size === 1
-      : mode === 'GROUP'
-        ? selected.size >= 1
-        : true;
-  const canSubmit =
-    peerCountOk && (!needsName || name.trim().length > 0);
+    mode === 'DM' ? selected.size === 1 : mode === 'GROUP' ? selected.size >= 1 : true;
+  const canSubmit = peerCountOk && (!needsName || name.trim().length > 0);
 
   function toggle(id: string): void {
     setSelected((prev) => {
@@ -116,9 +105,7 @@ export function NewChatDialog({
       type,
       participantUserIds: ids,
       ...(needsName ? { name: name.trim() } : {}),
-      ...(needsName && description.trim()
-        ? { description: description.trim() }
-        : {}),
+      ...(needsName && description.trim() ? { description: description.trim() } : {}),
       ...(mode === 'TEXT_CHANNEL' ? { isPrivate } : {}),
     } as CreateChatRoomInput;
     await onSubmit(base);
@@ -160,7 +147,7 @@ export function NewChatDialog({
                 >
                   <Icon className="h-4 w-4" aria-hidden />
                   <span className="font-medium">{m.label}</span>
-                  <span className="text-[10px] text-ink-muted">{m.helper}</span>
+                  <span className="text-ink-muted text-[10px]">{m.helper}</span>
                 </button>
               );
             })}
@@ -203,7 +190,7 @@ export function NewChatDialog({
                     )}
                   >
                     <span className="block font-medium">Private</span>
-                    <span className="mt-0.5 block text-[10px] text-ink-muted">
+                    <span className="text-ink-muted mt-0.5 block text-[10px]">
                       Only you and people you add - like a group.
                     </span>
                   </button>
@@ -219,13 +206,13 @@ export function NewChatDialog({
                     )}
                   >
                     <span className="block font-medium">Organization</span>
-                    <span className="mt-0.5 block text-[10px] text-ink-muted">
+                    <span className="text-ink-muted mt-0.5 block text-[10px]">
                       Anyone in your organization can find and join.
                     </span>
                   </button>
                 </div>
               </div>
-              <p className="text-[11px] text-ink-muted">
+              <p className="text-ink-muted text-[11px]">
                 {isPrivate
                   ? 'Add people below - they join immediately. No one else can see it.'
                   : 'Everyone in your organization can find and join. Adding people below is optional.'}
@@ -264,13 +251,9 @@ export function NewChatDialog({
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
-          <ul
-            role="listbox"
-            aria-multiselectable
-            className="max-h-56 space-y-1 overflow-y-auto"
-          >
+          <ul role="listbox" aria-multiselectable className="max-h-56 space-y-1 overflow-y-auto">
             {candidates.length === 0 ? (
-              <li className="px-2 py-4 text-center text-xs text-ink-muted">
+              <li className="text-ink-muted px-2 py-4 text-center text-xs">
                 {usersQuery.isLoading ? (
                   <Loader size="sm" label="Loading" />
                 ) : usersQuery.isError && !usersQuery.data ? (
@@ -295,17 +278,19 @@ export function NewChatDialog({
                       aria-selected={active}
                       className={cn(
                         'flex w-full items-center gap-3 rounded-md px-2 py-1.5 text-left',
-                        active ? 'bg-brand-teal/10 text-brand-teal dark:bg-brand-teal/20 dark:text-brand-teal' : 'hover:bg-bg-subtle',
+                        active
+                          ? 'bg-brand-teal/10 text-brand-teal dark:bg-brand-teal/20 dark:text-brand-teal'
+                          : 'hover:bg-bg-subtle',
                       )}
                     >
                       <UserAvatar size="sm" name={u.name || u.email} image={u.image ?? null} />
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-1.5">
-                          <span className="truncate text-sm font-medium text-ink">
+                          <span className="text-ink truncate text-sm font-medium">
                             {u.name || u.email}
                           </span>
                         </div>
-                        <div className="truncate text-xs text-ink-muted">{u.email}</div>
+                        <div className="text-ink-muted truncate text-xs">{u.email}</div>
                       </div>
                     </button>
                   </li>
@@ -317,10 +302,10 @@ export function NewChatDialog({
             <button
               type="button"
               onClick={onRequestChat}
-              className="w-full rounded-md px-2 py-1.5 text-left text-xs text-ink-muted transition-colors hover:bg-bg-subtle hover:text-ink"
+              className="text-ink-muted hover:bg-bg-subtle hover:text-ink w-full rounded-md px-2 py-1.5 text-left text-xs transition-colors"
             >
               Someone at another company?{' '}
-              <span className="font-medium text-brand-teal">Send a chat request</span>
+              <span className="text-brand-teal font-medium">Send a chat request</span>
             </button>
           ) : null}
         </div>

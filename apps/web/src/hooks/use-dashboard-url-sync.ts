@@ -2,10 +2,7 @@
 
 import { useCallback, useLayoutEffect, useRef, useState } from 'react';
 
-import {
-  selectDashboardFilterValues,
-  useDashboardFilters,
-} from '@/hooks/use-dashboard-filters';
+import { selectDashboardFilterValues, useDashboardFilters } from '@/hooks/use-dashboard-filters';
 import {
   hasDashboardUrlParams,
   parseDashboardUrl,

@@ -13,7 +13,8 @@ import { Platform } from 'react-native';
  * bundler at build time). Without it there is no push token and native push is
  * off; the app still works.
  */
-const EAS_PROJECT_ID: string | null = String(process.env.EXPO_PUBLIC_EAS_PROJECT_ID ?? '').trim() || null;
+const EAS_PROJECT_ID: string | null =
+  String(process.env.EXPO_PUBLIC_EAS_PROJECT_ID ?? '').trim() || null;
 
 /** Android requires notification channels up front. 'calls' rings at max
  *  importance; everything else uses 'default'. Channel ids match the server's

@@ -169,10 +169,10 @@ export default function HomePage() {
   return (
     <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-14">
       <header className="mb-10">
-        <p className="text-xs font-medium text-ink-muted">
+        <p className="text-ink-muted text-xs font-medium">
           {workspace.data?.name ?? 'Your workspace'}
         </p>
-        <h1 className="mt-2 text-2xl font-semibold text-ink sm:text-3xl">
+        <h1 className="text-ink mt-2 text-2xl font-semibold sm:text-3xl">
           {greeting}
           {firstName ? (
             <>
@@ -181,15 +181,13 @@ export default function HomePage() {
           ) : null}
           .
         </h1>
-        <p className="mt-1 text-sm text-ink-muted">
-          Pick where you want to work.
-        </p>
+        <p className="text-ink-muted mt-1 text-sm">Pick where you want to work.</p>
       </header>
 
       <section aria-labelledby="apps-heading" className="mb-10">
         <h2
           id="apps-heading"
-          className="mb-4 text-xs font-semibold uppercase tracking-wide text-ink-muted"
+          className="text-ink-muted mb-4 text-xs font-semibold uppercase tracking-wide"
         >
           Apps
         </h2>
@@ -203,7 +201,7 @@ export default function HomePage() {
       <section aria-labelledby="shortcuts-heading">
         <h2
           id="shortcuts-heading"
-          className="mb-4 text-xs font-semibold uppercase tracking-wide text-ink-muted"
+          className="text-ink-muted mb-4 text-xs font-semibold uppercase tracking-wide"
         >
           Shortcuts
         </h2>
@@ -223,14 +221,14 @@ function AppCard({ app, size }: { app: AppTile; size: 'lg' | 'sm' }) {
     <Link
       href={app.href}
       className={cn(
-        'group flex items-start gap-3 rounded-xl bg-white shadow-soft transition-all duration-200 hover:-translate-y-0.5 hover:shadow-soft-lg',
-        'focus-visible:outline-none focus-visible:shadow-focus',
+        'shadow-soft hover:shadow-soft-lg group flex items-start gap-3 rounded-xl bg-white transition-all duration-200 hover:-translate-y-0.5',
+        'focus-visible:shadow-focus focus-visible:outline-none',
         size === 'lg' ? 'p-6' : 'p-4',
       )}
     >
       <span
         className={cn(
-          'grid shrink-0 place-items-center rounded-lg bg-brand-gradient-soft',
+          'bg-brand-gradient-soft grid shrink-0 place-items-center rounded-lg',
           size === 'lg' ? 'h-12 w-12' : 'h-9 w-9',
         )}
       >
@@ -238,19 +236,11 @@ function AppCard({ app, size }: { app: AppTile; size: 'lg' | 'sm' }) {
       </span>
       <span className="min-w-0">
         <span
-          className={cn(
-            'block font-semibold text-ink',
-            size === 'lg' ? 'text-base' : 'text-sm',
-          )}
+          className={cn('text-ink block font-semibold', size === 'lg' ? 'text-base' : 'text-sm')}
         >
           {app.title}
         </span>
-        <span
-          className={cn(
-            'mt-0.5 block text-ink-muted',
-            size === 'lg' ? 'text-sm' : 'text-xs',
-          )}
-        >
+        <span className={cn('text-ink-muted mt-0.5 block', size === 'lg' ? 'text-sm' : 'text-xs')}>
           {app.description}
         </span>
       </span>

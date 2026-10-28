@@ -42,13 +42,7 @@ export function WorkspaceMembersCombobox({
         value: m.userId,
         label: m.user.name || m.user.email,
         description: m.user.email,
-        leading: (
-          <UserAvatar
-            size="sm"
-            name={m.user.name || m.user.email}
-            image={m.user.image}
-          />
-        ),
+        leading: <UserAvatar size="sm" name={m.user.name || m.user.email} image={m.user.image} />,
       }));
   }, [data, excludeUserIds]);
 

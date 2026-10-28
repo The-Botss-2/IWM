@@ -28,7 +28,7 @@ export default function SummaryView({ projectId }: { projectId: string }) {
     );
   }
   if (summary.isError || !summary.data) {
-    return <p className="text-sm text-state-error">Couldn&apos;t load summary.</p>;
+    return <p className="text-state-error text-sm">Couldn&apos;t load summary.</p>;
   }
   const s = summary.data;
   const completion = s.totals.tasks > 0 ? Math.round((s.totals.done / s.totals.tasks) * 100) : 0;
@@ -66,13 +66,16 @@ export default function SummaryView({ projectId }: { projectId: string }) {
       </div>
 
       {s.upcomingDeadline ? (
-        <div className="rounded-lg border border-brand-orange/30 bg-brand-orange/15 p-4">
-          <div className="text-xs uppercase tracking-wide text-brand-orange">Upcoming deadline</div>
-          <div className="mt-1 text-sm font-medium text-brand-orange">
+        <div className="border-brand-orange/30 bg-brand-orange/15 rounded-lg border p-4">
+          <div className="text-brand-orange text-xs uppercase tracking-wide">Upcoming deadline</div>
+          <div className="text-brand-orange mt-1 text-sm font-medium">
             <Link href={`?view=board`} className="hover:underline">
               {s.upcomingDeadline.title}
             </Link>{' '}
-            <span className="text-xs text-brand-orange" title={absoluteTime(s.upcomingDeadline.dueDate)}>
+            <span
+              className="text-brand-orange text-xs"
+              title={absoluteTime(s.upcomingDeadline.dueDate)}
+            >
               · {relativeTime(s.upcomingDeadline.dueDate)}
             </span>
           </div>
@@ -101,16 +104,13 @@ export default function SummaryView({ projectId }: { projectId: string }) {
 
       <ChartCard title="Recent activity">
         {s.recentActivity.length === 0 ? (
-          <p className="text-sm text-ink-muted">Nothing yet.</p>
+          <p className="text-ink-muted text-sm">Nothing yet.</p>
         ) : (
-          <ul className="divide-y divide-line">
+          <ul className="divide-line divide-y">
             {s.recentActivity.slice(0, 10).map((a) => (
               <li key={a.id} className="flex items-center justify-between py-2 text-sm">
                 <span className="truncate">{a.title}</span>
-                <span
-                  className="ml-3 shrink-0 text-xs text-ink-muted"
-                  title={absoluteTime(a.at)}
-                >
+                <span className="text-ink-muted ml-3 shrink-0 text-xs" title={absoluteTime(a.at)}>
                   {relativeTime(a.at)}
                 </span>
               </li>
@@ -141,20 +141,20 @@ function StatCard({
         tone === 'danger' ? 'border-state-error/30 bg-state-error/15' : 'border-line bg-bg-surface'
       }`}
     >
-      <div className="flex items-center gap-2 text-xs uppercase tracking-wide text-ink-muted">
+      <div className="text-ink-muted flex items-center gap-2 text-xs uppercase tracking-wide">
         {icon}
         {label}
       </div>
-      <div className="mt-1 text-xl font-semibold text-ink">{value}</div>
-      {sub ? <div className="text-xs text-ink-muted">{sub}</div> : null}
+      <div className="text-ink mt-1 text-xl font-semibold">{value}</div>
+      {sub ? <div className="text-ink-muted text-xs">{sub}</div> : null}
     </div>
   );
 }
 
 function ChartCard({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <section className="rounded-lg border border-line bg-bg-surface p-4">
-      <h3 className="text-sm font-semibold text-ink">{title}</h3>
+    <section className="border-line bg-bg-surface rounded-lg border p-4">
+      <h3 className="text-ink text-sm font-semibold">{title}</h3>
       <div className="mt-3">{children}</div>
     </section>
   );
@@ -164,7 +164,7 @@ function ChartCard({ title, children }: { title: string; children: React.ReactNo
 function Donut({ data }: { data: { label: string; value: number; color: string }[] }) {
   const total = data.reduce((s, d) => s + d.value, 0);
   if (total === 0) {
-    return <p className="text-sm text-ink-muted">No data yet.</p>;
+    return <p className="text-ink-muted text-sm">No data yet.</p>;
   }
   let acc = 0;
   const radius = 60;
@@ -202,7 +202,7 @@ function Donut({ data }: { data: { label: string; value: number; color: string }
               aria-hidden
             />
             <span className="text-ink">{d.label}</span>
-            <span className="ml-auto font-mono text-ink-muted">{d.value}</span>
+            <span className="text-ink-muted ml-auto font-mono">{d.value}</span>
           </li>
         ))}
       </ul>
@@ -213,21 +213,18 @@ function Donut({ data }: { data: { label: string; value: number; color: string }
 function HorizontalBars({ data }: { data: { label: string; value: number }[] }) {
   const max = Math.max(1, ...data.map((d) => d.value));
   if (data.length === 0) {
-    return <p className="text-sm text-ink-muted">No data yet.</p>;
+    return <p className="text-ink-muted text-sm">No data yet.</p>;
   }
   return (
     <ul className="space-y-2">
       {data.map((d) => (
         <li key={d.label} className="text-xs">
-          <div className="flex justify-between text-ink">
+          <div className="text-ink flex justify-between">
             <span className="truncate">{d.label}</span>
-            <span className="font-mono text-ink-muted">{d.value}</span>
+            <span className="text-ink-muted font-mono">{d.value}</span>
           </div>
-          <div className="mt-0.5 h-2 w-full overflow-hidden rounded-full bg-bg-subtle">
-            <div
-              className="h-full bg-[#EAF0FC]0"
-              style={{ width: `${(d.value / max) * 100}%` }}
-            />
+          <div className="bg-bg-subtle mt-0.5 h-2 w-full overflow-hidden rounded-full">
+            <div className="bg-[#EAF0FC]0 h-full" style={{ width: `${(d.value / max) * 100}%` }} />
           </div>
         </li>
       ))}

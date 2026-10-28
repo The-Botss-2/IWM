@@ -47,7 +47,13 @@ const LINK_HINT: Record<ClientDocumentLink, string> = {
 
 const docHref = (id: string) => `/documents?doc=${encodeURIComponent(id)}`;
 
-export function ClientDocumentsTab({ clientId, clientName }: { clientId: string; clientName: string }) {
+export function ClientDocumentsTab({
+  clientId,
+  clientName,
+}: {
+  clientId: string;
+  clientName: string;
+}) {
   const docs = useClientDocuments(clientId);
   const [creating, setCreating] = useState(false);
   const [signing, setSigning] = useState<ClientDocument | null>(null);
@@ -57,10 +63,10 @@ export function ClientDocumentsTab({ clientId, clientName }: { clientId: string;
     <section className="space-y-4" aria-labelledby="client-docs-heading">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h2 id="client-docs-heading" className="text-base font-semibold text-ink">
+          <h2 id="client-docs-heading" className="text-ink text-base font-semibold">
             Documents
           </h2>
-          <p className="mt-0.5 text-sm text-ink-muted">
+          <p className="text-ink-muted mt-0.5 text-sm">
             Filed under {clientName}, in its projects, or shared with it.
           </p>
         </div>
@@ -80,15 +86,16 @@ export function ClientDocumentsTab({ clientId, clientName }: { clientId: string;
       ) : docs.isError ? (
         <QueryError message="Couldn't load documents." onRetry={() => void docs.refetch()} />
       ) : items.length === 0 ? (
-        <div className="rounded-lg border border-dashed border-line bg-white p-10 text-center">
-          <p className="text-sm font-medium text-ink">No documents for this client yet.</p>
-          <p className="mt-1 text-sm text-ink-muted">
-            New documents made here are filed under {clientName} and stay internal until you share them.
+        <div className="border-line rounded-lg border border-dashed bg-white p-10 text-center">
+          <p className="text-ink text-sm font-medium">No documents for this client yet.</p>
+          <p className="text-ink-muted mt-1 text-sm">
+            New documents made here are filed under {clientName} and stay internal until you share
+            them.
           </p>
         </div>
       ) : (
         <>
-          <ul className="divide-y divide-line rounded-lg border border-line bg-white">
+          <ul className="divide-line border-line divide-y rounded-lg border bg-white">
             {items.map((d) => (
               <DocumentRow
                 key={d.id}
@@ -100,7 +107,7 @@ export function ClientDocumentsTab({ clientId, clientName }: { clientId: string;
             ))}
           </ul>
           {docs.data?.hasMore ? (
-            <p className="text-xs text-ink-muted">
+            <p className="text-ink-muted text-xs">
               Showing the most recent {items.length} documents. Search the{' '}
               <Link href="/documents" className="underline">
                 Documents page
@@ -152,16 +159,16 @@ function DocumentRow({
     <li className="flex flex-col gap-3 p-3 sm:flex-row sm:items-center">
       <div className="flex min-w-0 flex-1 items-start gap-3">
         <span
-          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-bg-subtle text-base"
+          className="bg-bg-subtle flex h-8 w-8 shrink-0 items-center justify-center rounded-md text-base"
           aria-hidden
         >
-          {d.icon ? d.icon : <FileText className="h-4 w-4 text-ink-muted" />}
+          {d.icon ? d.icon : <FileText className="text-ink-muted h-4 w-4" />}
         </span>
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
             <Link
               href={docHref(d.id)}
-              className="min-w-0 truncate text-sm font-medium text-ink hover:underline focus-visible:outline-none focus-visible:shadow-focus rounded"
+              className="text-ink focus-visible:shadow-focus min-w-0 truncate rounded text-sm font-medium hover:underline focus-visible:outline-none"
             >
               {d.title || 'Untitled'}
             </Link>
@@ -185,7 +192,7 @@ function DocumentRow({
               <Badge tone="neutral">Internal</Badge>
             )}
           </div>
-          <p className="mt-0.5 flex flex-wrap gap-x-2 text-xs text-ink-muted">
+          <p className="text-ink-muted mt-0.5 flex flex-wrap gap-x-2 text-xs">
             {projectName ? <span className="truncate">{projectName}</span> : null}
             <Tooltip content={absoluteTime(d.updatedAt)}>
               <span>Updated {relativeTime(d.updatedAt)}</span>
@@ -340,7 +347,7 @@ function NewClientDocumentDialog({
                 aria-describedby={error ? 'client-doc-title-error' : undefined}
               />
               {error ? (
-                <p id="client-doc-title-error" className="text-xs text-state-error">
+                <p id="client-doc-title-error" className="text-state-error text-xs">
                   {error}
                 </p>
               ) : null}
@@ -354,8 +361,9 @@ function NewClientDocumentDialog({
               />
               <div>
                 <Label htmlFor="client-doc-share">Share with {clientName} now</Label>
-                <p className="text-xs text-ink-muted">
-                  Everyone with portal access at {clientName} can read it. You can share it later instead.
+                <p className="text-ink-muted text-xs">
+                  Everyone with portal access at {clientName} can read it. You can share it later
+                  instead.
                 </p>
               </div>
             </div>

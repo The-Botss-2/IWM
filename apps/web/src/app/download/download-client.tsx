@@ -115,8 +115,7 @@ export function DownloadClient() {
     (async () => {
       const entries = await Promise.all(
         OS_ORDER.map(
-          async (os) =>
-            [os, await loadRelease(base, OS_META[os].feed, OS_META[os].kind)] as const,
+          async (os) => [os, await loadRelease(base, OS_META[os].feed, OS_META[os].kind)] as const,
         ),
       );
       if (cancelled) return;
@@ -138,7 +137,11 @@ export function DownloadClient() {
       <PageLoader
         fullScreen
         label={
-          authFailed ? 'Redirecting to sign-in' : isPortalAccount ? 'Opening your client portal' : 'Loading'
+          authFailed
+            ? 'Redirecting to sign-in'
+            : isPortalAccount
+              ? 'Opening your client portal'
+              : 'Loading'
         }
       />
     );
@@ -157,7 +160,7 @@ export function DownloadClient() {
             : router.push('/home')
         }
         aria-label="Go back"
-        className="fixed left-4 top-4 inline-flex items-center gap-1.5 rounded-full border border-line bg-white/80 px-3 py-1.5 text-sm text-ink shadow-soft backdrop-blur transition-colors hover:bg-bg-subtle focus-visible:outline-none focus-visible:ring-2"
+        className="border-line text-ink shadow-soft hover:bg-bg-subtle fixed left-4 top-4 inline-flex items-center gap-1.5 rounded-full border bg-white/80 px-3 py-1.5 text-sm backdrop-blur transition-colors focus-visible:outline-none focus-visible:ring-2"
       >
         <ArrowLeft className="h-4 w-4" />
         Back
@@ -165,27 +168,27 @@ export function DownloadClient() {
 
       <Logo variant="full" size="md" />
 
-      <h1 className="mt-8 text-2xl font-semibold text-ink">Botss Desktop</h1>
-      <p className="mt-2 text-sm text-ink-muted">
-        The full Botss workspace in a native window - chat, projects, mail, and
-        calls, with desktop notifications and deep links.
+      <h1 className="text-ink mt-8 text-2xl font-semibold">Botss Desktop</h1>
+      <p className="text-ink-muted mt-2 text-sm">
+        The full Botss workspace in a native window - chat, projects, mail, and calls, with desktop
+        notifications and deep links.
       </p>
 
       {/* Primary CTA for the visitor's detected OS. */}
       <div className="mt-8 w-full">
         {loading ? (
-          <div className="h-12 w-full animate-pulse rounded-full bg-bg-subtle" />
+          <div className="bg-bg-subtle h-12 w-full animate-pulse rounded-full" />
         ) : primaryRelease ? (
           <a
             href={primaryRelease.url}
-            className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-full bg-brand-gradient px-6 text-sm font-medium text-white shadow-pill transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60"
+            className="bg-brand-gradient shadow-pill inline-flex h-12 w-full items-center justify-center gap-2 rounded-full px-6 text-sm font-medium text-white transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60"
           >
             <PrimaryIcon className="h-4 w-4" />
             Download for {OS_META[primary].label}
             <span className="text-white/70">v{primaryRelease.version}</span>
           </a>
         ) : (
-          <div className="rounded-xl border border-line bg-bg-subtle px-4 py-3 text-sm text-ink-muted">
+          <div className="border-line bg-bg-subtle text-ink-muted rounded-xl border px-4 py-3 text-sm">
             No {OS_META[primary].label} build is published yet. Check back soon.
           </div>
         )}
@@ -193,7 +196,7 @@ export function DownloadClient() {
 
       {/* Every platform, so a visitor can grab a build for another machine. */}
       <div className="mt-6 w-full">
-        <div className="mb-2 text-xs font-medium uppercase tracking-wide text-ink-muted">
+        <div className="text-ink-muted mb-2 text-xs font-medium uppercase tracking-wide">
           All platforms
         </div>
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
@@ -209,46 +212,44 @@ export function DownloadClient() {
                 className={cn(
                   'flex items-center justify-center gap-2 rounded-lg border px-3 py-2.5 text-sm transition-colors',
                   disabled
-                    ? 'pointer-events-none border-line bg-bg-subtle text-ink-muted'
+                    ? 'border-line bg-bg-subtle text-ink-muted pointer-events-none'
                     : 'border-line text-ink hover:bg-bg-subtle',
                 )}
               >
                 <Icon className="h-4 w-4" />
                 {OS_META[os].label}
-                {rel ? <Download className="h-3.5 w-3.5 text-ink-muted" /> : null}
+                {rel ? <Download className="text-ink-muted h-3.5 w-3.5" /> : null}
               </a>
             );
           })}
         </div>
       </div>
 
-      <p className="mt-8 max-w-md text-xs text-ink-muted">
-        The app is unsigned, so the first launch shows a one-time
-        &ldquo;unrecognized app&rdquo; warning - choose <strong>More info → Run
-        anyway</strong> (Windows) or right-click → <strong>Open</strong> (macOS).
-        After that it updates itself automatically.
+      <p className="text-ink-muted mt-8 max-w-md text-xs">
+        The app is unsigned, so the first launch shows a one-time &ldquo;unrecognized app&rdquo;
+        warning - choose <strong>More info → Run anyway</strong> (Windows) or right-click →{' '}
+        <strong>Open</strong> (macOS). After that it updates itself automatically.
       </p>
 
-      <p className="mt-6 text-xs text-ink-muted">
-        On Android? Grab the APK above - you may need to allow installs from
-        this source on the first run. The app also ships on the Play Store.
+      <p className="text-ink-muted mt-6 text-xs">
+        On Android? Grab the APK above - you may need to allow installs from this source on the
+        first run. The app also ships on the Play Store.
       </p>
 
-      <p className="mt-3 max-w-md text-xs text-ink-muted">
+      <p className="text-ink-muted mt-3 max-w-md text-xs">
         On iPhone/iPad? The iOS app installs through{' '}
         <a
           href="https://altstore.io"
           target="_blank"
           rel="noopener noreferrer"
-          className="font-medium text-brand-600 hover:underline"
+          className="text-brand-600 font-medium hover:underline"
         >
           AltStore
         </a>{' '}
-        (sideloading), not the App Store. Install AltStore on your computer with
-        AltServer, then download the <strong>iOS (AltStore)</strong> file above and
-        open it in AltStore to install. With a free Apple ID the app needs a
-        refresh every 7 days - AltServer does this automatically while it can
-        reach your device on the same Wi-Fi.
+        (sideloading), not the App Store. Install AltStore on your computer with AltServer, then
+        download the <strong>iOS (AltStore)</strong> file above and open it in AltStore to install.
+        With a free Apple ID the app needs a refresh every 7 days - AltServer does this
+        automatically while it can reach your device on the same Wi-Fi.
       </p>
     </main>
   );

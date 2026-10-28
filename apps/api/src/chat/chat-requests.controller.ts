@@ -127,10 +127,7 @@ export class ChatRequestsController {
 
   @Delete(':id')
   @SkipPermissions()
-  cancel(
-    @CurrentUser() user: AuthedUser,
-    @Param('id', new ZodValidationPipe(cuid)) id: string,
-  ) {
+  cancel(@CurrentUser() user: AuthedUser, @Param('id', new ZodValidationPipe(cuid)) id: string) {
     return this.requests.cancel(user, id);
   }
 }

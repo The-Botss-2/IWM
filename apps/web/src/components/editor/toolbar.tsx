@@ -42,7 +42,7 @@ export function EditorToolbar({ editor, onUploadImage }: Props) {
   }, []);
 
   return (
-    <div className="sticky top-0 z-10 flex flex-wrap items-center gap-0.5 border-b border-line bg-white/95 px-2 py-1.5 backdrop-blur">
+    <div className="border-line sticky top-0 z-10 flex flex-wrap items-center gap-0.5 border-b bg-white/95 px-2 py-1.5 backdrop-blur">
       <ToolbarButton
         editor={editor}
         label="Undo"
@@ -177,8 +177,8 @@ function ToolbarButton({
       disabled={disabled || !editor.isEditable}
       onClick={onClick}
       className={cn(
-        'inline-flex h-8 w-8 items-center justify-center rounded text-ink-muted hover:bg-bg-subtle hover:text-ink',
-        'focus-visible:outline-none focus-visible:ring-2 focus-visible:shadow-focus',
+        'text-ink-muted hover:bg-bg-subtle hover:text-ink inline-flex h-8 w-8 items-center justify-center rounded',
+        'focus-visible:shadow-focus focus-visible:outline-none focus-visible:ring-2',
         'disabled:cursor-not-allowed disabled:opacity-40',
         active ? 'bg-brand-50 text-brand-700' : '',
       )}
@@ -190,5 +190,5 @@ function ToolbarButton({
 }
 
 function Separator() {
-  return <span aria-hidden className="mx-1 h-5 w-px bg-line" />;
+  return <span aria-hidden className="bg-line mx-1 h-5 w-px" />;
 }

@@ -54,7 +54,8 @@ export function netOrNull(a: LineAmounts): Decimal | null {
   return net.isNegative() ? null : net;
 }
 
-export const NEGATIVE_NET_DETAIL = 'Deductions and tax are larger than salary, bonus and commission.';
+export const NEGATIVE_NET_DETAIL =
+  'Deductions and tax are larger than salary, bonus and commission.';
 
 export function computeNet(a: LineAmounts): Decimal {
   const net = netOrNull(a);

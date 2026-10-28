@@ -57,7 +57,7 @@ export function TagInput({
   return (
     <div
       className={cn(
-        'flex min-h-10 w-full flex-wrap items-center gap-1.5 rounded-md border border-line bg-white px-2 py-1.5 transition-all',
+        'border-line flex min-h-10 w-full flex-wrap items-center gap-1.5 rounded-md border bg-white px-2 py-1.5 transition-all',
         'focus-within:border-brand-purple focus-within:shadow-focus',
         disabled && 'pointer-events-none opacity-50',
         className,
@@ -66,14 +66,14 @@ export function TagInput({
       {value.map((tag, idx) => (
         <span
           key={`${tag}-${idx}`}
-          className="inline-flex items-center gap-1 rounded-full bg-bg-subtle px-2 py-0.5 text-xs text-ink"
+          className="bg-bg-subtle text-ink inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs"
         >
           {tag}
           <button
             type="button"
             aria-label={`Remove ${tag}`}
             onClick={() => removeAt(idx)}
-            className="rounded p-0.5 text-ink-muted hover:text-ink focus-visible:outline-none focus-visible:shadow-focus"
+            className="text-ink-muted hover:text-ink focus-visible:shadow-focus rounded p-0.5 focus-visible:outline-none"
           >
             <X className="h-3 w-3" aria-hidden />
           </button>
@@ -89,7 +89,7 @@ export function TagInput({
         placeholder={value.length === 0 ? placeholder : ''}
         disabled={disabled}
         aria-label={ariaLabel}
-        className="flex-1 min-w-[100px] bg-transparent text-sm outline-none placeholder:text-ink-disabled"
+        className="placeholder:text-ink-disabled min-w-[100px] flex-1 bg-transparent text-sm outline-none"
       />
     </div>
   );

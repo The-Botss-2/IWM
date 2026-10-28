@@ -65,7 +65,10 @@ const MARKER_PREFIXES = ['__call__', '__share__', '__system__'];
  * kinds that understand at least one of the active filters; otherwise it
  * would list every task in the workspace.
  */
-const FILTERS: Record<SearchResultKind, { from: boolean; date: boolean; in: boolean; has: ('file' | 'link')[] }> = {
+const FILTERS: Record<
+  SearchResultKind,
+  { from: boolean; date: boolean; in: boolean; has: ('file' | 'link')[] }
+> = {
   chat_message: { from: true, date: true, in: true, has: ['file', 'link'] },
   file: { from: true, date: true, in: true, has: ['file'] },
   workspace_file: { from: true, date: true, in: false, has: ['file'] },
@@ -259,9 +262,7 @@ export class SearchService {
           deletedAt: null,
           OR: [
             { workspaceId: null },
-            ...(organizationId
-              ? [{ workspace: { organizationId, deletedAt: null } }]
-              : []),
+            ...(organizationId ? [{ workspace: { organizationId, deletedAt: null } }] : []),
           ],
         },
       },
@@ -367,7 +368,8 @@ export class SearchService {
     if (!leanKind) return [];
     // The text match runs once (MATERIALIZED); both pools read from it. Both
     // pools break date ties by id so every page of a query sees the same pool.
-    const titleOut = leanKind.titleOut && ctx.match.like ? Prisma.raw(`b."${leanKind.titleOut}"`) : null;
+    const titleOut =
+      leanKind.titleOut && ctx.match.like ? Prisma.raw(`b."${leanKind.titleOut}"`) : null;
     const titlePrefix = titleOut
       ? Prisma.sql`${titleOut} ILIKE ${prefixPattern(ctx.match.like)}`
       : Prisma.sql`FALSE`;
@@ -411,7 +413,13 @@ export class SearchService {
     return parts.length > 0 ? Prisma.join(parts, '') : Prisma.empty;
   }
 
-  private score(ctx: Ctx, fts: Prisma.Sql, title: Prisma.Sql | null, at: Prisma.Sql, lean: boolean) {
+  private score(
+    ctx: Ctx,
+    fts: Prisma.Sql,
+    title: Prisma.Sql | null,
+    at: Prisma.Sql,
+    lean: boolean,
+  ) {
     return lean ? Prisma.sql`0::float8` : scoreSql({ fts, title, at, match: ctx.match });
   }
 
@@ -514,7 +522,9 @@ export class SearchService {
       case 'client': {
         const fts = FTS.client;
         // clientVisibleWhere: full sales or finance sees every client.
-        const assignee = ctx.allClients ? Prisma.empty : Prisma.sql` AND c."assigneeId" = ${userId}`;
+        const assignee = ctx.allClients
+          ? Prisma.empty
+          : Prisma.sql` AND c."assigneeId" = ${userId}`;
         return {
           base: Prisma.sql`
             SELECT c.id, c.name, c."updatedAt" AS at,
@@ -580,7 +590,9 @@ export class SearchService {
           MARKER_PREFIXES.map((p) => Prisma.sql`starts_with(coalesce(m.content, ''), ${p})`),
           ' OR ',
         );
-        const from = ctx.fromUserId ? Prisma.sql` AND m."senderId" = ${ctx.fromUserId}` : Prisma.empty;
+        const from = ctx.fromUserId
+          ? Prisma.sql` AND m."senderId" = ${ctx.fromUserId}`
+          : Prisma.empty;
         const has =
           ctx.has === 'file'
             ? Prisma.sql` AND EXISTS (SELECT 1 FROM "ChatRoomAttachment" a WHERE a."messageId" = m.id)`
@@ -625,7 +637,9 @@ export class SearchService {
         const rooms = await this.chatRooms(ctx);
         if (rooms.length === 0) return null;
         const fts = FTS.chatFile;
-        const from = ctx.fromUserId ? Prisma.sql` AND m."senderId" = ${ctx.fromUserId}` : Prisma.empty;
+        const from = ctx.fromUserId
+          ? Prisma.sql` AND m."senderId" = ${ctx.fromUserId}`
+          : Prisma.empty;
         // The message join only contributes columns ChatRoomAttachment does not
         // have, so the unqualified "fileName" in FTS.chatFile stays unambiguous.
         return {
@@ -671,7 +685,9 @@ export class SearchService {
           WHERE ca."fileObjectId" = f.id
             AND cm."deletedAt" IS NULL AND tk."deletedAt" IS NULL AND p."deletedAt" IS NULL
             AND p."workspaceId" = ${workspaceId} AND ${this.projectVisible(ctx, 'p')}`;
-        const from = ctx.fromUserId ? Prisma.sql` AND f."uploadedById" = ${ctx.fromUserId}` : Prisma.empty;
+        const from = ctx.fromUserId
+          ? Prisma.sql` AND f."uploadedById" = ${ctx.fromUserId}`
+          : Prisma.empty;
         return {
           base: Prisma.sql`
             SELECT f.id, f.filename, f.url, f."createdAt" AS at,
@@ -805,7 +821,12 @@ export class SearchService {
         OR: [{ name: t }, { email: t }],
         // `-word`: drop people whose name or email contains it.
         ...(ctx.negWords.length > 0
-          ? { NOT: ctx.negWords.flatMap((w) => [{ name: insensitive(w) }, { email: insensitive(w) }]) }
+          ? {
+              NOT: ctx.negWords.flatMap((w) => [
+                { name: insensitive(w) },
+                { email: insensitive(w) },
+              ]),
+            }
           : {}),
       },
       select: { id: true, name: true, email: true },
@@ -855,7 +876,11 @@ export class SearchService {
           // `-word`: drop mail containing it in any field the text matches on.
           // fromName is nullable, and NOT over a NULL would drop the row too.
           ...ctx.negWords.map((w) => ({
-            NOT: [{ subject: insensitive(w) }, { fromAddress: insensitive(w) }, { bodyTextPreview: insensitive(w) }],
+            NOT: [
+              { subject: insensitive(w) },
+              { fromAddress: insensitive(w) },
+              { bodyTextPreview: insensitive(w) },
+            ],
             OR: [{ fromName: null }, { NOT: { fromName: insensitive(w) } }],
           })),
         ],

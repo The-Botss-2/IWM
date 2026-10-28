@@ -129,10 +129,7 @@ export class InvitationsService {
    * password: someone holding a forwarded or intercepted invite (link and
    * code) must not be able to take over an account that is already set up.
    */
-  async accept(
-    token: string,
-    input: AcceptInvitationInput,
-  ): Promise<AcceptInvitationResponse> {
+  async accept(token: string, input: AcceptInvitationInput): Promise<AcceptInvitationResponse> {
     const tokenRow = await this.liveToken(token);
 
     const portal = parsePortalTokenIdentifier(tokenRow.identifier);
@@ -345,7 +342,9 @@ export class InvitationsService {
       }
     });
 
-    this.logger.log(`[PORTAL_${p.kind === 'portal-reset' ? 'RESET' : 'INVITE'}_ACCEPT] client=${p.clientId} user=${p.userId}`);
+    this.logger.log(
+      `[PORTAL_${p.kind === 'portal-reset' ? 'RESET' : 'INVITE'}_ACCEPT] client=${p.clientId} user=${p.userId}`,
+    );
     return {
       ok: true,
       workspaceId: contact.client.workspaceId,

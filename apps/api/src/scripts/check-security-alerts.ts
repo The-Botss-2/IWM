@@ -137,7 +137,10 @@ async function main(): Promise<void> {
   {
     // Every alert is visible in the platform log.
     for (const action of SECURITY_ALERT_ACTIONS) {
-      assert.ok((PLATFORM_AUDIT_ACTIONS as readonly string[]).includes(action), `${action} is a platform action`);
+      assert.ok(
+        (PLATFORM_AUDIT_ACTIONS as readonly string[]).includes(action),
+        `${action} is a platform action`,
+      );
     }
   }
   {

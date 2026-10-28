@@ -1,14 +1,4 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Patch,
-  Post,
-  Query,
-  Req,
-} from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query, Req } from '@nestjs/common';
 import type { Request } from 'express';
 import {
   addDocumentAccessSchema,
@@ -35,20 +25,19 @@ import {
 import { CurrentUser, type AuthedUser } from '../common/decorators/current-user.decorator';
 import { CurrentWorkspaceId } from '../common/decorators/current-workspace.decorator';
 import { RequireAbility } from '../common/decorators/required-ability.decorator';
-import {
-  CurrentSalesActor,
-  type SalesActor,
-} from '../common/decorators/sales-actor.decorator';
+import { CurrentSalesActor, type SalesActor } from '../common/decorators/sales-actor.decorator';
 import type { RequestExtensions } from '../common/guards/auth.guard';
 import { ZodValidationPipe } from '../common/pipes/zod-validation.pipe';
 import { DocumentsService, type DocumentAccessContext } from './documents.service';
 
 /** Pulls the per-request access context out of the AuthGuard's payload. The
  *  document service uses this to gate reads, edits, and share-management. */
-function ctxOf(req: Request & RequestExtensions, workspaceId: string, userId: string): DocumentAccessContext {
-  const role = (req.workspaceMemberships ?? []).find(
-    (m) => m.workspaceId === workspaceId,
-  )?.role;
+function ctxOf(
+  req: Request & RequestExtensions,
+  workspaceId: string,
+  userId: string,
+): DocumentAccessContext {
+  const role = (req.workspaceMemberships ?? []).find((m) => m.workspaceId === workspaceId)?.role;
   return { userId, workspaceRole: role };
 }
 
@@ -189,7 +178,12 @@ export class DocumentsController {
     @Req() req: Request & RequestExtensions,
     @Param('id', new ZodValidationPipe(cuid)) id: string,
   ): Promise<DocumentShareTargets> {
-    return this.documents.listShareTargets(workspaceId, id, ctxOf(req, workspaceId, user.id), actor);
+    return this.documents.listShareTargets(
+      workspaceId,
+      id,
+      ctxOf(req, workspaceId, user.id),
+      actor,
+    );
   }
 
   @Post(':id/client-shares')

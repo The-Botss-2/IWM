@@ -51,9 +51,7 @@ export function projectAccessWhere(scope: UserScope): Record<string, unknown> {
  * Returns `null` when the caller sees everything, so callers can skip adding
  * a clause entirely rather than composing an always-true one.
  */
-export function projectVisibilityWhere(
-  scope: UserScope,
-): Record<string, unknown> | null {
+export function projectVisibilityWhere(scope: UserScope): Record<string, unknown> | null {
   if (scope.seesEveryProject) return null;
   return {
     OR: [

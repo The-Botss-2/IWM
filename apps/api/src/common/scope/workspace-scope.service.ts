@@ -50,11 +50,10 @@ export class WorkspaceScopeService {
       // No org assignment means the caller can only see their own
       // workspace memberships - keep the legacy behavior so we don't
       // accidentally widen visibility for an unmigrated user.
-      const memberships =
-        await this.prisma.client.workspaceMembership.findMany({
-          where: { userId },
-          select: { workspaceId: true },
-        });
+      const memberships = await this.prisma.client.workspaceMembership.findMany({
+        where: { userId },
+        select: { workspaceId: true },
+      });
       const scoped = memberships.map((m) => m.workspaceId);
       if (requestedWorkspaceId && !scoped.includes(requestedWorkspaceId)) {
         throw new NotFoundException({

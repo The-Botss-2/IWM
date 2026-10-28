@@ -2,11 +2,7 @@
 
 import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
-import type {
-  AuditLogEntry,
-  AuditLogListResponse,
-  ListAuditLogQuery,
-} from '@botss/shared-types';
+import type { AuditLogEntry, AuditLogListResponse, ListAuditLogQuery } from '@botss/shared-types';
 
 import { AuditLogTable } from '@/components/admin/audit-log-table';
 import { Button } from '@/components/ui/button';
@@ -68,8 +64,8 @@ export function AuditLogView<T extends AuditLogEntry>({
   return (
     <div className="space-y-6">
       <header>
-        <h2 className="text-lg font-semibold text-ink">{title}</h2>
-        <p className="mt-0.5 text-sm text-ink-muted">{description}</p>
+        <h2 className="text-ink text-lg font-semibold">{title}</h2>
+        <p className="text-ink-muted mt-0.5 text-sm">{description}</p>
       </header>
 
       <div className="flex flex-wrap items-end gap-3">
@@ -121,7 +117,7 @@ export function AuditLogView<T extends AuditLogEntry>({
         ) : null}
       </div>
 
-      <section className="rounded-lg border border-line bg-white">
+      <section className="border-line rounded-lg border bg-white">
         <div className="overflow-x-auto">
           {list.isLoading ? (
             <div className="flex justify-center px-4 py-8">
@@ -134,21 +130,16 @@ export function AuditLogView<T extends AuditLogEntry>({
               className="m-4"
             />
           ) : items.length === 0 ? (
-            <p className="px-4 py-8 text-center text-xs text-ink-muted">
-              No matching events.
-            </p>
+            <p className="text-ink-muted px-4 py-8 text-center text-xs">No matching events.</p>
           ) : (
-            <AuditLogTable
-              items={items}
-              {...(organizationName ? { organizationName } : {})}
-            />
+            <AuditLogTable items={items} {...(organizationName ? { organizationName } : {})} />
           )}
         </div>
       </section>
 
       {pagination && pagination.totalPages > 1 ? (
         <div className="flex items-center justify-end gap-2">
-          <span className="text-xs text-ink-muted">
+          <span className="text-ink-muted text-xs">
             Page {pagination.page} of {pagination.totalPages}
           </span>
           <Button

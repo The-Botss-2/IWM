@@ -1,9 +1,4 @@
-import {
-  Injectable,
-  Logger,
-  OnModuleDestroy,
-  ServiceUnavailableException,
-} from '@nestjs/common';
+import { Injectable, Logger, OnModuleDestroy, ServiceUnavailableException } from '@nestjs/common';
 import { Prisma, type MailAccount, type MailFolder } from '@botss/database';
 import { ImapFlow, type FetchMessageObject, type ListResponse } from 'imapflow';
 
@@ -106,10 +101,7 @@ const MAX_SOURCE_BYTES = intFromEnv('MAIL_MAX_SOURCE_BYTES', 15 * 1024 * 1024);
  */
 const FLAG_RECONCILE_WINDOW = intFromEnv('MAIL_FLAG_RECONCILE_WINDOW', 500);
 /** Minimum gap between flag reconciliations for the same folder. */
-const FLAG_RECONCILE_INTERVAL_MS = intFromEnv(
-  'MAIL_FLAG_RECONCILE_INTERVAL_MS',
-  60_000,
-);
+const FLAG_RECONCILE_INTERVAL_MS = intFromEnv('MAIL_FLAG_RECONCILE_INTERVAL_MS', 60_000);
 /**
  * A local flag write younger than this wins over whatever IMAP reports.
  * Covers two cases: the server has not yet reflected the STORE we just
@@ -196,7 +188,12 @@ export class ImapSyncService implements OnModuleDestroy {
   private async acquireClient(account: MailAccount): Promise<ImapFlow> {
     let entry = this.pool.get(account.id);
     if (!entry) {
-      entry = { client: null as unknown as ImapFlow, refCount: 0, idleTimer: null, connecting: null };
+      entry = {
+        client: null as unknown as ImapFlow,
+        refCount: 0,
+        idleTimer: null,
+        connecting: null,
+      };
       this.pool.set(account.id, entry);
     }
     if (entry.idleTimer) {
@@ -557,7 +554,16 @@ export class ImapSyncService implements OnModuleDestroy {
         hasSpecialUse: !!f.specialUse,
       }));
       const winners = new Map<string, string>(); // role -> winning folder.path
-      const ROLES = ['INBOX', 'SENT', 'DRAFTS', 'TRASH', 'SPAM', 'ARCHIVE', 'ALL', 'FLAGGED'] as const;
+      const ROLES = [
+        'INBOX',
+        'SENT',
+        'DRAFTS',
+        'TRASH',
+        'SPAM',
+        'ARCHIVE',
+        'ALL',
+        'FLAGGED',
+      ] as const;
       for (const role of ROLES) {
         const matches = candidates.filter((c) => c.role === role);
         if (matches.length === 0) continue;
@@ -575,10 +581,7 @@ export class ImapSyncService implements OnModuleDestroy {
         const detected = roleFromFolder(folder);
         // Only the winner for each role keeps the role assignment; runners-up
         // are demoted to null so they show up under their literal name.
-        const role =
-          detected != null && winners.get(detected) === folder.path
-            ? detected
-            : null;
+        const role = detected != null && winners.get(detected) === folder.path ? detected : null;
         const delimiter = folder.delimiter || '/';
 
         const row = await this.prisma.client.mailFolder.upsert({
@@ -702,7 +705,9 @@ export class ImapSyncService implements OnModuleDestroy {
           const mbox =
             client.mailbox && typeof client.mailbox !== 'boolean' ? client.mailbox : null;
           const rawExists = (mbox as { exists?: number | string } | null)?.exists;
-          const totalExists = Number.isFinite(Number(rawExists)) ? Math.trunc(Number(rawExists)) : 0;
+          const totalExists = Number.isFinite(Number(rawExists))
+            ? Math.trunc(Number(rawExists))
+            : 0;
           serverUidNext = mbox?.uidNext != null ? BigInt(mbox.uidNext) : null;
           const serverValidity = mbox?.uidValidity != null ? BigInt(mbox.uidValidity) : null;
 
@@ -762,9 +767,7 @@ export class ImapSyncService implements OnModuleDestroy {
                 where: { folderId },
               });
               if (count > 0) {
-                this.logger.log(
-                  `Cleared ${count} row(s) for now-empty folder=${folder.path}`,
-                );
+                this.logger.log(`Cleared ${count} row(s) for now-empty folder=${folder.path}`);
               }
               await this.prisma.client.mailFolder.update({
                 where: { id: folderId },
@@ -829,9 +832,7 @@ export class ImapSyncService implements OnModuleDestroy {
             if (!Array.isArray(found)) {
               throw new ServiceUnavailableException({ title: 'Mail search failed', status: 503 });
             }
-            newUids = found
-              .filter((u) => BigInt(u) >= floor)
-              .sort((a, b) => a - b);
+            newUids = found.filter((u) => BigInt(u) >= floor).sort((a, b) => a - b);
             if (newUids.length > 0) {
               const top = BigInt(newUids[newUids.length - 1]!) + 1n;
               if (serverUidNext == null || top > serverUidNext) serverUidNext = top;
@@ -880,7 +881,9 @@ export class ImapSyncService implements OnModuleDestroy {
             // Full source only for messages we have not stored yet and that
             // are small enough to pull whole. Flag-only updates need none.
             const wantSource = metas
-              .filter((m) => m.uid != null && !knownUids.has(m.uid) && (m.size ?? 0) <= MAX_SOURCE_BYTES)
+              .filter(
+                (m) => m.uid != null && !knownUids.has(m.uid) && (m.size ?? 0) <= MAX_SOURCE_BYTES,
+              )
               .map((m) => m.uid as number);
             if (wantSource.length > 0) {
               for await (const msg of client.fetch(
@@ -893,10 +896,15 @@ export class ImapSyncService implements OnModuleDestroy {
             }
 
             for (const m of metas) {
-              if (m.uid == null || knownUids.has(m.uid) || (m.size ?? 0) <= MAX_SOURCE_BYTES) continue;
+              if (m.uid == null || knownUids.has(m.uid) || (m.size ?? 0) <= MAX_SOURCE_BYTES)
+                continue;
               textBodies.set(
                 m.uid,
-                await this.downloadTextParts(client, m.uid, m.bodyStructure as BodyStructureNode | undefined),
+                await this.downloadTextParts(
+                  client,
+                  m.uid,
+                  m.bodyStructure as BodyStructureNode | undefined,
+                ),
               );
             }
           } finally {
@@ -946,11 +954,7 @@ export class ImapSyncService implements OnModuleDestroy {
       // Backstop: nothing listed but the server's UIDNEXT moved (a message was
       // expunged before we got to it). Catch the cursor up so we don't loop on
       // a gap the server already skipped.
-      if (
-        runUids.length === 0 &&
-        serverUidNext != null &&
-        serverUidNext > (folder.uidNext ?? 0n)
-      ) {
+      if (runUids.length === 0 && serverUidNext != null && serverUidNext > (folder.uidNext ?? 0n)) {
         await this.prisma.client.mailFolder.update({
           where: { id: folderId },
           data: { uidNext: serverUidNext },
@@ -1051,15 +1055,9 @@ export class ImapSyncService implements OnModuleDestroy {
    * optimization, and a failure here must not fail the import that preceded it.
    */
   private readonly lastReconcileAt = new Map<string, number>();
-  private async reconcileFolderFlags(
-    client: ImapFlow,
-    folder: MailFolder,
-  ): Promise<number> {
+  private async reconcileFolderFlags(client: ImapFlow, folder: MailFolder): Promise<number> {
     const now = Date.now();
-    if (
-      now - (this.lastReconcileAt.get(folder.id) ?? 0) <
-      FLAG_RECONCILE_INTERVAL_MS
-    ) {
+    if (now - (this.lastReconcileAt.get(folder.id) ?? 0) < FLAG_RECONCILE_INTERVAL_MS) {
       return 0;
     }
     this.lastReconcileAt.set(folder.id, now);
@@ -1089,11 +1087,7 @@ export class ImapSyncService implements OnModuleDestroy {
       const serverFlags = new Map<string, string[]>();
       const lock = await client.getMailboxLock(folder.path);
       try {
-        for await (const msg of client.fetch(
-          range,
-          { uid: true, flags: true },
-          { uid: true },
-        )) {
+        for await (const msg of client.fetch(range, { uid: true, flags: true }, { uid: true })) {
           if (msg.uid == null) continue;
           serverFlags.set(String(msg.uid), Array.from(msg.flags ?? []));
         }
@@ -1160,9 +1154,7 @@ export class ImapSyncService implements OnModuleDestroy {
           where: { id: { in: vanished } },
         });
         changed += count;
-        this.logger.log(
-          `Pruned ${count} expunged message(s) folder=${folder.path}`,
-        );
+        this.logger.log(`Pruned ${count} expunged message(s) folder=${folder.path}`);
       }
 
       // Keep the stored counter honest too. listFolders() derives the badge
@@ -1207,7 +1199,18 @@ export class ImapSyncService implements OnModuleDestroy {
   private async repushPending(
     client: ImapFlow,
     folder: MailFolder,
-    candidates: { row: { id: string; uid: bigint; isUnread: boolean; isStarred: boolean; seenPendingAt: Date | null; starredPendingAt: Date | null }; seen: boolean | null; flagged: boolean | null }[],
+    candidates: {
+      row: {
+        id: string;
+        uid: bigint;
+        isUnread: boolean;
+        isStarred: boolean;
+        seenPendingAt: Date | null;
+        starredPendingAt: Date | null;
+      };
+      seen: boolean | null;
+      flagged: boolean | null;
+    }[],
   ): Promise<void> {
     const sent = { seen: 0, flagged: 0 };
     const lock = await client.getMailboxLock(folder.path);
@@ -1216,11 +1219,18 @@ export class ImapSyncService implements OnModuleDestroy {
         (
           await this.prisma.client.mailMessage.findMany({
             where: { id: { in: candidates.map((c) => c.row.id) } },
-            select: { id: true, isUnread: true, isStarred: true, seenPendingAt: true, starredPendingAt: true },
+            select: {
+              id: true,
+              isUnread: true,
+              isStarred: true,
+              seenPendingAt: true,
+              starredPendingAt: true,
+            },
           })
         ).map((r) => [r.id, r] as const),
       );
-      const sameStamp = (a: Date | null, b: Date | null) => (a?.getTime() ?? null) === (b?.getTime() ?? null);
+      const sameStamp = (a: Date | null, b: Date | null) =>
+        (a?.getTime() ?? null) === (b?.getTime() ?? null);
 
       for (const field of ['seen', 'flagged'] as const) {
         const column = field === 'seen' ? 'seenPendingAt' : 'starredPendingAt';
@@ -1281,7 +1291,12 @@ export class ImapSyncService implements OnModuleDestroy {
    * the socket drops mid-command; ignoring that let a failed "mark as read"
    * look like a success, so it was never retried and later reverted.
    */
-  private async storeFlag(client: ImapFlow, range: string, flag: string, value: boolean): Promise<void> {
+  private async storeFlag(
+    client: ImapFlow,
+    range: string,
+    flag: string,
+    value: boolean,
+  ): Promise<void> {
     const applied = value
       ? await client.messageFlagsAdd(range, [flag], { uid: true })
       : await client.messageFlagsRemove(range, [flag], { uid: true });
@@ -1317,8 +1332,10 @@ export class ImapSyncService implements OnModuleDestroy {
       if (disposition === 'attachment' || n.dispositionParameters?.filename) return;
       const type = `${n.type ?? ''}/${n.subtype ?? ''}`.toLowerCase();
       const part = n.part ?? n.partID ?? '1';
-      if (type === 'text/plain' && !parts.some((p) => p.kind === 'text')) parts.push({ part, kind: 'text' });
-      if (type === 'text/html' && !parts.some((p) => p.kind === 'html')) parts.push({ part, kind: 'html' });
+      if (type === 'text/plain' && !parts.some((p) => p.kind === 'text'))
+        parts.push({ part, kind: 'text' });
+      if (type === 'text/html' && !parts.some((p) => p.kind === 'html'))
+        parts.push({ part, kind: 'html' });
     };
     walk(structure);
     for (const p of parts) {
@@ -1431,7 +1448,9 @@ export class ImapSyncService implements OnModuleDestroy {
         data: { [column]: null },
       })
       .catch((err: unknown) =>
-        this.logger.warn(`Clearing pending flags failed message=${(err as Error)?.message ?? 'unknown'}`),
+        this.logger.warn(
+          `Clearing pending flags failed message=${(err as Error)?.message ?? 'unknown'}`,
+        ),
       );
   }
 
@@ -1508,7 +1527,13 @@ export class ImapSyncService implements OnModuleDestroy {
    */
   private async flushPendingBeforeMove(
     client: ImapFlow,
-    rows: { uid: bigint; isUnread: boolean; isStarred: boolean; seenPendingAt: Date | null; starredPendingAt: Date | null }[],
+    rows: {
+      uid: bigint;
+      isUnread: boolean;
+      isStarred: boolean;
+      seenPendingAt: Date | null;
+      starredPendingAt: Date | null;
+    }[],
   ): Promise<void> {
     const groups: { flag: string; value: boolean; uids: string[] }[] = [];
     const add = (flag: string, value: boolean, uid: bigint) => {
@@ -1560,9 +1585,7 @@ export class ImapSyncService implements OnModuleDestroy {
     // we captured above. The row's uid/accountId/folderId is unchanged on
     // the server, so this re-insert puts the database back to the exact
     // pre-move state.
-    await this.prisma.client.mailMessage
-      .delete({ where: { id: messageId } })
-      .catch(() => {});
+    await this.prisma.client.mailMessage.delete({ where: { id: messageId } }).catch(() => {});
 
     let moveSucceeded = false;
     const client = await this.acquireClient(row.account);
@@ -1705,7 +1728,12 @@ export class ImapSyncService implements OnModuleDestroy {
       '\\Seen',
       true,
     );
-    if (pushed) await this.clearPending(unread.map((m) => m.id), 'seenPendingAt', pendingAt);
+    if (pushed)
+      await this.clearPending(
+        unread.map((m) => m.id),
+        'seenPendingAt',
+        pendingAt,
+      );
     return unread.length;
   }
 
@@ -1898,8 +1926,7 @@ export class ImapSyncService implements OnModuleDestroy {
                 seenPendingAt: row.seenPendingAt,
                 starredPendingAt: row.starredPendingAt,
                 inReplyTo: row.inReplyTo,
-                references:
-                  (row.references as Prisma.InputJsonValue) ?? Prisma.JsonNull,
+                references: (row.references as Prisma.InputJsonValue) ?? Prisma.JsonNull,
               })),
               skipDuplicates: true,
             })
@@ -1941,9 +1968,7 @@ export class ImapSyncService implements OnModuleDestroy {
    * - the controller enforces that constraint). One IMAP session per source
    * folder; one STORE + one EXPUNGE per group.
    */
-  async bulkDeleteMessages(
-    messageIds: string[],
-  ): Promise<{ deleted: number; skipped: number }> {
+  async bulkDeleteMessages(messageIds: string[]): Promise<{ deleted: number; skipped: number }> {
     if (messageIds.length === 0) return { deleted: 0, skipped: 0 };
 
     const rows = await this.prisma.client.mailMessage.findMany({
@@ -2024,7 +2049,13 @@ export class ImapSyncService implements OnModuleDestroy {
       {
         account: MailAccount;
         folder: MailFolder;
-        items: { id: string; uid: bigint; isUnread: boolean; isStarred: boolean; flags: Prisma.JsonValue }[];
+        items: {
+          id: string;
+          uid: bigint;
+          isUnread: boolean;
+          isStarred: boolean;
+          flags: Prisma.JsonValue;
+        }[];
       }
     >();
     for (const row of rows) {
@@ -2115,9 +2146,7 @@ export class ImapSyncService implements OnModuleDestroy {
         where: { folderId: { in: folderIds }, isUnread: true },
         _count: { _all: true },
       });
-      const unreadByFolder = new Map(
-        unreadRows.map((r) => [r.folderId, r._count._all]),
-      );
+      const unreadByFolder = new Map(unreadRows.map((r) => [r.folderId, r._count._all]));
       for (const folderId of folderIds) {
         await this.prisma.client.mailFolder.update({
           where: { id: folderId },
@@ -2179,11 +2208,7 @@ export class ImapSyncService implements OnModuleDestroy {
         if (!hint) return { content: null, healedPartId: null };
         let structure: BodyStructureNode | undefined;
         try {
-          const msg = await client.fetchOne(
-            uid.toString(),
-            { bodyStructure: true },
-            { uid: true },
-          );
+          const msg = await client.fetchOne(uid.toString(), { bodyStructure: true }, { uid: true });
           structure =
             msg && typeof msg === 'object'
               ? (msg.bodyStructure as BodyStructureNode | undefined)
@@ -2197,9 +2222,7 @@ export class ImapSyncService implements OnModuleDestroy {
           attachments.find(
             (a) => a.filename === hint.filename && a.contentType === hint.contentType,
           ) ??
-          (hint.contentId
-            ? attachments.find((a) => a.contentId === hint.contentId)
-            : undefined) ??
+          (hint.contentId ? attachments.find((a) => a.contentId === hint.contentId) : undefined) ??
           attachments.find((a) => a.filename === hint.filename);
         if (!match || match.partId === partId) {
           return { content: null, healedPartId: null };
@@ -2251,14 +2274,22 @@ export class ImapSyncService implements OnModuleDestroy {
     const sentAt = envelope?.date ?? receivedAt;
     const sizeBytes = msg.size ?? 0;
 
-    const toAddresses = (envelope?.to ?? []).map((a: { address?: string }) => a.address ?? '').filter(Boolean);
-    const ccAddresses = (envelope?.cc ?? []).map((a: { address?: string }) => a.address ?? '').filter(Boolean);
-    const bccAddresses = (envelope?.bcc ?? []).map((a: { address?: string }) => a.address ?? '').filter(Boolean);
+    const toAddresses = (envelope?.to ?? [])
+      .map((a: { address?: string }) => a.address ?? '')
+      .filter(Boolean);
+    const ccAddresses = (envelope?.cc ?? [])
+      .map((a: { address?: string }) => a.address ?? '')
+      .filter(Boolean);
+    const bccAddresses = (envelope?.bcc ?? [])
+      .map((a: { address?: string }) => a.address ?? '')
+      .filter(Boolean);
 
     const messageId = envelope?.messageId ?? null;
     const inReplyTo = envelope?.inReplyTo ?? null;
 
-    const { textPreview, attachments } = describeBodyStructure(msg.bodyStructure as BodyStructureNode | undefined);
+    const { textPreview, attachments } = describeBodyStructure(
+      msg.bodyStructure as BodyStructureNode | undefined,
+    );
 
     const existing = await this.prisma.client.mailMessage.findUnique({
       where: { accountId_folderId_uid: { accountId, folderId, uid: BigInt(msg.uid) } },
@@ -2297,7 +2328,7 @@ export class ImapSyncService implements OnModuleDestroy {
           existingPartIds.some((p, i) => p !== newPartIds[i]));
       const needsAttachmentHeal =
         existing.attachmentCount !== attachments.length ||
-        existing.hasAttachments !== (attachments.length > 0) ||
+        existing.hasAttachments !== attachments.length > 0 ||
         partIdsDrifted;
       if (needsAttachmentHeal) {
         await this.prisma.client.$transaction(async (tx) => {
@@ -2470,10 +2501,25 @@ interface BodyStructureNode {
   size?: number;
 }
 
-function describeBodyStructure(
-  node: BodyStructureNode | undefined,
-): { textPreview: string; attachments: { partId: string; filename: string; contentType: string; size: number; isInline: boolean; contentId: string | null }[] } {
-  const attachments: { partId: string; filename: string; contentType: string; size: number; isInline: boolean; contentId: string | null }[] = [];
+function describeBodyStructure(node: BodyStructureNode | undefined): {
+  textPreview: string;
+  attachments: {
+    partId: string;
+    filename: string;
+    contentType: string;
+    size: number;
+    isInline: boolean;
+    contentId: string | null;
+  }[];
+} {
+  const attachments: {
+    partId: string;
+    filename: string;
+    contentType: string;
+    size: number;
+    isInline: boolean;
+    contentId: string | null;
+  }[] = [];
   if (!node) return { textPreview: '', attachments };
 
   walk(node);
@@ -2485,13 +2531,11 @@ function describeBodyStructure(
       return;
     }
     const disposition = (n.disposition ?? '').toLowerCase();
-    const isAttachment = disposition === 'attachment' || (n.dispositionParameters?.filename != null);
+    const isAttachment = disposition === 'attachment' || n.dispositionParameters?.filename != null;
     const isInline = disposition === 'inline';
     if (isAttachment || (isInline && n.id != null)) {
       const filename =
-        n.dispositionParameters?.filename ??
-        n.parameters?.name ??
-        `untitled.${n.subtype ?? 'bin'}`;
+        n.dispositionParameters?.filename ?? n.parameters?.name ?? `untitled.${n.subtype ?? 'bin'}`;
       const contentType = `${n.type ?? 'application'}/${n.subtype ?? 'octet-stream'}`;
       // Prefer imapflow's `part` (e.g. "2", "2.1") which is what
       // `client.download(uid, part)` actually accepts. Falling through to
@@ -2516,12 +2560,11 @@ function describeBodyStructure(
 function roleFromFolder(folder: ListResponse): MailFolder['role'] {
   // 1. SPECIAL-USE flags (RFC 6154) - preferred when the server advertises
   //    them. Outlook / Gmail / FastMail set these reliably.
-  const flags = new Set(
-    Array.from(folder.flags ?? []).map((f) => String(f).toUpperCase()),
-  );
+  const flags = new Set(Array.from(folder.flags ?? []).map((f) => String(f).toUpperCase()));
   const su = folder.specialUse?.toUpperCase();
 
-  if (su === '\\INBOX' || flags.has('\\INBOX') || folder.path.toUpperCase() === 'INBOX') return 'INBOX';
+  if (su === '\\INBOX' || flags.has('\\INBOX') || folder.path.toUpperCase() === 'INBOX')
+    return 'INBOX';
   if (su === '\\SENT' || flags.has('\\SENT')) return 'SENT';
   if (su === '\\DRAFTS' || flags.has('\\DRAFTS')) return 'DRAFTS';
   if (su === '\\TRASH' || flags.has('\\TRASH')) return 'TRASH';
@@ -2539,9 +2582,11 @@ function roleFromFolder(folder: ListResponse): MailFolder['role'] {
   const tail = (segments[segments.length - 1] ?? folder.path).toLowerCase().trim();
 
   if (tail === 'inbox') return 'INBOX';
-  if (['sent', 'sent items', 'sent messages', 'sent mail', 'sent-mail'].includes(tail)) return 'SENT';
+  if (['sent', 'sent items', 'sent messages', 'sent mail', 'sent-mail'].includes(tail))
+    return 'SENT';
   if (['drafts', 'draft'].includes(tail)) return 'DRAFTS';
-  if (['trash', 'deleted', 'deleted items', 'deleted messages', 'bin'].includes(tail)) return 'TRASH';
+  if (['trash', 'deleted', 'deleted items', 'deleted messages', 'bin'].includes(tail))
+    return 'TRASH';
   if (['junk', 'spam', 'junk mail', 'junk e-mail'].includes(tail)) return 'SPAM';
   if (['archive', 'archives', 'all mail'].includes(tail)) return 'ARCHIVE';
 

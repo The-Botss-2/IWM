@@ -13,9 +13,7 @@ import {
  */
 export const CurrentOrganizationId = createParamDecorator(
   (_data: unknown, ctx: ExecutionContext): string => {
-    const req = ctx
-      .switchToHttp()
-      .getRequest<{ user?: { organizationId?: string | null } }>();
+    const req = ctx.switchToHttp().getRequest<{ user?: { organizationId?: string | null } }>();
     const orgId = req.user?.organizationId ?? null;
     if (!orgId) {
       throw new InternalServerErrorException({

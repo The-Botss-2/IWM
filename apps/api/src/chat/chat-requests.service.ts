@@ -83,7 +83,10 @@ export class ChatRequestsService {
     private readonly chat: ChatService,
   ) {}
 
-  async send(me: ChatRequestCaller, input: CreateChatRequestInput): Promise<ChatRequestSentResponse> {
+  async send(
+    me: ChatRequestCaller,
+    input: CreateChatRequestInput,
+  ): Promise<ChatRequestSentResponse> {
     // Depends on the caller only, so it reveals nothing about the address.
     if (!me.organizationId) {
       throw new ForbiddenException({

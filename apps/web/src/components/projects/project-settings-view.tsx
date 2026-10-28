@@ -25,11 +25,9 @@ export function ProjectSettingsView({ project }: { project: ProjectWithCreator }
       <ProjectMembersSection projectId={project.id} />
       <ProjectClientPortalSection project={project} />
       <ProjectWorkflowSection project={project} />
-      <section className="rounded-lg border border-line bg-white p-5">
-        <h2 className="text-base font-semibold text-ink">Integrations</h2>
-        <p className="mt-1 text-sm text-ink-muted">
-          Slack / GitHub / Linear sync - coming soon.
-        </p>
+      <section className="border-line rounded-lg border bg-white p-5">
+        <h2 className="text-ink text-base font-semibold">Integrations</h2>
+        <p className="text-ink-muted mt-1 text-sm">Slack / GitHub / Linear sync - coming soon.</p>
       </section>
       <ProjectDangerZone project={project} />
     </div>
@@ -50,19 +48,19 @@ function ProjectClientPortalSection({ project }: { project: ProjectWithCreator }
   return (
     <section
       aria-labelledby="project-portal-heading"
-      className="rounded-lg border border-line bg-white p-5"
+      className="border-line rounded-lg border bg-white p-5"
     >
-      <h2 id="project-portal-heading" className="text-base font-semibold text-ink">
+      <h2 id="project-portal-heading" className="text-ink text-base font-semibold">
         Client portal
       </h2>
       {project.clientId ? (
         <>
-          <p className="mt-1 text-sm text-ink-muted">
+          <p className="text-ink-muted mt-1 text-sm">
             What people at this project&apos;s client see when they sign in to their portal. Only
             workspace owners and admins, or the project lead, can change this.
           </p>
           <div className="mt-4 space-y-4">
-            <div className="flex items-start gap-3 rounded-md border border-line p-3">
+            <div className="border-line flex items-start gap-3 rounded-md border p-3">
               <Checkbox
                 id="project-portal-visible"
                 checked={visible}
@@ -75,7 +73,7 @@ function ProjectClientPortalSection({ project }: { project: ProjectWithCreator }
                 <Label htmlFor="project-portal-visible" className="cursor-pointer leading-snug">
                   Show this project in the client portal
                 </Label>
-                <p id="project-portal-visible-help" className="mt-1 text-xs text-ink-muted">
+                <p id="project-portal-visible-help" className="text-ink-muted mt-1 text-xs">
                   {!visible
                     ? 'Hidden: the client does not see this project at all.'
                     : portalListsProjectStatus(project.status)
@@ -103,7 +101,7 @@ function ProjectClientPortalSection({ project }: { project: ProjectWithCreator }
                   <SelectItem value="all">All tasks</SelectItem>
                 </SelectContent>
               </Select>
-              <p id="project-portal-tasks-help" className="text-xs text-ink-muted">
+              <p id="project-portal-tasks-help" className="text-ink-muted text-xs">
                 {showAllTasks
                   ? 'Every task in this project, including ones added later.'
                   : 'Turn on "Visible to client" in a task\'s panel to list it. Progress still counts every task.'}
@@ -112,7 +110,7 @@ function ProjectClientPortalSection({ project }: { project: ProjectWithCreator }
           </div>
         </>
       ) : (
-        <p className="mt-1 text-sm text-ink-muted">
+        <p className="text-ink-muted mt-1 text-sm">
           Link a client under Project info above to share this project in their client portal.
         </p>
       )}

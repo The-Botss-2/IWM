@@ -189,10 +189,7 @@ export class CpanelService {
       );
     }
     if (!res.ok) {
-      throw new HttpException(
-        `cPanel UAPI ${mod}/${fn} returned ${res.status}`,
-        502,
-      );
+      throw new HttpException(`cPanel UAPI ${mod}/${fn} returned ${res.status}`, 502);
     }
     const json = (await res.json()) as UapiResponse;
     return json;
@@ -207,10 +204,7 @@ interface UapiResponse {
   metadata?: unknown;
 }
 
-function mapMailboxRow(
-  raw: unknown,
-  domain: string,
-): CpanelEmailAccount | null {
+function mapMailboxRow(raw: unknown, domain: string): CpanelEmailAccount | null {
   if (!raw || typeof raw !== 'object') return null;
   const row = raw as Record<string, unknown>;
   const user = String(row['user'] ?? row['login'] ?? '').toLowerCase();

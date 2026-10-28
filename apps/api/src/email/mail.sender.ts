@@ -215,7 +215,8 @@ export class MailSender {
           `Recipient rejected by SMTP server: ${rejected.join(', ')} (response: ${info.response ?? 'none'})`,
           {
             transient: false,
-            responseCode: typeof info.response === 'string' ? Number.parseInt(info.response, 10) : undefined,
+            responseCode:
+              typeof info.response === 'string' ? Number.parseInt(info.response, 10) : undefined,
           },
         );
       }
@@ -281,7 +282,8 @@ export class MailSender {
           `Recipient rejected by organization SMTP server: ${rejected.join(', ')} (response: ${info.response ?? 'none'})`,
           {
             transient: false,
-            responseCode: typeof info.response === 'string' ? Number.parseInt(info.response, 10) : undefined,
+            responseCode:
+              typeof info.response === 'string' ? Number.parseInt(info.response, 10) : undefined,
           },
         );
       }
@@ -310,7 +312,9 @@ export class MailSender {
    */
   async withSession<T>(
     login: { host: string; port: number; secure: boolean; user: string; pass: string },
-    fn: (send: (args: MailSendArgs & { from: { name: string; address: string } }) => Promise<void>) => Promise<T>,
+    fn: (
+      send: (args: MailSendArgs & { from: { name: string; address: string } }) => Promise<void>,
+    ) => Promise<T>,
   ): Promise<T> {
     // The host is typed by the user; refuse private/internal targets.
     const target = await resolvePublicHost(login.host);
@@ -337,7 +341,10 @@ export class MailSender {
       return await fn(async (args) => {
         try {
           await transport.sendMail({
-            from: { name: stripHeaderUnsafe(args.from.name), address: stripHeaderUnsafe(args.from.address) },
+            from: {
+              name: stripHeaderUnsafe(args.from.name),
+              address: stripHeaderUnsafe(args.from.address),
+            },
             to: stripHeaderUnsafe(args.to),
             subject: stripHeaderUnsafe(args.subject),
             html: args.html,
@@ -370,20 +377,26 @@ function stripHeaderUnsafe(value: string): string {
  * and strip accidental outer quotes introduced in .env files so Nodemailer emits a clean RFC 5322 header.
  */
 export function cleanMailFrom(value: string): string {
-  const cleaned = stripHeaderUnsafe(value).replace(/^["']|["']$/g, '').trim();
+  const cleaned = stripHeaderUnsafe(value)
+    .replace(/^["']|["']$/g, '')
+    .trim();
   const match = cleaned.match(/^(.*?)\s*<([^>]+)>$/);
   if (match && match[2]) {
-    const name = match[1]?.trim().replace(/^["']|["']$/g, '').trim();
+    const name = match[1]
+      ?.trim()
+      .replace(/^["']|["']$/g, '')
+      .trim();
     const address = match[2].trim();
     return name ? `${name} <${address}>` : address;
   }
   return cleaned;
 }
 
-export function renderResetPasswordEmail(args: {
-  recipientName: string | null;
-  url: string;
-}): { subject: string; html: string; text: string } {
+export function renderResetPasswordEmail(args: { recipientName: string | null; url: string }): {
+  subject: string;
+  html: string;
+  text: string;
+} {
   const name = args.recipientName?.trim() || 'there';
   const subject = 'Reset your password';
   const text = [
@@ -482,10 +495,9 @@ export function renderInvoiceEmail(args: {
     `- ${args.companyName}`,
   ];
   const text = lines.join('\n');
-  const message = escapeHtml(args.message?.trim() || `Please find invoice ${args.invoiceNumber} attached.`).replace(
-    /\r?\n/g,
-    '<br>',
-  );
+  const message = escapeHtml(
+    args.message?.trim() || `Please find invoice ${args.invoiceNumber} attached.`,
+  ).replace(/\r?\n/g, '<br>');
   const html = `
     <div style="font-family:system-ui,-apple-system,sans-serif;max-width:560px;margin:0 auto;padding:24px;color:#0f172a">
       <p style="margin:0 0 20px;line-height:1.6">${message}</p>

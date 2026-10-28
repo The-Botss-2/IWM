@@ -11,7 +11,7 @@ import { cn } from '@/lib/utils';
 /** A round, muted icon plate used by every portal state below. */
 function StateIcon({ icon: Icon }: { icon: LucideIcon }) {
   return (
-    <span className="grid h-12 w-12 place-items-center rounded-full bg-bg-subtle text-ink-muted">
+    <span className="bg-bg-subtle text-ink-muted grid h-12 w-12 place-items-center rounded-full">
       <Icon className="h-5 w-5" aria-hidden />
     </span>
   );
@@ -55,10 +55,10 @@ export function PortalLoadError({
   return (
     <PortalCentered fullScreen>
       <StateIcon icon={offline ? WifiOff : SearchX} />
-      <p className="text-sm font-medium text-ink">
+      <p className="text-ink text-sm font-medium">
         {offline ? "Can't reach the server" : "We couldn't open your portal"}
       </p>
-      <p className="text-sm text-ink-muted">
+      <p className="text-ink-muted text-sm">
         {offline
           ? 'You are still signed in. Check your connection, then try again.'
           : 'Something went wrong on our side. Try again in a moment.'}
@@ -83,10 +83,10 @@ export function PortalNoAccess({ fullScreen = false }: { fullScreen?: boolean })
   return (
     <PortalCentered fullScreen={fullScreen}>
       <StateIcon icon={KeyRound} />
-      <h1 className="text-lg font-semibold text-ink">Your portal access has been removed</h1>
-      <p className="text-sm text-ink-muted">
-        This account is not linked to any client right now. If you think that is a mistake,
-        contact the team that invited you.
+      <h1 className="text-ink text-lg font-semibold">Your portal access has been removed</h1>
+      <p className="text-ink-muted text-sm">
+        This account is not linked to any client right now. If you think that is a mistake, contact
+        the team that invited you.
       </p>
       <Button
         variant="secondary"
@@ -115,8 +115,8 @@ export function PortalUnavailable({
   return (
     <PortalCentered>
       <StateIcon icon={SearchX} />
-      <h1 className="text-lg font-semibold text-ink">{title}</h1>
-      <p className="text-sm text-ink-muted">{description}</p>
+      <h1 className="text-ink text-lg font-semibold">{title}</h1>
+      <p className="text-ink-muted text-sm">{description}</p>
       <Button asChild variant="secondary" className="mt-2">
         <Link href={href}>{linkLabel}</Link>
       </Button>
@@ -139,13 +139,13 @@ export function PortalEmpty({
   return (
     <div
       className={cn(
-        'flex flex-col items-center gap-3 rounded-xl border border-dashed border-line-strong bg-bg-surface px-6 py-12 text-center',
+        'border-line-strong bg-bg-surface flex flex-col items-center gap-3 rounded-xl border border-dashed px-6 py-12 text-center',
         className,
       )}
     >
       <StateIcon icon={icon} />
-      <p className="text-sm font-medium text-ink">{title}</p>
-      {description ? <p className="max-w-sm text-sm text-ink-muted">{description}</p> : null}
+      <p className="text-ink text-sm font-medium">{title}</p>
+      {description ? <p className="text-ink-muted max-w-sm text-sm">{description}</p> : null}
     </div>
   );
 }

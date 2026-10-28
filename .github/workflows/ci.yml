@@ -18,11 +18,11 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v6
-      - uses: pnpm/action-setup@v4        # reads pnpm 9.15.9 from package.json
+      - uses: pnpm/action-setup@v4 # reads pnpm 9.15.9 from package.json
       - uses: actions/setup-node@v5
         with:
           node-version: 22
           cache: pnpm
-      - run: pnpm install --frozen-lockfile   # postinstall runs prisma generate
+      - run: pnpm install --frozen-lockfile # postinstall runs prisma generate
       - run: pnpm format:check
-      - run: pnpm verify                      # typecheck + lint + test
+      - run: pnpm verify # typecheck + lint + test

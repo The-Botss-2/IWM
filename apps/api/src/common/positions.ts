@@ -11,7 +11,9 @@ export function insertAt<T>(siblings: readonly T[], item: T, index: number): T[]
 }
 
 /** `{ id, position }` for every row of an ordered list, positions dense from 0. */
-export function densePositions(orderedIds: readonly string[]): Array<{ id: string; position: number }> {
+export function densePositions(
+  orderedIds: readonly string[],
+): Array<{ id: string; position: number }> {
   return orderedIds.map((id, position) => ({ id, position }));
 }
 

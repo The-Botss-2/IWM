@@ -24,13 +24,7 @@ const matrixKey = (a: MatrixArgs) =>
   ['attendance', 'matrix', a.from.toISOString(), a.to.toISOString()] as const;
 
 const summaryKey = (a: SummaryArgs) =>
-  [
-    'attendance',
-    'summary',
-    a.userId,
-    a.from.toISOString(),
-    a.to.toISOString(),
-  ] as const;
+  ['attendance', 'summary', a.userId, a.from.toISOString(), a.to.toISOString()] as const;
 
 export function useAttendanceMatrix(args: MatrixArgs) {
   return useQuery<AttendanceMatrixResponse>({
@@ -61,8 +55,7 @@ export function useAttendanceUsers() {
 export function useOverrideAttendance() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (input: OverrideAttendanceInput) =>
-      getApi().attendance.override(input),
+    mutationFn: (input: OverrideAttendanceInput) => getApi().attendance.override(input),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['attendance'] });
     },

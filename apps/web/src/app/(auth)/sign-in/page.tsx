@@ -82,46 +82,53 @@ function SignInForm() {
   };
 
   return (
-    <form
-      className="space-y-5"
-      method="post"
-      onSubmit={handleSubmit(onSubmit)}
-      noValidate
-    >
+    <form className="space-y-5" method="post" onSubmit={handleSubmit(onSubmit)} noValidate>
       <div>
         <h1 className="text-2xl font-semibold">
           Welcome <span className="text-brand-gradient">back</span>
         </h1>
-        <p className="mt-1 text-sm text-ink-muted">
-          Sign in to your workspace.
-        </p>
+        <p className="text-ink-muted mt-1 text-sm">Sign in to your workspace.</p>
       </div>
 
       <div className="space-y-1.5">
-        <label className="label" htmlFor="email">Email</label>
-        <input id="email" type="email" autoComplete="email" className="input"
-          {...register('email')} />
-        {errors.email ? <p className="text-xs text-state-error">{errors.email.message}</p> : null}
+        <label className="label" htmlFor="email">
+          Email
+        </label>
+        <input
+          id="email"
+          type="email"
+          autoComplete="email"
+          className="input"
+          {...register('email')}
+        />
+        {errors.email ? <p className="text-state-error text-xs">{errors.email.message}</p> : null}
       </div>
 
       <div className="space-y-1.5">
-        <label className="label" htmlFor="password">Password</label>
+        <label className="label" htmlFor="password">
+          Password
+        </label>
         <PasswordInput id="password" autoComplete="current-password" {...register('password')} />
-        {errors.password ? <p className="text-xs text-state-error">{errors.password.message}</p> : null}
+        {errors.password ? (
+          <p className="text-state-error text-xs">{errors.password.message}</p>
+        ) : null}
       </div>
 
-      <label htmlFor="rememberMe" className="flex items-center gap-2 text-sm text-ink-muted select-none">
+      <label
+        htmlFor="rememberMe"
+        className="text-ink-muted flex select-none items-center gap-2 text-sm"
+      >
         <input
           id="rememberMe"
           type="checkbox"
-          className="h-4 w-4 rounded border-line text-brand-600 focus-visible:ring-2 focus-visible:shadow-focus"
+          className="border-line text-brand-600 focus-visible:shadow-focus h-4 w-4 rounded focus-visible:ring-2"
           {...register('rememberMe')}
         />
         Remember me
       </label>
 
       {submitError ? (
-        <p className="rounded-md bg-tint-error px-3 py-2 text-sm text-state-error border border-state-error/30">
+        <p className="bg-tint-error text-state-error border-state-error/30 rounded-md border px-3 py-2 text-sm">
           {submitError}
         </p>
       ) : null}
@@ -137,16 +144,15 @@ function SignInForm() {
         )}
       </button>
 
-      <div className="text-center text-xs text-ink-muted">
-        Admin-managed accounts only. Ask your administrator if you need a
-        password reset.
+      <div className="text-ink-muted text-center text-xs">
+        Admin-managed accounts only. Ask your administrator if you need a password reset.
       </div>
 
-      <div className="border-t border-line pt-4 text-center text-sm text-ink-muted">
+      <div className="border-line text-ink-muted border-t pt-4 text-center text-sm">
         Are you an organization?{' '}
         <Link
           href="/org-signup"
-          className="font-medium text-brand-600 hover:text-brand-700 hover:underline"
+          className="text-brand-600 hover:text-brand-700 font-medium hover:underline"
         >
           Sign up now
         </Link>
@@ -158,9 +164,9 @@ function SignInForm() {
 function SignInFormSkeleton() {
   return (
     <div className="space-y-4">
-      <div className="h-9 animate-pulse rounded bg-bg-subtle" />
-      <div className="h-9 animate-pulse rounded bg-bg-subtle" />
-      <div className="h-10 animate-pulse rounded bg-line" />
+      <div className="bg-bg-subtle h-9 animate-pulse rounded" />
+      <div className="bg-bg-subtle h-9 animate-pulse rounded" />
+      <div className="bg-line h-10 animate-pulse rounded" />
     </div>
   );
 }

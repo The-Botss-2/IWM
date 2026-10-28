@@ -50,10 +50,17 @@ export class RolesResource {
   }
 
   setCompanyRole(userId: string, input: SetCompanyRoleInput): Promise<UserPermissionsResponse> {
-    return this.http.put(`/roles/users/${userId}/company-role`, userPermissionsResponseSchema, input);
+    return this.http.put(
+      `/roles/users/${userId}/company-role`,
+      userPermissionsResponseSchema,
+      input,
+    );
   }
 
-  setOverrides(userId: string, input: SetPermissionOverridesInput): Promise<UserPermissionsResponse> {
+  setOverrides(
+    userId: string,
+    input: SetPermissionOverridesInput,
+  ): Promise<UserPermissionsResponse> {
     return this.http.put(`/roles/users/${userId}/overrides`, userPermissionsResponseSchema, input);
   }
 }

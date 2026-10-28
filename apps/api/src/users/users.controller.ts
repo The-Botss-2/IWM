@@ -9,10 +9,7 @@ import {
 
 import { CurrentUser, type AuthedUser } from '../common/decorators/current-user.decorator';
 import { CurrentWorkspaceId } from '../common/decorators/current-workspace.decorator';
-import {
-  RequestUserScope,
-  type UserScope,
-} from '../common/decorators/user-scope.decorator';
+import { RequestUserScope, type UserScope } from '../common/decorators/user-scope.decorator';
 import { ZodValidationPipe } from '../common/pipes/zod-validation.pipe';
 import { UsersService } from './users.service';
 
@@ -42,10 +39,7 @@ export class UsersController {
   }
 
   @Get(':id')
-  get(
-    @RequestUserScope() scope: UserScope,
-    @Param('id', new ZodValidationPipe(cuid)) id: string,
-  ) {
+  get(@RequestUserScope() scope: UserScope, @Param('id', new ZodValidationPipe(cuid)) id: string) {
     return this.users.getByIdScoped(scope, id);
   }
 }

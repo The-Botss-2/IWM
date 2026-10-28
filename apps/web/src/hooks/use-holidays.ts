@@ -17,12 +17,7 @@ interface ListArgs {
 }
 
 const listKey = (a: ListArgs) =>
-  [
-    'holidays',
-    'list',
-    a.from?.toISOString() ?? null,
-    a.to?.toISOString() ?? null,
-  ] as const;
+  ['holidays', 'list', a.from?.toISOString() ?? null, a.to?.toISOString() ?? null] as const;
 
 /**
  * Read holidays in the actor's organisation. Open to any signed-in
@@ -48,8 +43,7 @@ export function useHolidays(args: ListArgs = {}) {
 export function useCreateHoliday() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (input: CreateHolidayInput) =>
-      getApi().holidays.create(input),
+    mutationFn: (input: CreateHolidayInput) => getApi().holidays.create(input),
     onSuccess: (res) => {
       qc.invalidateQueries({ queryKey: ['holidays'] });
       qc.invalidateQueries({ queryKey: ['attendance'] });

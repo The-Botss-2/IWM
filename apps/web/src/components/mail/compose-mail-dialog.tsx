@@ -19,11 +19,7 @@ import { Label } from '@/components/ui/label';
 import { useFileUpload } from '@/hooks/use-file-upload';
 import { useMailRecipientSuggestions } from '@/hooks/use-mail';
 import { useMailAccounts } from '@/hooks/use-mail-accounts';
-import {
-  useDiscardMailDraft,
-  useSaveMailDraft,
-  useSendMail,
-} from '@/hooks/use-mail-send';
+import { useDiscardMailDraft, useSaveMailDraft, useSendMail } from '@/hooks/use-mail-send';
 import { toast, toastError, toastErrorMessage } from '@/lib/toast';
 import { cn } from '@/lib/utils';
 
@@ -107,8 +103,7 @@ export function ComposeMailDialog({
       setTo(next?.to ?? '');
       setCc(next?.cc ?? '');
       setSubject(next?.subject ?? '');
-      const seededBody =
-        next?.bodyHtml ?? (next?.body ? plainToHtml(next.body) : '');
+      const seededBody = next?.bodyHtml ?? (next?.body ? plainToHtml(next.body) : '');
       // Append the saved signature for new messages and replies, but NOT when
       // editing a saved draft - that body already contains whatever signature
       // it was composed with, so re-appending would duplicate it.
@@ -117,8 +112,7 @@ export function ComposeMailDialog({
       const acct = accountRef.current;
       // New mail and replies/forwards each have their own default signature.
       const sigId = isReply ? acct?.replySignatureId : acct?.newSignatureId;
-      const sig =
-        (sigId && acct?.signatures.find((s) => s.id === sigId)?.html) || '';
+      const sig = (sigId && acct?.signatures.find((s) => s.id === sigId)?.html) || '';
       const initialHtml =
         sig && !isDraftEdit
           ? // For replies, "before quote" puts the signature above the quoted
@@ -181,12 +175,8 @@ export function ComposeMailDialog({
       subject: subject.trim(),
       bodyText,
       ...(bodyHtml.trim() ? { bodyHtml } : {}),
-      ...(prefill?.inReplyToMessageId
-        ? { inReplyToMessageId: prefill.inReplyToMessageId }
-        : {}),
-      ...(attachments.length > 0
-        ? { attachmentFileObjectIds: attachments.map((a) => a.id) }
-        : {}),
+      ...(prefill?.inReplyToMessageId ? { inReplyToMessageId: prefill.inReplyToMessageId } : {}),
+      ...(attachments.length > 0 ? { attachmentFileObjectIds: attachments.map((a) => a.id) } : {}),
       ...(draftId ? { replacesDraftId: draftId } : {}),
     };
 
@@ -213,9 +203,7 @@ export function ComposeMailDialog({
         ...(subject.trim() ? { subject: subject.trim() } : {}),
         bodyText,
         ...(bodyHtml.trim() ? { bodyHtml } : {}),
-        ...(prefill?.inReplyToMessageId
-          ? { inReplyToMessageId: prefill.inReplyToMessageId }
-          : {}),
+        ...(prefill?.inReplyToMessageId ? { inReplyToMessageId: prefill.inReplyToMessageId } : {}),
         // Carry attachments into the draft so reopening the saved draft
         // still surfaces the files. Same shape and 20-cap as the send
         // path on the other side of the API.
@@ -286,7 +274,7 @@ export function ComposeMailDialog({
                 ? 'Edit draft'
                 : 'New message'}
           </DialogTitle>
-          <DialogDescription className="text-xs text-ink-muted">
+          <DialogDescription className="text-ink-muted text-xs">
             From <span className="font-mono">{fromLabel}</span>
           </DialogDescription>
         </DialogHeader>
@@ -333,33 +321,29 @@ export function ComposeMailDialog({
           </div>
 
           {attachments.length > 0 || upload.isPending ? (
-            <ul
-              className="flex flex-wrap gap-2"
-              aria-label="Attachments"
-              role="list"
-            >
+            <ul className="flex flex-wrap gap-2" aria-label="Attachments" role="list">
               {attachments.map((a) => (
                 <li
                   key={a.id}
-                  className="inline-flex items-center gap-2 rounded-md border border-line bg-bg-subtle px-2 py-1 text-xs text-ink"
+                  className="border-line bg-bg-subtle text-ink inline-flex items-center gap-2 rounded-md border px-2 py-1 text-xs"
                 >
-                  <Paperclip className="h-3.5 w-3.5 text-ink-disabled" />
+                  <Paperclip className="text-ink-disabled h-3.5 w-3.5" />
                   <span className="max-w-[180px] truncate">{a.filename}</span>
-                  <span className="text-[10px] text-ink-muted">
+                  <span className="text-ink-muted text-[10px]">
                     {formatBytes(Number(a.sizeBytes))}
                   </span>
                   <button
                     type="button"
                     onClick={() => removeAttachment(a.id)}
                     aria-label={`Remove ${a.filename}`}
-                    className="rounded p-0.5 text-ink-disabled hover:bg-line hover:text-ink"
+                    className="text-ink-disabled hover:bg-line hover:text-ink rounded p-0.5"
                   >
                     <X className="h-3 w-3" />
                   </button>
                 </li>
               ))}
               {upload.isPending ? (
-                <li className="inline-flex items-center gap-2 rounded-md border border-line bg-bg-subtle px-2 py-1 text-xs text-ink-muted">
+                <li className="border-line bg-bg-subtle text-ink-muted inline-flex items-center gap-2 rounded-md border px-2 py-1 text-xs">
                   <Loader2 className="h-3.5 w-3.5 animate-spin" />
                   Uploading…
                 </li>
@@ -469,7 +453,10 @@ function RecipientInput({
   // is the token currently being typed and the only thing we filter on.
   const lastSep = Math.max(value.lastIndexOf(','), value.lastIndexOf(';'));
   const head = value.slice(0, lastSep + 1);
-  const currentToken = value.slice(lastSep + 1).trim().toLowerCase();
+  const currentToken = value
+    .slice(lastSep + 1)
+    .trim()
+    .toLowerCase();
 
   // Addresses already committed in the field - don't re-suggest them.
   const chosen = new Set(
@@ -535,7 +522,7 @@ function RecipientInput({
       {showList ? (
         <ul
           role="listbox"
-          className="absolute left-0 right-0 z-20 mt-1 max-h-56 overflow-y-auto rounded-md border border-line bg-bg-surface py-1 shadow-md"
+          className="border-line bg-bg-surface absolute left-0 right-0 z-20 mt-1 max-h-56 overflow-y-auto rounded-md border py-1 shadow-md"
         >
           {matches.map((addr, i) => (
             <li key={addr}>
@@ -550,7 +537,7 @@ function RecipientInput({
                 }}
                 onClick={() => choose(addr)}
                 className={cn(
-                  'block w-full truncate px-3 py-1.5 text-left text-sm text-ink',
+                  'text-ink block w-full truncate px-3 py-1.5 text-left text-sm',
                   i === activeIndex ? 'bg-bg-subtle' : 'hover:bg-bg-subtle',
                 )}
               >
@@ -580,7 +567,7 @@ function Field({
       <Label htmlFor={htmlFor}>
         {label}
         {required ? (
-          <span className="ml-1 text-state-error" aria-label="required">
+          <span className="text-state-error ml-1" aria-label="required">
             *
           </span>
         ) : null}

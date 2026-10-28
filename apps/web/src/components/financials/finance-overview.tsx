@@ -51,8 +51,7 @@ export function FinanceOverview({
   }
 
   const base = summary.baseCurrency;
-  const fees =
-    Number(summary.receivedGrossBase) - Number(summary.receivedBase);
+  const fees = Number(summary.receivedGrossBase) - Number(summary.receivedBase);
 
   return (
     <div className="space-y-6">
@@ -87,14 +86,14 @@ export function FinanceOverview({
       {/* Delivered but unpaid is the whole point of linking milestones to
           sprints, so it gets a panel rather than a buried column. */}
       {awaiting.data && awaiting.data.items.length > 0 ? (
-        <section className="rounded-md border border-line bg-bg-surface">
-          <header className="flex items-center justify-between border-b border-line px-4 py-3">
+        <section className="border-line bg-bg-surface rounded-md border">
+          <header className="border-line flex items-center justify-between border-b px-4 py-3">
             <h2 className="text-sm font-semibold">Awaiting payment</h2>
-            <span className="text-xs text-ink-muted">
+            <span className="text-ink-muted text-xs">
               Delivered work that has not been paid for
             </span>
           </header>
-          <ul className="divide-y divide-line" role="list">
+          <ul className="divide-line divide-y" role="list">
             {awaiting.data.items.slice(0, 8).map((m) => (
               <li key={m.milestoneId} className="flex flex-wrap items-center gap-3 px-4 py-2.5">
                 <Link
@@ -103,16 +102,13 @@ export function FinanceOverview({
                 >
                   {m.milestoneTitle}
                 </Link>
-                <span className="text-xs text-ink-muted">
+                <span className="text-ink-muted text-xs">
                   {m.contractTitle}
                   {m.client ? ` · ${m.client.name}` : ''}
                 </span>
                 <PaymentStatusBadge status={m.paymentStatus} />
                 <span className="ml-auto tabular-nums">
-                  {formatCurrency(
-                    Number(m.amount) - Number(m.amountPaid),
-                    m.currency,
-                  )}
+                  {formatCurrency(Number(m.amount) - Number(m.amountPaid), m.currency)}
                 </span>
               </li>
             ))}
@@ -131,22 +127,10 @@ export function FinanceOverview({
                 tickFormatter={(m: string) => m.slice(5)}
               />
               <YAxis tick={{ fontSize: 11 }} width={70} />
-              <Tooltip
-                formatter={(v) => formatCurrency(v as number, base)}
-              />
+              <Tooltip formatter={(v) => formatCurrency(v as number, base)} />
               <Legend wrapperStyle={{ fontSize: 12 }} />
-              <Bar
-                dataKey="receivedBase"
-                name="Received"
-                fill={SERIES[1]}
-                radius={[3, 3, 0, 0]}
-              />
-              <Bar
-                dataKey="spentBase"
-                name="Spent"
-                fill={SERIES[4]}
-                radius={[3, 3, 0, 0]}
-              />
+              <Bar dataKey="receivedBase" name="Received" fill={SERIES[1]} radius={[3, 3, 0, 0]} />
+              <Bar dataKey="spentBase" name="Spent" fill={SERIES[4]} radius={[3, 3, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </Panel>
@@ -191,9 +175,7 @@ export function FinanceOverview({
                   <Badge tone={r.region === 'LOCAL' ? 'neutral' : 'info'}>
                     {r.region === 'LOCAL' ? 'Local' : 'International'}
                   </Badge>
-                  <span className="tabular-nums">
-                    {formatCurrency(r.amountBase, base)}
-                  </span>
+                  <span className="tabular-nums">{formatCurrency(r.amountBase, base)}</span>
                 </li>
               ))}
             </ul>
@@ -208,9 +190,7 @@ export function FinanceOverview({
               {summary.outstandingByCurrency.map((c) => (
                 <li key={c.currency} className="flex items-center justify-between text-sm">
                   <span className="text-ink-muted">{c.currency}</span>
-                  <span className="tabular-nums">
-                    {formatCurrency(c.amount, c.currency)}
-                  </span>
+                  <span className="tabular-nums">{formatCurrency(c.amount, c.currency)}</span>
                 </li>
               ))}
             </ul>
@@ -226,9 +206,7 @@ export function FinanceOverview({
             {summary.byExpenseCategory.slice(0, 5).map((c) => (
               <li key={c.category} className="flex items-center justify-between">
                 <span className="text-ink-muted">{c.category.toLowerCase()}</span>
-                <span className="tabular-nums">
-                  {formatCurrency(c.amountBase, base)}
-                </span>
+                <span className="tabular-nums">{formatCurrency(c.amountBase, base)}</span>
               </li>
             ))}
           </ul>
@@ -250,8 +228,8 @@ function Kpi({
   emphasis?: 'positive' | 'negative';
 }) {
   return (
-    <div className="rounded-md border border-line bg-bg-surface p-4">
-      <p className="text-xs uppercase tracking-wide text-ink-muted">{label}</p>
+    <div className="border-line bg-bg-surface rounded-md border p-4">
+      <p className="text-ink-muted text-xs uppercase tracking-wide">{label}</p>
       <p
         className={`mt-1 text-2xl font-semibold tabular-nums ${
           emphasis === 'negative' ? 'text-state-error' : ''
@@ -259,7 +237,7 @@ function Kpi({
       >
         {value}
       </p>
-      {hint ? <p className="mt-1 text-xs text-ink-muted">{hint}</p> : null}
+      {hint ? <p className="text-ink-muted mt-1 text-xs">{hint}</p> : null}
     </div>
   );
 }
@@ -274,10 +252,10 @@ function Panel({
   children: React.ReactNode;
 }) {
   return (
-    <section className="rounded-md border border-line bg-bg-surface">
-      <header className="border-b border-line px-4 py-3">
+    <section className="border-line bg-bg-surface rounded-md border">
+      <header className="border-line border-b px-4 py-3">
         <h2 className="text-sm font-semibold">{title}</h2>
-        {subtitle ? <p className="text-xs text-ink-muted">{subtitle}</p> : null}
+        {subtitle ? <p className="text-ink-muted text-xs">{subtitle}</p> : null}
       </header>
       {children}
     </section>
@@ -285,9 +263,5 @@ function Panel({
 }
 
 function Empty() {
-  return (
-    <p className="p-8 text-center text-sm text-ink-muted">
-      Nothing recorded in this period.
-    </p>
-  );
+  return <p className="text-ink-muted p-8 text-center text-sm">Nothing recorded in this period.</p>;
 }

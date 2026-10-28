@@ -62,7 +62,9 @@ export function useRequestSignaturesFlow(documentId: string, documentTitle: stri
   // --- step 1 --------------------------------------------------------------
 
   const addSigner = () =>
-    setSigners((rows) => (rows.length >= 20 ? rows : [...rows, { key: fieldKey(), email: '', name: '' }]));
+    setSigners((rows) =>
+      rows.length >= 20 ? rows : [...rows, { key: fieldKey(), email: '', name: '' }],
+    );
   const removeSigner = (key: string) =>
     setSigners((rows) => (rows.length <= 1 ? rows : rows.filter((r) => r.key !== key)));
   const updateSigner = (key: string, patch: Partial<SignerRow>) =>
@@ -83,7 +85,12 @@ export function useRequestSignaturesFlow(documentId: string, documentTitle: stri
     const parsed = createSignatureRequestSchema.safeParse(basePayload());
     if (!parsed.success) return parsed.error.issues[0]?.message ?? 'Check the signers.';
     if (source === 'upload' && !pdfFile) return 'Choose a PDF to upload.';
-    if (source === 'upload' && pdfFile && pdfFile.type !== 'application/pdf' && !/\.pdf$/i.test(pdfFile.name)) {
+    if (
+      source === 'upload' &&
+      pdfFile &&
+      pdfFile.type !== 'application/pdf' &&
+      !/\.pdf$/i.test(pdfFile.name)
+    ) {
       return 'Only PDF files can be signed.';
     }
     return null;
@@ -124,7 +131,10 @@ export function useRequestSignaturesFlow(documentId: string, documentTitle: stri
   const placeAt = (page: number, point: { x: number; y: number }) => {
     const signer = draft?.signers[activeSigner];
     if (!signer) return;
-    setFields((prev) => [...prev, { key: fieldKey(), kind, signerId: signer.id, ...boxAt(kind, page, point.x, point.y) }]);
+    setFields((prev) => [
+      ...prev,
+      { key: fieldKey(), kind, signerId: signer.id, ...boxAt(kind, page, point.x, point.y) },
+    ]);
   };
   const updateField = (key: string, box: FieldBox) =>
     setFields((prev) => prev.map((f) => (f.key === key ? { ...f, ...clampBox(box) } : f)));
@@ -142,7 +152,15 @@ export function useRequestSignaturesFlow(documentId: string, documentTitle: stri
       await saveFields.mutateAsync({
         id: draft.id,
         input: {
-          fields: fields.map((f) => ({ signerId: f.signerId, kind: f.kind, page: f.page, x: f.x, y: f.y, w: f.w, h: f.h })),
+          fields: fields.map((f) => ({
+            signerId: f.signerId,
+            kind: f.kind,
+            page: f.page,
+            x: f.x,
+            y: f.y,
+            w: f.w,
+            h: f.h,
+          })),
         },
       });
       setStep('send');
@@ -168,7 +186,11 @@ export function useRequestSignaturesFlow(documentId: string, documentTitle: stri
     try {
       const res = await send.mutateAsync({
         id: draft.id,
-        input: { expiresInDays, message: message.trim() || null, ...(title.trim() ? { title: title.trim() } : {}) },
+        input: {
+          expiresInDays,
+          message: message.trim() || null,
+          ...(title.trim() ? { title: title.trim() } : {}),
+        },
       });
       setResult(res);
       setDraft(null);

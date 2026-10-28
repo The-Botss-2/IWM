@@ -71,7 +71,9 @@ export class ImapIdleService
 
   async onApplicationBootstrap(): Promise<void> {
     if (!this.ownsWatchers) {
-      this.logger.log('IMAP IDLE watchers are off in this process (ROLE=api); the worker runs them.');
+      this.logger.log(
+        'IMAP IDLE watchers are off in this process (ROLE=api); the worker runs them.',
+      );
       return;
     }
     // Defer slightly so HTTP routes are up first - boot logs stay readable
@@ -294,7 +296,10 @@ class Watcher {
   /** Identity of this watcher's pin, so stopping never unpins a successor. */
   private readonly handlers: PinHandlers;
 
-  constructor(private readonly accountId: string, private readonly deps: WatcherDeps) {
+  constructor(
+    private readonly accountId: string,
+    private readonly deps: WatcherDeps,
+  ) {
     this.handlers = {
       inboxPath: 'INBOX',
       // EXISTS is the canonical "new mail arrived" signal. EXPUNGE means a
@@ -378,9 +383,12 @@ class Watcher {
     // waited for the NEXT new message, or for someone to open the mail page.
     // It runs on the pinned connection, so it costs no login; the short
     // jitter just keeps a boot's worth of syncs from landing together.
-    setTimeout(() => {
-      if (!this.stopped) void this.triggerSync('reconnect');
-    }, 1_000 + Math.floor(Math.random() * 9_000));
+    setTimeout(
+      () => {
+        if (!this.stopped) void this.triggerSync('reconnect');
+      },
+      1_000 + Math.floor(Math.random() * 9_000),
+    );
   }
 
   private handleClose(): void {

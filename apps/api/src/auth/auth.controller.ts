@@ -21,10 +21,7 @@ export class AuthController {
    */
   @PortalRoute('both')
   @Get('me')
-  async me(
-    @CurrentUser() user: AuthedUser,
-    @Req() req: Request & RequestExtensions,
-  ) {
+  async me(@CurrentUser() user: AuthedUser, @Req() req: Request & RequestExtensions) {
     const fullUser = await rawPrisma.user.findUnique({ where: { id: user.id } });
     return sessionContextSchema.parse({
       // In a support session the app must see what the request runs as: a

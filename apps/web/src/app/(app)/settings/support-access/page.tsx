@@ -19,7 +19,7 @@ export default function SupportAccessSettingsPage() {
   }
   if (!perms.has('org.settings')) {
     return (
-      <p className="rounded-md border border-line bg-bg-subtle px-4 py-6 text-center text-sm text-ink-muted">
+      <p className="border-line bg-bg-subtle text-ink-muted rounded-md border px-4 py-6 text-center text-sm">
         Only people who can manage company settings can manage support access.
       </p>
     );

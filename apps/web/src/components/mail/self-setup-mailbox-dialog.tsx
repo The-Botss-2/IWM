@@ -74,19 +74,18 @@ export function SelfSetupMailboxDialog({
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-lg font-semibold">
-            <Sparkles className="h-4 w-4 text-brand-500" />
+            <Sparkles className="text-brand-500 h-4 w-4" />
             Set up your mailbox
           </DialogTitle>
           <DialogDescription>
-            One click. We&apos;ll reset your webmail password on the server,
-            store it encrypted on our side, and connect your inbox. No need
-            to fiddle with IMAP/SMTP settings.
+            One click. We&apos;ll reset your webmail password on the server, store it encrypted on
+            our side, and connect your inbox. No need to fiddle with IMAP/SMTP settings.
           </DialogDescription>
         </DialogHeader>
         <form className="space-y-3" onSubmit={submit} noValidate>
-          <div className="rounded-md border border-line bg-bg-subtle px-3 py-2 text-sm">
-            <div className="text-xs text-ink-muted">Mailbox</div>
-            <div className="font-mono text-ink">{email}</div>
+          <div className="border-line bg-bg-subtle rounded-md border px-3 py-2 text-sm">
+            <div className="text-ink-muted text-xs">Mailbox</div>
+            <div className="text-ink font-mono">{email}</div>
           </div>
           <div className="space-y-1">
             <Label htmlFor="ssm-password">New password</Label>
@@ -97,9 +96,9 @@ export function SelfSetupMailboxDialog({
               onChange={(e) => setPassword(e.target.value)}
               required
             />
-            <p className="text-[11px] text-ink-muted">
-              This becomes your password for both this app and your webmail.
-              Your old webmail password stops working as soon as you save.
+            <p className="text-ink-muted text-[11px]">
+              This becomes your password for both this app and your webmail. Your old webmail
+              password stops working as soon as you save.
             </p>
           </div>
           <div className="space-y-1">
@@ -113,7 +112,7 @@ export function SelfSetupMailboxDialog({
             />
           </div>
           {error ? (
-            <p className="rounded-md border border-red-100 bg-tint-error px-3 py-2 text-sm text-state-error">
+            <p className="bg-tint-error text-state-error rounded-md border border-red-100 px-3 py-2 text-sm">
               {error}
             </p>
           ) : null}

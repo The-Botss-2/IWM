@@ -28,28 +28,25 @@ export function WidgetShell({
     <section
       id={id}
       aria-labelledby={`${id}-heading`}
-      className="rounded-xl bg-white shadow-soft transition-shadow duration-200 hover:shadow-soft-lg"
+      className="shadow-soft hover:shadow-soft-lg rounded-xl bg-white transition-shadow duration-200"
     >
-      <header className="flex items-center justify-between border-b border-line px-5 py-3">
+      <header className="border-line flex items-center justify-between border-b px-5 py-3">
         <div className="flex min-w-0 items-center gap-2">
-          <Icon className="h-4 w-4 shrink-0 text-brand-purple" aria-hidden />
-          <h2
-            id={`${id}-heading`}
-            className="whitespace-nowrap text-sm font-semibold text-ink"
-          >
+          <Icon className="text-brand-purple h-4 w-4 shrink-0" aria-hidden />
+          <h2 id={`${id}-heading`} className="text-ink whitespace-nowrap text-sm font-semibold">
             {title}
           </h2>
           {subtitle ? (
-            <span className="truncate whitespace-nowrap text-xs text-ink-muted">{subtitle}</span>
+            <span className="text-ink-muted truncate whitespace-nowrap text-xs">{subtitle}</span>
           ) : null}
         </div>
         {linkHref ? (
           <Link
             href={linkHref}
-            className="inline-flex items-center gap-0.5 text-xs font-medium text-brand-gradient hover:underline focus-visible:outline-none focus-visible:shadow-focus rounded-sm"
+            className="text-brand-gradient focus-visible:shadow-focus inline-flex items-center gap-0.5 rounded-sm text-xs font-medium hover:underline focus-visible:outline-none"
           >
             {linkLabel ?? 'View all'}
-            <ArrowUpRight className="h-3 w-3 text-brand-purple" />
+            <ArrowUpRight className="text-brand-purple h-3 w-3" />
           </Link>
         ) : null}
       </header>
@@ -58,17 +55,11 @@ export function WidgetShell({
   );
 }
 
-export function WidgetEmpty({
-  icon: Icon,
-  message,
-}: {
-  icon: LucideIcon;
-  message: string;
-}) {
+export function WidgetEmpty({ icon: Icon, message }: { icon: LucideIcon; message: string }) {
   return (
     <div className="grid place-items-center py-8 text-center">
-      <Icon className="mb-2 h-8 w-8 text-line" aria-hidden />
-      <p className="text-xs text-ink-muted">{message}</p>
+      <Icon className="text-line mb-2 h-8 w-8" aria-hidden />
+      <p className="text-ink-muted text-xs">{message}</p>
     </div>
   );
 }

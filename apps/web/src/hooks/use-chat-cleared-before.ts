@@ -63,10 +63,7 @@ export function useChatClearedBefore(userId: string): {
     };
   }, [userId]);
 
-  const clearedBefore = useCallback(
-    (roomId: string) => map[roomId] ?? null,
-    [map],
-  );
+  const clearedBefore = useCallback((roomId: string) => map[roomId] ?? null, [map]);
 
   const clearRoom = useCallback(
     (roomId: string, at: Date = new Date()) => {

@@ -70,7 +70,11 @@ export class EmailProcessor extends WorkerHost {
         throw new UnrecoverableError(`Invoice PDF ${data.pdfFileId} not found`);
       }
       extras.attachments = [
-        { filename: `${data.invoiceNumber}.pdf`, content: pdf.body, contentType: 'application/pdf' },
+        {
+          filename: `${data.invoiceNumber}.pdf`,
+          content: pdf.body,
+          contentType: 'application/pdf',
+        },
       ];
       if (data.replyTo) extras.replyTo = data.replyTo;
     }
@@ -95,9 +99,7 @@ export class EmailProcessor extends WorkerHost {
       // Org-level mail config, if the producer told us which org we're
       // acting on behalf of.
       if (data.organizationId && this.organizations) {
-        const orgCreds = await this.organizations.resolveDecryptedMailConfig(
-          data.organizationId,
-        );
+        const orgCreds = await this.organizations.resolveDecryptedMailConfig(data.organizationId);
         if (orgCreds) {
           const outcome = await this.sender.sendVia(
             {

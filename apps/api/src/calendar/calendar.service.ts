@@ -38,9 +38,7 @@ export class CalendarService {
         const tasks = await this.prisma.client.task.findMany({
           where: {
             deletedAt: null,
-            ...(visibility
-              ? { project: visibility as Prisma.ProjectWhereInput }
-              : {}),
+            ...(visibility ? { project: visibility as Prisma.ProjectWhereInput } : {}),
             OR: [
               {
                 AND: [

@@ -3,12 +3,7 @@ import { z } from 'zod';
 import { cuid } from './common/id.js';
 import { decimalString, ISO_CURRENCY, moneyInput, rateInput, rateString } from './common/money.js';
 import { paginationQuerySchema, sortOrderSchema } from './common/pagination.js';
-import {
-  BillingModel,
-  ContractStatus,
-  MilestoneStatus,
-  PaymentStatus,
-} from './enums-finance.js';
+import { BillingModel, ContractStatus, MilestoneStatus, PaymentStatus } from './enums-finance.js';
 
 /**
  * A payment stage on a contract, optionally tied to the project work that
@@ -41,16 +36,10 @@ export type ContractMilestone = z.infer<typeof contractMilestoneSchema>;
 
 /** Milestone plus the project work it bills, for the detail view. */
 export const contractMilestoneWithWorkSchema = contractMilestoneSchema.extend({
-  sprint: z
-    .object({ id: cuid, name: z.string(), status: z.string() })
-    .nullable(),
-  tasks: z.array(
-    z.object({ id: cuid, title: z.string(), status: z.string() }),
-  ),
+  sprint: z.object({ id: cuid, name: z.string(), status: z.string() }).nullable(),
+  tasks: z.array(z.object({ id: cuid, title: z.string(), status: z.string() })),
 });
-export type ContractMilestoneWithWork = z.infer<
-  typeof contractMilestoneWithWorkSchema
->;
+export type ContractMilestoneWithWork = z.infer<typeof contractMilestoneWithWorkSchema>;
 
 /**
  * The root money object: what we agreed to bill a client, and on what model.

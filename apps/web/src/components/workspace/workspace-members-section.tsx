@@ -154,8 +154,7 @@ export function WorkspaceMembersSection() {
     if (!q) return all;
     return all.filter(
       (m) =>
-        (m.user.name ?? '').toLowerCase().includes(q) ||
-        m.user.email.toLowerCase().includes(q),
+        (m.user.name ?? '').toLowerCase().includes(q) || m.user.email.toLowerCase().includes(q),
     );
   }, [members.data, search]);
 
@@ -163,15 +162,16 @@ export function WorkspaceMembersSection() {
     <>
       <section
         aria-labelledby="workspace-members-heading"
-        className="rounded-lg border border-line bg-white p-5"
+        className="border-line rounded-lg border bg-white p-5"
       >
         <div className="flex items-center justify-between gap-3">
           <div>
-            <h2 id="workspace-members-heading" className="text-base font-semibold text-ink">
+            <h2 id="workspace-members-heading" className="text-ink text-base font-semibold">
               Members
             </h2>
-            <p className="mt-1 text-sm text-ink-muted">
-              Everyone with access to this workspace. Pending invitees show until they set a password.
+            <p className="text-ink-muted mt-1 text-sm">
+              Everyone with access to this workspace. Pending invitees show until they set a
+              password.
             </p>
           </div>
           {canManage ? (
@@ -186,7 +186,7 @@ export function WorkspaceMembersSection() {
           <div className="relative mt-4 max-w-sm">
             <Search
               aria-hidden
-              className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-muted"
+              className="text-ink-muted pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2"
             />
             <Input
               type="search"
@@ -208,7 +208,7 @@ export function WorkspaceMembersSection() {
             </div>
           ) : filteredMembers.length > 0 ? (
             <table className="w-full text-sm">
-              <thead className="text-left text-xs font-medium uppercase tracking-wide text-ink-muted">
+              <thead className="text-ink-muted text-left text-xs font-medium uppercase tracking-wide">
                 <tr>
                   <th className="px-3 py-2">Member</th>
                   <th className="px-3 py-2">Workspace role</th>
@@ -238,14 +238,16 @@ export function WorkspaceMembersSection() {
                     onRemove={() =>
                       setRemoveTarget({ id: m.id, name: m.user.name || m.user.email })
                     }
-                    onRevoke={() =>
-                      setRevokeTarget({ id: m.id, email: m.user.email })
-                    }
+                    onRevoke={() => setRevokeTarget({ id: m.id, email: m.user.email })}
                     onResend={async () => {
                       try {
                         const result = await resend.mutateAsync(m.id);
                         if (result.invitationUrl) {
-                          copyInvitationToast(result.invitationUrl, m.user.email, result.invitationCode);
+                          copyInvitationToast(
+                            result.invitationUrl,
+                            m.user.email,
+                            result.invitationCode,
+                          );
                         } else {
                           toast.success(`Invitation queued again for delivery to ${m.user.email}.`);
                         }
@@ -259,12 +261,9 @@ export function WorkspaceMembersSection() {
               </tbody>
             </table>
           ) : members.isError && !members.data ? (
-            <QueryError
-              message="Couldn't load members."
-              onRetry={() => void members.refetch()}
-            />
+            <QueryError message="Couldn't load members." onRetry={() => void members.refetch()} />
           ) : (
-            <div className="rounded-md border border-dashed border-line p-6 text-center text-sm text-ink-muted">
+            <div className="border-line text-ink-muted rounded-md border border-dashed p-6 text-center text-sm">
               {search.trim() ? 'No members match your search.' : 'No members yet.'}
             </div>
           )}
@@ -286,9 +285,7 @@ export function WorkspaceMembersSection() {
           if (!next) setRemoveTarget(null);
         }}
         title="Remove this member?"
-        description={
-          removeTarget ? `${removeTarget.name} will lose access to this workspace.` : ''
-        }
+        description={removeTarget ? `${removeTarget.name} will lose access to this workspace.` : ''}
         confirmLabel="Remove"
         variant="destructive"
         pending={remove.isPending}
@@ -307,9 +304,7 @@ export function WorkspaceMembersSection() {
         }}
         title="Revoke this invitation?"
         description={
-          revokeTarget
-            ? `${revokeTarget.email} will no longer be able to accept this invite.`
-            : ''
+          revokeTarget ? `${revokeTarget.email} will no longer be able to accept this invite.` : ''
         }
         confirmLabel="Revoke"
         variant="destructive"
@@ -358,15 +353,15 @@ function MemberRow({
   const canModifyTarget = canManage && !isOwner && !isSelf;
   const options = visibleRoleOptions(actorRole);
   return (
-    <tr className="border-t border-line">
+    <tr className="border-line border-t">
       <td className="px-3 py-3">
         <div className="flex items-center gap-3">
           <UserAvatar size="md" name={m.user.name || m.user.email} image={m.user.image} />
           <div className="min-w-0">
-            <div className="truncate text-sm font-medium text-ink">
+            <div className="text-ink truncate text-sm font-medium">
               {m.user.name || m.user.email}
             </div>
-            <div className="truncate text-xs text-ink-muted">{m.user.email}</div>
+            <div className="text-ink-muted truncate text-xs">{m.user.email}</div>
           </div>
         </div>
       </td>
@@ -408,11 +403,13 @@ function MemberRow({
           <Badge tone={ROLE_TONE[m.role]}>
             {isOwner ? <ShieldCheck className="h-3 w-3" aria-hidden /> : null}
             {customOptions.find((o) => o.value === memberRoleValue(m))?.label ?? ROLE_LABEL[m.role]}
-            {isSelf && !isOwner ? <span className="ml-1 text-[10px] text-ink-muted">(you)</span> : null}
+            {isSelf && !isOwner ? (
+              <span className="text-ink-muted ml-1 text-[10px]">(you)</span>
+            ) : null}
           </Badge>
         )}
       </td>
-      <td className="px-3 py-3 text-xs text-ink-muted">{companyRoleLabel(m.companyRole) ?? '-'}</td>
+      <td className="text-ink-muted px-3 py-3 text-xs">{companyRoleLabel(m.companyRole) ?? '-'}</td>
       <td className="px-3 py-3">
         {m.pending ? (
           <Badge tone="neutral" aria-label={`Pending invitation for ${m.user.email}`}>
@@ -425,7 +422,7 @@ function MemberRow({
           </Badge>
         )}
       </td>
-      <td className="px-3 py-3 text-xs text-ink-muted">
+      <td className="text-ink-muted px-3 py-3 text-xs">
         <span title={absoluteTime(m.joinedAt)}>{relativeTime(m.joinedAt)}</span>
       </td>
       {canManage ? (
@@ -440,7 +437,7 @@ function MemberRow({
                   onClick={onResend}
                   disabled={resending}
                 >
-                  <RefreshCw className="h-4 w-4 text-ink-muted" />
+                  <RefreshCw className="text-ink-muted h-4 w-4" />
                 </Button>
                 <Button
                   variant="ghost"
@@ -449,7 +446,7 @@ function MemberRow({
                   onClick={onRevoke}
                 >
                   <Copy className="hidden h-4 w-4" aria-hidden />
-                  <UserMinus className="h-4 w-4 text-ink-muted" />
+                  <UserMinus className="text-ink-muted h-4 w-4" />
                 </Button>
               </>
             ) : canModifyTarget ? (
@@ -460,7 +457,7 @@ function MemberRow({
                   aria-label={`Permission extras for ${m.user.name || m.user.email}`}
                   onClick={onExtras}
                 >
-                  <SlidersHorizontal className="h-4 w-4 text-ink-muted" />
+                  <SlidersHorizontal className="text-ink-muted h-4 w-4" />
                 </Button>
                 <Button
                   variant="ghost"
@@ -468,7 +465,7 @@ function MemberRow({
                   aria-label={`Remove ${m.user.name || m.user.email}`}
                   onClick={onRemove}
                 >
-                  <UserMinus className="h-4 w-4 text-ink-muted" />
+                  <UserMinus className="text-ink-muted h-4 w-4" />
                 </Button>
               </>
             ) : null}
@@ -550,7 +547,7 @@ function InviteDialog({
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="text-lg font-semibold">Invite a member</DialogTitle>
-          <DialogDescription className="text-sm text-ink-muted">
+          <DialogDescription className="text-ink-muted text-sm">
             We&apos;ll create their account and add them to the workspace immediately. They&apos;ll
             show as &ldquo;Pending&rdquo; until they accept the invitation link.
           </DialogDescription>
@@ -590,7 +587,7 @@ function InviteDialog({
                 <SelectItem value={AUTO_ROLE}>
                   <span className="flex flex-col">
                     <span>From company role</span>
-                    <span className="text-xs text-ink-muted">
+                    <span className="text-ink-muted text-xs">
                       Company admins join as Admin, everyone else as Member.
                     </span>
                   </span>
@@ -599,7 +596,7 @@ function InviteDialog({
                   <SelectItem key={r.value} value={r.value}>
                     <span className="flex flex-col">
                       <span>{r.label}</span>
-                      <span className="text-xs text-ink-muted">{r.description}</span>
+                      <span className="text-ink-muted text-xs">{r.description}</span>
                     </span>
                   </SelectItem>
                 ))}
@@ -607,7 +604,7 @@ function InviteDialog({
             </Select>
           </div>
           {fieldError ? (
-            <p className="rounded-md border border-red-100 bg-tint-error px-3 py-2 text-xs text-state-error">
+            <p className="bg-tint-error text-state-error rounded-md border border-red-100 px-3 py-2 text-xs">
               {fieldError}
             </p>
           ) : null}

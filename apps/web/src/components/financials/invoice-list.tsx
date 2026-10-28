@@ -107,16 +107,16 @@ export function InvoiceList({ clientId }: { clientId?: string } = {}) {
       {invoices.isLoading ? (
         <PageLoader label="Loading invoices" className="min-h-[12rem]" />
       ) : invoices.isError ? (
-        <div className="rounded-md border border-line bg-bg-surface p-6 text-sm text-ink-muted">
+        <div className="border-line bg-bg-surface text-ink-muted rounded-md border p-6 text-sm">
           Couldn&apos;t load invoices.{' '}
           <button type="button" className="underline" onClick={() => void invoices.refetch()}>
             Try again
           </button>
         </div>
       ) : items.length === 0 ? (
-        <div className="flex flex-col items-center gap-3 rounded-md border border-dashed border-line bg-bg-surface p-10 text-center">
-          <FileText className="h-8 w-8 text-ink-disabled" aria-hidden />
-          <p className="text-sm text-ink-muted">
+        <div className="border-line bg-bg-surface flex flex-col items-center gap-3 rounded-md border border-dashed p-10 text-center">
+          <FileText className="text-ink-disabled h-8 w-8" aria-hidden />
+          <p className="text-ink-muted text-sm">
             {q || status !== ALL ? 'No invoices match these filters.' : 'No invoices yet.'}
           </p>
           {!q && status === ALL ? (
@@ -128,10 +128,10 @@ export function InvoiceList({ clientId }: { clientId?: string } = {}) {
           ) : null}
         </div>
       ) : (
-        <div className="overflow-x-auto rounded-md border border-line bg-bg-surface">
+        <div className="border-line bg-bg-surface overflow-x-auto rounded-md border">
           <table className="w-full min-w-[640px] text-sm">
             <thead>
-              <tr className="border-b border-line text-left text-xs text-ink-muted">
+              <tr className="border-line text-ink-muted border-b text-left text-xs">
                 <th className="px-4 py-2 font-medium">Number</th>
                 {clientId ? null : <th className="px-4 py-2 font-medium">Client</th>}
                 <th className="px-4 py-2 font-medium">Status</th>
@@ -147,29 +147,32 @@ export function InvoiceList({ clientId }: { clientId?: string } = {}) {
               {items.map((inv) => {
                 const balance = Number(inv.total) - Number(inv.amountPaid);
                 return (
-                  <tr key={inv.id} className="border-b border-line last:border-0 hover:bg-bg-subtle">
+                  <tr
+                    key={inv.id}
+                    className="border-line hover:bg-bg-subtle border-b last:border-0"
+                  >
                     <td className="px-4 py-2">
                       <Link
                         href={`/financials/invoices/${inv.id}`}
-                        className="font-medium text-ink hover:underline"
+                        className="text-ink font-medium hover:underline"
                       >
                         {inv.number}
                       </Link>
                     </td>
                     {clientId ? null : (
-                      <td className="px-4 py-2 text-ink-muted">{inv.client.name}</td>
+                      <td className="text-ink-muted px-4 py-2">{inv.client.name}</td>
                     )}
                     <td className="px-4 py-2">
                       <span
                         className={cn(
-                          'whitespace-nowrap inline-flex rounded-full px-2 py-0.5 text-xs font-medium',
+                          'inline-flex whitespace-nowrap rounded-full px-2 py-0.5 text-xs font-medium',
                           STATUS_STYLES[inv.status],
                         )}
                       >
                         {statusLabel(inv.status)}
                       </span>
                     </td>
-                    <td className="px-4 py-2 text-ink-muted">
+                    <td className="text-ink-muted px-4 py-2">
                       {new Date(inv.dueAt).toLocaleDateString()}
                     </td>
                     <td className="px-4 py-2 text-right tabular-nums">

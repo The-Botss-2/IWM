@@ -2,10 +2,7 @@
 
 import { ChevronDown, ChevronRight } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import type {
-  ContractWithMilestones,
-  PaymentRegion,
-} from '@botss/shared-types';
+import type { ContractWithMilestones, PaymentRegion } from '@botss/shared-types';
 
 import { BaseCurrencyNotice } from '@/components/financials/base-currency-notice';
 import { PaymentSourceCombobox } from '@/components/financials/payment-source-combobox';
@@ -83,8 +80,22 @@ export function PaymentFormDialog({
   // Latest values for the late-base effect below, which must not re-run when
   // only these change.
   const contractCurrency = contract.currency;
-  const latest = useRef({ baseCurrency, open, rateTouched, receivedCurrency, contractCurrency, startingRate });
-  latest.current = { baseCurrency, open, rateTouched, receivedCurrency, contractCurrency, startingRate };
+  const latest = useRef({
+    baseCurrency,
+    open,
+    rateTouched,
+    receivedCurrency,
+    contractCurrency,
+    startingRate,
+  });
+  latest.current = {
+    baseCurrency,
+    open,
+    rateTouched,
+    receivedCurrency,
+    contractCurrency,
+    startingRate,
+  };
 
   useEffect(() => {
     if (!open) return;
@@ -208,9 +219,7 @@ export function PaymentFormDialog({
 
         <div className="space-y-4">
           <div>
-            <Label htmlFor="pay-amount">
-              Amount ({contract.currency})
-            </Label>
+            <Label htmlFor="pay-amount">Amount ({contract.currency})</Label>
             <Input
               id="pay-amount"
               className="mt-1"
@@ -220,9 +229,9 @@ export function PaymentFormDialog({
               placeholder="0.00"
               autoFocus
             />
-            <p className="mt-1 text-xs text-ink-muted">
-              How much of the contract this settles. Always in the contract
-              currency, even if the money arrived as something else.
+            <p className="text-ink-muted mt-1 text-xs">
+              How much of the contract this settles. Always in the contract currency, even if the
+              money arrived as something else.
             </p>
           </div>
 
@@ -252,18 +261,12 @@ export function PaymentFormDialog({
             <div>
               <Label>Source</Label>
               <div className="mt-1">
-                <PaymentSourceCombobox
-                  value={paymentSourceId}
-                  onChange={onPickSource}
-                />
+                <PaymentSourceCombobox value={paymentSourceId} onChange={onPickSource} />
               </div>
             </div>
             <div>
               <Label>Region</Label>
-              <Select
-                value={region}
-                onValueChange={(v) => setRegion(v as PaymentRegion)}
-              >
+              <Select value={region} onValueChange={(v) => setRegion(v as PaymentRegion)}>
                 <SelectTrigger className="mt-1">
                   <SelectValue />
                 </SelectTrigger>
@@ -297,7 +300,7 @@ export function PaymentFormDialog({
           <button
             type="button"
             onClick={() => setShowDetail((v) => !v)}
-            className="flex items-center gap-1 text-sm text-ink-muted hover:text-ink"
+            className="text-ink-muted hover:text-ink flex items-center gap-1 text-sm"
           >
             {showDetail ? (
               <ChevronDown className="h-4 w-4" />
@@ -308,12 +311,11 @@ export function PaymentFormDialog({
           </button>
 
           {showDetail ? (
-            <div className="space-y-4 rounded-md border border-line bg-bg-subtle p-3">
-              <p className="text-xs text-ink-muted">
-                Use these when the money landed as a different amount or
-                currency - an Upwork payout, say, where the client was billed{' '}
-                {contract.currency} but a fee was taken and the rest wired
-                locally.
+            <div className="border-line bg-bg-subtle space-y-4 rounded-md border p-3">
+              <p className="text-ink-muted text-xs">
+                Use these when the money landed as a different amount or currency - an Upwork
+                payout, say, where the client was billed {contract.currency} but a fee was taken and
+                the rest wired locally.
               </p>
               <div className="grid gap-4 sm:grid-cols-2">
                 <div>
@@ -387,7 +389,7 @@ export function PaymentFormDialog({
                     aria-describedby={rateError ? 'pay-fx-error' : undefined}
                   />
                   {rateError ? (
-                    <p id="pay-fx-error" className="mt-1 text-xs text-state-error">
+                    <p id="pay-fx-error" className="text-state-error mt-1 text-xs">
                       {rateError}
                     </p>
                   ) : null}

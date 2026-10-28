@@ -5,7 +5,8 @@ import type { ClientActivityItem, ClientActivityKind } from '@botss/shared-types
 
 import { getApi } from '@/lib/api';
 
-export const clientActivityKey = (clientId: string) => ['client-hub', clientId, 'activity'] as const;
+export const clientActivityKey = (clientId: string) =>
+  ['client-hub', clientId, 'activity'] as const;
 
 const PAGE_SIZE = 25;
 

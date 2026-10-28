@@ -59,7 +59,6 @@ export function formatCurrency(
   }
 }
 
-
 /**
  * Normalise free-typed money input to a 2dp decimal string the API will
  * accept, or `null` when the field is empty or unparseable.

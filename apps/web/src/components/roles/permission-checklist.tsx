@@ -19,14 +19,14 @@ export function PermissionChecklist({
     <div className="space-y-4">
       {groups.map((g) => (
         <fieldset key={g.group} className="space-y-2">
-          <legend className="text-[11px] font-semibold uppercase tracking-wide text-ink-muted">
+          <legend className="text-ink-muted text-[11px] font-semibold uppercase tracking-wide">
             {g.group}
           </legend>
           <div className="grid gap-2 sm:grid-cols-2">
             {g.permissions.map((p) => (
               <label
                 key={p.key}
-                className="flex cursor-pointer items-start gap-2 rounded-md border border-line p-2.5 has-[:disabled]:cursor-default"
+                className="border-line flex cursor-pointer items-start gap-2 rounded-md border p-2.5 has-[:disabled]:cursor-default"
               >
                 <Checkbox
                   checked={value.includes(p.key)}
@@ -36,9 +36,9 @@ export function PermissionChecklist({
                   aria-label={p.label}
                 />
                 <span className="min-w-0 text-sm">
-                  <span className="block font-medium text-ink">{p.label}</span>
+                  <span className="text-ink block font-medium">{p.label}</span>
                   {p.description ? (
-                    <span className="mt-0.5 block text-[11px] text-ink-muted">{p.description}</span>
+                    <span className="text-ink-muted mt-0.5 block text-[11px]">{p.description}</span>
                   ) : null}
                 </span>
               </label>

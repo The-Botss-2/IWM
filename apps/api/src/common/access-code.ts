@@ -40,11 +40,16 @@ export function newAccessCode(): { raw: string; hash: string } {
 }
 
 export function hashAccessCode(raw: string): string {
-  return createHash('sha256').update(`access-code:${normalizeAccessCode(raw)}`).digest('hex');
+  return createHash('sha256')
+    .update(`access-code:${normalizeAccessCode(raw)}`)
+    .digest('hex');
 }
 
 /** Constant-time comparison of a typed code against the stored hash. */
-export function accessCodeMatches(raw: string | null | undefined, storedHash: string | null): boolean {
+export function accessCodeMatches(
+  raw: string | null | undefined,
+  storedHash: string | null,
+): boolean {
   if (!raw || !storedHash) return false;
   const normalized = normalizeAccessCode(raw);
   if (!/^\d{6}$/.test(normalized)) return false;

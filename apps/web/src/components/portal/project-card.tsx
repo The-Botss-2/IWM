@@ -23,9 +23,9 @@ export function PortalProgressBar({
       aria-valuemin={0}
       aria-valuemax={100}
       aria-valuenow={percent}
-      className={cn('h-2 w-full overflow-hidden rounded-full bg-bg-subtle', className)}
+      className={cn('bg-bg-subtle h-2 w-full overflow-hidden rounded-full', className)}
     >
-      <div className="h-full rounded-full bg-brand-gradient" style={{ width: `${percent}%` }} />
+      <div className="bg-brand-gradient h-full rounded-full" style={{ width: `${percent}%` }} />
     </div>
   );
 }
@@ -48,7 +48,7 @@ export function PortalProjectCard({
   return (
     <Link
       href={portalProjectHref(clientId, project.id)}
-      className="card flex h-full flex-col gap-4 p-5 transition-shadow duration-200 hover:shadow-soft-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-purple/50"
+      className="card hover:shadow-soft-lg focus-visible:ring-brand-purple/50 flex h-full flex-col gap-4 p-5 transition-shadow duration-200 focus-visible:outline-none focus-visible:ring-2"
     >
       <div className="flex items-start justify-between gap-3">
         <div className="flex min-w-0 items-center gap-2">
@@ -59,18 +59,18 @@ export function PortalProjectCard({
               style={{ backgroundColor: project.color }}
             />
           ) : null}
-          <Heading className="truncate text-base font-semibold text-ink">{project.name}</Heading>
+          <Heading className="text-ink truncate text-base font-semibold">{project.name}</Heading>
         </div>
         <ProjectStatusBadge status={project.status} />
       </div>
       <div className="mt-auto space-y-2">
         <div className="flex items-baseline justify-between gap-3 text-sm">
           <span className="text-ink-muted">{tasksDoneLabel(progress.done, progress.total)}</span>
-          <span className="font-semibold tabular-nums text-ink">{progress.percent}%</span>
+          <span className="text-ink font-semibold tabular-nums">{progress.percent}%</span>
         </div>
         <PortalProgressBar percent={progress.percent} label={`${project.name} progress`} />
         {project.dueDate ? (
-          <p className="text-xs text-ink-muted">Due {formatDate(project.dueDate)}</p>
+          <p className="text-ink-muted text-xs">Due {formatDate(project.dueDate)}</p>
         ) : null}
       </div>
     </Link>

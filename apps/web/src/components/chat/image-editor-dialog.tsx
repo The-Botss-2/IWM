@@ -344,21 +344,26 @@ export function ImageEditorDialog({ file, onCancel, onConfirm }: ImageEditorDial
               className="w-40"
             />
             <div className="ml-2 flex items-center gap-1">
-              {([['Free', undefined], ['1:1', 1], ['4:3', 4 / 3], ['16:9', 16 / 9]] as const).map(
-                ([label, val]) => (
-                  <button
-                    key={label}
-                    type="button"
-                    onClick={() => setAspect(val)}
-                    className={cn(
-                      'rounded-full px-2 py-1 text-[11px]',
-                      aspect === val ? 'bg-white text-black' : 'bg-white/15 text-white',
-                    )}
-                  >
-                    {label}
-                  </button>
-                ),
-              )}
+              {(
+                [
+                  ['Free', undefined],
+                  ['1:1', 1],
+                  ['4:3', 4 / 3],
+                  ['16:9', 16 / 9],
+                ] as const
+              ).map(([label, val]) => (
+                <button
+                  key={label}
+                  type="button"
+                  onClick={() => setAspect(val)}
+                  className={cn(
+                    'rounded-full px-2 py-1 text-[11px]',
+                    aspect === val ? 'bg-white text-black' : 'bg-white/15 text-white',
+                  )}
+                >
+                  {label}
+                </button>
+              ))}
             </div>
           </>
         ) : (
@@ -485,17 +490,7 @@ async function renderCroppedImage(
   out.height = h;
   const octx = out.getContext('2d');
   if (!octx) throw new Error('no 2d context');
-  octx.drawImage(
-    tmp,
-    Math.round(cropArea.x),
-    Math.round(cropArea.y),
-    w,
-    h,
-    0,
-    0,
-    w,
-    h,
-  );
+  octx.drawImage(tmp, Math.round(cropArea.x), Math.round(cropArea.y), w, h, 0, 0, w, h);
   const blob = await new Promise<Blob | null>((res) => out.toBlob(res, 'image/png'));
   if (!blob) throw new Error('toBlob failed');
   return { url: URL.createObjectURL(blob), w, h };

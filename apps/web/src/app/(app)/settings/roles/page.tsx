@@ -25,8 +25,8 @@ export default function RolesSettingsPage() {
   if (!perms.canManageRoles) {
     return (
       <div className="py-12 text-center">
-        <h2 className="text-lg font-semibold text-ink">Admin only</h2>
-        <p className="mt-1 text-sm text-ink-muted">You need the Manage roles permission.</p>
+        <h2 className="text-ink text-lg font-semibold">Admin only</h2>
+        <p className="text-ink-muted mt-1 text-sm">You need the Manage roles permission.</p>
       </div>
     );
   }
@@ -34,17 +34,14 @@ export default function RolesSettingsPage() {
   return (
     <div className="space-y-8">
       <header>
-        <h2 className="text-lg font-semibold text-ink">Roles</h2>
-        <p className="text-sm text-ink-muted">
+        <h2 className="text-ink text-lg font-semibold">Roles</h2>
+        <p className="text-ink-muted text-sm">
           What each role can do. Assign company roles from Users, and workspace roles from a
           workspace&apos;s Members screen.
         </p>
       </header>
       {roles.isError && !roles.data ? (
-        <QueryError
-          message="Couldn't load roles."
-          onRetry={() => void roles.refetch()}
-        />
+        <QueryError message="Couldn't load roles." onRetry={() => void roles.refetch()} />
       ) : roles.isLoading || !roles.data ? (
         <Skeleton className="h-48" />
       ) : (
@@ -107,9 +104,9 @@ function RoleSection({
   onDelete: (r: RoleDto) => void;
 }) {
   return (
-    <section className="rounded-lg border border-line bg-bg-surface p-4">
+    <section className="border-line bg-bg-surface rounded-lg border p-4">
       <div className="mb-3 flex items-center justify-between gap-3">
-        <h3 className="text-sm font-semibold text-ink">{title}</h3>
+        <h3 className="text-ink text-sm font-semibold">{title}</h3>
         <Button size="sm" onClick={() => onOpen({ mode: 'create', scope })}>
           <Plus className="h-4 w-4" />
           New role
@@ -117,7 +114,7 @@ function RoleSection({
       </div>
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
-          <thead className="text-left text-xs font-medium uppercase tracking-wide text-ink-muted">
+          <thead className="text-ink-muted text-left text-xs font-medium uppercase tracking-wide">
             <tr>
               <th className="px-3 py-2">Role</th>
               <th className="px-3 py-2">Permissions</th>
@@ -129,20 +126,20 @@ function RoleSection({
           </thead>
           <tbody>
             {roles.map((r) => (
-              <tr key={r.id} className="border-t border-line">
+              <tr key={r.id} className="border-line border-t">
                 <td className="px-3 py-3">
                   <div className="flex items-center gap-2">
-                    <span className="font-medium text-ink">{r.name}</span>
+                    <span className="text-ink font-medium">{r.name}</span>
                     <Badge tone={r.preset ? 'neutral' : 'brand'}>
                       {r.preset ? 'Built-in' : 'Custom'}
                     </Badge>
                   </div>
                   {r.description ? (
-                    <p className="mt-0.5 text-xs text-ink-muted">{r.description}</p>
+                    <p className="text-ink-muted mt-0.5 text-xs">{r.description}</p>
                   ) : null}
                 </td>
-                <td className="px-3 py-3 text-xs text-ink-muted">{r.permissions.length}</td>
-                <td className="px-3 py-3 text-xs text-ink-muted">{r.memberCount}</td>
+                <td className="text-ink-muted px-3 py-3 text-xs">{r.permissions.length}</td>
+                <td className="text-ink-muted px-3 py-3 text-xs">{r.memberCount}</td>
                 <td className="px-3 py-3">
                   <div className="flex justify-end gap-1">
                     {r.locked ? (
@@ -152,7 +149,7 @@ function RoleSection({
                         aria-label={`View ${r.name}`}
                         onClick={() => onOpen({ mode: 'view', role: r })}
                       >
-                        <Eye className="h-4 w-4 text-ink-muted" />
+                        <Eye className="text-ink-muted h-4 w-4" />
                       </Button>
                     ) : (
                       <Button
@@ -161,7 +158,7 @@ function RoleSection({
                         aria-label={`Edit ${r.name}`}
                         onClick={() => onOpen({ mode: 'edit', role: r })}
                       >
-                        <Pencil className="h-4 w-4 text-ink-muted" />
+                        <Pencil className="text-ink-muted h-4 w-4" />
                       </Button>
                     )}
                     <Button
@@ -170,7 +167,7 @@ function RoleSection({
                       aria-label={`Duplicate ${r.name}`}
                       onClick={() => onOpen({ mode: 'create', scope, from: r })}
                     >
-                      <Copy className="h-4 w-4 text-ink-muted" />
+                      <Copy className="text-ink-muted h-4 w-4" />
                     </Button>
                     {r.preset ? null : (
                       <Button
@@ -179,7 +176,7 @@ function RoleSection({
                         aria-label={`Delete ${r.name}`}
                         onClick={() => onDelete(r)}
                       >
-                        <Trash2 className="h-4 w-4 text-ink-muted" />
+                        <Trash2 className="text-ink-muted h-4 w-4" />
                       </Button>
                     )}
                   </div>

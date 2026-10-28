@@ -94,7 +94,11 @@ function sortContacts(items: ClientContact[]): ClientContact[] {
 }
 
 /** One main contact per client: promoting someone demotes the current one. */
-function withRole(items: ClientContact[], contactId: string, role: ClientContactRole): ClientContact[] {
+function withRole(
+  items: ClientContact[],
+  contactId: string,
+  role: ClientContactRole,
+): ClientContact[] {
   return items.map((c) => {
     if (c.id === contactId) return { ...c, role };
     if (role === 'PRIMARY' && c.role === 'PRIMARY') return { ...c, role: 'MEMBER' };
@@ -166,8 +170,12 @@ export function useResendPortalInvite(clientId: string) {
         upsertContact(prev, result.contact),
       );
     },
-    onError: (err) => toastErrorMessage("Couldn't resend the invite", {
-        description: portalContactErrorMessage(err, 'Something unexpected happened. Try again in a moment.'),
+    onError: (err) =>
+      toastErrorMessage("Couldn't resend the invite", {
+        description: portalContactErrorMessage(
+          err,
+          'Something unexpected happened. Try again in a moment.',
+        ),
       }),
     // A 409 here usually means they accepted meanwhile, so refetch either way.
     onSettled: () => refreshContacts(qc, clientId),
@@ -188,7 +196,10 @@ export function useSendPortalPasswordReset(clientId: string) {
     },
     onError: (err) =>
       toastErrorMessage("Couldn't send the password reset link", {
-        description: portalContactErrorMessage(err, 'Something unexpected happened. Try again in a moment.'),
+        description: portalContactErrorMessage(
+          err,
+          'Something unexpected happened. Try again in a moment.',
+        ),
       }),
     onSettled: () => refreshContacts(qc, clientId),
   });
@@ -215,7 +226,10 @@ export function useSetPortalContactRole(clientId: string) {
     onError: (err, _vars, ctx) => {
       if (ctx?.previous) qc.setQueryData(key, ctx.previous);
       toastErrorMessage("Couldn't change the main contact", {
-        description: portalContactErrorMessage(err, 'Something unexpected happened. Try again in a moment.'),
+        description: portalContactErrorMessage(
+          err,
+          'Something unexpected happened. Try again in a moment.',
+        ),
       });
     },
     onSettled: () => refreshContacts(qc, clientId),
@@ -244,7 +258,10 @@ export function useRevokePortalContact(clientId: string) {
     onError: (err, _contactId, ctx) => {
       if (ctx?.previous) qc.setQueryData(key, ctx.previous);
       toastErrorMessage("Couldn't remove portal access", {
-        description: portalContactErrorMessage(err, 'Something unexpected happened. Try again in a moment.'),
+        description: portalContactErrorMessage(
+          err,
+          'Something unexpected happened. Try again in a moment.',
+        ),
       });
     },
     onSettled: () => refreshContacts(qc, clientId),

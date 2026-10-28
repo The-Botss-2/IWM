@@ -53,7 +53,7 @@ services:
       MINIO_ROOT_PASSWORD: botss-local-secret
       # Origins allowed to load files directly from MinIO. Add your web app's
       # public origin (e.g. https://app.example.com) when self-hosting.
-      MINIO_API_CORS_ALLOW_ORIGIN: "http://localhost:3000"
+      MINIO_API_CORS_ALLOW_ORIGIN: 'http://localhost:3000'
     # Host ports 9100/9101 to avoid clashes with any other local MinIO.
     # Bind to 127.0.0.1 so the bucket is not internet-reachable. The API
     # talks to MinIO via loopback; signed URLs handed to clients should go

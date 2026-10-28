@@ -14,11 +14,7 @@ import { CSS } from '@dnd-kit/utilities';
 import { useCallback, useMemo, useRef } from 'react';
 import type { LeadStage, LeadWithOwner } from '@botss/shared-types';
 
-import {
-  SourceBadge,
-  STAGE_OPTIONS,
-  stageLabel,
-} from '@/components/leads/lead-badges';
+import { SourceBadge, STAGE_OPTIONS, stageLabel } from '@/components/leads/lead-badges';
 import { formatCurrency } from '@/lib/money';
 import { UserAvatar } from '@/components/ui/avatar';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -82,11 +78,13 @@ export function LeadPipeline({ leads, isLoading, onSelect }: Props) {
 
     // overId is either a column key (`STAGE`) or a lead id we landed on.
     const current = groupedRef.current;
-    const overStage = (STAGE_OPTIONS.includes(overId as LeadStage)
-      ? (overId as LeadStage)
-      : (Object.entries(current).find(([, list]) =>
-          list.some((l) => l.id === overId),
-        )?.[0] as LeadStage | undefined)) as LeadStage | undefined;
+    const overStage = (
+      STAGE_OPTIONS.includes(overId as LeadStage)
+        ? (overId as LeadStage)
+        : (Object.entries(current).find(([, list]) => list.some((l) => l.id === overId))?.[0] as
+            | LeadStage
+            | undefined)
+    ) as LeadStage | undefined;
     if (!overStage) return;
 
     const existing = leadsRef.current.find((l) => l.id === leadId);
@@ -109,8 +107,11 @@ export function LeadPipeline({ leads, isLoading, onSelect }: Props) {
     return (
       <div className="flex gap-3 overflow-x-auto overscroll-x-contain pb-2 [-webkit-overflow-scrolling:touch]">
         {STAGE_OPTIONS.map((s) => (
-          <div key={s} className="w-[80vw] max-w-[18rem] shrink-0 rounded-lg bg-bg-subtle p-2 md:w-72 md:max-w-none">
-            <div className="px-2 py-1 text-xs font-semibold uppercase tracking-wide text-ink">
+          <div
+            key={s}
+            className="bg-bg-subtle w-[80vw] max-w-[18rem] shrink-0 rounded-lg p-2 md:w-72 md:max-w-none"
+          >
+            <div className="text-ink px-2 py-1 text-xs font-semibold uppercase tracking-wide">
               {stageLabel(s)}
             </div>
             <div className="mt-1 space-y-2 p-1">
@@ -127,12 +128,7 @@ export function LeadPipeline({ leads, isLoading, onSelect }: Props) {
     <DndContext sensors={sensors} collisionDetection={closestCorners} onDragEnd={onDragEnd}>
       <div className="flex gap-3 overflow-x-auto overscroll-x-contain pb-2 [-webkit-overflow-scrolling:touch]">
         {STAGE_OPTIONS.map((stage) => (
-          <Column
-            key={stage}
-            stage={stage}
-            leads={grouped[stage]}
-            onSelect={handleSelect}
-          />
+          <Column key={stage} stage={stage} leads={grouped[stage]} onSelect={handleSelect} />
         ))}
       </div>
     </DndContext>
@@ -165,18 +161,21 @@ function Column({
   }, [leads]);
 
   return (
-    <div className="w-[80vw] max-w-[18rem] shrink-0 rounded-lg bg-bg-subtle p-2 md:w-72 md:max-w-none">
+    <div className="bg-bg-subtle w-[80vw] max-w-[18rem] shrink-0 rounded-lg p-2 md:w-72 md:max-w-none">
       <div className="flex flex-col gap-0.5 px-2 py-1">
         <div className="flex items-center justify-between">
-          <div className="text-xs font-semibold text-ink uppercase tracking-wide">
+          <div className="text-ink text-xs font-semibold uppercase tracking-wide">
             {stageLabel(stage)}
-            <span className="ml-2 rounded-full bg-white px-1.5 py-0.5 text-[10px] font-mono text-ink-muted">
+            <span className="text-ink-muted ml-2 rounded-full bg-white px-1.5 py-0.5 font-mono text-[10px]">
               {leads.length}
             </span>
           </div>
         </div>
         {totals.length > 0 ? (
-          <div className="text-[11px] text-ink-muted break-words md:truncate" title={totals.map(([c, v]) => formatCurrency(v, c, { compact: true })).join(' · ')}>
+          <div
+            className="text-ink-muted break-words text-[11px] md:truncate"
+            title={totals.map(([c, v]) => formatCurrency(v, c, { compact: true })).join(' · ')}
+          >
             {totals.map(([c, v]) => formatCurrency(v, c, { compact: true })).join(' · ')}
           </div>
         ) : null}
@@ -197,13 +196,7 @@ function Column({
   );
 }
 
-function Card({
-  lead,
-  onSelect,
-}: {
-  lead: LeadWithOwner;
-  onSelect: (id: string) => void;
-}) {
+function Card({ lead, onSelect }: { lead: LeadWithOwner; onSelect: (id: string) => void }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: lead.id,
   });
@@ -236,18 +229,16 @@ function Card({
           onSelect(lead.id);
         }
       }}
-      className="space-y-2 rounded-lg border border-line bg-white p-3 shadow-sm cursor-grab active:cursor-grabbing
-                 focus-visible:outline-none focus-visible:ring-2 focus-visible:shadow-focus
-                 hover:border-line-strong transition-colors"
+      className="border-line focus-visible:shadow-focus hover:border-line-strong cursor-grab space-y-2 rounded-lg border bg-white p-3 shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-2 active:cursor-grabbing"
     >
       <div className="min-w-0">
-        <div className="text-sm font-medium text-ink leading-snug break-words">{lead.name}</div>
+        <div className="text-ink break-words text-sm font-medium leading-snug">{lead.name}</div>
         {lead.company ? (
-          <div className="text-xs text-ink-muted break-words">{lead.company}</div>
+          <div className="text-ink-muted break-words text-xs">{lead.company}</div>
         ) : null}
       </div>
       {lead.estimatedValue ? (
-        <div className="text-xs font-medium text-ink">
+        <div className="text-ink text-xs font-medium">
           {formatCurrency(lead.estimatedValue, lead.currency, { compact: true })}
         </div>
       ) : null}
@@ -265,7 +256,7 @@ function Card({
             />
           </Tooltip>
         ) : (
-          <span className="text-[10px] text-ink-disabled uppercase tracking-wide">Unassigned</span>
+          <span className="text-ink-disabled text-[10px] uppercase tracking-wide">Unassigned</span>
         )}
       </div>
       {tagsToShow.length > 0 ? (
@@ -273,13 +264,13 @@ function Card({
           {tagsToShow.map((t) => (
             <span
               key={t}
-              className="rounded-full bg-bg-subtle px-1.5 py-0.5 text-[10px] text-ink-muted"
+              className="bg-bg-subtle text-ink-muted rounded-full px-1.5 py-0.5 text-[10px]"
             >
               {t}
             </span>
           ))}
           {remainingTags > 0 ? (
-            <span className="text-[10px] text-ink-muted">+{remainingTags}</span>
+            <span className="text-ink-muted text-[10px]">+{remainingTags}</span>
           ) : null}
         </div>
       ) : null}

@@ -85,7 +85,10 @@ export const createInvoiceSchema = z.object({
   notes: z.string().max(2000).optional(),
   terms: z.string().max(2000).optional(),
   footer: z.string().max(500).optional(),
-  templateKey: z.string().regex(/^[a-z0-9][a-z0-9-]{0,48}$/).optional(),
+  templateKey: z
+    .string()
+    .regex(/^[a-z0-9][a-z0-9-]{0,48}$/)
+    .optional(),
 });
 export type CreateInvoiceInput = z.infer<typeof createInvoiceSchema>;
 
@@ -101,7 +104,11 @@ export const updateInvoiceSchema = z.object({
   notes: z.string().max(2000).nullable().optional(),
   terms: z.string().max(2000).nullable().optional(),
   footer: z.string().max(500).nullable().optional(),
-  templateKey: z.string().regex(/^[a-z0-9][a-z0-9-]{0,48}$/).nullable().optional(),
+  templateKey: z
+    .string()
+    .regex(/^[a-z0-9][a-z0-9-]{0,48}$/)
+    .nullable()
+    .optional(),
 });
 export type UpdateInvoiceInput = z.infer<typeof updateInvoiceSchema>;
 

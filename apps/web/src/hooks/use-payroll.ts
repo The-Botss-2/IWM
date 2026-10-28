@@ -181,16 +181,18 @@ export function usePayPayrollRun(runId: string) {
   return useRunMutation(
     (input: PayPayrollRunInput) => getApi().payroll.pay(runId, input),
     "Couldn't mark the payroll as paid",
-    { touchesExpenses: true, success: 'Payroll marked as paid. Salaries are recorded as expenses.' },
+    {
+      touchesExpenses: true,
+      success: 'Payroll marked as paid. Salaries are recorded as expenses.',
+    },
   );
 }
 
 export function useUnpayPayrollRun(runId: string) {
-  return useRunMutation(
-    () => getApi().payroll.unpay(runId),
-    "Couldn't undo the payment",
-    { touchesExpenses: true, success: 'Payment undone. The run can be edited again.' },
-  );
+  return useRunMutation(() => getApi().payroll.unpay(runId), "Couldn't undo the payment", {
+    touchesExpenses: true,
+    success: 'Payment undone. The run can be edited again.',
+  });
 }
 
 export function useDeletePayrollRun() {
@@ -278,7 +280,15 @@ export function useSendPayslips(runId: string) {
       before: Map<string, number | null>,
     ) => {
       const results: SendPayslipsResult['results'] = [];
-      setState({ status: 'sending', done: 0, total: itemIds.length, results, pending: [], before, error: null });
+      setState({
+        status: 'sending',
+        done: 0,
+        total: itemIds.length,
+        results,
+        pending: [],
+        before,
+        error: null,
+      });
       let i = 0;
       try {
         for (; i < itemIds.length; i += SEND_BATCH) {
@@ -293,7 +303,12 @@ export function useSendPayslips(runId: string) {
         // a rejected login may have sent some payslips first: the server
         // marks those, and the dialog compares against `before` to skip them.
         const pending = itemIds.slice(i);
-        setState((s) => ({ ...s, status: results.length > 0 ? 'done' : 'idle', pending, error: err }));
+        setState((s) => ({
+          ...s,
+          status: results.length > 0 ? 'done' : 'idle',
+          pending,
+          error: err,
+        }));
       } finally {
         void qc.invalidateQueries({ queryKey: payrollRunKey(runId) });
       }
@@ -334,7 +349,8 @@ export function useDownloadPayslips() {
 
 export function useDownloadPayslip() {
   return useDownload(
-    ({ runId, itemId }: { runId: string; itemId: string }) => getApi().payroll.payslipPdf(runId, itemId),
+    ({ runId, itemId }: { runId: string; itemId: string }) =>
+      getApi().payroll.payslipPdf(runId, itemId),
     () => 'payslip.pdf',
     "Couldn't generate this payslip",
   );

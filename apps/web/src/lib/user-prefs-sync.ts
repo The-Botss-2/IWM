@@ -1,8 +1,4 @@
-import {
-  MAX_HIDDEN_NAV_IDS,
-  navDestinationId,
-  type UserPreferences,
-} from '@botss/shared-types';
+import { MAX_HIDDEN_NAV_IDS, navDestinationId, type UserPreferences } from '@botss/shared-types';
 
 import { type AppAppearance, DEFAULT_APPEARANCE } from './app-prefs';
 
@@ -25,9 +21,7 @@ export interface LocalPrefs {
 }
 
 /** Translate a user-initiated appearance change into a server patch. */
-export function appearanceChangeToPatch(
-  change: Partial<AppAppearance>,
-): UserPreferences {
+export function appearanceChangeToPatch(change: Partial<AppAppearance>): UserPreferences {
   const patch: UserPreferences = {};
   const appearance: NonNullable<UserPreferences['appearance']> = {};
   if (change.theme !== undefined) appearance.theme = change.theme;
@@ -52,10 +46,7 @@ export function hiddenChangeToPatch(hidden: string[]): UserPreferences {
 }
 
 /** Combine two pending patches; later keys win, sections merge, arrays replace. */
-export function mergePatches(
-  a: UserPreferences | null,
-  b: UserPreferences,
-): UserPreferences {
+export function mergePatches(a: UserPreferences | null, b: UserPreferences): UserPreferences {
   if (!a) return b;
   const out: UserPreferences = {};
   if (a.appearance || b.appearance) out.appearance = { ...a.appearance, ...b.appearance };
@@ -99,10 +90,7 @@ export function serverToLocal(prefs: UserPreferences): LocalPrefs {
  * - two devices customised before sync shipped contribute the union of their
  *   choices, with whichever synced first winning any key both set.
  */
-export function localGapsForServer(
-  local: LocalPrefs,
-  server: UserPreferences,
-): UserPreferences {
+export function localGapsForServer(local: LocalPrefs, server: UserPreferences): UserPreferences {
   const sa = server.appearance ?? {};
   const sn = server.navigation ?? {};
   const la = local.appearance;

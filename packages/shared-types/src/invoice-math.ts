@@ -27,7 +27,8 @@ export interface InvoiceMathTotals {
 const SCALE = 100_000n; // 1.00000 in fixed point
 
 function toFixedPoint(value: string | number | null | undefined, fallback: string): bigint {
-  const raw = value === null || value === undefined || value === '' ? fallback : String(value).trim();
+  const raw =
+    value === null || value === undefined || value === '' ? fallback : String(value).trim();
   const match = /^(-?)(\d*)(?:\.(\d*))?$/.exec(raw);
   if (!match) return toFixedPoint(fallback, fallback);
   const sign = match[1] === '-' ? -1n : 1n;

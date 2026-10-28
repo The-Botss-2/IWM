@@ -57,7 +57,10 @@ export const searchQuerySchema = z
      */
     kind: searchResultKind.optional(),
     /** Opaque cursor from a previous page's `nextCursor`. */
-    cursor: z.string().regex(/^\d{1,4}$/).optional(),
+    cursor: z
+      .string()
+      .regex(/^\d{1,4}$/)
+      .optional(),
     /** Chat and mail filters (the search page's `from:` / `in:` / date chips). */
     fromUserId: cuid.optional(),
     roomId: cuid.optional(),
@@ -74,9 +77,7 @@ export const searchQuerySchema = z
       .transform((v) => v === true || v === 'true'),
   })
   .refine(
-    (v) =>
-      v.q.length >= 2 ||
-      Boolean(v.fromUserId || v.roomId || v.has || v.after || v.before),
+    (v) => v.q.length >= 2 || Boolean(v.fromUserId || v.roomId || v.has || v.after || v.before),
     {
       message: 'Type at least two characters or add a filter',
       path: ['q'],

@@ -30,15 +30,15 @@ export default function TimeOffPage() {
     <div className="mx-auto h-[var(--app-content-h,calc(100vh-4rem))] w-full max-w-5xl overflow-y-auto px-4 py-6 sm:px-6">
       <Link
         href="/timesheets"
-        className="mb-3 inline-flex items-center gap-1 text-xs text-ink-muted hover:text-ink"
+        className="text-ink-muted hover:text-ink mb-3 inline-flex items-center gap-1 text-xs"
       >
         <ChevronLeft className="h-3.5 w-3.5" aria-hidden />
         Timesheets
       </Link>
       <header className="mb-6 flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-semibold text-ink">Time off</h1>
-          <p className="mt-0.5 text-sm text-ink-muted">
+          <h1 className="text-ink text-2xl font-semibold">Time off</h1>
+          <p className="text-ink-muted mt-0.5 text-sm">
             Request leave and follow what HR decides. Approved days show as leave in attendance.
           </p>
         </div>
@@ -49,7 +49,7 @@ export default function TimeOffPage() {
       </header>
 
       <section aria-labelledby="my-requests-heading" className="space-y-3">
-        <h2 id="my-requests-heading" className="text-base font-semibold text-ink">
+        <h2 id="my-requests-heading" className="text-ink text-base font-semibold">
           My requests
         </h2>
         {leaves.isError && !leaves.data ? (
@@ -58,15 +58,13 @@ export default function TimeOffPage() {
             onRetry={() => void leaves.refetch()}
           />
         ) : leaves.isPending ? (
-          <div className="rounded-xl bg-white py-12 shadow-soft">
+          <div className="shadow-soft rounded-xl bg-white py-12">
             <Loader size="sm" label="Loading leave requests" />
           </div>
         ) : items.length === 0 ? (
-          <div className="rounded-xl bg-white px-4 py-12 text-center shadow-soft">
-            <p className="text-sm text-ink">No leave requests yet.</p>
-            <p className="mt-1 text-xs text-ink-muted">
-              Use Request leave to ask for time off.
-            </p>
+          <div className="shadow-soft rounded-xl bg-white px-4 py-12 text-center">
+            <p className="text-ink text-sm">No leave requests yet.</p>
+            <p className="text-ink-muted mt-1 text-xs">Use Request leave to ask for time off.</p>
           </div>
         ) : (
           <LeaveTable

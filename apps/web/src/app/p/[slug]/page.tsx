@@ -63,37 +63,37 @@ export default async function PublicDocumentPage({ params }: PageProps) {
     // Paper-feel layout: light page background with a white "sheet" centered
     // on top, subtle shadow, generous padding. Reads as a document rather
     // than a marketing page.
-    <div className="min-h-[calc(100vh-4rem)] bg-bg-subtle">
+    <div className="bg-bg-subtle min-h-[calc(100vh-4rem)]">
       <article className="mx-auto max-w-3xl px-4 py-8 sm:py-12">
-        <div className="rounded-lg border border-line bg-white px-6 py-10 shadow-sm sm:px-12 sm:py-14">
+        <div className="border-line rounded-lg border bg-white px-6 py-10 shadow-sm sm:px-12 sm:py-14">
           <header className="mb-8">
             {doc.workspaceName ? (
-              <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-ink-disabled">
+              <p className="text-ink-disabled text-[11px] font-medium uppercase tracking-[0.18em]">
                 {doc.workspaceName}
               </p>
             ) : null}
-            <h1 className="mt-2 text-3xl font-bold tracking-tight text-ink sm:text-4xl">
+            <h1 className="text-ink mt-2 text-3xl font-bold tracking-tight sm:text-4xl">
               {doc.title}
             </h1>
-            <p className="mt-3 text-sm text-ink-muted">
-              By <span className="font-medium text-ink">{doc.authorName}</span>
-              <span className="mx-1.5 text-line-strong">·</span>
+            <p className="text-ink-muted mt-3 text-sm">
+              By <span className="text-ink font-medium">{doc.authorName}</span>
+              <span className="text-line-strong mx-1.5">·</span>
               <span>Last updated {updatedAbsolute}</span>
             </p>
           </header>
 
           <div
-            className="prose prose-slate max-w-none prose-headings:font-semibold prose-headings:tracking-tight prose-pre:bg-ink prose-pre:text-slate-100 prose-pre:text-xs prose-pre:rounded-md prose-code:before:content-none prose-code:after:content-none prose-table:border prose-th:border prose-td:border prose-th:p-2 prose-td:p-2 prose-img:rounded-md prose-a:text-brand-700 prose-a:no-underline hover:prose-a:underline prose-blockquote:border-brand-purple/40"
+            className="prose prose-slate prose-headings:font-semibold prose-headings:tracking-tight prose-pre:bg-ink prose-pre:text-slate-100 prose-pre:text-xs prose-pre:rounded-md prose-code:before:content-none prose-code:after:content-none prose-table:border prose-th:border prose-td:border prose-th:p-2 prose-td:p-2 prose-img:rounded-md prose-a:text-brand-700 prose-a:no-underline hover:prose-a:underline prose-blockquote:border-brand-purple/40 max-w-none"
             // Tiptap's `generateHTML` serializes only schema-permitted nodes;
             // no script tags or event handlers can survive that round-trip.
             dangerouslySetInnerHTML={{ __html: html }}
           />
         </div>
 
-        <footer className="mt-6 flex items-center justify-center text-xs text-ink-disabled">
+        <footer className="text-ink-disabled mt-6 flex items-center justify-center text-xs">
           <Link
             href="/"
-            className="inline-flex items-center gap-1 rounded px-2 py-1 hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:shadow-focus"
+            className="hover:text-ink focus-visible:shadow-focus inline-flex items-center gap-1 rounded px-2 py-1 focus-visible:outline-none focus-visible:ring-2"
           >
             Made with The Botss
           </Link>

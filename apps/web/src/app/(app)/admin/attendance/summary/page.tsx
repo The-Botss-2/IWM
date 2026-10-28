@@ -33,18 +33,14 @@ export default function AttendanceSummaryPage() {
     const q = memberSearch.trim().toLowerCase();
     if (!q) return all;
     return all.filter(
-      (u) =>
-        (u.name ?? '').toLowerCase().includes(q) ||
-        u.email.toLowerCase().includes(q),
+      (u) => (u.name ?? '').toLowerCase().includes(q) || u.email.toLowerCase().includes(q),
     );
   }, [members.data, memberSearch]);
   const [preset, setPreset] = useState<RangePreset>('monthly');
   const [from, setFrom] = useState<string>(() =>
     isoDate(startOfPreset(new Date(), 'monthly').from),
   );
-  const [to, setTo] = useState<string>(() =>
-    isoDate(startOfPreset(new Date(), 'monthly').to),
-  );
+  const [to, setTo] = useState<string>(() => isoDate(startOfPreset(new Date(), 'monthly').to));
 
   const range = useMemo(
     () => ({ from: new Date(`${from}T00:00:00Z`), to: new Date(`${to}T00:00:00Z`) }),
@@ -86,23 +82,16 @@ export default function AttendanceSummaryPage() {
     <div className="space-y-5">
       <header className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h2 className="text-base font-semibold text-ink">Attendance summary</h2>
-          <p className="text-sm text-ink-muted">
-            Per-user combined attendance and tracked hours.
-          </p>
+          <h2 className="text-ink text-base font-semibold">Attendance summary</h2>
+          <p className="text-ink-muted text-sm">Per-user combined attendance and tracked hours.</p>
         </div>
-        <Button
-          type="button"
-          onClick={exportCsv}
-          disabled={!userId}
-          variant="secondary"
-        >
+        <Button type="button" onClick={exportCsv} disabled={!userId} variant="secondary">
           <Download className="h-4 w-4" />
           Export CSV
         </Button>
       </header>
 
-      <section className="rounded-xl bg-white p-4 shadow-soft">
+      <section className="shadow-soft rounded-xl bg-white p-4">
         <div className="grid gap-3 sm:grid-cols-[2fr_3fr_2fr]">
           <div className="space-y-1.5">
             <Label htmlFor="summary-user">Member</Label>
@@ -112,18 +101,16 @@ export default function AttendanceSummaryPage() {
               onChange={(e) => setMemberSearch(e.target.value)}
               placeholder="Search members…"
               aria-label="Search members"
-              className="mb-1.5 h-9 w-full rounded-md border border-line bg-white px-3 text-sm"
+              className="border-line mb-1.5 h-9 w-full rounded-md border bg-white px-3 text-sm"
             />
             <select
               id="summary-user"
               value={userId}
               onChange={(e) => setUserId(e.target.value)}
-              className="h-10 w-full rounded-md border border-line bg-white px-3 text-sm"
+              className="border-line h-10 w-full rounded-md border bg-white px-3 text-sm"
             >
               <option value="">
-                {members.isError && !members.data
-                  ? "Couldn't load members"
-                  : 'Select a member…'}
+                {members.isError && !members.data ? "Couldn't load members" : 'Select a member…'}
               </option>
               {filteredMembers.map((u) => (
                 <option key={u.id} value={u.id}>
@@ -144,7 +131,7 @@ export default function AttendanceSummaryPage() {
                   className={cn(
                     'rounded-full px-3 py-1 text-xs font-medium transition',
                     preset === p
-                      ? 'bg-brand-gradient text-white shadow-soft'
+                      ? 'bg-brand-gradient shadow-soft text-white'
                       : 'bg-bg-subtle text-ink hover:bg-line',
                   )}
                 >
@@ -165,7 +152,7 @@ export default function AttendanceSummaryPage() {
                   setFrom(e.target.value);
                   setPreset('monthly');
                 }}
-                className="h-10 w-full rounded-md border border-line bg-white px-3 text-sm"
+                className="border-line h-10 w-full rounded-md border bg-white px-3 text-sm"
               />
             </div>
             <div className="space-y-1.5">
@@ -178,7 +165,7 @@ export default function AttendanceSummaryPage() {
                   setTo(e.target.value);
                   setPreset('monthly');
                 }}
-                className="h-10 w-full rounded-md border border-line bg-white px-3 text-sm"
+                className="border-line h-10 w-full rounded-md border bg-white px-3 text-sm"
               />
             </div>
           </div>
@@ -186,7 +173,7 @@ export default function AttendanceSummaryPage() {
       </section>
 
       {!userId ? (
-        <div className="rounded-xl bg-bg-subtle p-10 text-center text-sm text-ink-muted">
+        <div className="bg-bg-subtle text-ink-muted rounded-xl p-10 text-center text-sm">
           Pick a member to view their summary.
         </div>
       ) : summary.isLoading ? (
@@ -201,7 +188,7 @@ export default function AttendanceSummaryPage() {
           onRetry={() => void summary.refetch()}
         />
       ) : !summary.data ? (
-        <div className="rounded-xl bg-bg-subtle p-10 text-center text-sm text-ink-muted">
+        <div className="bg-bg-subtle text-ink-muted rounded-xl p-10 text-center text-sm">
           No data for this range.
         </div>
       ) : (
@@ -221,13 +208,11 @@ function UserCard({
   data: NonNullable<ReturnType<typeof useAttendanceSummary>['data']>;
 }) {
   return (
-    <div className="flex items-center gap-3 rounded-xl bg-white p-4 shadow-soft">
+    <div className="shadow-soft flex items-center gap-3 rounded-xl bg-white p-4">
       <UserAvatar size="md" name={data.user.name} image={data.user.image} />
       <div className="min-w-0">
-        <div className="truncate text-sm font-semibold text-ink">
-          {data.user.name}
-        </div>
-        <div className="truncate text-xs text-ink-muted">{data.user.email}</div>
+        <div className="text-ink truncate text-sm font-semibold">{data.user.name}</div>
+        <div className="text-ink-muted truncate text-xs">{data.user.email}</div>
       </div>
     </div>
   );
@@ -241,24 +226,24 @@ function MetricGrid({
   return (
     <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
       <MetricCard
-        icon={<Clock className="h-3.5 w-3.5 text-brand-purple" />}
+        icon={<Clock className="text-brand-purple h-3.5 w-3.5" />}
         label="Hours tracked"
         value={fmtHours(data.totalTrackedMinutes)}
       />
       <MetricCard
-        icon={<CheckCircle2 className="h-3.5 w-3.5 text-brand-teal" />}
+        icon={<CheckCircle2 className="text-brand-teal h-3.5 w-3.5" />}
         label="Present"
         value={String(data.daysPresent)}
         suffix="days"
       />
       <MetricCard
-        icon={<XCircle className="h-3.5 w-3.5 text-state-error" />}
+        icon={<XCircle className="text-state-error h-3.5 w-3.5" />}
         label="Unexcused absences"
         value={String(data.daysAbsent)}
         suffix="days"
       />
       <MetricCard
-        icon={<CalendarDays className="h-3.5 w-3.5 text-brand-orange" />}
+        icon={<CalendarDays className="text-brand-orange h-3.5 w-3.5" />}
         label="Leave allocation"
         value={String(data.daysLeave)}
         suffix="days"
@@ -279,14 +264,14 @@ function MetricCard({
   suffix?: string;
 }) {
   return (
-    <div className="rounded-xl bg-white p-5 shadow-soft">
-      <div className="flex items-center gap-1.5 text-xs font-medium text-ink-muted">
+    <div className="shadow-soft rounded-xl bg-white p-5">
+      <div className="text-ink-muted flex items-center gap-1.5 text-xs font-medium">
         {icon}
         {label}
       </div>
       <div className="mt-3 flex items-baseline gap-1.5">
-        <div className="text-3xl font-bold text-ink">{value}</div>
-        {suffix ? <div className="text-xs text-ink-muted">{suffix}</div> : null}
+        <div className="text-ink text-3xl font-bold">{value}</div>
+        {suffix ? <div className="text-ink-muted text-xs">{suffix}</div> : null}
       </div>
     </div>
   );
@@ -298,8 +283,8 @@ function DayHeatmap({
   data: NonNullable<ReturnType<typeof useAttendanceSummary>['data']>;
 }) {
   return (
-    <div className="rounded-xl bg-white p-4 shadow-soft">
-      <h3 className="mb-3 text-sm font-semibold text-ink">Daily breakdown</h3>
+    <div className="shadow-soft rounded-xl bg-white p-4">
+      <h3 className="text-ink mb-3 text-sm font-semibold">Daily breakdown</h3>
       <div className="flex flex-wrap gap-1.5">
         {data.days.map((d) => (
           <span
@@ -314,13 +299,13 @@ function DayHeatmap({
             className={cn(
               'relative inline-flex h-9 w-9 items-center justify-center rounded-md text-[10px] font-semibold',
               dayTone(d.status),
-              d.anomaly !== 'NONE' && 'ring-2 ring-state-error/70',
+              d.anomaly !== 'NONE' && 'ring-state-error/70 ring-2',
             )}
           >
             {d.date.slice(-2)}
             {d.anomaly !== 'NONE' ? (
               <AlertTriangle
-                className="absolute -right-1 -top-1 h-3 w-3 text-state-error drop-shadow-sm"
+                className="text-state-error absolute -right-1 -top-1 h-3 w-3 drop-shadow-sm"
                 aria-hidden
               />
             ) : null}
@@ -331,9 +316,7 @@ function DayHeatmap({
   );
 }
 
-function dayTone(
-  status: 'PRESENT' | 'ABSENT' | 'LEAVE' | 'HOLIDAY' | null,
-): string {
+function dayTone(status: 'PRESENT' | 'ABSENT' | 'LEAVE' | 'HOLIDAY' | null): string {
   switch (status) {
     case 'PRESENT':
       return 'bg-brand-teal text-white';
@@ -362,9 +345,7 @@ function isoDate(d: Date): string {
 }
 
 function startOfPreset(now: Date, preset: RangePreset): { from: Date; to: Date } {
-  const today = new Date(
-    Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()),
-  );
+  const today = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
   switch (preset) {
     case 'daily':
       return { from: today, to: today };
@@ -377,12 +358,8 @@ function startOfPreset(now: Date, preset: RangePreset): { from: Date; to: Date }
       return { from: start, to: end };
     }
     case 'monthly': {
-      const start = new Date(
-        Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), 1),
-      );
-      const end = new Date(
-        Date.UTC(today.getUTCFullYear(), today.getUTCMonth() + 1, 0),
-      );
+      const start = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), 1));
+      const end = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth() + 1, 0));
       return { from: start, to: end };
     }
     case 'yearly': {

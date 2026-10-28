@@ -38,10 +38,7 @@ export function round2(value: Decimal): Decimal {
  * schemas allow, and rejects NaN / Infinity rather than storing a poisoned
  * Decimal.
  */
-export function toDecimal(
-  value: string | number | null | undefined,
-  fallback = 0,
-): Decimal {
+export function toDecimal(value: string | number | null | undefined, fallback = 0): Decimal {
   if (value == null || value === '') return new D(fallback);
   try {
     const d = new D(value);

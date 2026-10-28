@@ -37,8 +37,8 @@ export function ProjectFormDialog({ onClose, defaultClientId }: Props) {
   };
 
   return (
-    <div className="fixed inset-0 z-30 grid place-items-center bg-ink/40 p-4">
-      <div className="card w-full max-w-md p-6 space-y-4">
+    <div className="bg-ink/40 fixed inset-0 z-30 grid place-items-center p-4">
+      <div className="card w-full max-w-md space-y-4 p-6">
         <h2 className="text-base font-semibold">New project</h2>
         <form className="space-y-3" onSubmit={handleSubmit(onSubmit)}>
           <div>
@@ -47,22 +47,28 @@ export function ProjectFormDialog({ onClose, defaultClientId }: Props) {
               <RequiredMark />
             </label>
             <input className="input" {...register('name')} />
-            {errors.name && <p className="text-xs text-state-error mt-1">{errors.name.message}</p>}
+            {errors.name && <p className="text-state-error mt-1 text-xs">{errors.name.message}</p>}
           </div>
           <div>
             <label className="label">Key (optional)</label>
-            <input className="input" {...register('key')} placeholder="Auto-generated from the name if left blank" />
-            <p className="text-xs text-ink-muted mt-1">
-              Uppercase letters/digits, 2-10 chars. Leave blank to generate one
-              from the project name.
+            <input
+              className="input"
+              {...register('key')}
+              placeholder="Auto-generated from the name if left blank"
+            />
+            <p className="text-ink-muted mt-1 text-xs">
+              Uppercase letters/digits, 2-10 chars. Leave blank to generate one from the project
+              name.
             </p>
-            {errors.key && <p className="text-xs text-state-error mt-1">{errors.key.message}</p>}
+            {errors.key && <p className="text-state-error mt-1 text-xs">{errors.key.message}</p>}
           </div>
           <div>
             <label className="label">Status</label>
             <select className="input" {...register('status')}>
               {ProjectStatus.options.map((s) => (
-                <option key={s} value={s}>{s}</option>
+                <option key={s} value={s}>
+                  {s}
+                </option>
               ))}
             </select>
           </div>
@@ -71,7 +77,9 @@ export function ProjectFormDialog({ onClose, defaultClientId }: Props) {
             <textarea className="input min-h-[80px]" {...register('description')} />
           </div>
           <div className="flex justify-end gap-2 pt-2">
-            <button type="button" className="btn-secondary" onClick={onClose}>Cancel</button>
+            <button type="button" className="btn-secondary" onClick={onClose}>
+              Cancel
+            </button>
             <button type="submit" className="btn-primary" disabled={isSubmitting}>
               {isSubmitting ? 'Creating…' : 'Create project'}
             </button>
@@ -84,7 +92,7 @@ export function ProjectFormDialog({ onClose, defaultClientId }: Props) {
 
 function RequiredMark() {
   return (
-    <span className="ml-1 text-state-error" aria-label="required">
+    <span className="text-state-error ml-1" aria-label="required">
       *
     </span>
   );

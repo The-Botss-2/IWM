@@ -353,9 +353,7 @@ if (!gotLock) {
   // Register `botss://` as a default protocol client. In dev (unpackaged) the
   // exec path is electron itself, so the script path must be forwarded.
   if (process.defaultApp && process.argv.length >= 2) {
-    app.setAsDefaultProtocolClient(PROTOCOL, process.execPath, [
-      path.resolve(process.argv[1]),
-    ]);
+    app.setAsDefaultProtocolClient(PROTOCOL, process.execPath, [path.resolve(process.argv[1])]);
   } else {
     app.setAsDefaultProtocolClient(PROTOCOL);
   }
@@ -390,9 +388,7 @@ if (!gotLock) {
     // window.botssDesktop.{get,set}AutoStart). The macOS-only `openAsHidden`
     // flag used to be passed here; it was a no-op on macOS 13+ and on
     // Windows/Linux, and Electron removed it, so it is no longer sent.
-    ipcMain.handle('botss:getAutoStart', () =>
-      app.getLoginItemSettings().openAtLogin,
-    );
+    ipcMain.handle('botss:getAutoStart', () => app.getLoginItemSettings().openAtLogin);
     ipcMain.handle('botss:setAutoStart', (_event, enabled: boolean) => {
       app.setLoginItemSettings({ openAtLogin: Boolean(enabled) });
       return true;
@@ -404,9 +400,7 @@ if (!gotLock) {
     const sendPower = (state: 'battery' | 'ac' | 'suspend' | 'resume'): void => {
       mainWindow?.webContents.send('botss:powerState', state);
     };
-    ipcMain.handle('botss:getPowerState', () =>
-      powerMonitor.onBatteryPower ? 'battery' : 'ac',
-    );
+    ipcMain.handle('botss:getPowerState', () => (powerMonitor.onBatteryPower ? 'battery' : 'ac'));
     powerMonitor.on('on-battery', () => sendPower('battery'));
     powerMonitor.on('on-ac', () => sendPower('ac'));
     powerMonitor.on('suspend', () => sendPower('suspend'));

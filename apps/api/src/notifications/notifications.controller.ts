@@ -41,10 +41,7 @@ export class NotificationsController {
 
   @Post(':id/read')
   @SkipPermissions()
-  markRead(
-    @CurrentUser() user: AuthedUser,
-    @Param('id', new ZodValidationPipe(cuid)) id: string,
-  ) {
+  markRead(@CurrentUser() user: AuthedUser, @Param('id', new ZodValidationPipe(cuid)) id: string) {
     return this.notifications.markRead(user.id, id);
   }
 
@@ -66,11 +63,7 @@ export class NotificationsController {
     @Body(new ZodValidationPipe(markReadByEntitySchema))
     input: MarkReadByEntityInput,
   ) {
-    return this.notifications.markReadByEntity(
-      user.id,
-      input.entityType,
-      input.entityId,
-    );
+    return this.notifications.markReadByEntity(user.id, input.entityType, input.entityId);
   }
 
   /**

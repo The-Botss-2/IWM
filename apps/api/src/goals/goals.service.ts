@@ -184,9 +184,7 @@ export class GoalsService {
         title: input.title,
         metricType: input.metricType,
         targetValue: new Prisma.Decimal(input.targetValue.toString()),
-        currentValue: new Prisma.Decimal(
-          (input.currentValue ?? 0).toString(),
-        ),
+        currentValue: new Prisma.Decimal((input.currentValue ?? 0).toString()),
         unit: input.unit ?? null,
         position: (last?.position ?? -1) + 1,
       },
@@ -287,8 +285,7 @@ export class GoalsService {
         authorId: userId,
         body: input.body,
         keyResultId: input.keyResultId ?? null,
-        valueAt:
-          input.valueAt !== undefined ? new Prisma.Decimal(input.valueAt.toString()) : null,
+        valueAt: input.valueAt !== undefined ? new Prisma.Decimal(input.valueAt.toString()) : null,
       },
     });
 

@@ -130,7 +130,11 @@ export class SupportSessionService {
       await outsideRequestContext(() =>
         this.prisma.client.auditLog
           .updateMany({
-            where: { id: accessLogId, organizationId: session.organizationId, action: 'support.access' },
+            where: {
+              id: accessLogId,
+              organizationId: session.organizationId,
+              action: 'support.access',
+            },
             data: { metadata: { method: request.method, path: request.path, refused: true } },
           })
           .then((result) => result),

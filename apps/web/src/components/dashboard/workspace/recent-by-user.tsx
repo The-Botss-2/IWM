@@ -76,7 +76,11 @@ export function RecentByUserWidget() {
           ))}
         </div>
       ) : q.isError && !q.data ? (
-        <QueryError compact message="Couldn't load recent tasks." onRetry={() => void q.refetch()} />
+        <QueryError
+          compact
+          message="Couldn't load recent tasks."
+          onRetry={() => void q.refetch()}
+        />
       ) : groups.length === 0 ? (
         <WidgetEmpty icon={Users} message="No assigned task activity yet." />
       ) : (
@@ -85,8 +89,8 @@ export function RecentByUserWidget() {
             <li key={g.userId}>
               <div className="mb-1.5 flex items-center gap-2">
                 <UserAvatar size="sm" name={g.name} image={g.image} />
-                <span className="text-xs font-semibold text-ink">{g.name}</span>
-                <span className="text-[10px] text-ink-muted">
+                <span className="text-ink text-xs font-semibold">{g.name}</span>
+                <span className="text-ink-muted text-[10px]">
                   {g.tasks.length} {g.tasks.length === 1 ? 'task' : 'tasks'}
                 </span>
               </div>
@@ -95,10 +99,10 @@ export function RecentByUserWidget() {
                   <li key={t.id}>
                     <Link
                       href={`/projects/${t.projectId}`}
-                      className="flex items-center justify-between gap-2 rounded-md px-2 py-1 text-xs transition-colors hover:bg-bg-subtle"
+                      className="hover:bg-bg-subtle flex items-center justify-between gap-2 rounded-md px-2 py-1 text-xs transition-colors"
                     >
-                      <span className="truncate text-ink">{t.title}</span>
-                      <span className="shrink-0 text-[10px] text-ink-muted">
+                      <span className="text-ink truncate">{t.title}</span>
+                      <span className="text-ink-muted shrink-0 text-[10px]">
                         {relativeTime(new Date(t.updatedAt))}
                       </span>
                     </Link>

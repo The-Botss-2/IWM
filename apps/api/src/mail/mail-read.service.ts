@@ -164,15 +164,13 @@ export class MailReadService {
     // mail filed there by server-side rules - never showed up locally until
     // the user manually re-verified the account.
     if (resolvedAccountId) {
-      void this.maybeBackgroundSync(resolvedAccountId, q.folderId ?? null).catch(
-        (err) => {
-          this.logThrottled(
-            `bg-sync:${resolvedAccountId}`,
-            'warn',
-            `Background sync failed accountId=${resolvedAccountId} message=${(err as Error)?.message ?? 'unknown'}`,
-          );
-        },
-      );
+      void this.maybeBackgroundSync(resolvedAccountId, q.folderId ?? null).catch((err) => {
+        this.logThrottled(
+          `bg-sync:${resolvedAccountId}`,
+          'warn',
+          `Background sync failed accountId=${resolvedAccountId} message=${(err as Error)?.message ?? 'unknown'}`,
+        );
+      });
     }
 
     const where: Prisma.MailMessageWhereInput = {};
@@ -247,7 +245,7 @@ export class MailReadService {
 
     const hasMore = rows.length > q.limit;
     const slice = hasMore ? rows.slice(0, q.limit) : rows;
-    const nextCursor = hasMore ? slice[slice.length - 1]?.id ?? null : null;
+    const nextCursor = hasMore ? (slice[slice.length - 1]?.id ?? null) : null;
 
     return { items: slice, nextCursor };
   }
@@ -398,8 +396,7 @@ export class MailReadService {
     return {
       ok: true,
       affected: result.deleted,
-      skipped:
-        result.skipped + (ids.length - safeIds.length),
+      skipped: result.skipped + (ids.length - safeIds.length),
     };
   }
 
@@ -424,10 +421,7 @@ export class MailReadService {
    * One query, no per-id round-trip. Used by every bulk endpoint as the
    * authorization gate.
    */
-  private async filterOwnedMessageIds(
-    userId: string,
-    ids: string[],
-  ): Promise<string[]> {
+  private async filterOwnedMessageIds(userId: string, ids: string[]): Promise<string[]> {
     if (ids.length === 0) return [];
     const rows = await this.prisma.client.mailMessage.findMany({
       where: { id: { in: ids }, account: { userId } },
@@ -455,9 +449,7 @@ export class MailReadService {
       // Contextual auto-read: opening/reading the message clears its bell
       // notification. Best-effort - never fail the flag write over this.
       if (op === 'read') {
-        void this.notifications
-          .markReadByEntity(userId, 'mail', messageId)
-          .catch(() => {});
+        void this.notifications.markReadByEntity(userId, 'mail', messageId).catch(() => {});
       }
     } else {
       await this.sync.setFlagged(messageId, op === 'star');
@@ -488,10 +480,7 @@ export class MailReadService {
   // share one TCP login regardless of this value.
   private static readonly SYNC_COOLDOWN_MS = 60_000;
   private readonly inflight = new Set<string>();
-  private async maybeBackgroundSync(
-    accountId: string,
-    folderId: string | null,
-  ): Promise<void> {
+  private async maybeBackgroundSync(accountId: string, folderId: string | null): Promise<void> {
     if (this.inflight.has(accountId)) return;
     const account = await this.prisma.client.mailAccount.findUnique({
       where: { id: accountId },
@@ -729,10 +718,7 @@ export class MailReadService {
    * folder role must be TRASH or SPAM - emptying Inbox/Sent through this
    * endpoint would be a foot-gun.
    */
-  async emptyFolder(
-    userId: string,
-    folderId: string,
-  ): Promise<{ ok: true; deleted: number }> {
+  async emptyFolder(userId: string, folderId: string): Promise<{ ok: true; deleted: number }> {
     const folder = await this.prisma.client.mailFolder.findUnique({
       where: { id: folderId },
       select: { accountId: true, role: true },

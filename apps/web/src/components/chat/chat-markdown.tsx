@@ -109,7 +109,10 @@ function renderInline(text: string, keyBase: string): React.ReactNode[] {
   const k = `${keyBase}-${best.idx}`;
   if (best.type === 'code') {
     nodes.push(
-      <code key={k} className="rounded bg-black/10 px-1 py-0.5 font-mono text-[0.9em] dark:bg-white/15">
+      <code
+        key={k}
+        className="rounded bg-black/10 px-1 py-0.5 font-mono text-[0.9em] dark:bg-white/15"
+      >
         {best.inner}
       </code>,
     );

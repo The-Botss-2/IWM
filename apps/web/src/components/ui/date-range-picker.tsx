@@ -75,15 +75,15 @@ export function DateRangePicker({
           size="sm"
           className={cn(
             'h-9 gap-1.5 whitespace-nowrap text-xs',
-            value && 'border-brand-purple/40 bg-brand-50/50 font-medium text-brand-700',
+            value && 'border-brand-purple/40 bg-brand-50/50 text-brand-700 font-medium',
             className,
           )}
         >
-          <CalendarRange className="h-3.5 w-3.5 shrink-0 text-ink-muted" aria-hidden />
+          <CalendarRange className="text-ink-muted h-3.5 w-3.5 shrink-0" aria-hidden />
           <span className="max-w-[180px] truncate">
-            {value ? label ?? formatDayRange(value) : placeholder}
+            {value ? (label ?? formatDayRange(value)) : placeholder}
           </span>
-          <ChevronDown className="h-3 w-3 shrink-0 text-ink-disabled" aria-hidden />
+          <ChevronDown className="text-ink-disabled h-3 w-3 shrink-0" aria-hidden />
         </Button>
       </PopoverTrigger>
       <PopoverContent
@@ -91,7 +91,7 @@ export function DateRangePicker({
         collisionPadding={16}
         className="w-auto max-w-[calc(100vw-2rem)] p-2"
       >
-        {header ? <div className="mb-2 border-b border-line/60 pb-2">{header}</div> : null}
+        {header ? <div className="border-line/60 mb-2 border-b pb-2">{header}</div> : null}
 
         <div className="grid grid-cols-2 gap-1" role="group" aria-label="Quick ranges">
           {DATE_RANGE_PRESETS.map((p) => (
@@ -103,7 +103,7 @@ export function DateRangePicker({
               className={cn(
                 'whitespace-nowrap rounded px-2.5 py-1.5 text-left text-xs transition-colors',
                 activePreset === p.id
-                  ? 'bg-brand-50 font-medium text-brand-700'
+                  ? 'bg-brand-50 text-brand-700 font-medium'
                   : 'text-ink hover:bg-bg-subtle',
               )}
             >
@@ -112,7 +112,7 @@ export function DateRangePicker({
           ))}
         </div>
 
-        <div className="mt-2 border-t border-line/60 pt-1">
+        <div className="border-line/60 mt-2 border-t pt-1">
           <p
             className={cn(
               'px-2.5 pt-1 text-[11px] font-semibold uppercase tracking-wider',
@@ -131,7 +131,7 @@ export function DateRangePicker({
           />
         </div>
 
-        <div className="flex items-center justify-between gap-2 border-t border-line/60 pt-2">
+        <div className="border-line/60 flex items-center justify-between gap-2 border-t pt-2">
           <Button
             type="button"
             variant="ghost"

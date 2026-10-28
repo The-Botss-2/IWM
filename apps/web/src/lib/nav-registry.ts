@@ -41,12 +41,7 @@ export type NavSurface = 'rail' | 'panel' | 'topbar';
  * two of these (leads/clients) need a server answer - a user can be assigned
  * individual records without holding a sales role.
  */
-export type NavGate =
-  | 'always'
-  | 'admin'
-  | 'adminOrFinance'
-  | 'salesLeads'
-  | 'salesClients';
+export type NavGate = 'always' | 'admin' | 'adminOrFinance' | 'salesLeads' | 'salesClients';
 
 /** Grouping used by the settings screen and the panel's static lists. */
 export type NavGroup = 'primary' | 'workspace' | 'money' | 'admin';
@@ -257,7 +252,9 @@ export interface NavAccess {
 export function canAccessNav(dest: NavDestination, access: NavAccess): boolean {
   const role = access.systemRole ?? 'EMPLOYEE';
   const perms = access.companyPermissions;
-  const isAdmin = perms ? perms.includes('workspaces.admin_all') : role === 'ADMIN' || role === 'SUPER_ADMIN';
+  const isAdmin = perms
+    ? perms.includes('workspaces.admin_all')
+    : role === 'ADMIN' || role === 'SUPER_ADMIN';
   const isFinance = perms
     ? perms.includes('finance.view') || perms.includes('finance.manage')
     : role === 'ADMIN' || role === 'SUPER_ADMIN' || role === 'FINANCE';

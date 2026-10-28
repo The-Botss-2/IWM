@@ -112,7 +112,10 @@ export function SendPayslipsDialog({
 
   // The server could not tell which mail server to use: ask for it.
   useEffect(() => {
-    if (sending.error instanceof ApiError && sending.error.problem.code === 'payroll_smtp_host_required') {
+    if (
+      sending.error instanceof ApiError &&
+      sending.error.problem.code === 'payroll_smtp_host_required'
+    ) {
       setShowServer(true);
     }
   }, [sending.error]);
@@ -120,7 +123,9 @@ export function SendPayslipsDialog({
   const visible = useMemo(() => {
     const term = search.trim().toLowerCase();
     if (!term) return run.items;
-    return run.items.filter((i) => `${i.employeeName} ${i.email ?? ''}`.toLowerCase().includes(term));
+    return run.items.filter((i) =>
+      `${i.employeeName} ${i.email ?? ''}`.toLowerCase().includes(term),
+    );
   }, [run.items, search]);
 
   function toggle(id: string) {
@@ -168,7 +173,9 @@ export function SendPayslipsDialog({
     }
     rememberSender(creds.email);
     const before = new Map(
-      run.items.map((i) => [i.id, i.payslipSentAt ? new Date(i.payslipSentAt).getTime() : null] as const),
+      run.items.map(
+        (i) => [i.id, i.payslipSentAt ? new Date(i.payslipSentAt).getTime() : null] as const,
+      ),
     );
     await sending.send(creds, ids, before);
   }
@@ -187,8 +194,8 @@ export function SendPayslipsDialog({
         <DialogHeader>
           <DialogTitle>Email payslips</DialogTitle>
           <DialogDescription>
-            {payrollPeriod(run.year, run.month)}. Each person gets their own payslip as a PDF, sent from the
-            mailbox below. The password is used for this send only and is not saved.
+            {payrollPeriod(run.year, run.month)}. Each person gets their own payslip as a PDF, sent
+            from the mailbox below. The password is used for this send only and is not saved.
           </DialogDescription>
         </DialogHeader>
 
@@ -206,7 +213,7 @@ export function SendPayslipsDialog({
               ) : null}
             </p>
             {sending.error ? (
-              <p role="alert" className="text-sm text-state-error">
+              <p role="alert" className="text-state-error text-sm">
                 Stopped early: {describeError(sending.error, 'Sending stopped.')}
               </p>
             ) : null}
@@ -220,10 +227,18 @@ export function SendPayslipsDialog({
                   <span
                     className={cn(
                       'shrink-0 text-xs',
-                      r.status === 'SENT' ? 'text-brand-teal' : r.status === 'FAILED' ? 'text-state-error' : 'text-ink-muted',
+                      r.status === 'SENT'
+                        ? 'text-brand-teal'
+                        : r.status === 'FAILED'
+                          ? 'text-state-error'
+                          : 'text-ink-muted',
                     )}
                   >
-                    {r.status === 'SENT' ? 'Sent' : r.status === 'FAILED' ? r.error ?? 'Failed' : r.error ?? 'Skipped'}
+                    {r.status === 'SENT'
+                      ? 'Sent'
+                      : r.status === 'FAILED'
+                        ? (r.error ?? 'Failed')
+                        : (r.error ?? 'Skipped')}
                   </span>
                 </li>
               ))}
@@ -259,11 +274,13 @@ export function SendPayslipsDialog({
             <div>
               <button
                 type="button"
-                className="flex items-center gap-1 text-xs font-medium text-ink-muted hover:text-ink"
+                className="text-ink-muted hover:text-ink flex items-center gap-1 text-xs font-medium"
                 aria-expanded={showServer}
                 onClick={() => setShowServer((v) => !v)}
               >
-                <ChevronDown className={cn('h-3.5 w-3.5 transition-transform', showServer && 'rotate-180')} />
+                <ChevronDown
+                  className={cn('h-3.5 w-3.5 transition-transform', showServer && 'rotate-180')}
+                />
                 Mail server settings
               </button>
               {showServer ? (
@@ -291,7 +308,10 @@ export function SendPayslipsDialog({
                   </div>
                   <div className="space-y-1.5">
                     <Label htmlFor="payslip-security">Security</Label>
-                    <Select value={security} onValueChange={(v) => setSecurity(v as 'ssl' | 'starttls')}>
+                    <Select
+                      value={security}
+                      onValueChange={(v) => setSecurity(v as 'ssl' | 'starttls')}
+                    >
                       <SelectTrigger id="payslip-security" disabled={busy}>
                         <SelectValue />
                       </SelectTrigger>
@@ -301,7 +321,7 @@ export function SendPayslipsDialog({
                       </SelectContent>
                     </Select>
                   </div>
-                  <p className="text-xs text-ink-muted sm:col-span-3">
+                  <p className="text-ink-muted text-xs sm:col-span-3">
                     Leave blank to use the settings already saved for this address&apos;s domain.
                   </p>
                 </div>
@@ -311,7 +331,8 @@ export function SendPayslipsDialog({
             <div className="space-y-2">
               <div className="flex flex-wrap items-center gap-2">
                 <p className="text-sm font-medium">
-                  People <span className="font-normal text-ink-muted">({selected.size} selected)</span>
+                  People{' '}
+                  <span className="text-ink-muted font-normal">({selected.size} selected)</span>
                 </p>
                 <div className="ml-auto flex gap-1">
                   <Button
@@ -336,7 +357,11 @@ export function SendPayslipsDialog({
                     variant="ghost"
                     size="sm"
                     disabled={busy}
-                    onClick={() => setSelected(new Set(reachable.filter((i) => !i.payslipSentAt).map((i) => i.id)))}
+                    onClick={() =>
+                      setSelected(
+                        new Set(reachable.filter((i) => !i.payslipSentAt).map((i) => i.id)),
+                      )
+                    }
                   >
                     Not emailed yet
                   </Button>
@@ -351,13 +376,13 @@ export function SendPayslipsDialog({
                   disabled={busy}
                 />
               ) : null}
-              <ul className="max-h-56 space-y-0.5 overflow-y-auto rounded-md border border-line p-1">
+              <ul className="border-line max-h-56 space-y-0.5 overflow-y-auto rounded-md border p-1">
                 {visible.map((i) => (
                   <li key={i.id}>
                     <label
                       className={cn(
                         'flex items-center gap-3 rounded px-2 py-1.5 text-sm',
-                        i.email ? 'cursor-pointer hover:bg-bg-subtle' : 'opacity-60',
+                        i.email ? 'hover:bg-bg-subtle cursor-pointer' : 'opacity-60',
                       )}
                     >
                       <Checkbox
@@ -367,13 +392,13 @@ export function SendPayslipsDialog({
                       />
                       <span className="min-w-0 flex-1">
                         <span className="block truncate font-medium">{i.employeeName}</span>
-                        <span className="block truncate text-xs text-ink-muted">
+                        <span className="text-ink-muted block truncate text-xs">
                           {i.email ?? 'No email: add one to their payroll details'}
                         </span>
                       </span>
                       {i.payslipSentAt ? (
                         <span
-                          className="shrink-0 text-xs text-ink-muted"
+                          className="text-ink-muted shrink-0 text-xs"
                           title={`Sent to ${i.payslipSentTo ?? ''}`}
                         >
                           Emailed {new Date(i.payslipSentAt).toLocaleDateString()}
@@ -387,20 +412,22 @@ export function SendPayslipsDialog({
 
             {busy ? (
               <div className="space-y-1.5" aria-live="polite">
-                <div className="h-1.5 overflow-hidden rounded-full bg-bg-subtle">
+                <div className="bg-bg-subtle h-1.5 overflow-hidden rounded-full">
                   <div
-                    className="h-full rounded-full bg-brand-teal transition-[width]"
-                    style={{ width: `${sending.total ? (sending.done / sending.total) * 100 : 0}%` }}
+                    className="bg-brand-teal h-full rounded-full transition-[width]"
+                    style={{
+                      width: `${sending.total ? (sending.done / sending.total) * 100 : 0}%`,
+                    }}
                   />
                 </div>
-                <p className="text-xs text-ink-muted">
+                <p className="text-ink-muted text-xs">
                   Sending… {sending.done} of {sending.total}
                 </p>
               </div>
             ) : null}
 
             {formError || (sending.error && !finished) ? (
-              <p role="alert" className="text-sm text-state-error">
+              <p role="alert" className="text-state-error text-sm">
                 {formError ?? describeError(sending.error, "Couldn't send the payslips.")}
               </p>
             ) : null}
@@ -422,7 +449,10 @@ export function SendPayslipsDialog({
               <Button variant="secondary" onClick={() => onOpenChange(false)} disabled={busy}>
                 Cancel
               </Button>
-              <Button onClick={() => void send([...selected])} disabled={busy || selected.size === 0}>
+              <Button
+                onClick={() => void send([...selected])}
+                disabled={busy || selected.size === 0}
+              >
                 <Mail className="h-4 w-4" />
                 {busy
                   ? 'Sending…'

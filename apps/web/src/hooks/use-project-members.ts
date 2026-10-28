@@ -11,8 +11,7 @@ import { getApi } from '@/lib/api';
 import { findCachedUser } from '@/lib/member-cache';
 import { toastError } from '@/lib/toast';
 
-const projectMembersKey = (projectId: string) =>
-  ['project-members', projectId] as const;
+const projectMembersKey = (projectId: string) => ['project-members', projectId] as const;
 
 export function useProjectMembers(projectId: string) {
   return useQuery({
@@ -29,8 +28,7 @@ export function useProjectMembers(projectId: string) {
 export function useAddProjectMember(projectId: string) {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (input: AddProjectMemberInput) =>
-      getApi().projectMembers.add(projectId, input),
+    mutationFn: (input: AddProjectMemberInput) => getApi().projectMembers.add(projectId, input),
     onSuccess: (created) => {
       // Synthesize a row with user info pulled from any cached members list.
       const user = findCachedUser(qc, created.userId) ?? {
@@ -65,7 +63,8 @@ export function useUpdateProjectMember(projectId: string) {
               ? {
                   ...m,
                   role: input.role ?? m.role,
-                  abilities: (input.abilities ?? m.abilities) as ProjectMembershipWithUser['abilities'],
+                  abilities: (input.abilities ??
+                    m.abilities) as ProjectMembershipWithUser['abilities'],
                   updatedAt: new Date(),
                 }
               : m,

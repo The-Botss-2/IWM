@@ -13,8 +13,7 @@ const STATUSES: TaskStatus[] = ['BACKLOG', 'TODO', 'IN_PROGRESS', 'IN_REVIEW', '
 
 export function ProjectWorkflowSection({ project }: { project: ProjectWithCreator }) {
   const update = useUpdateProject(project.id);
-  const initial =
-    (project.workflowSettings?.wipLimits as Record<string, number> | undefined) ?? {};
+  const initial = (project.workflowSettings?.wipLimits as Record<string, number> | undefined) ?? {};
   const [limits, setLimits] = useState<Record<string, string>>(
     Object.fromEntries(STATUSES.map((s) => [s, initial[s]?.toString() ?? ''])),
   );
@@ -34,17 +33,17 @@ export function ProjectWorkflowSection({ project }: { project: ProjectWithCreato
   }
 
   return (
-    <section className="rounded-lg border border-line bg-white p-5">
-      <h2 className="text-base font-semibold text-ink">Workflow</h2>
-      <p className="mt-1 text-sm text-ink-muted">
-        WIP limit per status column. Leave blank for no limit. Columns over the limit show a
-        red border on the board.
+    <section className="border-line rounded-lg border bg-white p-5">
+      <h2 className="text-ink text-base font-semibold">Workflow</h2>
+      <p className="text-ink-muted mt-1 text-sm">
+        WIP limit per status column. Leave blank for no limit. Columns over the limit show a red
+        border on the board.
       </p>
 
       <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {STATUSES.map((s) => (
           <div key={s} className="space-y-1.5">
-            <Label className="text-xs uppercase tracking-wide text-ink-muted">{s}</Label>
+            <Label className="text-ink-muted text-xs uppercase tracking-wide">{s}</Label>
             <Input
               type="number"
               min={1}

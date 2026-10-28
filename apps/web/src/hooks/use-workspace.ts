@@ -48,8 +48,9 @@ export function useUpdateCurrentWorkspace() {
           ...prev,
           ...input,
           // Preserve fields the partial patch can't touch.
-          description: input.description !== undefined ? input.description ?? null : prev.description,
-          logoUrl: input.logoUrl !== undefined ? input.logoUrl ?? null : prev.logoUrl,
+          description:
+            input.description !== undefined ? (input.description ?? null) : prev.description,
+          logoUrl: input.logoUrl !== undefined ? (input.logoUrl ?? null) : prev.logoUrl,
           updatedAt: new Date(),
         });
       }

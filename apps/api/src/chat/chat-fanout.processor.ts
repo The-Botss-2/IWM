@@ -2,7 +2,11 @@ import { Processor, WorkerHost } from '@nestjs/bullmq';
 import { Logger } from '@nestjs/common';
 import type { Job } from 'bullmq';
 
-import { CHAT_FANOUT_CONCURRENCY, CHAT_FANOUT_QUEUE, type ChatFanoutJobData } from './chat-fanout.queue';
+import {
+  CHAT_FANOUT_CONCURRENCY,
+  CHAT_FANOUT_QUEUE,
+  type ChatFanoutJobData,
+} from './chat-fanout.queue';
 import { ChatService } from './chat.service';
 
 /** Worker for chat message fan-out (OS push + bell rows). */

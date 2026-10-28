@@ -7,10 +7,7 @@ import {
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { AccessToken } from 'livekit-server-sdk';
-import type {
-  LivekitTokenRequest,
-  LivekitTokenResponse,
-} from '@botss/shared-types';
+import type { LivekitTokenRequest, LivekitTokenResponse } from '@botss/shared-types';
 
 import { assertNotBlockedInCrossOrgDm } from '../chat/cross-org-block';
 import { orgWorkspaceMembership } from '../common/tenant-scope';
@@ -40,10 +37,7 @@ export class LivekitService {
     private readonly config: ConfigService,
   ) {}
 
-  async mintToken(
-    userId: string,
-    input: LivekitTokenRequest,
-  ): Promise<LivekitTokenResponse> {
+  async mintToken(userId: string, input: LivekitTokenRequest): Promise<LivekitTokenResponse> {
     const url = this.config.get<string>('LIVEKIT_URL');
     const apiKey = this.config.get<string>('LIVEKIT_API_KEY');
     const apiSecret = this.config.get<string>('LIVEKIT_API_SECRET');
@@ -120,9 +114,7 @@ export class LivekitService {
     // identifier means we don't need a side table mapping the two, and
     // any server-side state stays naturally aligned.
     const roomName =
-      input.kind === 'voice-channel'
-        ? `voice:${input.roomId}`
-        : `call:${input.roomId}`;
+      input.kind === 'voice-channel' ? `voice:${input.roomId}` : `call:${input.roomId}`;
     const identity = user.id;
 
     const at = new AccessToken(apiKey, apiSecret, {

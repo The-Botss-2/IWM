@@ -109,7 +109,13 @@ interface TypingMap {
   [userId: string]: number;
 }
 
-export function ChatWindow({ room, currentUserId, onStartCall, onOpenInfo, focusMessageId }: Props) {
+export function ChatWindow({
+  room,
+  currentUserId,
+  onStartCall,
+  onOpenInfo,
+  focusMessageId,
+}: Props) {
   const { data, isLoading, isError, refetch } = useRoomMessages(room.id);
   const qc = useQueryClient();
   useRoomRealtime(room.id, currentUserId);
@@ -192,9 +198,7 @@ export function ChatWindow({ room, currentUserId, onStartCall, onOpenInfo, focus
     if (room.spansOrganizations) return false;
     const adminCount = room.participants.filter((p) => p.role === 'ADMIN').length;
     if (adminCount === 0) return true;
-    return (
-      room.participants.find((p) => p.userId === currentUserId)?.role === 'ADMIN'
-    );
+    return room.participants.find((p) => p.userId === currentUserId)?.role === 'ADMIN';
   }, [room.participants, room.spansOrganizations, currentUserId]);
 
   useEffect(() => {
@@ -312,10 +316,7 @@ export function ChatWindow({ room, currentUserId, onStartCall, onOpenInfo, focus
   // rows skip re-rendering on unrelated window state changes.
   /** userId -> display name (`name`, falling back to email). */
   const participantsById = useMemo<Record<string, string>>(
-    () =>
-      Object.fromEntries(
-        room.participants.map((p) => [p.userId, p.user.name || p.user.email]),
-      ),
+    () => Object.fromEntries(room.participants.map((p) => [p.userId, p.user.name || p.user.email])),
     [room.participants],
   );
   /** userId -> `user.name` (nullable), used for sender labels. */
@@ -378,8 +379,7 @@ export function ChatWindow({ room, currentUserId, onStartCall, onOpenInfo, focus
           setReplyTo({
             id: m.id,
             senderName:
-              room.participants.find((p) => p.userId === m.senderId)?.user.name ??
-              'Member',
+              room.participants.find((p) => p.userId === m.senderId)?.user.name ?? 'Member',
             content: m.content,
           }),
       });
@@ -393,7 +393,10 @@ export function ChatWindow({ room, currentUserId, onStartCall, onOpenInfo, focus
               await navigator.clipboard.writeText(m.content ?? '');
               toast.success('Copied.');
             } catch {
-              toastErrorMessage("Couldn't copy", { description: "Your browser blocked clipboard access. Allow it in site settings, or copy it by hand." });
+              toastErrorMessage("Couldn't copy", {
+                description:
+                  'Your browser blocked clipboard access. Allow it in site settings, or copy it by hand.',
+              });
             }
           },
         });
@@ -451,15 +454,15 @@ export function ChatWindow({ room, currentUserId, onStartCall, onOpenInfo, focus
   const peer = useMemo(
     () =>
       room.type === 'DM'
-        ? room.participants.find((p) => p.userId !== currentUserId) ?? null
+        ? (room.participants.find((p) => p.userId !== currentUserId) ?? null)
         : null,
     [room, currentUserId],
   );
   const titleName = isChannel
     ? (room.name ?? (room.type === 'VOICE_CHANNEL' ? 'voice' : 'channel'))
     : room.type === 'GROUP'
-      ? room.name ?? 'Group'
-      : peer?.user.name ?? peer?.user.email ?? 'Conversation';
+      ? (room.name ?? 'Group')
+      : (peer?.user.name ?? peer?.user.email ?? 'Conversation');
   const titleImage = peer?.user.image ?? null;
 
   const grouped = useMemo(() => groupBySender(messages), [messages]);
@@ -530,8 +533,7 @@ export function ChatWindow({ room, currentUserId, onStartCall, onOpenInfo, focus
     const clamped = Math.min(Math.max(0, index), matchIds.length - 1);
     setPickedMatchId(matchIds[clamped] ?? null);
   };
-  const activeMatchId =
-    searchOpen && matchIds.length > 0 ? matchIds[matchIndex] ?? null : null;
+  const activeMatchId = searchOpen && matchIds.length > 0 ? (matchIds[matchIndex] ?? null) : null;
   // Scroll the active match into view as the user steps through results. A
   // server hit that is not loaded yet pulls older pages first, the same way
   // a linked message does below (and with the same page cap).
@@ -569,7 +571,10 @@ export function ChatWindow({ room, currentUserId, onStartCall, onOpenInfo, focus
       stickyBottomRef.current = false;
       el.scrollIntoView({ block: 'center', behavior: 'smooth' });
       el.classList.add('ring-2', 'ring-brand-purple/50', 'rounded-md');
-      window.setTimeout(() => el.classList.remove('ring-2', 'ring-brand-purple/50', 'rounded-md'), 2_500);
+      window.setTimeout(
+        () => el.classList.remove('ring-2', 'ring-brand-purple/50', 'rounded-md'),
+        2_500,
+      );
       return;
     }
     if (data?.nextCursor && !loadOlder.isPending && focusPagesRef.current < FOCUS_MAX_PAGES) {
@@ -587,9 +592,7 @@ export function ChatWindow({ room, currentUserId, onStartCall, onOpenInfo, focus
   const typingNames = useMemo(() => {
     const ids = Object.keys(typing);
     if (ids.length === 0) return '';
-    return ids
-      .map((uid) => senderNameById.get(uid) ?? 'Someone')
-      .join(', ');
+    return ids.map((uid) => senderNameById.get(uid) ?? 'Someone').join(', ');
   }, [typing, senderNameById]);
 
   return (
@@ -628,12 +631,12 @@ export function ChatWindow({ room, currentUserId, onStartCall, onOpenInfo, focus
       }}
     >
       {dragActive ? (
-        <div className="pointer-events-none absolute inset-0 z-30 m-2 flex flex-col items-center justify-center gap-3 rounded-2xl border-2 border-dashed border-brand-purple bg-bg-subtle/90 text-ink dark:bg-ink/90">
-          <Upload className="h-10 w-10 text-brand-purple" aria-hidden />
+        <div className="border-brand-purple bg-bg-subtle/90 text-ink dark:bg-ink/90 pointer-events-none absolute inset-0 z-30 m-2 flex flex-col items-center justify-center gap-3 rounded-2xl border-2 border-dashed">
+          <Upload className="text-brand-purple h-10 w-10" aria-hidden />
           <span className="text-lg font-semibold">Drag file here</span>
         </div>
       ) : null}
-      <header className="sticky top-0 z-10 flex shrink-0 items-center justify-between gap-3 border-b border-line bg-white px-4 py-2 dark:border-slate-700 dark:bg-ink">
+      <header className="border-line dark:bg-ink sticky top-0 z-10 flex shrink-0 items-center justify-between gap-3 border-b bg-white px-4 py-2 dark:border-slate-700">
         <div className="flex min-w-0 items-center gap-3">
           {/* Back-to-chat-list button - mobile only. On md+ the sidebar
               is always visible to the left so a back button would be
@@ -641,12 +644,12 @@ export function ChatWindow({ room, currentUserId, onStartCall, onOpenInfo, focus
           <Link
             href="/chat"
             aria-label="Back to chat list"
-            className="grid h-8 w-8 shrink-0 place-items-center rounded-full text-ink-muted hover:bg-bg-subtle hover:text-ink md:hidden"
+            className="text-ink-muted hover:bg-bg-subtle hover:text-ink grid h-8 w-8 shrink-0 place-items-center rounded-full md:hidden"
           >
             <ArrowLeft className="h-4 w-4" aria-hidden />
           </Link>
           {isChannel ? (
-            <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-bg-subtle text-ink-muted dark:bg-slate-800 dark:text-line-strong">
+            <span className="bg-bg-subtle text-ink-muted dark:text-line-strong grid h-8 w-8 shrink-0 place-items-center rounded-full dark:bg-slate-800">
               {room.type === 'VOICE_CHANNEL' ? (
                 <Volume2 className="h-4 w-4" aria-hidden />
               ) : (
@@ -657,10 +660,10 @@ export function ChatWindow({ room, currentUserId, onStartCall, onOpenInfo, focus
             <UserAvatar size="sm" name={titleName} image={titleImage} />
           )}
           <div className="min-w-0">
-            <h2 className="truncate text-sm font-semibold text-ink dark:text-slate-100">
+            <h2 className="text-ink truncate text-sm font-semibold dark:text-slate-100">
               {isChannel && room.type === 'TEXT_CHANNEL' ? `# ${titleName}` : titleName}
             </h2>
-            <p className="truncate text-xs text-ink-muted dark:text-ink-disabled">
+            <p className="text-ink-muted dark:text-ink-disabled truncate text-xs">
               {typingNames ? `${typingNames} typing…` : presenceLabel(room)}
             </p>
           </div>
@@ -698,20 +701,15 @@ export function ChatWindow({ room, currentUserId, onStartCall, onOpenInfo, focus
               <Ban className="h-4 w-4" />
             </Button>
           ) : null}
-          <Button
-            size="icon"
-            variant="ghost"
-            aria-label="Chat info"
-            onClick={onOpenInfo}
-          >
+          <Button size="icon" variant="ghost" aria-label="Chat info" onClick={onOpenInfo}>
             <Info className="h-4 w-4" />
           </Button>
         </div>
       </header>
 
       {searchOpen ? (
-        <div className="flex shrink-0 items-center gap-2 border-b border-line bg-bg-subtle px-4 py-2 dark:border-slate-700 dark:bg-ink">
-          <Search className="h-4 w-4 shrink-0 text-ink-muted" aria-hidden />
+        <div className="border-line bg-bg-subtle dark:bg-ink flex shrink-0 items-center gap-2 border-b px-4 py-2 dark:border-slate-700">
+          <Search className="text-ink-muted h-4 w-4 shrink-0" aria-hidden />
           <input
             type="search"
             autoFocus
@@ -731,9 +729,9 @@ export function ChatWindow({ room, currentUserId, onStartCall, onOpenInfo, focus
             }}
             placeholder="Search this conversation…"
             aria-label="Search this conversation"
-            className="h-8 flex-1 rounded-md border border-line bg-white px-3 text-sm dark:bg-slate-900"
+            className="border-line h-8 flex-1 rounded-md border bg-white px-3 text-sm dark:bg-slate-900"
           />
-          <span className="shrink-0 text-xs tabular-nums text-ink-muted">
+          <span className="text-ink-muted shrink-0 text-xs tabular-nums">
             {searchQuery.trim()
               ? matchIds.length > 0
                 ? `${matchIndex + 1}/${matchIds.length}`
@@ -746,7 +744,7 @@ export function ChatWindow({ room, currentUserId, onStartCall, onOpenInfo, focus
             aria-label="Previous (older) match"
             disabled={matchIds.length === 0 || matchIndex <= 0}
             onClick={() => goToMatch(matchIndex - 1)}
-            className="h-8 w-8 min-h-0 min-w-0"
+            className="h-8 min-h-0 w-8 min-w-0"
           >
             <ChevronUp className="h-4 w-4" />
           </Button>
@@ -756,7 +754,7 @@ export function ChatWindow({ room, currentUserId, onStartCall, onOpenInfo, focus
             aria-label="Next (newer) match"
             disabled={matchIds.length === 0 || matchIndex >= matchIds.length - 1}
             onClick={() => goToMatch(matchIndex + 1)}
-            className="h-8 w-8 min-h-0 min-w-0"
+            className="h-8 min-h-0 w-8 min-w-0"
           >
             <ChevronDown className="h-4 w-4" />
           </Button>
@@ -765,7 +763,7 @@ export function ChatWindow({ room, currentUserId, onStartCall, onOpenInfo, focus
             variant="ghost"
             aria-label="Close search"
             onClick={closeSearch}
-            className="h-8 w-8 min-h-0 min-w-0"
+            className="h-8 min-h-0 w-8 min-w-0"
           >
             <X className="h-4 w-4" />
           </Button>
@@ -776,8 +774,7 @@ export function ChatWindow({ room, currentUserId, onStartCall, onOpenInfo, focus
         ref={scrollRef}
         onScroll={(e) => {
           const t = e.currentTarget;
-          stickyBottomRef.current =
-            t.scrollHeight - t.scrollTop - t.clientHeight < 80;
+          stickyBottomRef.current = t.scrollHeight - t.scrollTop - t.clientHeight < 80;
         }}
         className="flex flex-1 flex-col overflow-y-auto px-4 py-3"
       >
@@ -787,14 +784,10 @@ export function ChatWindow({ room, currentUserId, onStartCall, onOpenInfo, focus
           </div>
         ) : isError && !data ? (
           <div className="m-auto">
-            <QueryError
-              compact
-              message="Couldn't load messages."
-              onRetry={() => void refetch()}
-            />
+            <QueryError compact message="Couldn't load messages." onRetry={() => void refetch()} />
           </div>
         ) : grouped.length === 0 ? (
-          <p className="m-auto text-center text-xs text-ink-muted dark:text-ink-disabled">
+          <p className="text-ink-muted dark:text-ink-disabled m-auto text-center text-xs">
             No messages yet. Say hi.
           </p>
         ) : (
@@ -808,7 +801,7 @@ export function ChatWindow({ room, currentUserId, onStartCall, onOpenInfo, focus
                   type="button"
                   onClick={onLoadOlder}
                   disabled={loadOlder.isPending}
-                  className="inline-flex items-center gap-1.5 rounded-full bg-bg-subtle px-3 py-1 text-[11px] font-medium text-ink-muted ring-1 ring-line hover:bg-line disabled:opacity-60"
+                  className="bg-bg-subtle text-ink-muted ring-line hover:bg-line inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[11px] font-medium ring-1 disabled:opacity-60"
                 >
                   {loadOlder.isPending ? (
                     <Loader2 className="h-3 w-3 animate-spin" aria-hidden />
@@ -841,8 +834,8 @@ export function ChatWindow({ room, currentUserId, onStartCall, onOpenInfo, focus
       </div>
 
       {selectionMode ? (
-        <div className="flex shrink-0 items-center justify-between gap-3 border-t border-line bg-white px-4 py-3 dark:border-slate-700 dark:bg-ink">
-          <span className="text-sm font-medium text-ink dark:text-slate-100">
+        <div className="border-line dark:bg-ink flex shrink-0 items-center justify-between gap-3 border-t bg-white px-4 py-3 dark:border-slate-700">
+          <span className="text-ink text-sm font-medium dark:text-slate-100">
             {selectedIds.size} selected
           </span>
           <div className="flex items-center gap-2">
@@ -867,9 +860,7 @@ export function ChatWindow({ room, currentUserId, onStartCall, onOpenInfo, focus
           replyTo={replyTo}
           onClearReply={() => setReplyTo(null)}
           editing={
-            editingMessage
-              ? { id: editingMessage.id, content: editingMessage.content ?? '' }
-              : null
+            editingMessage ? { id: editingMessage.id, content: editingMessage.content ?? '' } : null
           }
           onClearEdit={() => setEditingMessage(null)}
         />
@@ -893,19 +884,13 @@ export function ChatWindow({ room, currentUserId, onStartCall, onOpenInfo, focus
                   id: 'download',
                   label: 'Download',
                   icon: <Download className="h-3.5 w-3.5" aria-hidden />,
-                  onSelect: () =>
-                    downloadUrl(attachMenu.fileUrl, attachMenu.fileName),
+                  onSelect: () => downloadUrl(attachMenu.fileUrl, attachMenu.fileName),
                 },
                 {
                   id: 'open',
                   label: 'Open in new tab',
                   icon: <ExternalLink className="h-3.5 w-3.5" aria-hidden />,
-                  onSelect: () =>
-                    window.open(
-                      attachMenu.fileUrl,
-                      '_blank',
-                      'noopener,noreferrer',
-                    ),
+                  onSelect: () => window.open(attachMenu.fileUrl, '_blank', 'noopener,noreferrer'),
                 },
                 {
                   id: 'copy-link',
@@ -916,7 +901,10 @@ export function ChatWindow({ room, currentUserId, onStartCall, onOpenInfo, focus
                       await navigator.clipboard.writeText(attachMenu.fileUrl);
                       toast.success('Link copied.');
                     } catch {
-                      toastErrorMessage("Couldn't copy", { description: "Your browser blocked clipboard access. Allow it in site settings, or copy it by hand." });
+                      toastErrorMessage("Couldn't copy", {
+                        description:
+                          'Your browser blocked clipboard access. Allow it in site settings, or copy it by hand.',
+                      });
                     }
                   },
                 },
@@ -1046,7 +1034,7 @@ function ForwardDialog({
 
         <ul className="max-h-[45vh] space-y-1 overflow-y-auto" role="list">
           {filtered.length === 0 ? (
-            <li className="py-6 text-center text-xs text-ink-muted">
+            <li className="text-ink-muted py-6 text-center text-xs">
               {search.trim() ? 'No chats match.' : 'No chats to forward to.'}
             </li>
           ) : (
@@ -1061,7 +1049,9 @@ function ForwardDialog({
                     onClick={() => toggle(r.id)}
                     className={cn(
                       'flex w-full items-center gap-2 rounded-lg px-2 py-2 text-left text-sm disabled:opacity-60 dark:text-slate-100',
-                      checked ? 'bg-brand-teal/10 text-brand-teal dark:bg-brand-teal/20' : 'text-ink hover:bg-bg-subtle',
+                      checked
+                        ? 'bg-brand-teal/10 text-brand-teal dark:bg-brand-teal/20'
+                        : 'text-ink hover:bg-bg-subtle',
                     )}
                   >
                     <span
@@ -1203,10 +1193,7 @@ const MessageGroup = memo(function MessageGroup({
   onReply: (m: ChatRoomMessage) => void;
   onReact: (messageId: string, emoji: string) => void;
   onContextMenu: (m: ChatRoomMessage, e: React.MouseEvent) => void;
-  onAttachContextMenu: (
-    a: { fileUrl: string; fileName: string },
-    e: React.MouseEvent,
-  ) => void;
+  onAttachContextMenu: (a: { fileUrl: string; fileName: string }, e: React.MouseEvent) => void;
   participantsById: Record<string, string>;
   /** Active in-conversation search match - ringed + scrolled to. */
   highlightId?: string | null;
@@ -1239,9 +1226,7 @@ const MessageGroup = memo(function MessageGroup({
     return (
       <li className={cn('flex flex-col gap-1', fromMe ? 'items-end' : 'items-start')}>
         {!fromMe && showSenderName ? (
-          <span className="px-2 text-[11px] font-medium text-brand-gradient">
-            {senderName}
-          </span>
+          <span className="text-brand-gradient px-2 text-[11px] font-medium">{senderName}</span>
         ) : null}
         {group.messages.map((m) => (
           <ShareCardBubble
@@ -1314,7 +1299,7 @@ function CallLogBubble({ message }: { message: ChatRoomMessage }) {
     >
       <Icon className="h-3.5 w-3.5" aria-hidden />
       <span className="font-medium">{label}</span>
-      <span className="text-[10px] text-ink-muted" title={absoluteTime(message.createdAt)}>
+      <span className="text-ink-muted text-[10px]" title={absoluteTime(message.createdAt)}>
         · {relativeTime(message.createdAt)}
       </span>
     </div>
@@ -1325,7 +1310,7 @@ function SystemMessageBubble({ message }: { message: ChatRoomMessage }) {
   const parsed = parseSystemMessage(message.content);
   if (!parsed) return null;
   return (
-    <div className="flex max-w-[80%] items-center gap-1.5 rounded-full bg-bg-subtle px-3 py-1 text-[11px] text-ink-muted">
+    <div className="bg-bg-subtle text-ink-muted flex max-w-[80%] items-center gap-1.5 rounded-full px-3 py-1 text-[11px]">
       <span className="font-medium">{formatSystemMessage(parsed)}</span>
       <span className="text-[10px]" title={absoluteTime(message.createdAt)}>
         · {relativeTime(message.createdAt)}
@@ -1361,21 +1346,17 @@ function ShareCardBubble({
         'block max-w-[78%] rounded-xl border px-3 py-2 shadow-sm transition-colors',
         fromMe
           ? 'border-brand-purple/20 bg-bg-subtle hover:bg-bg-app'
-          : 'border-line bg-white hover:bg-bg-subtle',
+          : 'border-line hover:bg-bg-subtle bg-white',
       )}
     >
-      <div className="text-[10px] font-semibold uppercase tracking-wide text-ink-muted">
+      <div className="text-ink-muted text-[10px] font-semibold uppercase tracking-wide">
         {kindLabel}
       </div>
-      <div className="mt-0.5 line-clamp-2 text-sm font-medium text-ink">
-        {card.title}
-      </div>
+      <div className="text-ink mt-0.5 line-clamp-2 text-sm font-medium">{card.title}</div>
       {card.subtitle ? (
-        <div className="mt-0.5 truncate text-xs text-ink-muted">
-          {card.subtitle}
-        </div>
+        <div className="text-ink-muted mt-0.5 truncate text-xs">{card.subtitle}</div>
       ) : null}
-      <div className="mt-1 text-[10px] text-ink-disabled" title={absoluteTime(message.createdAt)}>
+      <div className="text-ink-disabled mt-1 text-[10px]" title={absoluteTime(message.createdAt)}>
         {relativeTime(message.createdAt)}
       </div>
     </a>
@@ -1414,10 +1395,7 @@ const MessageBubble = memo(function MessageBubble({
   onReply: (m: ChatRoomMessage) => void;
   onReact: (messageId: string, emoji: string) => void;
   onContextMenu: (m: ChatRoomMessage, e: React.MouseEvent) => void;
-  onAttachContextMenu: (
-    a: { fileUrl: string; fileName: string },
-    e: React.MouseEvent,
-  ) => void;
+  onAttachContextMenu: (a: { fileUrl: string; fileName: string }, e: React.MouseEvent) => void;
   participantsById: Record<string, string>;
   /** Active in-conversation search match. */
   highlighted: boolean;
@@ -1462,23 +1440,19 @@ const MessageBubble = memo(function MessageBubble({
         'group/bubble relative w-fit max-w-[min(78%,560px)]',
         fromMe ? 'self-end' : 'self-start',
         selectionMode ? 'cursor-pointer rounded-xl ring-2 ring-offset-1' : '',
-        selectionMode
-          ? selected
-            ? 'ring-brand-purple'
-            : 'ring-transparent'
-          : '',
+        selectionMode ? (selected ? 'ring-brand-purple' : 'ring-transparent') : '',
         // In-conversation search highlight (only when not selecting).
         !selectionMode && highlighted
-          ? 'rounded-xl ring-2 ring-brand-purple/70'
+          ? 'ring-brand-purple/70 rounded-xl ring-2'
           : !selectionMode && matched
-            ? 'rounded-xl ring-1 ring-brand-purple/30'
+            ? 'ring-brand-purple/30 rounded-xl ring-1'
             : '',
       )}
     >
       {!isTmp && !isDeleted && !selectionMode ? (
         <div
           className={cn(
-            'absolute top-1/2 -translate-y-1/2 flex items-center gap-1 opacity-0 transition-opacity group-hover/bubble:opacity-100',
+            'absolute top-1/2 flex -translate-y-1/2 items-center gap-1 opacity-0 transition-opacity group-hover/bubble:opacity-100',
             fromMe ? 'right-full mr-1' : 'left-full ml-1',
           )}
         >
@@ -1486,7 +1460,7 @@ const MessageBubble = memo(function MessageBubble({
             type="button"
             onClick={() => setShowPicker((v) => !v)}
             aria-label="Add reaction"
-            className="grid h-7 w-7 place-items-center rounded-full bg-white text-ink-muted shadow ring-1 ring-slate-200 hover:bg-bg-subtle"
+            className="text-ink-muted hover:bg-bg-subtle grid h-7 w-7 place-items-center rounded-full bg-white shadow ring-1 ring-slate-200"
           >
             <Smile className="h-3.5 w-3.5" />
           </button>
@@ -1494,7 +1468,7 @@ const MessageBubble = memo(function MessageBubble({
             type="button"
             onClick={onReply}
             aria-label="Reply"
-            className="grid h-7 w-7 place-items-center rounded-full bg-white text-ink-muted shadow ring-1 ring-slate-200 hover:bg-bg-subtle"
+            className="text-ink-muted hover:bg-bg-subtle grid h-7 w-7 place-items-center rounded-full bg-white shadow ring-1 ring-slate-200"
           >
             <CornerUpLeft className="h-3.5 w-3.5" />
           </button>
@@ -1504,7 +1478,7 @@ const MessageBubble = memo(function MessageBubble({
       {showPicker ? (
         <div
           className={cn(
-            'absolute bottom-full mb-1 flex gap-1 rounded-full border border-line bg-white p-1 shadow-lg',
+            'border-line absolute bottom-full mb-1 flex gap-1 rounded-full border bg-white p-1 shadow-lg',
             fromMe ? 'right-0' : 'left-0',
           )}
         >
@@ -1516,7 +1490,7 @@ const MessageBubble = memo(function MessageBubble({
                 onReact(emoji);
                 setShowPicker(false);
               }}
-              className="grid h-7 w-7 place-items-center rounded-full text-sm hover:bg-bg-subtle"
+              className="hover:bg-bg-subtle grid h-7 w-7 place-items-center rounded-full text-sm"
               aria-label={`React with ${emoji}`}
             >
               {emoji}
@@ -1531,19 +1505,16 @@ const MessageBubble = memo(function MessageBubble({
           // outer wrapper's width (now constrained by max-w there).
           // Removing the local max-w-[78%] avoids the prior
           // intrinsic-parent percentage trap.
-          'chat-bubble-content block rounded-xl px-3.5 py-2 text-sm shadow-soft',
+          'chat-bubble-content shadow-soft block rounded-xl px-3.5 py-2 text-sm',
           isTmp ? 'opacity-70' : '',
           isDeleted ? 'italic opacity-70' : '',
           fromMe
-            ? 'rounded-br-[4px] bg-bg-subtle text-ink ring-1 ring-brand-purple/15'
-            : 'rounded-bl-[4px] bg-white text-ink ring-1 ring-line',
+            ? 'bg-bg-subtle text-ink ring-brand-purple/15 rounded-br-[4px] ring-1'
+            : 'text-ink ring-line rounded-bl-[4px] bg-white ring-1',
         )}
       >
         {!isDeleted && message.parentMessage ? (
-          <ReplyPreview
-            parent={message.parentMessage}
-            participantsById={participantsById}
-          />
+          <ReplyPreview parent={message.parentMessage} participantsById={participantsById} />
         ) : null}
         {isDeleted ? (
           <span className="text-ink-muted">This message was deleted.</span>
@@ -1570,12 +1541,9 @@ const MessageBubble = memo(function MessageBubble({
                       target="_blank"
                       rel="noopener noreferrer"
                       onContextMenu={(e) =>
-                        onAttachContextMenu(
-                          { fileUrl: a.fileUrl, fileName: a.fileName },
-                          e,
-                        )
+                        onAttachContextMenu({ fileUrl: a.fileUrl, fileName: a.fileName }, e)
                       }
-                      className="block overflow-hidden rounded-lg ring-1 ring-line transition-shadow hover:shadow-soft"
+                      className="ring-line hover:shadow-soft block overflow-hidden rounded-lg ring-1 transition-shadow"
                       aria-label={`Image: ${a.fileName}`}
                     >
                       {/* Width cap matches the bubble's max-w; height
@@ -1590,21 +1558,14 @@ const MessageBubble = memo(function MessageBubble({
                       />
                     </a>
                   ) : isAudio ? (
-                    <VoiceMessage
-                      src={a.fileUrl}
-                      fileName={a.fileName}
-                      fromMe={fromMe}
-                    />
+                    <VoiceMessage src={a.fileUrl} fileName={a.fileName} fromMe={fromMe} />
                   ) : (
                     <FileAttachmentChip
                       fileUrl={a.fileUrl}
                       fileName={a.fileName}
                       fileType={a.fileType}
                       onContextMenu={(e) =>
-                        onAttachContextMenu(
-                          { fileUrl: a.fileUrl, fileName: a.fileName },
-                          e,
-                        )
+                        onAttachContextMenu({ fileUrl: a.fileUrl, fileName: a.fileName }, e)
                       }
                     />
                   )}
@@ -1628,13 +1589,11 @@ const MessageBubble = memo(function MessageBubble({
             })}
           </ul>
         ) : null}
-        <div className="mt-0.5 flex items-center justify-end gap-1 text-[10px] text-ink-muted">
+        <div className="text-ink-muted mt-0.5 flex items-center justify-end gap-1 text-[10px]">
           {!isDeleted && message.editedAt ? (
             <span title={`Edited ${absoluteTime(message.editedAt)}`}>edited</span>
           ) : null}
-          <span title={absoluteTime(message.createdAt)}>
-            {relativeTime(message.createdAt)}
-          </span>
+          <span title={absoluteTime(message.createdAt)}>{relativeTime(message.createdAt)}</span>
           {fromMe && !isDeleted ? <StatusTick status={message.status} /> : null}
         </div>
       </div>
@@ -1650,7 +1609,7 @@ const MessageBubble = memo(function MessageBubble({
                 'inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] ring-1 transition-colors',
                 r.reactedByMe
                   ? 'bg-brand-gradient text-white ring-transparent'
-                  : 'bg-white text-ink ring-line hover:bg-bg-subtle',
+                  : 'text-ink ring-line hover:bg-bg-subtle bg-white',
               )}
             >
               <span>{r.emoji}</span>
@@ -1672,10 +1631,10 @@ function ReplyPreview({
 }) {
   const senderName = participantsById[parent.senderId] ?? 'Member';
   return (
-    <div className="mb-1 rounded-md border-l-2 border-brand-purple bg-bg-subtle px-2 py-1 text-xs text-ink">
-      <div className="font-medium text-brand-gradient">{senderName}</div>
-      <div className="line-clamp-2 text-ink-muted">
-        {parent.deletedAt ? '(message deleted)' : parent.content ?? '(no content)'}
+    <div className="border-brand-purple bg-bg-subtle text-ink mb-1 rounded-md border-l-2 px-2 py-1 text-xs">
+      <div className="text-brand-gradient font-medium">{senderName}</div>
+      <div className="text-ink-muted line-clamp-2">
+        {parent.deletedAt ? '(message deleted)' : (parent.content ?? '(no content)')}
       </div>
     </div>
   );
@@ -1687,12 +1646,12 @@ function ReplyPreview({
 
 function StatusTick({ status }: { status: ChatRoomMessage['status'] }) {
   if (status === 'READ') {
-    return <CheckCheck className="h-3.5 w-3.5 text-brand-teal" aria-label="Read" />;
+    return <CheckCheck className="text-brand-teal h-3.5 w-3.5" aria-label="Read" />;
   }
   if (status === 'DELIVERED') {
-    return <CheckCheck className="h-3.5 w-3.5 text-ink-disabled" aria-label="Delivered" />;
+    return <CheckCheck className="text-ink-disabled h-3.5 w-3.5" aria-label="Delivered" />;
   }
-  return <Check className="h-3.5 w-3.5 text-ink-disabled" aria-label="Sent" />;
+  return <Check className="text-ink-disabled h-3.5 w-3.5" aria-label="Sent" />;
 }
 
 /**
@@ -1725,9 +1684,9 @@ function FileAttachmentChip({
         target="_blank"
         rel="noopener noreferrer"
         onContextMenu={onContextMenu}
-        className="inline-flex items-center gap-2 rounded-md bg-bg-subtle px-2.5 py-1.5 text-xs text-ink hover:bg-line"
+        className="bg-bg-subtle text-ink hover:bg-line inline-flex items-center gap-2 rounded-md px-2.5 py-1.5 text-xs"
       >
-        📎 <span className="truncate max-w-[200px]">{fileName}</span>
+        📎 <span className="max-w-[200px] truncate">{fileName}</span>
       </a>
     );
   }
@@ -1738,10 +1697,10 @@ function FileAttachmentChip({
         type="button"
         onClick={() => setWarnOpen(true)}
         onContextMenu={onContextMenu}
-        className="inline-flex items-center gap-2 rounded-md bg-bg-subtle px-2.5 py-1.5 text-xs text-ink ring-1 ring-state-error/30 hover:bg-line"
+        className="bg-bg-subtle text-ink ring-state-error/30 hover:bg-line inline-flex items-center gap-2 rounded-md px-2.5 py-1.5 text-xs ring-1"
       >
         <span aria-hidden>⚠️</span>
-        <span className="truncate max-w-[200px]">{fileName}</span>
+        <span className="max-w-[200px] truncate">{fileName}</span>
       </button>
       <ConfirmDialog
         open={warnOpen}

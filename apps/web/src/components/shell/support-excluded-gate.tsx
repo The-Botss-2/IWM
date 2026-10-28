@@ -16,9 +16,9 @@ export function SupportExcludedGate({ area, children }: { area: string; children
   return (
     <div className="grid min-h-[50vh] place-items-center px-4">
       <div className="flex max-w-sm flex-col items-center gap-3 text-center">
-        <EyeOff className="h-6 w-6 text-ink-muted" aria-hidden />
-        <p className="text-sm font-medium text-ink">{area} is not available in a support session</p>
-        <p className="text-sm text-ink-muted">
+        <EyeOff className="text-ink-muted h-6 w-6" aria-hidden />
+        <p className="text-ink text-sm font-medium">{area} is not available in a support session</p>
+        <p className="text-ink-muted text-sm">
           {area} is private to each person, so a read only support session can&apos;t open it.
         </p>
       </div>

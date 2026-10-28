@@ -31,7 +31,9 @@ const ROLE_FROM = 'cmrole000000000000000from';
 const ROLE_TO = 'cmrole00000000000000000to';
 const GONE = 'cmgone0000000000000000000';
 
-function lookups(entries: Partial<Record<AuditLabelKind, Record<string, LabelRecord>>>): LabelLookups {
+function lookups(
+  entries: Partial<Record<AuditLabelKind, Record<string, LabelRecord>>>,
+): LabelLookups {
   const map = (kind: AuditLabelKind) => new Map(Object.entries(entries[kind] ?? {}));
   return {
     user: map('user'),
@@ -68,7 +70,15 @@ function main(): void {
   assert.ok(looksLikeAuditId(SARA));
   // The shared helper hard-codes the root id; keep it in step with the API.
   assert.ok(looksLikeAuditId(ROOT_ORG_ID));
-  for (const word of ['ADMIN', 'MEMBER', 'sara@acme.com', 'acme', 'users.manage', 'Sales team', '']) {
+  for (const word of [
+    'ADMIN',
+    'MEMBER',
+    'sara@acme.com',
+    'acme',
+    'users.manage',
+    'Sales team',
+    '',
+  ]) {
     assert.equal(looksLikeAuditId(word), false, `"${word}" is not an id`);
   }
 
@@ -81,13 +91,15 @@ function main(): void {
 
   // --- metadata walk: nested objects and arrays, non-ids skipped ------------
   assert.deepEqual(
-    [...collectMetadataIds({
-      workspaceId: WORKSPACE,
-      from: { role: 'MEMBER', customRoleId: ROLE_FROM },
-      to: { role: 'ADMIN', customRoleId: null },
-      list: [CONTACT, 'ADMIN'],
-      email: 'sara@acme.com',
-    })].sort(),
+    [
+      ...collectMetadataIds({
+        workspaceId: WORKSPACE,
+        from: { role: 'MEMBER', customRoleId: ROLE_FROM },
+        to: { role: 'ADMIN', customRoleId: null },
+        list: [CONTACT, 'ADMIN'],
+        email: 'sara@acme.com',
+      }),
+    ].sort(),
     [CONTACT, ROLE_FROM, WORKSPACE].sort(),
   );
 
@@ -101,7 +113,11 @@ function main(): void {
 
   // --- client portal invite: target + contact resolve -----------------------
   const invite = labelRow(
-    { organizationId: ORG_A, target: `client:${CLIENT}`, metadata: { contactId: CONTACT, email: 'ali@acme.com' } },
+    {
+      organizationId: ORG_A,
+      target: `client:${CLIENT}`,
+      metadata: { contactId: CONTACT, email: 'ali@acme.com' },
+    },
     L,
   );
   assert.deepEqual(invite.targetLabel, { type: 'client', name: 'Acme Ltd' });
@@ -123,20 +139,30 @@ function main(): void {
   );
   assert.deepEqual(foreign.targetLabel, { type: 'user', name: null });
   assert.deepEqual(foreign.labels, {});
-  const fromOtherOrg = labelRow({ organizationId: ORG_B, target: `client:${CLIENT}`, metadata: {} }, L);
+  const fromOtherOrg = labelRow(
+    { organizationId: ORG_B, target: `client:${CLIENT}`, metadata: {} },
+    L,
+  );
   assert.deepEqual(fromOtherOrg.targetLabel, { type: 'client', name: null });
 
   // --- deleted / unknown records and kinds ----------------------------------
   const purged = labelRow(
-    { organizationId: ROOT_ORG_ID, target: `organization:${GONE}`, metadata: { purgedOrgId: GONE } },
+    {
+      organizationId: ROOT_ORG_ID,
+      target: `organization:${GONE}`,
+      metadata: { purgedOrgId: GONE },
+    },
     L,
   );
   assert.deepEqual(purged.targetLabel, { type: 'organization', name: null });
   assert.deepEqual(purged.labels, {});
-  assert.deepEqual(labelRow({ organizationId: ORG_A, target: 'invoice:x1', metadata: {} }, L).targetLabel, {
-    type: 'invoice',
-    name: null,
-  });
+  assert.deepEqual(
+    labelRow({ organizationId: ORG_A, target: 'invoice:x1', metadata: {} }, L).targetLabel,
+    {
+      type: 'invoice',
+      name: null,
+    },
+  );
   assert.deepEqual(labelRow({ organizationId: ORG_A, target: null, metadata: {} }, L), {
     targetLabel: null,
     labels: {},

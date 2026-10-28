@@ -12,10 +12,7 @@ import {
   PaymentStatusBadge,
   billingModelLabel,
 } from '@/components/financials/finance-badges';
-import {
-  type ContractTab,
-  ContractTabs,
-} from '@/components/financials/financials-tabs';
+import { type ContractTab, ContractTabs } from '@/components/financials/financials-tabs';
 import { MilestoneTable } from '@/components/financials/milestone-table';
 import { PaymentFormDialog } from '@/components/financials/payment-form-dialog';
 import { PaymentList } from '@/components/financials/payment-list';
@@ -23,12 +20,7 @@ import { Button } from '@/components/ui/button';
 import { ConfirmByTypingDialog } from '@/components/ui/confirm-dialog';
 import { QueryError } from '@/components/ui/query-error';
 import { Skeleton } from '@/components/ui/skeleton';
-import {
-  useContract,
-  useDeleteContract,
-  useExpenses,
-  usePayments,
-} from '@/hooks/use-finance';
+import { useContract, useDeleteContract, useExpenses, usePayments } from '@/hooks/use-finance';
 import { useRequireSystemRole } from '@/hooks/use-require-system-role';
 import { useAbility } from '@/lib/ability';
 import { formatCurrency } from '@/lib/money';
@@ -38,22 +30,12 @@ const DEFAULT_TAB: ContractTab = 'overview';
 
 function parseTab(value: string | null | undefined): ContractTab {
   if (!value) return DEFAULT_TAB;
-  return (TABS as readonly string[]).includes(value)
-    ? (value as ContractTab)
-    : DEFAULT_TAB;
+  return (TABS as readonly string[]).includes(value) ? (value as ContractTab) : DEFAULT_TAB;
 }
 
-export default function ContractDetailPage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
+export default function ContractDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
-  const { checking, allowed } = useRequireSystemRole([
-    'ADMIN',
-    'SUPER_ADMIN',
-    'FINANCE',
-  ]);
+  const { checking, allowed } = useRequireSystemRole(['ADMIN', 'SUPER_ADMIN', 'FINANCE']);
 
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -85,7 +67,7 @@ export default function ContractDetailPage({
 
   if (checking || !allowed) {
     return (
-      <div className="p-6 text-sm text-ink-muted">
+      <div className="text-ink-muted p-6 text-sm">
         {checking ? 'Checking access…' : 'Redirecting…'}
       </div>
     );
@@ -118,7 +100,7 @@ export default function ContractDetailPage({
   if (!c) {
     return (
       <div className="mx-auto max-w-6xl p-6">
-        <p className="text-sm text-ink-muted">Contract not found.</p>
+        <p className="text-ink-muted text-sm">Contract not found.</p>
         <Link href="/financials" className="text-sm underline">
           Back to Financials
         </Link>
@@ -132,7 +114,7 @@ export default function ContractDetailPage({
     <div className="mx-auto max-w-6xl space-y-4 p-4 sm:p-6">
       <Link
         href="/financials?tab=contracts"
-        className="inline-flex items-center gap-1 text-sm text-ink-muted hover:text-ink"
+        className="text-ink-muted hover:text-ink inline-flex items-center gap-1 text-sm"
       >
         <ArrowLeft className="h-4 w-4" /> Financials
       </Link>
@@ -140,10 +122,9 @@ export default function ContractDetailPage({
       <header className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h1 className="text-xl font-semibold">{c.title}</h1>
-          <p className="mt-1 text-sm text-ink-muted">
+          <p className="text-ink-muted mt-1 text-sm">
             {c.project?.name ?? 'No project'}
-            {c.client ? ` · ${c.client.name}` : ''} ·{' '}
-            {billingModelLabel(c.billingModel)}
+            {c.client ? ` · ${c.client.name}` : ''} · {billingModelLabel(c.billingModel)}
           </p>
           <div className="mt-2 flex flex-wrap items-center gap-2">
             <ContractStatusBadge status={c.status} />
@@ -176,14 +157,10 @@ export default function ContractDetailPage({
         />
       </dl>
 
-      <ContractTabs
-        tab={tab}
-        onChange={setTab}
-        showMilestones={c.billingModel !== 'ONE_TIME'}
-      />
+      <ContractTabs tab={tab} onChange={setTab} showMilestones={c.billingModel !== 'ONE_TIME'} />
 
       {tab === 'overview' ? (
-        <section className="rounded-md border border-line bg-bg-surface p-4 text-sm">
+        <section className="border-line bg-bg-surface rounded-md border p-4 text-sm">
           <dl className="grid gap-4 sm:grid-cols-2">
             <Row label="Currency" value={c.currency} />
             <Row
@@ -194,17 +171,14 @@ export default function ContractDetailPage({
               label="Starts"
               value={c.startDate ? new Date(c.startDate).toLocaleDateString() : '-'}
             />
-            <Row
-              label="Ends"
-              value={c.endDate ? new Date(c.endDate).toLocaleDateString() : '-'}
-            />
+            <Row label="Ends" value={c.endDate ? new Date(c.endDate).toLocaleDateString() : '-'} />
             <Row label="Created by" value={c.createdBy?.name ?? '-'} />
             <Row label="Milestones" value={String(c.milestones.length)} />
           </dl>
           {c.notes ? (
             <>
-              <hr className="my-4 border-line" />
-              <p className="whitespace-pre-wrap text-ink-muted">{c.notes}</p>
+              <hr className="border-line my-4" />
+              <p className="text-ink-muted whitespace-pre-wrap">{c.notes}</p>
             </>
           ) : null}
         </section>
@@ -220,10 +194,7 @@ export default function ContractDetailPage({
 
       {tab === 'payments' ? (
         payments.isError && !payments.data ? (
-          <QueryError
-            message="Couldn't load payments."
-            onRetry={() => void payments.refetch()}
-          />
+          <QueryError message="Couldn't load payments." onRetry={() => void payments.refetch()} />
         ) : (
           <PaymentList
             items={payments.data?.items ?? []}
@@ -242,21 +213,15 @@ export default function ContractDetailPage({
             </Button>
           </div>
           {expenses.isError && !expenses.data ? (
-            <QueryError
-              message="Couldn't load expenses."
-              onRetry={() => void expenses.refetch()}
-            />
+            <QueryError message="Couldn't load expenses." onRetry={() => void expenses.refetch()} />
           ) : (
-            <ExpenseList
-              items={expenses.data?.items ?? []}
-              loading={expenses.isLoading}
-            />
+            <ExpenseList items={expenses.data?.items ?? []} loading={expenses.isLoading} />
           )}
         </div>
       ) : null}
 
       {tab === 'invoices' ? (
-        <div className="flex flex-col items-center gap-3 rounded-md border border-dashed border-line bg-bg-surface p-8 text-center text-sm text-ink-muted">
+        <div className="border-line bg-bg-surface text-ink-muted flex flex-col items-center gap-3 rounded-md border border-dashed p-8 text-center text-sm">
           <p>Raise an invoice for this contract, or use Invoice on a milestone row.</p>
           <Button asChild size="sm">
             <Link
@@ -274,11 +239,7 @@ export default function ContractDetailPage({
         </div>
       ) : null}
 
-      <ContractFormDialog
-        open={editing}
-        onOpenChange={setEditing}
-        existing={c}
-      />
+      <ContractFormDialog open={editing} onOpenChange={setEditing} existing={c} />
       <ConfirmByTypingDialog
         open={deleting}
         onOpenChange={setDeleting}
@@ -305,19 +266,15 @@ export default function ContractDetailPage({
           defaultMilestoneId={paying.milestoneId}
         />
       ) : null}
-      <ExpenseFormDialog
-        open={addingExpense}
-        onOpenChange={setAddingExpense}
-        contractId={c.id}
-      />
+      <ExpenseFormDialog open={addingExpense} onOpenChange={setAddingExpense} contractId={c.id} />
     </div>
   );
 }
 
 function Stat({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-md border border-line bg-bg-surface p-4">
-      <dt className="text-xs uppercase tracking-wide text-ink-muted">{label}</dt>
+    <div className="border-line bg-bg-surface rounded-md border p-4">
+      <dt className="text-ink-muted text-xs uppercase tracking-wide">{label}</dt>
       <dd className="mt-1 text-xl font-semibold tabular-nums">{value}</dd>
     </div>
   );
@@ -326,7 +283,7 @@ function Stat({ label, value }: { label: string; value: string }) {
 function Row({ label, value }: { label: string; value: string }) {
   return (
     <div>
-      <dt className="text-xs uppercase tracking-wide text-ink-muted">{label}</dt>
+      <dt className="text-ink-muted text-xs uppercase tracking-wide">{label}</dt>
       <dd className="mt-0.5">{value}</dd>
     </div>
   );

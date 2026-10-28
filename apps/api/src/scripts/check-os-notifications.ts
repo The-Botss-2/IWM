@@ -57,7 +57,9 @@ interface FakeRoom {
 }
 
 /** The slice of Prisma these paths touch. */
-function fakePrisma(opts: { room?: FakeRoom; devices?: Array<{ id: string; token: string }> } = {}) {
+function fakePrisma(
+  opts: { room?: FakeRoom; devices?: Array<{ id: string; token: string }> } = {},
+) {
   let seq = 0;
   const row = (data: Record<string, unknown>) => ({
     id: `cmnotif${String((seq += 1)).padStart(18, '0')}`,
@@ -133,19 +135,30 @@ async function main(): Promise<void> {
     assert.deepEqual(result, { sent: 0, dropped: 0 }, 'no Web Push without VAPID');
     assert.equal(pushes.length, 1, 'one live publish per send');
     assert.deepEqual(pushes[0]!.userIds, [USER_B, USER_C], 'recipients de-duplicated');
-    assert.deepEqual(withoutPushId(pushes[0]!), payload, 'live payload is the push payload, unchanged');
+    assert.deepEqual(
+      withoutPushId(pushes[0]!),
+      payload,
+      'live payload is the push payload, unchanged',
+    );
 
     assert.equal(sentToExpo.length, 1, 'the phone got its native push too');
     const expo = sentToExpo[0]!;
     assert.equal(expo.title, payload.title, 'same title as the phone');
     assert.equal(expo.body, payload.body, 'same body as the phone');
-    assert.deepEqual(expo.data, { url: payload.url, ...payload.data }, 'same url + data as the phone');
+    assert.deepEqual(
+      expo.data,
+      { url: payload.url, ...payload.data },
+      'same url + data as the phone',
+    );
 
     await push.sendDesktopNotificationToUsers([], payload);
     assert.equal(pushes.length, 1, 'nobody to notify, nothing published');
 
     const second = await push.sendDesktopNotification(USER_B, payload).then(() => pushes[1]);
-    assert.ok(second && second.payload.pushId !== pushes[0]!.payload.pushId, 'pushId is unique per send');
+    assert.ok(
+      second && second.payload.pushId !== pushes[0]!.payload.pushId,
+      'pushId is unique per send',
+    );
   }
 
   // --- 2. bell rows ---------------------------------------------------------
@@ -243,7 +256,11 @@ async function main(): Promise<void> {
     await settle();
     assert.equal(dm.bell.length, 1, 'a DM writes a bell row');
     assert.equal(dm.pushes.length, 1, "the DM's bell row adds no second banner");
-    assert.equal(dm.pushes[0]!.payload.data?.['messageId'], undefined, 'older jobs without an id still push');
+    assert.equal(
+      dm.pushes[0]!.payload.data?.['messageId'],
+      undefined,
+      'older jobs without an id still push',
+    );
     assert.ok(dm.pushes[0]!.payload.body.length <= 400, 'body within the payload schema');
   }
 

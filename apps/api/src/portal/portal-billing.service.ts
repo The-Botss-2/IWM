@@ -82,7 +82,11 @@ export class PortalBillingService {
     return portalInvoiceListSchema.parse({ items: rows.map(invoiceSummary) });
   }
 
-  async getInvoice(userId: string, clientId: string, invoiceId: string): Promise<PortalInvoiceDetail> {
+  async getInvoice(
+    userId: string,
+    clientId: string,
+    invoiceId: string,
+  ): Promise<PortalInvoiceDetail> {
     const contact = await this.scope.require(userId, clientId, { billing: true });
     const row = await this.prisma.client.invoice.findFirst({
       where: { id: invoiceId, ...portalInvoiceWhere(contact) },
@@ -140,7 +144,11 @@ export class PortalBillingService {
     invoiceId: string,
   ): Promise<{ body: Buffer; filename: string }> {
     const contact = await this.scope.require(userId, clientId, { billing: true });
-    const pdf = await this.invoices.ensurePdfForPortal(contact.workspaceId, contact.clientId, invoiceId);
+    const pdf = await this.invoices.ensurePdfForPortal(
+      contact.workspaceId,
+      contact.clientId,
+      invoiceId,
+    );
     const file = await this.files.getObjectBuffer(contact.workspaceId, pdf.fileId);
     if (!file) {
       throw new NotFoundException({ title: 'Invoice PDF not found', status: 404 });
@@ -217,10 +225,7 @@ export class PortalBillingService {
         workspaceId: contact.workspaceId,
         // Payment is voided, never soft-deleted: filter voids by hand.
         voidedAt: null,
-        OR: [
-          { invoice: portalInvoiceWhere(contact) },
-          { contract: portalContractWhere(contact) },
-        ],
+        OR: [{ invoice: portalInvoiceWhere(contact) }, { contract: portalContractWhere(contact) }],
       },
       orderBy: { paidAt: 'desc' },
       take: LIST_LIMIT,
@@ -281,10 +286,17 @@ export class PortalBillingService {
       const due = r.total.minus(r.amountPaid);
       if (due.lte(0)) continue;
       const cur = byCurrency.get(r.currency) ?? { amount: new Prisma.Decimal(0), invoiceCount: 0 };
-      byCurrency.set(r.currency, { amount: cur.amount.plus(due), invoiceCount: cur.invoiceCount + 1 });
+      byCurrency.set(r.currency, {
+        amount: cur.amount.plus(due),
+        invoiceCount: cur.invoiceCount + 1,
+      });
     }
     return [...byCurrency.entries()]
       .sort(([a], [b]) => a.localeCompare(b))
-      .map(([currency, v]) => ({ currency, amount: money(v.amount), invoiceCount: v.invoiceCount }));
+      .map(([currency, v]) => ({
+        currency,
+        amount: money(v.amount),
+        invoiceCount: v.invoiceCount,
+      }));
   }
 }

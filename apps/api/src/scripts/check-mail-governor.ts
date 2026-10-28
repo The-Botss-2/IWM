@@ -137,7 +137,10 @@ async function breakerTripsAndProbes(): Promise<void> {
   const logins = ['a1', 'a2', 'a3', 'a4'].map((id) => ({ id, ...login() }));
   const results = logins.map((l) => settled(g.connect(HOST, l.id, l.fn)));
   await env.advance(1_000);
-  check('two connects in flight, the rest queued', logins.filter((l) => l.handle.started).length === 2);
+  check(
+    'two connects in flight, the rest queued',
+    logins.filter((l) => l.handle.started).length === 2,
+  );
   logins[0]!.handle.settle(false);
   logins[1]!.handle.settle(false);
   await env.advance(2_000);
@@ -151,7 +154,10 @@ async function breakerTripsAndProbes(): Promise<void> {
   );
   logins[3]!.handle.settle(false);
   const outcomes = await Promise.all(results);
-  check('all four failed', outcomes.every((o) => !o.ok));
+  check(
+    'all four failed',
+    outcomes.every((o) => !o.ok),
+  );
 
   const blocked = login();
   const r = await settled(g.connect(HOST, 'a5', blocked.fn));
@@ -174,7 +180,10 @@ async function breakerTripsAndProbes(): Promise<void> {
   // Probe fails: reopen at step 2 (60 s +-20%), so 40 s later still closed.
   probe.handle.settle(false);
   await probeResult;
-  check('failed probe reopens at step 2', env.logs.some((m) => m.includes('step=2')));
+  check(
+    'failed probe reopens at step 2',
+    env.logs.some((m) => m.includes('step=2')),
+  );
   await env.advance(40_000);
   const early = login();
   const earlyResult = await settled(g.connect(HOST, 'a8', early.fn));
@@ -187,7 +196,10 @@ async function breakerTripsAndProbes(): Promise<void> {
   await env.advance(0);
   probe2.handle.settle(true);
   check('successful probe connects', (await probe2Result).ok);
-  check('breaker closed', env.logs.some((m) => m.startsWith('IMAP host circuit closed')));
+  check(
+    'breaker closed',
+    env.logs.some((m) => m.startsWith('IMAP host circuit closed')),
+  );
   const after = login();
   const afterResult = settled(g.connect(HOST, 'a10', after.fn));
   await env.advance(1_000);
@@ -304,7 +316,10 @@ async function longBlockKeepsEscalating(): Promise<void> {
     await env.advance(g.msUntilAllowed(HOST, 'r1') + 1_000);
     await failLogin(env, g, 'r1', rejectedLogin());
   }
-  check('escalates to step 5', env.logs.some((m) => m.includes('step=5')));
+  check(
+    'escalates to step 5',
+    env.logs.some((m) => m.includes('step=5')),
+  );
   check(
     'never closes while the host keeps rejecting',
     !env.logs.some((m) => m.startsWith('IMAP host circuit closed')),
@@ -324,7 +339,10 @@ async function stalePasswordsOnceGoodDoNotRetrip(): Promise<void> {
   // r3 wins the probe: the host is fine, r1 and r2 just have old passwords.
   await env.advance(g.msUntilAllowed(HOST, 'r3') + 1_000);
   await succeedLogin(env, g, 'r3');
-  check('probe success closes it', env.logs.some((m) => m.startsWith('IMAP host circuit closed')));
+  check(
+    'probe success closes it',
+    env.logs.some((m) => m.startsWith('IMAP host circuit closed')),
+  );
   const opensBefore = env.logs.filter((m) => m.startsWith('IMAP host circuit open')).length;
   await env.advance(Math.max(g.msUntilAllowed(HOST, 'r1'), g.msUntilAllowed(HOST, 'r2')) + 1_000);
   await failLogin(env, g, 'r1', rejectedLogin());
@@ -397,7 +415,11 @@ async function loginSpacing(): Promise<void> {
   check('all six connected', starts.length === 6);
   check('never more than 2 in flight', maxInFlight <= 2, `max=${maxInFlight}`);
   const gaps = starts.slice(1).map((t, i) => t - starts[i]!);
-  check('starts at least 750 ms apart', gaps.every((gap) => gap >= 750), gaps.join(','));
+  check(
+    'starts at least 750 ms apart',
+    gaps.every((gap) => gap >= 750),
+    gaps.join(','),
+  );
 }
 
 async function main(): Promise<void> {

@@ -132,9 +132,7 @@ export function ContractTabs({
   onChange: (next: ContractTab) => void;
   showMilestones: boolean;
 }) {
-  const visible = CONTRACT_TABS.filter(
-    (t) => t !== 'milestones' || showMilestones,
-  );
+  const visible = CONTRACT_TABS.filter((t) => t !== 'milestones' || showMilestones);
   return (
     <Tabs value={tab} onValueChange={(v) => onChange(v as ContractTab)}>
       <TabsList className="overflow-x-auto">

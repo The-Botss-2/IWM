@@ -141,7 +141,9 @@ export function EmployeeDialog({
           <DialogHeader>
             <DialogTitle>{employee?.name ?? 'Person'}</DialogTitle>
             <DialogDescription>
-              {hasAccount ? 'On the platform' : 'Paid through payroll only, with no platform account'}
+              {hasAccount
+                ? 'On the platform'
+                : 'Paid through payroll only, with no platform account'}
             </DialogDescription>
           </DialogHeader>
 
@@ -150,7 +152,9 @@ export function EmployeeDialog({
               <div className="space-y-1.5">
                 <Label htmlFor="pe-name">Name</Label>
                 <Input id="pe-name" aria-invalid={!!errors.name} {...register('name')} />
-                {errors.name ? <p className="text-xs text-state-error">{errors.name.message}</p> : null}
+                {errors.name ? (
+                  <p className="text-state-error text-xs">{errors.name.message}</p>
+                ) : null}
               </div>
             ) : null}
             <div className="grid gap-4 sm:grid-cols-2">
@@ -164,12 +168,16 @@ export function EmployeeDialog({
                   {...register('monthlySalary')}
                 />
                 {errors.monthlySalary ? (
-                  <p className="text-xs text-state-error">{errors.monthlySalary.message}</p>
+                  <p className="text-state-error text-xs">{errors.monthlySalary.message}</p>
                 ) : null}
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="pe-designation">Designation</Label>
-                <Input id="pe-designation" placeholder="e.g. Software Engineer" {...register('designation')} />
+                <Input
+                  id="pe-designation"
+                  placeholder="e.g. Software Engineer"
+                  {...register('designation')}
+                />
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="pe-email">Payslip email</Label>
@@ -181,7 +189,9 @@ export function EmployeeDialog({
                   aria-invalid={!!errors.email}
                   {...register('email')}
                 />
-                {errors.email ? <p className="text-xs text-state-error">{errors.email.message}</p> : null}
+                {errors.email ? (
+                  <p className="text-state-error text-xs">{errors.email.message}</p>
+                ) : null}
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="pe-cnic">CNIC</Label>
@@ -194,13 +204,20 @@ export function EmployeeDialog({
                   aria-invalid={!!errors.cnic}
                   {...register('cnic')}
                 />
-                {errors.cnic ? <p className="text-xs text-state-error">{errors.cnic.message}</p> : null}
+                {errors.cnic ? (
+                  <p className="text-state-error text-xs">{errors.cnic.message}</p>
+                ) : null}
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="pe-doj">Date of joining</Label>
-                <Input id="pe-doj" type="date" aria-invalid={!!errors.dateOfJoining} {...register('dateOfJoining')} />
+                <Input
+                  id="pe-doj"
+                  type="date"
+                  aria-invalid={!!errors.dateOfJoining}
+                  {...register('dateOfJoining')}
+                />
                 {errors.dateOfJoining ? (
-                  <p className="text-xs text-state-error">{errors.dateOfJoining.message}</p>
+                  <p className="text-state-error text-xs">{errors.dateOfJoining.message}</p>
                 ) : null}
               </div>
               <div className="space-y-1.5">
@@ -225,8 +242,8 @@ export function EmployeeDialog({
               </div>
             </div>
 
-            <fieldset className="space-y-3 rounded-md border border-line p-3">
-              <legend className="px-1 text-xs font-medium uppercase tracking-wide text-ink-muted">
+            <fieldset className="border-line space-y-3 rounded-md border p-3">
+              <legend className="text-ink-muted px-1 text-xs font-medium uppercase tracking-wide">
                 Bank details
               </legend>
               <div className="grid gap-3 sm:grid-cols-2">
@@ -253,7 +270,7 @@ export function EmployeeDialog({
               />
               <span>
                 Include in new payroll runs
-                <span className="block text-xs text-ink-muted">
+                <span className="text-ink-muted block text-xs">
                   Turn off for someone on unpaid leave. They stay on the list.
                 </span>
               </span>
@@ -261,14 +278,22 @@ export function EmployeeDialog({
           </form>
 
           <DialogFooter className="sm:justify-between">
-            <Button variant="ghost" className="text-state-error" onClick={() => setConfirmRemove(true)}>
+            <Button
+              variant="ghost"
+              className="text-state-error"
+              onClick={() => setConfirmRemove(true)}
+            >
               Remove from payroll
             </Button>
             <div className="flex gap-2">
               <Button variant="secondary" onClick={() => onOpenChange(false)}>
                 Cancel
               </Button>
-              <Button type="submit" form="payroll-employee-form" disabled={isSubmitting || update.isPending}>
+              <Button
+                type="submit"
+                form="payroll-employee-form"
+                disabled={isSubmitting || update.isPending}
+              >
                 {update.isPending ? 'Saving…' : 'Save'}
               </Button>
             </div>

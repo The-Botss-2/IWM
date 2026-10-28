@@ -67,8 +67,18 @@ const PAYMENT_METHOD_LABELS: Record<PayslipSource['paymentMethod'], string> = {
 };
 
 const LONG_MONTHS = [
-  'January', 'February', 'March', 'April', 'May', 'June',
-  'July', 'August', 'September', 'October', 'November', 'December',
+  'January',
+  'February',
+  'March',
+  'April',
+  'May',
+  'June',
+  'July',
+  'August',
+  'September',
+  'October',
+  'November',
+  'December',
 ];
 
 /** "September 2026". */
@@ -122,7 +132,8 @@ export class PayslipRenderService {
     path.resolve(__dirname, '..', '..', 'payslip-templates', 'default');
 
   private readonly logger = new Logger(PayslipRenderService.name);
-  private cache: { stamp: string; compiled: CompiledTemplate; css: string; assets: Assets } | null = null;
+  private cache: { stamp: string; compiled: CompiledTemplate; css: string; assets: Assets } | null =
+    null;
 
   constructor(private readonly invoiceRender: InvoiceRenderService) {}
 
@@ -161,7 +172,9 @@ export class PayslipRenderService {
     const assetCss = (Object.entries(shown) as [keyof Assets, string][])
       .map(([key, uri]) => `.asset-${key} { background-image: url("${uri}"); }`)
       .join('\n');
-    const body = models.map((vm) => compiled.render({ ...vm, assets: flags, signatory })).join('\n');
+    const body = models
+      .map((vm) => compiled.render({ ...vm, assets: flags, signatory }))
+      .join('\n');
     const title = models.length === 1 ? `Payslip ${models[0]!.period.label}` : 'Payslips';
     return `<!doctype html>
 <html lang="en">
@@ -189,7 +202,9 @@ ${body}
       fs.stat(cssPath).catch(() => null),
       ...assetEntries.map(([, file]) => fs.stat(path.join(this.rootDir, file)).catch(() => null)),
     ]);
-    const stamp = [htmlStat, cssStat, ...assetStats].map((st) => `${st?.mtimeMs ?? 0}:${st?.size ?? 0}`).join('|');
+    const stamp = [htmlStat, cssStat, ...assetStats]
+      .map((st) => `${st?.mtimeMs ?? 0}:${st?.size ?? 0}`)
+      .join('|');
     if (this.cache?.stamp === stamp) return this.cache;
     const [source, css] = await Promise.all([
       fs.readFile(htmlPath, 'utf8'),
@@ -202,7 +217,9 @@ ${body}
         const st = assetStats[i];
         if (!st) return;
         if (st.size > MAX_ASSET_BYTES) {
-          this.logger.warn(`Payslip image ${file} skipped: ${st.size} bytes (max ${MAX_ASSET_BYTES})`);
+          this.logger.warn(
+            `Payslip image ${file} skipped: ${st.size} bytes (max ${MAX_ASSET_BYTES})`,
+          );
           return;
         }
         const bytes = await fs.readFile(path.join(this.rootDir, file));

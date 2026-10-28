@@ -29,7 +29,10 @@ function oldOrder(siblings: string[], id: string, position: number): string[] {
 async function main(): Promise<void> {
   const siblings = ['a', 'b', 'c', 'd'];
   for (const pos of [-3, 0, 1, 2, 4, 9]) {
-    check(`insertAt matches the old order at ${pos}`, same(insertAt(siblings, 'x', pos), oldOrder(siblings, 'x', pos)));
+    check(
+      `insertAt matches the old order at ${pos}`,
+      same(insertAt(siblings, 'x', pos), oldOrder(siblings, 'x', pos)),
+    );
   }
   check('insertAt into an empty column', same(insertAt([], 'x', 5), ['x']));
   check(
@@ -67,11 +70,23 @@ async function main(): Promise<void> {
   await rewritePositions(db, 'SprintTask', densePositions(['s1', 's2']));
   check('one statement per call', captured.length === 2);
   const [task, sprint] = captured;
-  check('task rewrite targets "Task" and stamps updatedAt', !!task && /UPDATE "Task"/.test(task.sql) && /"updatedAt"/.test(task.sql), task?.sql);
-  check('sprint rewrite targets "SprintTask" without updatedAt', !!sprint && /UPDATE "SprintTask"/.test(sprint.sql) && !/updatedAt/.test(sprint.sql), sprint?.sql);
+  check(
+    'task rewrite targets "Task" and stamps updatedAt',
+    !!task && /UPDATE "Task"/.test(task.sql) && /"updatedAt"/.test(task.sql),
+    task?.sql,
+  );
+  check(
+    'sprint rewrite targets "SprintTask" without updatedAt',
+    !!sprint && /UPDATE "SprintTask"/.test(sprint.sql) && !/updatedAt/.test(sprint.sql),
+    sprint?.sql,
+  );
   check(
     'ids and positions are bound parameters',
-    !!task && same(task.values, [['a', 'b', 'c', 'd'], [0, 1, 3, 4]]),
+    !!task &&
+      same(task.values, [
+        ['a', 'b', 'c', 'd'],
+        [0, 1, 3, 4],
+      ]),
     JSON.stringify(task?.values),
   );
 

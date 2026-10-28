@@ -125,11 +125,7 @@ export function VoiceMessage({
           accent,
         )}
       >
-        {playing ? (
-          <Pause className="h-4 w-4" />
-        ) : (
-          <Play className="h-4 w-4 translate-x-[1px]" />
-        )}
+        {playing ? <Pause className="h-4 w-4" /> : <Play className="h-4 w-4 translate-x-[1px]" />}
       </button>
 
       <div className="flex min-w-0 flex-1 flex-col gap-1">

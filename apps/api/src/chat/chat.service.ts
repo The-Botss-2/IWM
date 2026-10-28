@@ -70,10 +70,7 @@ interface CallRecord {
  * DURATION_SECONDS - wall-clock seconds (0 for missed/rejected).
  */
 const CALL_LOG_PREFIX = '__call__';
-function callLogContent(
-  status: 'COMPLETED' | 'MISSED' | 'REJECTED',
-  durationSec: number,
-): string {
+function callLogContent(status: 'COMPLETED' | 'MISSED' | 'REJECTED', durationSec: number): string {
   return `${CALL_LOG_PREFIX}:${status}:${Math.max(0, Math.round(durationSec))}`;
 }
 
@@ -326,7 +323,8 @@ export class ChatService {
         id: p.id,
         userId: p.userId,
         joinedAt: p.joinedAt,
-        role: ((p as { role?: ChatRoomParticipantRole }).role ?? 'MEMBER') as ChatRoomParticipantRole,
+        role: ((p as { role?: ChatRoomParticipantRole }).role ??
+          'MEMBER') as ChatRoomParticipantRole,
         user: {
           id: p.user.id,
           name: p.user.name,
@@ -334,9 +332,7 @@ export class ChatService {
           image: p.user.image,
         },
       })),
-      lastMessage: lastByRoom.has(r.id)
-        ? this.mapMessageRow(lastByRoom.get(r.id)!, userId)
-        : null,
+      lastMessage: lastByRoom.has(r.id) ? this.mapMessageRow(lastByRoom.get(r.id)!, userId) : null,
       unreadCount: unreadByRoom.get(r.id) ?? 0,
       spansOrganizations: spansOrganizations(r.type, r.participants),
     }));
@@ -452,8 +448,7 @@ export class ChatService {
         data: {
           type: input.type,
           name: input.type === 'GROUP' ? (input.name ?? null) : null,
-          description:
-            input.type === 'GROUP' ? (input.description ?? null) : null,
+          description: input.type === 'GROUP' ? (input.description ?? null) : null,
           isPrivate: input.type === 'GROUP' ? true : true,
           createdById: userId,
           participants: {
@@ -552,7 +547,11 @@ export class ChatService {
   }
 
   /** First row of a new group or channel: "Sara created #design". */
-  private async announceCreated(roomId: string, userId: string, name: string | null): Promise<void> {
+  private async announceCreated(
+    roomId: string,
+    userId: string,
+    name: string | null,
+  ): Promise<void> {
     const actor = await this.displayName(userId);
     await this.recordSystemMessage(roomId, userId, {
       event: 'created',
@@ -610,7 +609,8 @@ export class ChatService {
         id: p.id,
         userId: p.userId,
         joinedAt: p.joinedAt,
-        role: ((p as { role?: ChatRoomParticipantRole }).role ?? 'MEMBER') as ChatRoomParticipantRole,
+        role: ((p as { role?: ChatRoomParticipantRole }).role ??
+          'MEMBER') as ChatRoomParticipantRole,
         user: {
           id: p.user.id,
           name: p.user.name,
@@ -623,10 +623,7 @@ export class ChatService {
     };
   }
 
-  private async findExistingDm(
-    userA: string,
-    userB: string,
-  ): Promise<ChatRoomSummary | null> {
+  private async findExistingDm(userA: string, userB: string): Promise<ChatRoomSummary | null> {
     const candidates = await this.prisma.client.chatRoom.findMany({
       // Both users must be in it: the old filter only pinned `userA` and
       // loaded every DM they had, with all participants, to test `userB` in
@@ -877,10 +874,7 @@ export class ChatService {
     }
   }
 
-  async sendMessage(
-    userId: string,
-    input: SendChatMessageInput,
-  ): Promise<ChatRoomMessage> {
+  async sendMessage(userId: string, input: SendChatMessageInput): Promise<ChatRoomMessage> {
     await this.assertRoomMember(userId, input.roomId);
     await this.assertNotBlockedInCrossOrgDm(userId, input.roomId);
     this.assertOwnStorageUrls(input.attachments);
@@ -1106,16 +1100,12 @@ export class ChatService {
     let type: 'CHAT_MESSAGE' | 'MENTION';
     let title: string;
     if (room.type === 'DM') {
-      recipients = room.participants
-        .map((p) => p.userId)
-        .filter((id) => id !== senderUserId);
+      recipients = room.participants.map((p) => p.userId).filter((id) => id !== senderUserId);
       type = 'CHAT_MESSAGE';
       title = senderName;
     } else {
       // Only mentioned participants get a bell row in channels/groups.
-      recipients = mentionedUserIds.filter(
-        (id) => id !== senderUserId && participantIds.has(id),
-      );
+      recipients = mentionedUserIds.filter((id) => id !== senderUserId && participantIds.has(id));
       type = 'MENTION';
       title = `${senderName} mentioned you`;
     }
@@ -1153,11 +1143,9 @@ export class ChatService {
     const roomTitle =
       room.type === 'DM'
         ? senderName
-        : room.name ?? (room.type === 'GROUP' ? 'Group chat' : 'Channel');
+        : (room.name ?? (room.type === 'GROUP' ? 'Group chat' : 'Channel'));
     const body = (content ?? '').slice(0, 280) || '[attachment]';
-    const targets = room.participants
-      .map((p) => p.userId)
-      .filter((id) => id !== senderUserId);
+    const targets = room.participants.map((p) => p.userId).filter((id) => id !== senderUserId);
     if (targets.length === 0) return;
     await this.push.sendDesktopNotificationToUsers(targets, {
       // Within desktopPushPayloadSchema's limits: the desktop app validates
@@ -1299,7 +1287,13 @@ export class ChatService {
           title: true,
           status: true,
           project: {
-            select: { id: true, name: true, workspaceId: true, visibility: true, createdById: true },
+            select: {
+              id: true,
+              name: true,
+              workspaceId: true,
+              visibility: true,
+              createdById: true,
+            },
           },
         },
       });
@@ -1358,7 +1352,11 @@ export class ChatService {
         itemType,
         itemId: todo.id,
         title: todo.title,
-        subtitle: todo.done ? 'Done' : todo.dueDate ? `Due ${todo.dueDate.toISOString().slice(0, 10)}` : 'Open',
+        subtitle: todo.done
+          ? 'Done'
+          : todo.dueDate
+            ? `Due ${todo.dueDate.toISOString().slice(0, 10)}`
+            : 'Open',
         link: `/todo#todo=${todo.id}`,
       };
     }
@@ -1457,10 +1455,7 @@ export class ChatService {
       where: { messageId },
       select: { emoji: true, userId: true },
     });
-    const tally = new Map<
-      string,
-      { count: number; userIds: string[]; reactedByMe: boolean }
-    >();
+    const tally = new Map<string, { count: number; userIds: string[]; reactedByMe: boolean }>();
     for (const r of all) {
       const e = tally.get(r.emoji) ?? {
         count: 0,
@@ -1484,10 +1479,7 @@ export class ChatService {
     };
   }
 
-  async markDelivered(
-    userId: string,
-    roomId: string,
-  ): Promise<{ updated: number }> {
+  async markDelivered(userId: string, roomId: string): Promise<{ updated: number }> {
     await this.assertRoomMember(userId, roomId);
     const res = await this.prisma.client.chatRoomMessage.updateMany({
       where: {
@@ -1509,9 +1501,7 @@ export class ChatService {
     await this.assertRoomMember(userId, roomId);
     // Contextual auto-read: opening the room clears its bell notifications
     // regardless of how many messages were marked read below.
-    void this.notifications
-      .markReadByEntity(userId, 'chat', roomId)
-      .catch(() => {});
+    void this.notifications.markReadByEntity(userId, 'chat', roomId).catch(() => {});
     const cutoff = upToMessageId
       ? await this.prisma.client.chatRoomMessage.findUnique({
           where: { id: upToMessageId },
@@ -1568,9 +1558,7 @@ export class ChatService {
       where: { roomId },
       select: { userId: true },
     });
-    const receiverUserIds = participants
-      .map((p) => p.userId)
-      .filter((id) => id !== callerId);
+    const receiverUserIds = participants.map((p) => p.userId).filter((id) => id !== callerId);
 
     const record: CallRecord = {
       id: session.id,
@@ -1589,11 +1577,10 @@ export class ChatService {
     // Sticky Web Push fan-out - the SW raises `requireInteraction: true`
     // banners so the OS keeps them on-screen until the user dismisses or
     // answers. Fire-and-forget; in-app socket ring still runs in parallel.
-    void this.fanoutCallPush(roomId, callerId, session.id, receiverUserIds).catch(
-      (err) =>
-        this.logger.warn(
-          `Call push fan-out failed roomId=${roomId}: ${(err as Error)?.message ?? 'unknown'}`,
-        ),
+    void this.fanoutCallPush(roomId, callerId, session.id, receiverUserIds).catch((err) =>
+      this.logger.warn(
+        `Call push fan-out failed roomId=${roomId}: ${(err as Error)?.message ?? 'unknown'}`,
+      ),
     );
 
     return {
@@ -1675,7 +1662,10 @@ export class ChatService {
     };
   }
 
-  async rejectCall(callId: string, userId: string): Promise<{
+  async rejectCall(
+    callId: string,
+    userId: string,
+  ): Promise<{
     call: CallSummary | null;
     callerId: string | null;
     roomId: string | null;
@@ -1707,12 +1697,7 @@ export class ChatService {
     });
     this.activeCalls.delete(callId);
     this.callsByRoom.delete(record.roomId);
-    const callLog = await this.recordCallLog(
-      record.roomId,
-      record.callerId,
-      'REJECTED',
-      0,
-    );
+    const callLog = await this.recordCallLog(record.roomId, record.callerId, 'REJECTED', 0);
     return {
       call: {
         id: session.id,
@@ -1758,8 +1743,7 @@ export class ChatService {
     }
     await this.assertRoomMember(userId, record.roomId);
     const endedAt = new Date();
-    const finalStatus =
-      record.status === 'RINGING' ? 'MISSED' : 'COMPLETED';
+    const finalStatus = record.status === 'RINGING' ? 'MISSED' : 'COMPLETED';
     const session = await this.prisma.client.callSession.update({
       where: { id: callId },
       data: { status: finalStatus, endedAt },
@@ -1795,17 +1779,16 @@ export class ChatService {
     };
   }
 
-  async getRoomDetail(
-    userId: string,
-    roomId: string,
-  ): Promise<ChatRoomSummary> {
+  async getRoomDetail(userId: string, roomId: string): Promise<ChatRoomSummary> {
     await this.assertRoomMember(userId, roomId);
     const room = await this.prisma.client.chatRoom.findFirst({
       where: { id: roomId, deletedAt: null },
       include: {
         participants: {
           include: {
-            user: { select: { id: true, name: true, email: true, image: true, organizationId: true } },
+            user: {
+              select: { id: true, name: true, email: true, image: true, organizationId: true },
+            },
           },
         },
         messages: {
@@ -1835,7 +1818,8 @@ export class ChatService {
         id: p.id,
         userId: p.userId,
         joinedAt: p.joinedAt,
-        role: ((p as { role?: ChatRoomParticipantRole }).role ?? 'MEMBER') as ChatRoomParticipantRole,
+        role: ((p as { role?: ChatRoomParticipantRole }).role ??
+          'MEMBER') as ChatRoomParticipantRole,
         user: {
           id: p.user.id,
           name: p.user.name,
@@ -1843,9 +1827,7 @@ export class ChatService {
           image: p.user.image,
         },
       })),
-      lastMessage: room.messages[0]
-        ? this.mapMessageRow(room.messages[0])
-        : null,
+      lastMessage: room.messages[0] ? this.mapMessageRow(room.messages[0]) : null,
       unreadCount: 0,
       spansOrganizations: spansOrganizations(room.type, room.participants),
     };
@@ -2012,11 +1994,7 @@ export class ChatService {
         status: 400,
       });
     }
-    if (
-      room.createdById &&
-      room.createdById === targetUserId &&
-      role !== 'ADMIN'
-    ) {
+    if (room.createdById && room.createdById === targetUserId && role !== 'ADMIN') {
       throw new ForbiddenException({
         title: 'Creator must remain admin',
         status: 403,
@@ -2070,9 +2048,7 @@ export class ChatService {
     const others = participants.filter((p) => p.userId !== userId);
     const otherAdminExists = others.some((p) => p.role === 'ADMIN');
     const successor =
-      self?.role === 'ADMIN' && !otherAdminExists && others.length > 0
-        ? others[0]
-        : null;
+      self?.role === 'ADMIN' && !otherAdminExists && others.length > 0 ? others[0] : null;
 
     // Record the "left" system message before the leaver drops out of the
     // room, authored by the leaver so it threads correctly. Best-effort.
@@ -2237,10 +2213,7 @@ export class ChatService {
     };
   }
 
-  async previewInvite(
-    userId: string,
-    code: string,
-  ): Promise<InvitePreview> {
+  async previewInvite(userId: string, code: string): Promise<InvitePreview> {
     const invite = await this.findActiveInvite(code);
     const [participants, alreadyJoined] = await Promise.all([
       this.prisma.client.chatRoomParticipant.count({
@@ -2252,12 +2225,8 @@ export class ChatService {
       }),
     ]);
     const now = Date.now();
-    const expired = invite.expiresAt
-      ? invite.expiresAt.getTime() < now
-      : false;
-    const exhausted = invite.maxUses
-      ? invite.usedCount >= invite.maxUses
-      : false;
+    const expired = invite.expiresAt ? invite.expiresAt.getTime() < now : false;
+    const exhausted = invite.maxUses ? invite.usedCount >= invite.maxUses : false;
     return {
       code: invite.code,
       room: {
@@ -2424,7 +2393,8 @@ export class ChatService {
           id: p.id,
           userId: p.userId,
           joinedAt: p.joinedAt,
-          role: ((p as { role?: ChatRoomParticipantRole }).role ?? 'MEMBER') as ChatRoomParticipantRole,
+          role: ((p as { role?: ChatRoomParticipantRole }).role ??
+            'MEMBER') as ChatRoomParticipantRole,
           user: {
             id: p.user.id,
             name: p.user.name,
@@ -2505,10 +2475,7 @@ export class ChatService {
       this.callsByRoom.delete(record.roomId);
       const durationSec =
         finalStatus === 'COMPLETED'
-          ? Math.max(
-              0,
-              Math.round((endedAt.getTime() - record.startedAt.getTime()) / 1000),
-            )
+          ? Math.max(0, Math.round((endedAt.getTime() - record.startedAt.getTime()) / 1000))
           : 0;
       const callLog = await this.recordCallLog(
         record.roomId,
@@ -2535,11 +2502,7 @@ export class ChatService {
    * or a room participant. Without the target check any member could relay
    * signaling at an arbitrary user id outside the room.
    */
-  async assertCallSignal(
-    callId: string,
-    fromUserId: string,
-    toUserId: string,
-  ): Promise<string> {
+  async assertCallSignal(callId: string, fromUserId: string, toUserId: string): Promise<string> {
     const record = this.activeCalls.get(callId);
     if (!record) {
       throw new NotFoundException({ title: 'Call no longer active', status: 404 });
@@ -2745,11 +2708,7 @@ export class ChatService {
    * not rewrite someone else's words). Sets `editedAt` so the UI can show an
    * "(edited)" marker. Attachments are immutable here.
    */
-  async editMessage(
-    userId: string,
-    messageId: string,
-    content: string,
-  ): Promise<ChatRoomMessage> {
+  async editMessage(userId: string, messageId: string, content: string): Promise<ChatRoomMessage> {
     const message = await this.prisma.client.chatRoomMessage.findFirst({
       where: { id: messageId, deletedAt: null },
       select: { id: true, roomId: true, senderId: true },
@@ -2881,9 +2840,7 @@ export class ChatService {
       }),
     );
     const rows = await this.prisma.client.$transaction(creates);
-    const created: ChatRoomMessage[] = rows.map((row) =>
-      this.mapMessageRow(row, userId),
-    );
+    const created: ChatRoomMessage[] = rows.map((row) => this.mapMessageRow(row, userId));
     await this.prisma.client.chatRoom.update({
       where: { id: targetRoomId },
       data: { updatedAt: new Date() },
@@ -2947,15 +2904,13 @@ export class ChatService {
       editedAt?: Date | null;
       deletedAt: Date | null;
       parentMessageId?: string | null;
-      parentMessage?:
-        | {
-            id: string;
-            senderId: string;
-            content: string | null;
-            createdAt: Date;
-            deletedAt: Date | null;
-          }
-        | null;
+      parentMessage?: {
+        id: string;
+        senderId: string;
+        content: string | null;
+        createdAt: Date;
+        deletedAt: Date | null;
+      } | null;
       reactions?: { emoji: string; userId: string }[];
       attachments: {
         id: string;
@@ -2968,10 +2923,7 @@ export class ChatService {
     },
     viewerId?: string,
   ): ChatRoomMessage {
-    const tally = new Map<
-      string,
-      { count: number; userIds: string[]; reactedByMe: boolean }
-    >();
+    const tally = new Map<string, { count: number; userIds: string[]; reactedByMe: boolean }>();
     for (const r of row.reactions ?? []) {
       const existing = tally.get(r.emoji) ?? {
         count: 0,
@@ -2983,9 +2935,12 @@ export class ChatService {
       if (viewerId && r.userId === viewerId) existing.reactedByMe = true;
       tally.set(r.emoji, existing);
     }
-    const reactions: ChatReactionTally[] = Array.from(tally.entries()).map(
-      ([emoji, t]) => ({ emoji, count: t.count, userIds: t.userIds, reactedByMe: t.reactedByMe }),
-    );
+    const reactions: ChatReactionTally[] = Array.from(tally.entries()).map(([emoji, t]) => ({
+      emoji,
+      count: t.count,
+      userIds: t.userIds,
+      reactedByMe: t.reactedByMe,
+    }));
     return {
       id: row.id,
       roomId: row.roomId,
@@ -3021,4 +2976,3 @@ export class ChatService {
 function generateInviteCode(): string {
   return randomBytes(9).toString('base64url');
 }
-

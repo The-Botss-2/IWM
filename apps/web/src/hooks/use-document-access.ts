@@ -15,8 +15,7 @@ import { getApi } from '@/lib/api';
 import { toastError } from '@/lib/toast';
 
 export const documentAccessRootKey = ['document-access'] as const;
-export const documentAccessKey = (docId: string) =>
-  [...documentAccessRootKey, docId] as const;
+export const documentAccessKey = (docId: string) => [...documentAccessRootKey, docId] as const;
 
 /** Clients (and their portal people) a document can be shared with. */
 export const documentShareTargetsRootKey = ['document-share-targets'] as const;
@@ -56,8 +55,7 @@ export function useAddDocumentAccess(docId: string) {
   const qc = useQueryClient();
   return useMutation({
     meta: { errorTitle: "Couldn't share document" },
-    mutationFn: (input: AddDocumentAccessInput) =>
-      getApi().documents.addAccess(docId, input),
+    mutationFn: (input: AddDocumentAccessInput) => getApi().documents.addAccess(docId, input),
     onSuccess: (server) => {
       // Replace any existing grant for this user (upsert semantics) so a
       // permission change for an existing grantee shows immediately.
@@ -75,13 +73,8 @@ export function useUpdateDocumentAccess(docId: string) {
   const qc = useQueryClient();
   return useMutation({
     meta: { errorTitle: "Couldn't change access" },
-    mutationFn: ({
-      userId,
-      input,
-    }: {
-      userId: string;
-      input: UpdateDocumentAccessInput;
-    }) => getApi().documents.updateAccess(docId, userId, input),
+    mutationFn: ({ userId, input }: { userId: string; input: UpdateDocumentAccessInput }) =>
+      getApi().documents.updateAccess(docId, userId, input),
     onMutate: async ({ userId, input }) => {
       await qc.cancelQueries({ queryKey: documentAccessKey(docId) });
       const previous = patchList(qc, docId, (curr) => {

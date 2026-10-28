@@ -64,9 +64,7 @@ export function useHiddenMessages(userId: string): {
         next.add(messageId);
         if (userId) writeSet(userId, next);
         if (typeof window !== 'undefined') {
-          window.dispatchEvent(
-            new CustomEvent(EVT, { detail: Array.from(next) }),
-          );
+          window.dispatchEvent(new CustomEvent(EVT, { detail: Array.from(next) }));
         }
         return next;
       });
@@ -74,10 +72,7 @@ export function useHiddenMessages(userId: string): {
     [userId],
   );
 
-  const isHidden = useCallback(
-    (messageId: string) => hidden.has(messageId),
-    [hidden],
-  );
+  const isHidden = useCallback((messageId: string) => hidden.has(messageId), [hidden]);
 
   return { hide, isHidden };
 }

@@ -107,11 +107,11 @@ export function RequestLeaveDialog({
             </div>
           </div>
           {form.endBeforeStart ? (
-            <p className="text-xs text-state-error" role="alert">
+            <p className="text-state-error text-xs" role="alert">
               The last day must be on or after the first day.
             </p>
           ) : form.days !== null ? (
-            <p className="text-xs text-ink-muted">
+            <p className="text-ink-muted text-xs">
               {form.days === 1 ? '1 day' : `${form.days} days`}, weekends included.
             </p>
           ) : null}
@@ -133,11 +133,7 @@ export function RequestLeaveDialog({
               Cancel
             </Button>
             <Button type="submit" disabled={!form.canSubmit || form.pending}>
-              {form.pending
-                ? 'Sending…'
-                : forSomeone
-                  ? 'Record leave'
-                  : 'Send request'}
+              {form.pending ? 'Sending…' : forSomeone ? 'Record leave' : 'Send request'}
             </Button>
           </DialogFooter>
         </form>

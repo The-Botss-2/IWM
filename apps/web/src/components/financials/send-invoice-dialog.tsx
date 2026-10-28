@@ -243,16 +243,16 @@ function ViaOption({
       onClick={onSelect}
       className={cn(
         'flex min-w-0 flex-col items-start gap-1 rounded-md border px-3 py-2 text-left transition',
-        'focus-visible:outline-none focus-visible:ring-2 focus-visible:shadow-focus',
+        'focus-visible:shadow-focus focus-visible:outline-none focus-visible:ring-2',
         selected ? 'border-brand-purple bg-brand-50/60' : 'border-line hover:border-line-strong',
         disabled && 'cursor-not-allowed opacity-50',
       )}
     >
-      <span className="flex items-center gap-2 text-sm font-medium text-ink">
+      <span className="text-ink flex items-center gap-2 text-sm font-medium">
         {icon}
         {title}
       </span>
-      <span className="w-full truncate text-xs text-ink-muted">{detail}</span>
+      <span className="text-ink-muted w-full truncate text-xs">{detail}</span>
     </button>
   );
 }

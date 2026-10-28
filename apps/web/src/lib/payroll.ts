@@ -6,8 +6,18 @@ import { parseMoneyInput } from './money';
 export const PAYROLL_CURRENCY = 'PKR';
 
 export const MONTH_NAMES = [
-  'January', 'February', 'March', 'April', 'May', 'June',
-  'July', 'August', 'September', 'October', 'November', 'December',
+  'January',
+  'February',
+  'March',
+  'April',
+  'May',
+  'June',
+  'July',
+  'August',
+  'September',
+  'October',
+  'November',
+  'December',
 ] as const;
 
 /** "September 2026". */
@@ -45,7 +55,13 @@ export function previewNet(amounts: {
   );
   if (parts.some((p) => p === null)) return null;
   // In cents, so 0.1 + 0.2 style float error never shows.
-  const [s, b, c, d, t] = parts.map((p) => Math.round(Number(p) * 100)) as [number, number, number, number, number];
+  const [s, b, c, d, t] = parts.map((p) => Math.round(Number(p) * 100)) as [
+    number,
+    number,
+    number,
+    number,
+    number,
+  ];
   return (s + b + c - d - t) / 100;
 }
 

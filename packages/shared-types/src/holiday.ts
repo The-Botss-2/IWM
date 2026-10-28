@@ -44,12 +44,7 @@ export type CreateHolidayInput = z.infer<typeof createHolidaySchema>;
  * the others force every affected row to that single status. Omitting the
  * field falls back to per-user recomputation (leave/present/absent).
  */
-export const holidayRevertStatusSchema = z.enum([
-  'CLEAR',
-  'PRESENT',
-  'ABSENT',
-  'LEAVE',
-]);
+export const holidayRevertStatusSchema = z.enum(['CLEAR', 'PRESENT', 'ABSENT', 'LEAVE']);
 export type HolidayRevertStatus = z.infer<typeof holidayRevertStatusSchema>;
 
 /**
@@ -75,10 +70,10 @@ export const listHolidaysQuerySchema = z
     from: z.coerce.date().optional(),
     to: z.coerce.date().optional(),
   })
-  .refine(
-    (v) => !v.from || !v.to || v.to.getTime() >= v.from.getTime(),
-    { path: ['to'], message: '`to` must be on or after `from`' },
-  );
+  .refine((v) => !v.from || !v.to || v.to.getTime() >= v.from.getTime(), {
+    path: ['to'],
+    message: '`to` must be on or after `from`',
+  });
 export type ListHolidaysQuery = z.infer<typeof listHolidaysQuerySchema>;
 
 export const holidayListResponseSchema = z.object({

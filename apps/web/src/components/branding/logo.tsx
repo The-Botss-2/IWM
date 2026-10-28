@@ -33,11 +33,7 @@ export function Logo({ variant = 'full', size = 'md', className, inverse }: Logo
         src="/branding/logo-icon.svg"
         alt="The Botss"
         style={{ height, width: 'auto' }}
-        className={cn(
-          'shrink-0 select-none',
-          inverse ? 'brightness-0 invert' : '',
-          className,
-        )}
+        className={cn('shrink-0 select-none', inverse ? 'brightness-0 invert' : '', className)}
         draggable={false}
       />
     );
@@ -68,4 +64,3 @@ export function Logo({ variant = 'full', size = 'md', className, inverse }: Logo
     />
   );
 }
-

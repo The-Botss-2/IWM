@@ -74,12 +74,7 @@ export class CommentsService {
     };
   }
 
-  async create(
-    scope: UserScope,
-    userId: string,
-    taskId: string,
-    input: CreateCommentInput,
-  ) {
+  async create(scope: UserScope, userId: string, taskId: string, input: CreateCommentInput) {
     const workspaceId = await this.resolveTaskWorkspace(scope, taskId);
 
     const fileIds = input.fileObjectIds ?? [];
@@ -192,12 +187,7 @@ export class CommentsService {
     );
   }
 
-  async update(
-    scope: UserScope,
-    userId: string,
-    commentId: string,
-    input: UpdateCommentInput,
-  ) {
+  async update(scope: UserScope, userId: string, commentId: string, input: UpdateCommentInput) {
     const existing = await this.prisma.client.comment.findUnique({
       where: { id: commentId },
       select: { id: true, authorId: true, taskId: true },

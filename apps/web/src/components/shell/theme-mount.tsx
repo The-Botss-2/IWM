@@ -2,12 +2,7 @@
 
 import { useEffect } from 'react';
 
-import {
-  findGradient,
-  findUiScale,
-  resolveTheme,
-  useAppAppearance,
-} from '@/lib/app-prefs';
+import { findGradient, findUiScale, resolveTheme, useAppAppearance } from '@/lib/app-prefs';
 import { toastErrorMessage } from '@/lib/toast';
 
 /** Set on <html> by ThemePreScript when the saved appearance was unreadable. */
@@ -36,7 +31,14 @@ export function ThemeMount() {
     const root = document.documentElement;
     if (!root.hasAttribute(THEME_ERROR_ATTR)) return;
     root.removeAttribute(THEME_ERROR_ATTR);
-    const timer = window.setTimeout(() => toastErrorMessage("Couldn't apply your saved theme", { description: "The saved theme was invalid, so the default theme is showing. Pick a theme in Settings." }), 0);
+    const timer = window.setTimeout(
+      () =>
+        toastErrorMessage("Couldn't apply your saved theme", {
+          description:
+            'The saved theme was invalid, so the default theme is showing. Pick a theme in Settings.',
+        }),
+      0,
+    );
     return () => window.clearTimeout(timer);
   }, []);
 

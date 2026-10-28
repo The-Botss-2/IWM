@@ -36,7 +36,7 @@ export function useUpdateTask() {
           next.assignee =
             input.assigneeId == null
               ? null
-              : findCachedUser(qc, input.assigneeId) ?? next.assignee;
+              : (findCachedUser(qc, input.assigneeId) ?? next.assignee);
         }
         next.updatedAt = new Date();
         return next;

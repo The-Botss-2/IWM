@@ -50,10 +50,6 @@ export class HolidaysResource {
   }
 
   unmark(id: string, status?: HolidayRevertStatus) {
-    return this.http.post(
-      `/holidays/${id}/unmark`,
-      okSchema,
-      status ? { status } : {},
-    );
+    return this.http.post(`/holidays/${id}/unmark`, okSchema, status ? { status } : {});
   }
 }

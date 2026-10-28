@@ -10,12 +10,7 @@ import { z } from 'zod';
 export const BillingModel = z.enum(['ONE_TIME', 'MILESTONE', 'RETAINER']);
 export type BillingModel = z.infer<typeof BillingModel>;
 
-export const ContractStatus = z.enum([
-  'DRAFT',
-  'ACTIVE',
-  'COMPLETED',
-  'CANCELLED',
-]);
+export const ContractStatus = z.enum(['DRAFT', 'ACTIVE', 'COMPLETED', 'CANCELLED']);
 export type ContractStatus = z.infer<typeof ContractStatus>;
 
 /**
@@ -31,12 +26,7 @@ export type PaymentStatus = z.infer<typeof PaymentStatus>;
  * tell whether the work shipped - which is exactly the "delivered, awaiting
  * payment" question the Financials tab exists to answer.
  */
-export const MilestoneStatus = z.enum([
-  'PENDING',
-  'IN_PROGRESS',
-  'DELIVERED',
-  'CANCELLED',
-]);
+export const MilestoneStatus = z.enum(['PENDING', 'IN_PROGRESS', 'DELIVERED', 'CANCELLED']);
 export type MilestoneStatus = z.infer<typeof MilestoneStatus>;
 
 /**

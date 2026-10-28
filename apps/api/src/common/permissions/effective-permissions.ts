@@ -78,7 +78,10 @@ export async function loadEffectivePermissions(
   // A custom role only counts while it is live, of the right scope and in the
   // user's own org. Anything else falls back to the preset.
   const liveRole = (
-    r: { permissions: string[]; deletedAt: Date | null; scope: string; organizationId: string } | null | undefined,
+    r:
+      | { permissions: string[]; deletedAt: Date | null; scope: string; organizationId: string }
+      | null
+      | undefined,
     scope: 'COMPANY' | 'WORKSPACE',
   ): string[] | null =>
     r && r.deletedAt === null && r.scope === scope && r.organizationId === user.organizationId

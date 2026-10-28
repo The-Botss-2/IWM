@@ -60,7 +60,7 @@ export function AppChrome({ children }: { children: ReactNode }) {
           wrong under the rail layout - the rail has no 4rem bar, so every
           such page came up 64px short and left a dead strip below its
           composer / footer. See NavRailShell for the rail's value. */}
-      <div className="flex min-h-screen flex-col bg-bg-app text-ink [--app-content-h:calc(100vh-4rem)]">
+      <div className="bg-bg-app text-ink flex min-h-screen flex-col [--app-content-h:calc(100vh-4rem)]">
         <TopBar />
         <main className="flex-1">{children}</main>
       </div>

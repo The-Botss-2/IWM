@@ -26,7 +26,7 @@ export function AuditLogTable<T extends AuditLogEntry>({
 }) {
   return (
     <table className="w-full min-w-[640px] text-sm">
-      <thead className="text-left text-[11px] font-medium uppercase tracking-wide text-ink-muted">
+      <thead className="text-ink-muted text-left text-[11px] font-medium uppercase tracking-wide">
         <tr>
           <th className="px-4 py-2">When</th>
           <th className="px-4 py-2">Actor</th>
@@ -60,34 +60,30 @@ function AuditRow({
   const target = formatAuditTarget(row);
   const details = formatAuditDetails(row);
   return (
-    <tr className="border-t border-line">
-      <td className="px-4 py-3 text-xs text-ink-muted whitespace-nowrap">
-        <span title={absoluteTime(row.createdAt)}>
-          {relativeTime(row.createdAt)}
-        </span>
+    <tr className="border-line border-t">
+      <td className="text-ink-muted whitespace-nowrap px-4 py-3 text-xs">
+        <span title={absoluteTime(row.createdAt)}>{relativeTime(row.createdAt)}</span>
       </td>
-      <td className="px-4 py-3 text-sm text-ink">
+      <td className="text-ink px-4 py-3 text-sm">
         {row.actorUser ? (
           <div className="flex flex-col">
             <span className="font-medium">{row.actorUser.name}</span>
-            <span className="text-[11px] text-ink-muted">{row.actorUser.email}</span>
+            <span className="text-ink-muted text-[11px]">{row.actorUser.email}</span>
           </div>
         ) : (
-          <span className="italic text-ink-disabled">System</span>
+          <span className="text-ink-disabled italic">System</span>
         )}
       </td>
       {organization !== undefined ? (
         <td className="px-4 py-3 text-sm">
-          {organization ?? (
-            <span className="italic text-ink-disabled">Deleted organization</span>
-          )}
+          {organization ?? <span className="text-ink-disabled italic">Deleted organization</span>}
         </td>
       ) : null}
       <td className="px-4 py-3">
         {isSecurityAlert(row.action) ? (
           <div className="flex flex-wrap items-center gap-1.5">
             <Badge tone="danger">Alert</Badge>
-            <span className="text-sm text-ink">{formatAuditAction(row.action)}</span>
+            <span className="text-ink text-sm">{formatAuditAction(row.action)}</span>
           </div>
         ) : (
           <Badge tone="neutral">{row.action}</Badge>
@@ -96,27 +92,27 @@ function AuditRow({
       <td className="px-4 py-3 text-sm">
         {target ? (
           <div className="flex flex-col">
-            <span className="text-[11px] text-ink-muted">{target.kind}</span>
-            <span className={target.resolved ? 'text-ink' : 'italic text-ink-disabled'}>
+            <span className="text-ink-muted text-[11px]">{target.kind}</span>
+            <span className={target.resolved ? 'text-ink' : 'text-ink-disabled italic'}>
               {target.name}
             </span>
           </div>
         ) : (
-          <span className="italic text-ink-disabled">-</span>
+          <span className="text-ink-disabled italic">-</span>
         )}
       </td>
-      <td className="px-4 py-3 text-xs text-ink-muted max-w-md">
+      <td className="text-ink-muted max-w-md px-4 py-3 text-xs">
         {details.length > 0 ? (
           <dl className="space-y-0.5">
             {details.map((d) => (
               <div key={d.key} className="flex gap-1.5">
-                <dt className="shrink-0 text-ink-muted">{d.label}:</dt>
-                <dd className="min-w-0 break-words text-ink">{d.value}</dd>
+                <dt className="text-ink-muted shrink-0">{d.label}:</dt>
+                <dd className="text-ink min-w-0 break-words">{d.value}</dd>
               </div>
             ))}
           </dl>
         ) : (
-          <span className="italic text-ink-disabled">-</span>
+          <span className="text-ink-disabled italic">-</span>
         )}
       </td>
     </tr>

@@ -72,9 +72,7 @@ export function PromptHost() {
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>{req?.title ?? ''}</DialogTitle>
-          {req?.description ? (
-            <DialogDescription>{req.description}</DialogDescription>
-          ) : null}
+          {req?.description ? <DialogDescription>{req.description}</DialogDescription> : null}
         </DialogHeader>
         <form
           onSubmit={(e) => {

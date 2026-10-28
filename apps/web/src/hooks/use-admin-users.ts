@@ -61,8 +61,7 @@ export function useImportWebmailUser() {
   const qc = useQueryClient();
   return useMutation({
     meta: { errorTitle: "Couldn't import webmail user" },
-    mutationFn: (input: AdminImportWebmailUserInput) =>
-      getApi().admin.importWebmailUser(input),
+    mutationFn: (input: AdminImportWebmailUserInput) => getApi().admin.importWebmailUser(input),
     onSuccess: (created) => {
       qc.invalidateQueries({ queryKey: KEY });
       qc.invalidateQueries({ queryKey: WEBMAIL_KEY });

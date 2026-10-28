@@ -177,7 +177,11 @@ export class ClientPortalService {
     // admin already knows their own team). Any other unusable account gets
     // one generic answer, so the caller cannot learn which kind of account or
     // which organization it belongs to.
-    if (existing && existing.accountType !== 'CLIENT' && existing.organizationId === client.organizationId) {
+    if (
+      existing &&
+      existing.accountType !== 'CLIENT' &&
+      existing.organizationId === client.organizationId
+    ) {
       throw new ConflictException({
         title: 'Team member email',
         status: 409,
@@ -195,7 +199,11 @@ export class ClientPortalService {
       });
     }
     if (existing) {
-      await this.assertAccountBelongsHere(existing.id, existing.accounts.length > 0, client.workspaceId);
+      await this.assertAccountBelongsHere(
+        existing.id,
+        existing.accounts.length > 0,
+        client.workspaceId,
+      );
       const live = await this.prisma.client.clientContact.findFirst({
         where: { clientId, userId: existing.id, deletedAt: null },
         select: { id: true },
@@ -210,7 +218,10 @@ export class ClientPortalService {
       }
     }
 
-    const name = (input.name?.trim() || existing?.name || email.split('@')[0] || email).slice(0, 100);
+    const name = (input.name?.trim() || existing?.name || email.split('@')[0] || email).slice(
+      0,
+      100,
+    );
     const contactId = await this.prisma.client.$transaction(async (tx) => {
       await lockClientRow(tx, clientId);
       if (existing) {
@@ -229,7 +240,9 @@ export class ClientPortalService {
           JOIN "Client" c ON c.id = cc."clientId"
           WHERE cc."userId" = ${existing.id}`;
         const { elsewhere = 0, here = 0 } = counts[0] ?? {};
-        if (!portalAccountReusable({ elsewhere, here, hasPassword: existing.accounts.length > 0 })) {
+        if (
+          !portalAccountReusable({ elsewhere, here, hasPassword: existing.accounts.length > 0 })
+        ) {
           throw accountElsewhereConflict();
         }
       }

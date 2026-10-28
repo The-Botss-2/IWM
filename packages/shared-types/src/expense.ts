@@ -44,9 +44,7 @@ export const expenseWithRefsSchema = expenseSchema.extend({
   project: z.object({ id: cuid, name: z.string() }).nullable(),
   contract: z.object({ id: cuid, title: z.string() }).nullable(),
   paymentSource: z.object({ id: cuid, name: z.string() }).nullable(),
-  receipt: z
-    .object({ id: cuid, filename: z.string(), url: z.string().nullable() })
-    .nullable(),
+  receipt: z.object({ id: cuid, filename: z.string(), url: z.string().nullable() }).nullable(),
   recordedBy: z.object({ id: cuid, name: z.string() }).nullable(),
   /** Recorded by a payroll run: edit or delete it through the run, not here. */
   fromPayroll: z.boolean(),

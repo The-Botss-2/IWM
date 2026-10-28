@@ -93,7 +93,10 @@ function cachedFlags(qc: QueryClient, projectId: string): PortalFlags | undefine
         ? data
         : undefined;
     if (project) {
-      return { portalVisible: project.portalVisible, portalShowAllTasks: project.portalShowAllTasks };
+      return {
+        portalVisible: project.portalVisible,
+        portalShowAllTasks: project.portalShowAllTasks,
+      };
     }
   }
   return undefined;
@@ -128,7 +131,10 @@ export function useUpdateProjectPortal(projectId: string) {
         patchProjectCaches(qc, projectId, rollback);
       }
       toastErrorMessage("Couldn't update the client portal settings", {
-        description: portalErrorMessage(err, 'Something unexpected happened. Try again in a moment.'),
+        description: portalErrorMessage(
+          err,
+          'Something unexpected happened. Try again in a moment.',
+        ),
       });
     },
     onSettled: () => {
@@ -174,7 +180,10 @@ export function useUpdateTaskPortalVisibility() {
       // Roll back only this flag (absent reads as false), never other edits.
       if (ctx) patchEvery(qc, taskId, (t) => ({ ...t, portalVisible: ctx.previous }));
       toastErrorMessage("Couldn't change whether the client sees this task", {
-        description: portalErrorMessage(err, 'Something unexpected happened. Try again in a moment.'),
+        description: portalErrorMessage(
+          err,
+          'Something unexpected happened. Try again in a moment.',
+        ),
       });
     },
   });

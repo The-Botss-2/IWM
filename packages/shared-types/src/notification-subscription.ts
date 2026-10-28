@@ -64,9 +64,7 @@ export type RegisterPushDeviceInput = z.infer<typeof registerPushDeviceSchema>;
 export const unregisterPushDeviceSchema = z.object({
   token: z.string().min(1).max(512),
 });
-export type UnregisterPushDeviceInput = z.infer<
-  typeof unregisterPushDeviceSchema
->;
+export type UnregisterPushDeviceInput = z.infer<typeof unregisterPushDeviceSchema>;
 
 export const userNotificationSubscriptionSchema = z.object({
   id: cuid,
@@ -77,9 +75,7 @@ export const userNotificationSubscriptionSchema = z.object({
   userAgent: z.string().nullable(),
   createdAt: z.coerce.date(),
 });
-export type UserNotificationSubscription = z.infer<
-  typeof userNotificationSubscriptionSchema
->;
+export type UserNotificationSubscription = z.infer<typeof userNotificationSubscriptionSchema>;
 
 /**
  * Server-side payload sent through web-push to a browser. Mirrored

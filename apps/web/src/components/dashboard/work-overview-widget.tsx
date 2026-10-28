@@ -217,27 +217,25 @@ export function WorkOverviewWidget() {
   }, [filteredTasks, groupBy]);
 
   return (
-    <div className="rounded-2xl border border-line bg-white shadow-soft">
+    <div className="border-line shadow-soft rounded-2xl border bg-white">
       {/* Widget Header with Stat Cards & View Controls */}
-      <div className="border-b border-line p-5 sm:p-6">
+      <div className="border-line border-b p-5 sm:p-6">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <div className="flex items-center gap-2">
-              <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-brand-50 text-brand-purple">
+              <span className="bg-brand-50 text-brand-purple flex h-7 w-7 items-center justify-center rounded-lg">
                 <Layers className="h-4 w-4" />
               </span>
-              <h2 className="text-base font-semibold text-ink">
-                Work Overview
-              </h2>
-              <span className="whitespace-nowrap rounded-full bg-brand-50 px-2 py-0.5 text-xs font-semibold text-brand-700">
+              <h2 className="text-ink text-base font-semibold">Work Overview</h2>
+              <span className="bg-brand-50 text-brand-700 whitespace-nowrap rounded-full px-2 py-0.5 text-xs font-semibold">
                 {filteredTasks.length} {filteredTasks.length === 1 ? 'task' : 'tasks'}
               </span>
             </div>
-            <p className="mt-1 text-xs text-ink-muted">
+            <p className="text-ink-muted mt-1 text-xs">
               Live multi-criteria overview across workspaces, assignees, and deadlines.
             </p>
             {metrics.total > metrics.loaded ? (
-              <p className="mt-1 text-xs text-ink-muted">
+              <p className="text-ink-muted mt-1 text-xs">
                 Showing the first {metrics.loaded} of {metrics.total} matching tasks. Narrow the
                 filters to see the rest.
               </p>
@@ -248,13 +246,13 @@ export function WorkOverviewWidget() {
           <div className="flex flex-wrap items-center gap-2">
             {/* Group By selector */}
             <div className="flex items-center gap-1.5">
-              <span className="text-[11px] font-medium uppercase tracking-wider text-ink-muted">
+              <span className="text-ink-muted text-[11px] font-medium uppercase tracking-wider">
                 Group:
               </span>
               <select
                 value={groupBy}
                 onChange={(e) => setGroupBy(e.target.value as DashboardGroupBy)}
-                className="h-8 rounded-lg border border-line bg-white px-2.5 text-xs text-ink shadow-sm focus:border-brand-purple focus:outline-none"
+                className="border-line text-ink focus:border-brand-purple h-8 rounded-lg border bg-white px-2.5 text-xs shadow-sm focus:outline-none"
                 aria-label="Group tasks by"
               >
                 <option value="none">No grouping</option>
@@ -267,7 +265,7 @@ export function WorkOverviewWidget() {
             </div>
 
             {/* View Mode Toggle: List vs Board */}
-            <div className="flex rounded-lg border border-line p-0.5 shadow-sm">
+            <div className="border-line flex rounded-lg border p-0.5 shadow-sm">
               <button
                 type="button"
                 onClick={() => setViewMode('list')}
@@ -344,25 +342,20 @@ export function WorkOverviewWidget() {
         {tasksQuery.isLoading ? (
           <div className="flex h-56 flex-col items-center justify-center gap-2">
             <Loader size="md" />
-            <p className="text-xs text-ink-muted">Loading tasks overview…</p>
+            <p className="text-ink-muted text-xs">Loading tasks overview…</p>
           </div>
         ) : tasksQuery.isError ? (
           <QueryError onRetry={() => void tasksQuery.refetch()} />
         ) : filteredTasks.length === 0 ? (
-          <div className="flex h-56 flex-col items-center justify-center rounded-xl border border-dashed border-line p-6 text-center">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-brand-50 text-brand-purple">
+          <div className="border-line flex h-56 flex-col items-center justify-center rounded-xl border border-dashed p-6 text-center">
+            <div className="bg-brand-50 text-brand-purple flex h-10 w-10 items-center justify-center rounded-full">
               <CheckCircle2 className="h-5 w-5" />
             </div>
-            <h3 className="mt-3 text-sm font-medium text-ink">No matching tasks found</h3>
-            <p className="mt-1 text-xs text-ink-muted">
+            <h3 className="text-ink mt-3 text-sm font-medium">No matching tasks found</h3>
+            <p className="text-ink-muted mt-1 text-xs">
               Try adjusting your workspace, assignee, status or date filters.
             </p>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={resetFilters}
-              className="mt-3.5 text-xs"
-            >
+            <Button variant="outline" size="sm" onClick={resetFilters} className="mt-3.5 text-xs">
               Reset all filters
             </Button>
           </div>
@@ -372,19 +365,19 @@ export function WorkOverviewWidget() {
             {groupedTasks ? (
               groupedTasks.map((grp) => (
                 <div key={grp.key} className="space-y-2">
-                  <div className="flex items-center gap-2 px-1 text-xs font-semibold uppercase tracking-wider text-ink-muted">
+                  <div className="text-ink-muted flex items-center gap-2 px-1 text-xs font-semibold uppercase tracking-wider">
                     <span>{grp.title}</span>
-                    <span className="rounded-full bg-bg-subtle px-2 py-0.2 text-[10px] text-ink-muted">
+                    <span className="bg-bg-subtle py-0.2 text-ink-muted rounded-full px-2 text-[10px]">
                       {grp.tasks.length}
                     </span>
                   </div>
-                  <div className="overflow-hidden rounded-xl border border-line bg-white">
+                  <div className="border-line overflow-hidden rounded-xl border bg-white">
                     <TaskTableRows tasks={grp.tasks} onUpdateStatus={handleUpdateStatus} />
                   </div>
                 </div>
               ))
             ) : (
-              <div className="overflow-hidden rounded-xl border border-line bg-white">
+              <div className="border-line overflow-hidden rounded-xl border bg-white">
                 <TaskTableRows tasks={filteredTasks} onUpdateStatus={handleUpdateStatus} />
               </div>
             )}
@@ -392,38 +385,28 @@ export function WorkOverviewWidget() {
         ) : (
           /* Cards / Board View */
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {groupedTasks ? (
-              groupedTasks.map((grp) => (
-                <div
-                  key={grp.key}
-                  className="flex flex-col rounded-xl border border-line bg-bg-subtle/40 p-3"
-                >
-                  <div className="mb-3 flex items-center justify-between">
-                    <h3 className="text-xs font-semibold text-ink">{grp.title}</h3>
-                    <span className="rounded-full bg-white px-2 py-0.5 text-[10px] font-medium text-ink-muted shadow-sm">
-                      {grp.tasks.length}
-                    </span>
+            {groupedTasks
+              ? groupedTasks.map((grp) => (
+                  <div
+                    key={grp.key}
+                    className="border-line bg-bg-subtle/40 flex flex-col rounded-xl border p-3"
+                  >
+                    <div className="mb-3 flex items-center justify-between">
+                      <h3 className="text-ink text-xs font-semibold">{grp.title}</h3>
+                      <span className="text-ink-muted rounded-full bg-white px-2 py-0.5 text-[10px] font-medium shadow-sm">
+                        {grp.tasks.length}
+                      </span>
+                    </div>
+                    <div className="space-y-2">
+                      {grp.tasks.map((task) => (
+                        <TaskCard key={task.id} task={task} onUpdateStatus={handleUpdateStatus} />
+                      ))}
+                    </div>
                   </div>
-                  <div className="space-y-2">
-                    {grp.tasks.map((task) => (
-                      <TaskCard
-                        key={task.id}
-                        task={task}
-                        onUpdateStatus={handleUpdateStatus}
-                      />
-                    ))}
-                  </div>
-                </div>
-              ))
-            ) : (
-              filteredTasks.map((task) => (
-                <TaskCard
-                  key={task.id}
-                  task={task}
-                  onUpdateStatus={handleUpdateStatus}
-                />
-              ))
-            )}
+                ))
+              : filteredTasks.map((task) => (
+                  <TaskCard key={task.id} task={task} onUpdateStatus={handleUpdateStatus} />
+                ))}
           </div>
         )}
       </div>
@@ -446,7 +429,7 @@ function TaskTableRows({
   onUpdateStatus: (taskId: string, status: TaskStatus) => void;
 }) {
   return (
-    <div className="divide-y divide-line/60 overflow-x-auto">
+    <div className="divide-line/60 divide-y overflow-x-auto">
       {tasks.map((t) => {
         const due = t.dueDate ? new Date(t.dueDate) : null;
         const overdue = due
@@ -459,36 +442,33 @@ function TaskTableRows({
         return (
           <div
             key={t.id}
-            className="group flex items-center justify-between gap-3 px-3.5 py-2.5 transition-colors hover:bg-bg-subtle/70"
+            className="hover:bg-bg-subtle/70 group flex items-center justify-between gap-3 px-3.5 py-2.5 transition-colors"
           >
             {/* Status changer & Title */}
             <div className="flex min-w-0 flex-1 items-center gap-2.5">
-              <StatusChanger
-                status={t.status}
-                onChange={(s) => onUpdateStatus(t.id, s)}
-              />
+              <StatusChanger status={t.status} onChange={(s) => onUpdateStatus(t.id, s)} />
 
               <div className="min-w-0 flex-1">
                 <Link
                   href={`/projects/${t.projectId}`}
-                  className="flex items-center gap-1.5 font-medium text-ink hover:text-brand-purple"
+                  className="text-ink hover:text-brand-purple flex items-center gap-1.5 font-medium"
                 >
                   <span className="truncate text-xs sm:text-sm">{t.title}</span>
-                  <ExternalLink className="h-3 w-3 shrink-0 opacity-0 transition-opacity group-hover:opacity-100 text-ink-muted" />
+                  <ExternalLink className="text-ink-muted h-3 w-3 shrink-0 opacity-0 transition-opacity group-hover:opacity-100" />
                 </Link>
 
-                <div className="mt-0.5 flex flex-wrap items-center gap-1.5 text-[11px] text-ink-muted">
+                <div className="text-ink-muted mt-0.5 flex flex-wrap items-center gap-1.5 text-[11px]">
                   {/* Workspace badge */}
                   {t.project?.workspace ? (
-                    <span className="inline-flex items-center gap-1 rounded bg-bg-subtle px-1.5 py-0.2 text-[10px] font-medium text-ink">
-                      <Building2 className="h-2.5 w-2.5 text-ink-muted" />
+                    <span className="bg-bg-subtle py-0.2 text-ink inline-flex items-center gap-1 rounded px-1.5 text-[10px] font-medium">
+                      <Building2 className="text-ink-muted h-2.5 w-2.5" />
                       {t.project.workspace.name}
                     </span>
                   ) : null}
 
                   {/* Project badge */}
                   {t.project ? (
-                    <span className="inline-flex items-center gap-1 text-[11px] text-ink-muted">
+                    <span className="text-ink-muted inline-flex items-center gap-1 text-[11px]">
                       <span
                         className="h-1.5 w-1.5 rounded-full"
                         style={{ backgroundColor: t.project.color ?? '#6366f1' }}
@@ -509,21 +489,19 @@ function TaskTableRows({
               {due ? (
                 <span
                   className={cn(
-                    'whitespace-nowrap inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-xs tabular-nums',
+                    'inline-flex items-center gap-1 whitespace-nowrap rounded-md px-2 py-0.5 text-xs tabular-nums',
                     overdue
-                      ? 'bg-state-error/10 font-semibold text-state-error'
+                      ? 'bg-state-error/10 text-state-error font-semibold'
                       : dueToday
-                        ? 'bg-brand-orange/10 font-semibold text-brand-orange'
+                        ? 'bg-brand-orange/10 text-brand-orange font-semibold'
                         : 'text-ink-muted',
                   )}
                 >
-                  {overdue ? <AlertTriangle className="h-3 w-3 text-state-error" /> : null}
+                  {overdue ? <AlertTriangle className="text-state-error h-3 w-3" /> : null}
                   {formatDuePill(due)}
                 </span>
               ) : (
-                <span className="hidden text-xs text-ink-disabled sm:inline">
-                  No date
-                </span>
+                <span className="text-ink-disabled hidden text-xs sm:inline">No date</span>
               )}
 
               {/* Assignee Avatar */}
@@ -537,12 +515,12 @@ function TaskTableRows({
                     name={t.assignee.name || t.assignee.email}
                     image={t.assignee.image}
                   />
-                  <span className="hidden max-w-[100px] truncate text-xs text-ink sm:inline">
+                  <span className="text-ink hidden max-w-[100px] truncate text-xs sm:inline">
                     {t.assignee.name || t.assignee.email.split('@')[0]}
                   </span>
                 </div>
               ) : (
-                <span className="text-xs text-ink-disabled">Unassigned</span>
+                <span className="text-ink-disabled text-xs">Unassigned</span>
               )}
             </div>
           </div>
@@ -569,23 +547,23 @@ function StatusChanger({
       <PopoverTrigger asChild>
         <button
           type="button"
-          className="shrink-0 rounded p-1 transition-colors hover:bg-bg-subtle focus-visible:outline-none"
+          className="hover:bg-bg-subtle shrink-0 rounded p-1 transition-colors focus-visible:outline-none"
           title={`Status: ${statusLabel(status)}. Click to change.`}
         >
           {status === 'DONE' ? (
-            <CheckCircle2 className="h-4 w-4 text-brand-teal" />
+            <CheckCircle2 className="text-brand-teal h-4 w-4" />
           ) : status === 'IN_PROGRESS' ? (
             <span className="relative flex h-3.5 w-3.5 items-center justify-center">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand-purple opacity-40" />
-              <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-brand-purple" />
+              <span className="bg-brand-purple absolute inline-flex h-full w-full animate-ping rounded-full opacity-40" />
+              <span className="bg-brand-purple relative inline-flex h-2.5 w-2.5 rounded-full" />
             </span>
           ) : (
-            <Circle className="h-3.5 w-3.5 text-ink-disabled hover:text-ink" />
+            <Circle className="text-ink-disabled hover:text-ink h-3.5 w-3.5" />
           )}
         </button>
       </PopoverTrigger>
       <PopoverContent align="start" className="w-44 p-1">
-        <div className="px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-ink-muted">
+        <div className="text-ink-muted px-2 py-1 text-[10px] font-semibold uppercase tracking-wider">
           Change Status
         </div>
         <div className="space-y-0.5">
@@ -600,7 +578,7 @@ function StatusChanger({
               className={cn(
                 'flex w-full items-center justify-between rounded px-2 py-1 text-xs transition-colors',
                 status === s
-                  ? 'bg-brand-50 font-medium text-brand-700'
+                  ? 'bg-brand-50 text-brand-700 font-medium'
                   : 'text-ink hover:bg-bg-subtle',
               )}
             >
@@ -632,7 +610,7 @@ function TaskCard({
     : false;
 
   return (
-    <div className="group rounded-xl border border-line bg-white p-3.5 shadow-sm transition-all hover:border-brand-purple/30 hover:shadow-soft">
+    <div className="border-line hover:border-brand-purple/30 hover:shadow-soft group rounded-xl border bg-white p-3.5 shadow-sm transition-all">
       <div className="flex items-start justify-between gap-2">
         <StatusBadge status={task.status} />
         <PriorityBadge priority={task.priority} />
@@ -640,35 +618,37 @@ function TaskCard({
 
       <Link
         href={`/projects/${task.projectId}`}
-        className="mt-2 block font-medium text-ink hover:text-brand-purple"
+        className="text-ink hover:text-brand-purple mt-2 block font-medium"
       >
-        <h4 className="line-clamp-2 text-xs font-semibold leading-relaxed">
-          {task.title}
-        </h4>
+        <h4 className="line-clamp-2 text-xs font-semibold leading-relaxed">{task.title}</h4>
       </Link>
 
-      <div className="mt-2.5 flex flex-wrap items-center gap-1.5 text-[10px] text-ink-muted">
+      <div className="text-ink-muted mt-2.5 flex flex-wrap items-center gap-1.5 text-[10px]">
         {task.project?.workspace ? (
-          <span className="rounded bg-bg-subtle px-1.5 py-0.5 font-medium text-ink">
+          <span className="bg-bg-subtle text-ink rounded px-1.5 py-0.5 font-medium">
             {task.project.workspace.name}
           </span>
         ) : null}
         {task.project ? <span>• {task.project.name}</span> : null}
       </div>
 
-      <div className="mt-3 flex items-center justify-between border-t border-line/60 pt-2 text-xs">
+      <div className="border-line/60 mt-3 flex items-center justify-between border-t pt-2 text-xs">
         {due ? (
           <span
             className={cn(
               'inline-flex items-center gap-1 text-[11px] tabular-nums',
-              overdue ? 'font-semibold text-state-error' : 'text-ink-muted',
+              overdue ? 'text-state-error font-semibold' : 'text-ink-muted',
             )}
           >
-            {overdue ? <AlertTriangle className="h-3 w-3 text-state-error" /> : <Calendar className="h-3 w-3" />}
+            {overdue ? (
+              <AlertTriangle className="text-state-error h-3 w-3" />
+            ) : (
+              <Calendar className="h-3 w-3" />
+            )}
             {formatDuePill(due)}
           </span>
         ) : (
-          <span className="text-[11px] text-ink-disabled">No due date</span>
+          <span className="text-ink-disabled text-[11px]">No due date</span>
         )}
 
         {task.assignee ? (
@@ -683,7 +663,7 @@ function TaskCard({
             />
           </div>
         ) : (
-          <span className="text-[11px] text-ink-disabled">Unassigned</span>
+          <span className="text-ink-disabled text-[11px]">Unassigned</span>
         )}
       </div>
     </div>
@@ -721,11 +701,11 @@ function StatShortcut({
       className={cn(
         'flex flex-col items-start rounded-xl border p-2.5 text-left transition-all',
         active
-          ? 'border-brand-purple/50 bg-brand-50/50 shadow-sm ring-1 ring-brand-purple/20'
-          : 'border-line/70 bg-white hover:bg-bg-subtle hover:border-line',
+          ? 'border-brand-purple/50 bg-brand-50/50 ring-brand-purple/20 shadow-sm ring-1'
+          : 'border-line/70 hover:bg-bg-subtle hover:border-line bg-white',
       )}
     >
-      <span className="text-[10px] font-semibold uppercase tracking-wider text-ink-muted">
+      <span className="text-ink-muted text-[10px] font-semibold uppercase tracking-wider">
         {label}
       </span>
       <span className={cn('mt-0.5 text-lg font-bold tabular-nums', colorMap[variant])}>

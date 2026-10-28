@@ -2,11 +2,7 @@
 
 import { ChevronDown, ChevronRight } from 'lucide-react';
 import { useState } from 'react';
-import type {
-  ContractMilestone,
-  PaymentRegion,
-  PaymentWithSource,
-} from '@botss/shared-types';
+import type { ContractMilestone, PaymentRegion, PaymentWithSource } from '@botss/shared-types';
 
 import { BaseCurrencyNotice } from '@/components/financials/base-currency-notice';
 import { PaymentSourceCombobox } from '@/components/financials/payment-source-combobox';
@@ -112,8 +108,8 @@ export function PaymentEditDialog({
           <DialogTitle>Edit payment</DialogTitle>
           <DialogDescription>
             {payment.contract?.title ?? 'Invoice payment'} · recorded{' '}
-            {new Date(payment.createdAt).toLocaleDateString()}. Totals are
-            recalculated when you save.
+            {new Date(payment.createdAt).toLocaleDateString()}. Totals are recalculated when you
+            save.
           </DialogDescription>
         </DialogHeader>
 
@@ -198,15 +194,19 @@ export function PaymentEditDialog({
           <button
             type="button"
             onClick={() => setShowDetail((v) => !v)}
-            className="flex items-center gap-1 text-sm text-ink-muted hover:text-ink"
+            className="text-ink-muted hover:text-ink flex items-center gap-1 text-sm"
             aria-expanded={showDetail}
           >
-            {showDetail ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+            {showDetail ? (
+              <ChevronDown className="h-4 w-4" />
+            ) : (
+              <ChevronRight className="h-4 w-4" />
+            )}
             What landed in the bank
           </button>
 
           {showDetail ? (
-            <div className="space-y-4 rounded-md border border-line bg-bg-subtle p-3">
+            <div className="border-line bg-bg-subtle space-y-4 rounded-md border p-3">
               <div className="grid gap-4 sm:grid-cols-2">
                 <div>
                   <Label htmlFor="pay-edit-received">Received (gross)</Label>
@@ -281,7 +281,7 @@ export function PaymentEditDialog({
                     aria-describedby={rateError ? 'pay-edit-fx-error' : undefined}
                   />
                   {rateError ? (
-                    <p id="pay-edit-fx-error" className="mt-1 text-xs text-state-error">
+                    <p id="pay-edit-fx-error" className="text-state-error mt-1 text-xs">
                       {rateError}
                     </p>
                   ) : null}

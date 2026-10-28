@@ -5,8 +5,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { getApi } from '@/lib/api';
 import { invalidateDashboardTaskWidgets, removeEverywhere, restore } from './tasks/query-helpers';
 
-const archivedTasksKey = (projectId: string) =>
-  ['archived-tasks', projectId] as const;
+const archivedTasksKey = (projectId: string) => ['archived-tasks', projectId] as const;
 
 export function useArchivedTasks(projectId: string) {
   return useQuery({

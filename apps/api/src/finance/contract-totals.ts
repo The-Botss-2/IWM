@@ -41,10 +41,7 @@ function statusFor(paid: Prisma.Decimal, total: Prisma.Decimal) {
  *      contract-level alike - for the contract's `amountPaid`.
  *   5. Refresh `baseTotalValue` at the booked rate.
  */
-export async function recalcContract(
-  tx: TxClient,
-  contractId: string,
-): Promise<void> {
+export async function recalcContract(tx: TxClient, contractId: string): Promise<void> {
   const contract = await tx.contract.findUnique({
     where: { id: contractId },
     select: {
@@ -100,7 +97,10 @@ export async function recalcContract(
       ? new D(contract.totalValue)
       : milestones
           .filter((m: { status: string }) => m.status !== 'CANCELLED')
-          .reduce((acc: Prisma.Decimal, m: { amount: Prisma.Decimal }) => acc.plus(new D(m.amount)), new D(0));
+          .reduce(
+            (acc: Prisma.Decimal, m: { amount: Prisma.Decimal }) => acc.plus(new D(m.amount)),
+            new D(0),
+          );
 
   const fx = new D(contract.fxRateToBase);
 

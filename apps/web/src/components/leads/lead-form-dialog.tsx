@@ -124,7 +124,7 @@ export function LeadFormDialog({
       <DialogContent className="sm:max-w-2xl">
         <DialogHeader>
           <DialogTitle className="text-lg font-semibold">New lead</DialogTitle>
-          <DialogDescription className="text-sm text-ink-muted">
+          <DialogDescription className="text-ink-muted text-sm">
             Capture a new opportunity. You can refine details after creating.
           </DialogDescription>
         </DialogHeader>
@@ -140,7 +140,7 @@ export function LeadFormDialog({
             />
           </Field>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <Field label="Email" htmlFor="new-lead-email" error={errors.email?.message}>
               <Input
                 id="new-lead-email"
@@ -151,21 +151,12 @@ export function LeadFormDialog({
               />
             </Field>
             <Field label="Phone" htmlFor="new-lead-phone" error={errors.phone?.message}>
-              <Input
-                id="new-lead-phone"
-                type="tel"
-                autoComplete="off"
-                {...register('phone')}
-              />
+              <Input id="new-lead-phone" type="tel" autoComplete="off" {...register('phone')} />
             </Field>
             <Field label="Company" htmlFor="new-lead-company" error={errors.company?.message}>
               <Input id="new-lead-company" autoComplete="off" {...register('company')} />
             </Field>
-            <Field
-              label="Job title"
-              htmlFor="new-lead-jobtitle"
-              error={errors.jobTitle?.message}
-            >
+            <Field label="Job title" htmlFor="new-lead-jobtitle" error={errors.jobTitle?.message}>
               <Input id="new-lead-jobtitle" autoComplete="off" {...register('jobTitle')} />
             </Field>
 
@@ -306,13 +297,13 @@ function Field({
       <Label htmlFor={htmlFor}>
         {label}
         {required ? (
-          <span className="ml-1 text-state-error" aria-hidden>
+          <span className="text-state-error ml-1" aria-hidden>
             *
           </span>
         ) : null}
       </Label>
       {children}
-      {error ? <p className="text-xs text-state-error">{error}</p> : null}
+      {error ? <p className="text-state-error text-xs">{error}</p> : null}
     </div>
   );
 }

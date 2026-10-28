@@ -12,12 +12,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Loader } from '@/components/ui/loader';
 import { QueryError } from '@/components/ui/query-error';
-import {
-  useCreateTodo,
-  useDeleteTodo,
-  useTodos,
-  useUpdateTodo,
-} from '@/hooks/use-todos';
+import { useCreateTodo, useDeleteTodo, useTodos, useUpdateTodo } from '@/hooks/use-todos';
 import { getApi } from '@/lib/api';
 import { cn } from '@/lib/utils';
 
@@ -58,14 +53,10 @@ export function ProjectTodosView({ projectId, workspaceId }: Props) {
   // preserves the user-defined order from the org-wide todo page.
   const items = useMemo(() => {
     const all = todosQuery.data?.items ?? [];
-    const open = all
-      .filter((t) => !t.done)
-      .sort((a, b) => a.sortOrder - b.sortOrder);
+    const open = all.filter((t) => !t.done).sort((a, b) => a.sortOrder - b.sortOrder);
     const done = all
       .filter((t) => t.done)
-      .sort(
-        (a, b) => (b.doneAt?.getTime() ?? 0) - (a.doneAt?.getTime() ?? 0),
-      );
+      .sort((a, b) => (b.doneAt?.getTime() ?? 0) - (a.doneAt?.getTime() ?? 0));
     return { open, done };
   }, [todosQuery.data]);
 
@@ -88,9 +79,9 @@ export function ProjectTodosView({ projectId, workspaceId }: Props) {
 
   return (
     <div className="space-y-4">
-      <section className="rounded-md border border-line bg-white p-3 shadow-sm">
+      <section className="border-line rounded-md border bg-white p-3 shadow-sm">
         <div className="flex flex-wrap items-center gap-2">
-          <Plus className="ml-1 h-4 w-4 text-ink-disabled" aria-hidden />
+          <Plus className="text-ink-disabled ml-1 h-4 w-4" aria-hidden />
           <Input
             id="project-todo-new-title"
             aria-label="New todo for this project"
@@ -109,7 +100,7 @@ export function ProjectTodosView({ projectId, workspaceId }: Props) {
             aria-label="Assignee"
             value={assigneeId}
             onChange={(e) => setAssigneeId(e.target.value)}
-            className="h-9 rounded-md border border-line bg-white px-2 text-sm"
+            className="border-line h-9 rounded-md border bg-white px-2 text-sm"
           >
             <option value="">Me (default)</option>
             {(members.data ?? [])
@@ -120,11 +111,7 @@ export function ProjectTodosView({ projectId, workspaceId }: Props) {
                 </option>
               ))}
           </select>
-          <Button
-            size="sm"
-            onClick={submit}
-            disabled={create.isPending || !title.trim()}
-          >
+          <Button size="sm" onClick={submit} disabled={create.isPending || !title.trim()}>
             {create.isPending ? 'Adding…' : 'Add'}
           </Button>
         </div>
@@ -136,10 +123,7 @@ export function ProjectTodosView({ projectId, workspaceId }: Props) {
             <Loader label="Loading" />
           </Empty>
         ) : todosQuery.isError && !todosQuery.data ? (
-          <QueryError
-            message="Couldn't load todos."
-            onRetry={() => void todosQuery.refetch()}
-          />
+          <QueryError message="Couldn't load todos." onRetry={() => void todosQuery.refetch()} />
         ) : items.open.length === 0 ? (
           <Empty>No open todos for this project yet.</Empty>
         ) : (
@@ -149,19 +133,11 @@ export function ProjectTodosView({ projectId, workspaceId }: Props) {
                 <TodoRow
                   todo={t}
                   hideContextBadges
-                  onToggle={(done) =>
-                    update.mutate({ id: t.id, input: { done } })
-                  }
-                  onRename={(next) =>
-                    update.mutate({ id: t.id, input: { title: next } })
-                  }
-                  onPriority={(priority) =>
-                    update.mutate({ id: t.id, input: { priority } })
-                  }
+                  onToggle={(done) => update.mutate({ id: t.id, input: { done } })}
+                  onRename={(next) => update.mutate({ id: t.id, input: { title: next } })}
+                  onPriority={(priority) => update.mutate({ id: t.id, input: { priority } })}
                   onDelete={() => remove.mutate(t.id)}
-                  onShare={() =>
-                    setShareTarget({ id: t.id, title: t.title })
-                  }
+                  onShare={() => setShareTarget({ id: t.id, title: t.title })}
                 />
               </li>
             ))}
@@ -172,7 +148,7 @@ export function ProjectTodosView({ projectId, workspaceId }: Props) {
           <details className="mt-3 rounded-md">
             <summary
               className={cn(
-                'cursor-pointer select-none text-xs font-semibold uppercase tracking-wide text-ink-muted',
+                'text-ink-muted cursor-pointer select-none text-xs font-semibold uppercase tracking-wide',
                 'hover:text-ink',
               )}
             >
@@ -184,19 +160,11 @@ export function ProjectTodosView({ projectId, workspaceId }: Props) {
                   <TodoRow
                     todo={t}
                     hideContextBadges
-                    onToggle={(done) =>
-                      update.mutate({ id: t.id, input: { done } })
-                    }
-                    onRename={(next) =>
-                      update.mutate({ id: t.id, input: { title: next } })
-                    }
-                    onPriority={(priority) =>
-                      update.mutate({ id: t.id, input: { priority } })
-                    }
+                    onToggle={(done) => update.mutate({ id: t.id, input: { done } })}
+                    onRename={(next) => update.mutate({ id: t.id, input: { title: next } })}
+                    onPriority={(priority) => update.mutate({ id: t.id, input: { priority } })}
                     onDelete={() => remove.mutate(t.id)}
-                    onShare={() =>
-                      setShareTarget({ id: t.id, title: t.title })
-                    }
+                    onShare={() => setShareTarget({ id: t.id, title: t.title })}
                   />
                 </li>
               ))}
@@ -222,7 +190,7 @@ export function ProjectTodosView({ projectId, workspaceId }: Props) {
 
 function Empty({ children }: { children: React.ReactNode }) {
   return (
-    <div className="rounded-md border border-dashed border-line bg-white p-8 text-center text-sm text-ink-muted">
+    <div className="border-line text-ink-muted rounded-md border border-dashed bg-white p-8 text-center text-sm">
       {children}
     </div>
   );

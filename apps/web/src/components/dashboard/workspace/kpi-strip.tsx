@@ -36,10 +36,7 @@ export function WorkspaceKpiStrip() {
   const canSeeLeads = useSalesAccess().leads;
   return (
     <div
-      className={cn(
-        'grid gap-4 sm:grid-cols-2',
-        canSeeLeads ? 'lg:grid-cols-4' : 'lg:grid-cols-3',
-      )}
+      className={cn('grid gap-4 sm:grid-cols-2', canSeeLeads ? 'lg:grid-cols-4' : 'lg:grid-cols-3')}
       aria-label="Workspace KPIs"
     >
       <ActiveProjectsTile />
@@ -60,8 +57,8 @@ interface TileProps {
 
 function Tile({ label, icon, value, delta }: TileProps) {
   return (
-    <div className="rounded-xl bg-white p-5 shadow-soft transition-shadow duration-200 hover:shadow-soft-lg">
-      <div className="flex items-center justify-between text-xs font-medium text-ink-muted">
+    <div className="shadow-soft hover:shadow-soft-lg rounded-xl bg-white p-5 transition-shadow duration-200">
+      <div className="text-ink-muted flex items-center justify-between text-xs font-medium">
         <span className="flex items-center gap-1.5">
           {icon}
           {label}
@@ -84,7 +81,7 @@ function Tile({ label, icon, value, delta }: TileProps) {
           </span>
         ) : null}
       </div>
-      <div className="mt-3 text-3xl font-bold text-ink">{value}</div>
+      <div className="text-ink mt-3 text-3xl font-bold">{value}</div>
     </div>
   );
 }
@@ -94,7 +91,7 @@ function ErrorValue({ onRetry }: { onRetry: () => void }) {
     <button
       type="button"
       onClick={onRetry}
-      className="text-xs font-normal text-ink-muted hover:underline"
+      className="text-ink-muted text-xs font-normal hover:underline"
     >
       Couldn&apos;t load. Try again
     </button>
@@ -116,7 +113,7 @@ function ActiveProjectsTile() {
   return (
     <Tile
       label="Active projects"
-      icon={<FolderKanban className="h-3.5 w-3.5 text-brand-purple" />}
+      icon={<FolderKanban className="text-brand-purple h-3.5 w-3.5" />}
       value={
         q.isLoading ? (
           <Skeleton className="h-8 w-12" />
@@ -136,7 +133,7 @@ function CompletedThisWeekTile() {
   return (
     <Tile
       label={rangeLabel ? `Completed ${rangeLabel}` : 'Completed this week'}
-      icon={<CheckCircle2 className="h-3.5 w-3.5 text-brand-teal" />}
+      icon={<CheckCircle2 className="text-brand-teal h-3.5 w-3.5" />}
       value={
         isLoading ? (
           <Skeleton className="h-8 w-12" />
@@ -168,22 +165,18 @@ function OverdueTasksTile() {
     staleTime: 60_000,
   });
   const items = q.data?.items ?? [];
-  const open = items.filter(
-    (t) => t.status !== 'DONE' && t.status !== 'CANCELLED',
-  ).length;
+  const open = items.filter((t) => t.status !== 'DONE' && t.status !== 'CANCELLED').length;
   return (
     <Tile
       label="Overdue tasks"
-      icon={<AlertTriangle className="h-3.5 w-3.5 text-state-error" />}
+      icon={<AlertTriangle className="text-state-error h-3.5 w-3.5" />}
       value={
         q.isLoading ? (
           <Skeleton className="h-8 w-12" />
         ) : q.isError && !q.data ? (
           <ErrorValue onRetry={() => void q.refetch()} />
         ) : (
-          <span className={open > 0 ? 'text-state-error' : undefined}>
-            {open}
-          </span>
+          <span className={open > 0 ? 'text-state-error' : undefined}>{open}</span>
         )
       }
     />
@@ -197,7 +190,7 @@ function OpenLeadsTile() {
   return (
     <Tile
       label="Open leads"
-      icon={<UserPlus className="h-3.5 w-3.5 text-brand-orange" />}
+      icon={<UserPlus className="text-brand-orange h-3.5 w-3.5" />}
       value={
         q.isLoading ? (
           <Skeleton className="h-8 w-12" />
@@ -210,4 +203,3 @@ function OpenLeadsTile() {
     />
   );
 }
-

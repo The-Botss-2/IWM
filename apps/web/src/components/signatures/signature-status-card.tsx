@@ -89,9 +89,11 @@ export function SignatureStatusCard({
           type="button"
           onClick={() => setShowAll((v) => !v)}
           aria-expanded={showAll}
-          className="text-xs font-medium text-ink-muted hover:text-ink focus-visible:outline-none focus-visible:shadow-focus"
+          className="text-ink-muted hover:text-ink focus-visible:shadow-focus text-xs font-medium focus-visible:outline-none"
         >
-          {showAll ? 'Show fewer requests' : `Show ${hidden} older request${hidden === 1 ? '' : 's'}`}
+          {showAll
+            ? 'Show fewer requests'
+            : `Show ${hidden} older request${hidden === 1 ? '' : 's'}`}
         </button>
       ) : null}
     </section>
@@ -125,20 +127,20 @@ export function SignatureRequestRow({
   const sealing = r.status === 'SENT' && allSigned;
 
   return (
-    <div className="rounded-lg border border-line bg-bg-surface p-3">
+    <div className="border-line bg-bg-surface rounded-lg border p-3">
       <div className="flex flex-wrap items-center gap-2">
-        <FileSignature className="h-4 w-4 text-brand-purple" aria-hidden />
-        <span className="min-w-0 flex-1 truncate text-sm font-medium text-ink">{r.title}</span>
+        <FileSignature className="text-brand-purple h-4 w-4" aria-hidden />
+        <span className="text-ink min-w-0 flex-1 truncate text-sm font-medium">{r.title}</span>
         <Badge tone={sealing ? 'info' : REQUEST_TONE[r.status]}>
           {sealing ? 'Preparing signed PDF' : REQUEST_LABEL[r.status]}
         </Badge>
-        <span className="text-xs text-ink-muted">
+        <span className="text-ink-muted text-xs">
           {signed}/{r.signers.length} signed
         </span>
       </div>
-      {subtitle ? <div className="mt-1 text-xs text-ink-muted">{subtitle}</div> : null}
+      {subtitle ? <div className="text-ink-muted mt-1 text-xs">{subtitle}</div> : null}
 
-      <ul className="mt-2 divide-y divide-line">
+      <ul className="divide-line mt-2 divide-y">
         {r.signers.map((s) => (
           <li key={s.id} className="flex flex-wrap items-center gap-2 py-1.5 text-sm">
             <span
@@ -158,11 +160,17 @@ export function SignatureRequestRow({
               {s.name ? `${s.name} ` : ''}
               <span className="text-ink-muted">{s.email}</span>
             </span>
-            <span className="text-xs text-ink-muted">
+            <span className="text-ink-muted text-xs">
               {SIGNER_LABEL[s.status]}
-              {s.status === 'SIGNED' ? ` ${when(s.signedAt)}` : s.status === 'VIEWED' ? ` ${when(s.viewedAt)}` : ''}
+              {s.status === 'SIGNED'
+                ? ` ${when(s.signedAt)}`
+                : s.status === 'VIEWED'
+                  ? ` ${when(s.viewedAt)}`
+                  : ''}
             </span>
-            {canManage && r.status === 'SENT' && (s.status === 'PENDING' || s.status === 'VIEWED') ? (
+            {canManage &&
+            r.status === 'SENT' &&
+            (s.status === 'PENDING' || s.status === 'VIEWED') ? (
               <Button
                 variant="ghost"
                 size="sm"
@@ -184,16 +192,18 @@ export function SignatureRequestRow({
               </Button>
             ) : null}
             {s.status === 'DECLINED' && s.declineReason ? (
-              <p className="w-full pl-4 text-xs text-state-error">&ldquo;{s.declineReason}&rdquo;</p>
+              <p className="text-state-error w-full pl-4 text-xs">
+                &ldquo;{s.declineReason}&rdquo;
+              </p>
             ) : null}
           </li>
         ))}
       </ul>
 
       {link ? (
-        <div className="mt-2 flex items-center gap-2 rounded-md bg-bg-subtle p-2 text-xs">
-          <span className="min-w-0 flex-1 truncate text-ink-muted">New link: {link.url}</span>
-          {link.code ? <span className="font-mono text-ink-muted">Code {link.code}</span> : null}
+        <div className="bg-bg-subtle mt-2 flex items-center gap-2 rounded-md p-2 text-xs">
+          <span className="text-ink-muted min-w-0 flex-1 truncate">New link: {link.url}</span>
+          {link.code ? <span className="text-ink-muted font-mono">Code {link.code}</span> : null}
           <Button
             variant="secondary"
             size="sm"
@@ -209,7 +219,11 @@ export function SignatureRequestRow({
               );
             }}
           >
-            {copied ? <Check className="mr-1 h-3.5 w-3.5" /> : <Copy className="mr-1 h-3.5 w-3.5" />}
+            {copied ? (
+              <Check className="mr-1 h-3.5 w-3.5" />
+            ) : (
+              <Copy className="mr-1 h-3.5 w-3.5" />
+            )}
             {copied ? 'Copied' : 'Copy'}
           </Button>
         </div>
@@ -227,7 +241,12 @@ export function SignatureRequestRow({
           </Button>
         ) : null}
         {canManage && sealing ? (
-          <Button variant="ghost" size="sm" onClick={() => retry.mutate(r.id)} disabled={retry.isPending}>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => retry.mutate(r.id)}
+            disabled={retry.isPending}
+          >
             <RotateCw className="mr-1 h-3.5 w-3.5" aria-hidden />
             Retry signed PDF
           </Button>
@@ -239,7 +258,10 @@ export function SignatureRequestRow({
           </Button>
         ) : null}
         {r.status === 'COMPLETED' && r.signedSha256 ? (
-          <span className="ml-auto truncate font-mono text-[10px] text-ink-muted" title={r.signedSha256}>
+          <span
+            className="text-ink-muted ml-auto truncate font-mono text-[10px]"
+            title={r.signedSha256}
+          >
             SHA-256 {r.signedSha256.slice(0, 16)}...
           </span>
         ) : null}

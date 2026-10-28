@@ -55,12 +55,7 @@ import type { SalesActor } from '../common/decorators/sales-actor.decorator';
 import { decodeSignaturePng } from './signature-image';
 import { signatureVisibleWhere } from './signature-visibility';
 import { MAX_SOURCE_PDF_BYTES, SignaturePdfService } from './signature-pdf.service';
-import {
-  SEAL_JOB_OPTIONS,
-  sealJobId,
-  type SealJobData,
-  SIGNATURES_QUEUE,
-} from './signature.queue';
+import { SEAL_JOB_OPTIONS, sealJobId, type SealJobData, SIGNATURES_QUEUE } from './signature.queue';
 import {
   accessCodeMatches,
   attemptsExhausted,
@@ -162,10 +157,18 @@ export class SignaturesService {
   // =========================================================================
 
   /** Freeze the PDF and create a DRAFT with its signers. */
-  async create(actor: SignatureActor, input: CreateSignatureRequestInput): Promise<SignatureRequestDetails> {
+  async create(
+    actor: SignatureActor,
+    input: CreateSignatureRequestInput,
+  ): Promise<SignatureRequestDetails> {
     let title = input.title?.trim() || '';
     if (input.documentId) {
-      await this.documents.assertAccess(actor.workspaceId, input.documentId, this.docCtx(actor), 'write');
+      await this.documents.assertAccess(
+        actor.workspaceId,
+        input.documentId,
+        this.docCtx(actor),
+        'write',
+      );
       if (!title) {
         const doc = await this.prisma.client.document.findFirst({
           where: { id: input.documentId, workspaceId: actor.workspaceId },
@@ -178,7 +181,11 @@ export class SignaturesService {
     let bytes: Buffer;
     if (input.sourceFileId) {
       const file = await this.prisma.client.fileObject.findFirst({
-        where: { id: input.sourceFileId, workspaceId: actor.workspaceId, ...generalFileVisibility(false) },
+        where: {
+          id: input.sourceFileId,
+          workspaceId: actor.workspaceId,
+          ...generalFileVisibility(false),
+        },
         select: { id: true, mimeType: true, filename: true, sizeBytes: true },
       });
       if (!file) throw new NotFoundException({ title: 'File not found', status: 404 });
@@ -262,7 +269,12 @@ export class SignaturesService {
     if (q.status) where.status = q.status;
     if (q.documentId) {
       // Anyone who can read the document sees its requests.
-      await this.documents.assertAccess(actor.workspaceId, q.documentId, this.docCtx(actor), 'read');
+      await this.documents.assertAccess(
+        actor.workspaceId,
+        q.documentId,
+        this.docCtx(actor),
+        'read',
+      );
       where.documentId = q.documentId;
     } else if (!isWorkspaceAdmin(actor)) {
       where.createdById = actor.userId;
@@ -525,7 +537,9 @@ export class SignaturesService {
     }
     await this.prisma.client.signatureRequest.delete({ where: { id } });
     // The frozen PDF is a private copy made for this draft; nothing else uses it.
-    await this.prisma.client.fileObject.delete({ where: { id: row.sourceFileId } }).catch(() => undefined);
+    await this.prisma.client.fileObject
+      .delete({ where: { id: row.sourceFileId } })
+      .catch(() => undefined);
     return { ok: true };
   }
 
@@ -558,7 +572,11 @@ export class SignaturesService {
         detail: 'The signed PDF exists once everyone has signed.',
       });
     }
-    return this.readFile(row.workspaceId, row.signedFileId, `${safeFilename(row.title)} (signed).pdf`);
+    return this.readFile(
+      row.workspaceId,
+      row.signedFileId,
+      `${safeFilename(row.title)} (signed).pdf`,
+    );
   }
 
   // =========================================================================
@@ -690,7 +708,13 @@ export class SignaturesService {
     client: ClientInfo,
   ): Promise<{ ok: true }> {
     await this.limitWrites(`esign:rate:user:${ref.userId}`);
-    return this.declineFor(await this.resolvePortalSigner(ref), input, client, 'portal', ref.userId);
+    return this.declineFor(
+      await this.resolvePortalSigner(ref),
+      input,
+      client,
+      'portal',
+      ref.userId,
+    );
   }
 
   // ---- Shared implementation ----------------------------------------------
@@ -737,7 +761,15 @@ export class SignaturesService {
         status: signer.status,
         signedAt: signer.signedAt,
       },
-      fields: own.map((f) => ({ id: f.id, kind: f.kind, page: f.page, x: f.x, y: f.y, w: f.w, h: f.h })),
+      fields: own.map((f) => ({
+        id: f.id,
+        kind: f.kind,
+        page: f.page,
+        x: f.x,
+        y: f.y,
+        w: f.w,
+        h: f.h,
+      })),
       canPlaceFields: !own.some((f) => f.kind === 'SIGNATURE') && signer.status !== 'SIGNED',
       signersTotal: request.signers.length,
       signersSigned: request.signers.filter((s) => s.status === 'SIGNED').length,
@@ -745,7 +777,11 @@ export class SignaturesService {
   }
 
   private async sourceFileFor({ request }: SignerContext) {
-    return this.readFile(request.workspaceId, request.sourceFileId, `${safeFilename(request.title)}.pdf`);
+    return this.readFile(
+      request.workspaceId,
+      request.sourceFileId,
+      `${safeFilename(request.title)}.pdf`,
+    );
   }
 
   private async signedFileFor({ request }: SignerContext) {
@@ -771,7 +807,8 @@ export class SignaturesService {
       throw new ConflictException({
         title: 'Already answered',
         status: 409,
-        detail: signer.status === 'SIGNED' ? 'You have already signed.' : 'You declined this request.',
+        detail:
+          signer.status === 'SIGNED' ? 'You have already signed.' : 'You declined this request.',
       });
     }
 
@@ -802,57 +839,61 @@ export class SignaturesService {
     });
 
     const now = new Date();
-    await this.prisma.client.$transaction(async (tx) => {
-      await lockOpenRequest(tx, request.id);
-      const flipped = await tx.signatureSigner.updateMany({
-        where: { id: signer.id, status: { in: ['PENDING', 'VIEWED'] } },
-        data: {
-          status: 'SIGNED',
-          signedAt: now,
-          viewedAt: signer.viewedAt ?? now,
-          consentAt: now,
-          method: input.method,
-          typedName: input.method === 'TYPED' ? input.typedName ?? null : null,
-          ...(input.signerName ? { name: input.signerName } : {}),
-          signatureFileId: stored.id,
-          ip: client.ip,
-          userAgent: truncate(client.userAgent, 500),
-        },
-      });
-      if (flipped.count !== 1) {
-        throw new ConflictException({ title: 'Already answered', status: 409 });
-      }
-      if (placed && placed.length > 0) {
-        await tx.signatureField.createMany({
-          data: placed.map((f) => ({
+    await this.prisma.client
+      .$transaction(async (tx) => {
+        await lockOpenRequest(tx, request.id);
+        const flipped = await tx.signatureSigner.updateMany({
+          where: { id: signer.id, status: { in: ['PENDING', 'VIEWED'] } },
+          data: {
+            status: 'SIGNED',
+            signedAt: now,
+            viewedAt: signer.viewedAt ?? now,
+            consentAt: now,
+            method: input.method,
+            typedName: input.method === 'TYPED' ? (input.typedName ?? null) : null,
+            ...(input.signerName ? { name: input.signerName } : {}),
+            signatureFileId: stored.id,
+            ip: client.ip,
+            userAgent: truncate(client.userAgent, 500),
+          },
+        });
+        if (flipped.count !== 1) {
+          throw new ConflictException({ title: 'Already answered', status: 409 });
+        }
+        if (placed && placed.length > 0) {
+          await tx.signatureField.createMany({
+            data: placed.map((f) => ({
+              requestId: request.id,
+              signerId: signer.id,
+              kind: f.kind,
+              page: f.page,
+              x: f.x,
+              y: f.y,
+              w: Math.min(f.w, 1 - f.x),
+              h: Math.min(f.h, 1 - f.y),
+              placedBySigner: true,
+            })),
+          });
+        }
+        await tx.signatureEvent.create({
+          data: {
             requestId: request.id,
             signerId: signer.id,
-            kind: f.kind,
-            page: f.page,
-            x: f.x,
-            y: f.y,
-            w: Math.min(f.w, 1 - f.x),
-            h: Math.min(f.h, 1 - f.y),
-            placedBySigner: true,
-          })),
+            kind: 'SIGNED',
+            ip: client.ip,
+            userAgent: truncate(client.userAgent, 500),
+            metadata: { method: input.method, consent: true, ...viaTrail(via, userId) },
+          },
         });
-      }
-      await tx.signatureEvent.create({
-        data: {
-          requestId: request.id,
-          signerId: signer.id,
-          kind: 'SIGNED',
-          ip: client.ip,
-          userAgent: truncate(client.userAgent, 500),
-          metadata: { method: input.method, consent: true, ...viaTrail(via, userId) },
-        },
+      })
+      .catch(async (err: unknown) => {
+        // Another request signed first, or the write failed: drop the image
+        // this call stored so no orphan signature is left in the workspace.
+        await this.prisma.client.fileObject
+          .delete({ where: { id: stored.id } })
+          .catch(() => undefined);
+        throw err;
       });
-    }).catch(async (err: unknown) => {
-      // Another request signed first, or the write failed: drop the image
-      // this call stored so no orphan signature is left in the workspace.
-      await this.prisma.client.fileObject.delete({ where: { id: stored.id } }).catch(() => undefined);
-      throw err;
-    });
 
     const remaining = await this.prisma.client.signatureSigner.count({
       where: { requestId: request.id, status: { not: 'SIGNED' } },
@@ -864,7 +905,9 @@ export class SignaturesService {
       .emit({
         userId: request.createdById,
         type: 'SIGNATURE_SIGNED',
-        title: allSigned ? `Everyone signed "${request.title}"` : `${who} signed "${request.title}"`,
+        title: allSigned
+          ? `Everyone signed "${request.title}"`
+          : `${who} signed "${request.title}"`,
         body: allSigned
           ? 'The signed PDF is being prepared.'
           : `${request.signers.length - remaining} of ${request.signers.length} signed.`,
@@ -872,7 +915,9 @@ export class SignaturesService {
         entityId: request.id,
         url: requestUrl(request.documentId),
       })
-      .catch((err: unknown) => this.logger.warn(`Notify failed: ${(err as Error)?.message ?? err}`));
+      .catch((err: unknown) =>
+        this.logger.warn(`Notify failed: ${(err as Error)?.message ?? err}`),
+      );
 
     if (allSigned) await this.enqueueSeal(request.id, false);
     return signPublicResponseSchema.parse({ status: 'SIGNED', allSigned });
@@ -906,7 +951,8 @@ export class SignaturesService {
           userAgent: truncate(client.userAgent, 500),
         },
       });
-      if (flipped.count !== 1) throw new ConflictException({ title: 'Already answered', status: 409 });
+      if (flipped.count !== 1)
+        throw new ConflictException({ title: 'Already answered', status: 409 });
       const closed = await tx.signatureRequest.updateMany({
         where: { id: request.id, status: 'SENT' },
         data: { status: 'DECLINED' },
@@ -934,7 +980,9 @@ export class SignaturesService {
         entityId: request.id,
         url: requestUrl(request.documentId),
       })
-      .catch((err: unknown) => this.logger.warn(`Notify failed: ${(err as Error)?.message ?? err}`));
+      .catch((err: unknown) =>
+        this.logger.warn(`Notify failed: ${(err as Error)?.message ?? err}`),
+      );
     await this.email.sendSignatureDeclined(request.workspace.organizationId, {
       to: request.createdBy.email,
       title: request.title,
@@ -980,8 +1028,11 @@ export class SignaturesService {
     const signatureImages = await Promise.all(
       row.signers.map(async (s) =>
         s.signatureFileId
-          ? ((await this.files.getObjectBuffer(row.workspaceId, s.signatureFileId, { includeDeleted: true }))
-              ?.body ?? null)
+          ? ((
+              await this.files.getObjectBuffer(row.workspaceId, s.signatureFileId, {
+                includeDeleted: true,
+              })
+            )?.body ?? null)
           : null,
       ),
     );
@@ -1048,7 +1099,9 @@ export class SignaturesService {
     });
     if (!done) {
       // A concurrent run finished first; drop our duplicate object row.
-      await this.prisma.client.fileObject.delete({ where: { id: stored.id } }).catch(() => undefined);
+      await this.prisma.client.fileObject
+        .delete({ where: { id: stored.id } })
+        .catch(() => undefined);
       return;
     }
 
@@ -1062,7 +1115,9 @@ export class SignaturesService {
         entityId: row.id,
         url: requestUrl(row.documentId),
       })
-      .catch((err: unknown) => this.logger.warn(`Notify failed: ${(err as Error)?.message ?? err}`));
+      .catch((err: unknown) =>
+        this.logger.warn(`Notify failed: ${(err as Error)?.message ?? err}`),
+      );
 
     const recipients = [...new Set([row.createdBy.email, ...row.signers.map((s) => s.email)])];
     await this.email.sendSignatureCompleted(row.workspace.organizationId, recipients, {
@@ -1144,7 +1199,10 @@ export class SignaturesService {
           keysetWhere(CLIENT_SIGNATURE_SOURCE, 'createdAt', page.cursor),
         ],
       },
-      include: { ...SUMMARY_INCLUDE, document: { select: { id: true, title: true, deletedAt: true } } },
+      include: {
+        ...SUMMARY_INCLUDE,
+        document: { select: { id: true, title: true, deletedAt: true } },
+      },
       orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
       take: page.limit + 1,
     });
@@ -1463,7 +1521,8 @@ function requestClosedConflict(): ConflictException {
   return new ConflictException({
     title: 'This request is closed',
     status: 409,
-    detail: 'It was cancelled or changed while you were signing. Reload the page to see its current state.',
+    detail:
+      'It was cancelled or changed while you were signing. Reload the page to see its current state.',
   });
 }
 
@@ -1488,7 +1547,8 @@ function notFoundLink(): NotFoundException {
   return new NotFoundException({
     title: 'Signing link not found',
     status: 404,
-    detail: 'This link is not valid any more. It may have been replaced by a newer email, or the request was cancelled.',
+    detail:
+      'This link is not valid any more. It may have been replaced by a newer email, or the request was cancelled.',
     code: 'signing-link-invalid',
   });
 }
@@ -1503,7 +1563,10 @@ function truncate(value: string | null, max: number): string | null {
 }
 
 function safeFilename(title: string): string {
-  const cleaned = title.replace(/[\\/:*?"<>|\u0000-\u001f]+/g, ' ').replace(/\s+/g, ' ').trim();
+  const cleaned = title
+    .replace(/[\\/:*?"<>|\u0000-\u001f]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
   return (cleaned || 'document').slice(0, 120);
 }
 

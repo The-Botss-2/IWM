@@ -39,11 +39,7 @@ export function getSharedMailSender(): MailSender {
     forwardRef(() => OrganizationsModule),
   ],
   controllers: [EmailController],
-  providers: [
-    EmailService,
-    EmailProcessor,
-    { provide: MAIL_SENDER, useValue: sharedSender },
-  ],
+  providers: [EmailService, EmailProcessor, { provide: MAIL_SENDER, useValue: sharedSender }],
   // MAIL_SENDER: payroll sends payslips through a typed-in mailbox login.
   exports: [EmailService, MAIL_SENDER],
 })

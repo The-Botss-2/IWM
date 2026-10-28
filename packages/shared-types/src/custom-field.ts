@@ -57,9 +57,7 @@ export const createCustomFieldDefinitionSchema = z.object({
   required: z.boolean().optional(),
   position: z.number().int().nonnegative().optional(),
 });
-export type CreateCustomFieldDefinitionInput = z.infer<
-  typeof createCustomFieldDefinitionSchema
->;
+export type CreateCustomFieldDefinitionInput = z.infer<typeof createCustomFieldDefinitionSchema>;
 
 export const updateCustomFieldDefinitionSchema = z.object({
   name: z.string().min(1).max(120).optional(),
@@ -67,17 +65,13 @@ export const updateCustomFieldDefinitionSchema = z.object({
   required: z.boolean().optional(),
   position: z.number().int().nonnegative().optional(),
 });
-export type UpdateCustomFieldDefinitionInput = z.infer<
-  typeof updateCustomFieldDefinitionSchema
->;
+export type UpdateCustomFieldDefinitionInput = z.infer<typeof updateCustomFieldDefinitionSchema>;
 
 export const listCustomFieldDefinitionsQuerySchema = z.object({
   scope: CustomFieldScope.optional(),
   projectId: cuid.optional(),
 });
-export type ListCustomFieldDefinitionsQuery = z.infer<
-  typeof listCustomFieldDefinitionsQuerySchema
->;
+export type ListCustomFieldDefinitionsQuery = z.infer<typeof listCustomFieldDefinitionsQuerySchema>;
 
 /**
  * Stored value payload - the shape varies by definition.type. Validation of the

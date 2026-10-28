@@ -80,12 +80,12 @@ export function CalendarMiniWidget() {
         <QueryError compact onRetry={() => void refetch()} />
       ) : (
         <div>
-          <div className="mb-2 text-xs font-semibold text-ink">
+          <div className="text-ink mb-2 text-xs font-semibold">
             {today.toLocaleDateString(undefined, { month: 'long', year: 'numeric' })}
           </div>
           <div className="grid grid-cols-7 gap-1 text-center">
             {['M', 'T', 'W', 'T', 'F', 'S', 'S'].map((d, i) => (
-              <div key={`${d}-${i}`} className="text-[10px] text-ink-disabled">
+              <div key={`${d}-${i}`} className="text-ink-disabled text-[10px]">
                 {d}
               </div>
             ))}
@@ -101,9 +101,7 @@ export function CalendarMiniWidget() {
                   className={cn(
                     'relative aspect-square rounded text-[11px]',
                     inMonth ? 'text-ink' : 'text-line-strong',
-                    isToday
-                      ? 'bg-brand-600 font-semibold text-white'
-                      : 'hover:bg-bg-subtle',
+                    isToday ? 'bg-brand-600 font-semibold text-white' : 'hover:bg-bg-subtle',
                   )}
                 >
                   <span className="absolute left-1 top-0.5">{day.getDate()}</span>

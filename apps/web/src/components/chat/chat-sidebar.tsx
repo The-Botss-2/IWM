@@ -167,15 +167,15 @@ export function ChatSidebar({
   }, [cleared, currentUserId, markRead, menu, qc, router, systemAdmin]);
 
   return (
-    <div className="flex h-full flex-col bg-bg-surface">
-      <header className="flex items-center justify-between border-b border-line px-4 py-3">
-        <h2 className="text-sm font-semibold text-ink">Chats</h2>
+    <div className="bg-bg-surface flex h-full flex-col">
+      <header className="border-line flex items-center justify-between border-b px-4 py-3">
+        <h2 className="text-ink text-sm font-semibold">Chats</h2>
         <div className="flex items-center gap-1">
           <Link
             href="/settings/communication"
             aria-label="Chat settings"
             title="Chat settings"
-            className="grid h-8 w-8 place-items-center rounded-full text-ink-muted hover:bg-bg-subtle hover:text-ink transition-all"
+            className="text-ink-muted hover:bg-bg-subtle hover:text-ink grid h-8 w-8 place-items-center rounded-full transition-all"
           >
             <Settings className="h-4 w-4" />
           </Link>
@@ -184,7 +184,7 @@ export function ChatSidebar({
             size="icon"
             aria-label="New chat"
             onClick={onNewChat}
-            className="h-8 w-8 min-h-0 min-w-0"
+            className="h-8 min-h-0 w-8 min-w-0"
           >
             <MessageSquarePlus className="h-4 w-4" />
           </Button>
@@ -194,7 +194,7 @@ export function ChatSidebar({
       <div className="px-3 py-2">
         <div className="relative">
           <Search
-            className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-ink-muted"
+            className="text-ink-muted pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2"
             aria-hidden
           />
           <Input
@@ -219,7 +219,7 @@ export function ChatSidebar({
             <QueryError compact message="Couldn't load chats." onRetry={onRetry} />
           </div>
         ) : filtered.length === 0 ? (
-          <p className="px-3 py-6 text-center text-xs text-ink-muted">
+          <p className="text-ink-muted px-3 py-6 text-center text-xs">
             {query.trim() ? 'No chats match that search.' : 'No conversations yet.'}
           </p>
         ) : (
@@ -228,11 +228,11 @@ export function ChatSidebar({
               <section aria-labelledby="chat-section-channels">
                 <h3
                   id="chat-section-channels"
-                  className="px-4 pt-4 pb-1 text-[10px] font-semibold uppercase tracking-wide text-ink-muted"
+                  className="text-ink-muted px-4 pb-1 pt-4 text-[10px] font-semibold uppercase tracking-wide"
                 >
                   Channels
                 </h3>
-                <ul role="list" className="divide-y divide-line">
+                <ul role="list" className="divide-line divide-y">
                   {channels.map((r) => (
                     <li key={r.id}>
                       <RoomRow
@@ -250,11 +250,11 @@ export function ChatSidebar({
               <section aria-labelledby="chat-section-chats">
                 <h3
                   id="chat-section-chats"
-                  className="px-4 pt-4 pb-1 text-[10px] font-semibold uppercase tracking-wide text-ink-muted"
+                  className="text-ink-muted px-4 pb-1 pt-4 text-[10px] font-semibold uppercase tracking-wide"
                 >
                   Direct messages
                 </h3>
-                <ul role="list" className="divide-y divide-line">
+                <ul role="list" className="divide-line divide-y">
                   {chats.map((r) => (
                     <li key={r.id}>
                       <RoomRow
@@ -351,14 +351,12 @@ function RoomRow({
   const active = pathname === href;
   const title = roomTitle(room, currentUserId);
   const peerUserId =
-    room.type === 'DM'
-      ? room.participants.find((p) => p.userId !== currentUserId)?.userId
-      : null;
+    room.type === 'DM' ? room.participants.find((p) => p.userId !== currentUserId)?.userId : null;
   const image =
     room.type === 'DM'
-      ? room.participants.find((p) => p.userId !== currentUserId)?.user.image ?? null
+      ? (room.participants.find((p) => p.userId !== currentUserId)?.user.image ?? null)
       : null;
-  const peerOnline = peerUserId ? onlineUserIds?.has(peerUserId) ?? false : false;
+  const peerOnline = peerUserId ? (onlineUserIds?.has(peerUserId) ?? false) : false;
   return (
     <Link
       href={href}
@@ -369,13 +367,10 @@ function RoomRow({
       )}
     >
       {active ? (
-        <span
-          aria-hidden
-          className="absolute left-0 top-0 h-full w-[3px] bg-brand-gradient"
-        />
+        <span aria-hidden className="bg-brand-gradient absolute left-0 top-0 h-full w-[3px]" />
       ) : null}
       {isChannel(room) ? (
-        <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-bg-subtle text-brand-purple">
+        <span className="bg-bg-subtle text-brand-purple grid h-10 w-10 shrink-0 place-items-center rounded-full">
           {room.type === 'VOICE_CHANNEL' ? (
             <Volume2 className="h-4 w-4" aria-hidden />
           ) : (
@@ -387,12 +382,10 @@ function RoomRow({
       )}
       <div className="min-w-0 flex-1">
         <div className="flex items-baseline justify-between gap-2">
-          <span className="truncate text-sm font-medium text-ink">
-            {title}
-          </span>
+          <span className="text-ink truncate text-sm font-medium">{title}</span>
           {room.lastMessage ? (
             <span
-              className="shrink-0 text-[10px] text-ink-disabled"
+              className="text-ink-disabled shrink-0 text-[10px]"
               title={absoluteTime(room.lastMessage.createdAt)}
             >
               {relativeTime(room.lastMessage.createdAt)}
@@ -400,12 +393,9 @@ function RoomRow({
           ) : null}
         </div>
         <div className="flex items-center justify-between gap-2">
-          <LastMessageSnippet
-            room={room}
-            currentUserId={currentUserId}
-          />
+          <LastMessageSnippet room={room} currentUserId={currentUserId} />
           {room.unreadCount > 0 ? (
-            <span className="inline-flex h-5 min-w-[20px] items-center justify-center rounded-full bg-brand-gradient px-1.5 text-[10px] font-semibold text-white">
+            <span className="bg-brand-gradient inline-flex h-5 min-w-[20px] items-center justify-center rounded-full px-1.5 text-[10px] font-semibold text-white">
               {room.unreadCount > 99 ? '99+' : room.unreadCount}
             </span>
           ) : null}
@@ -423,14 +413,16 @@ function LastMessageSnippet({
   currentUserId: string;
 }) {
   if (!room.lastMessage) {
-    return <span className="truncate text-xs text-ink-disabled">No messages yet</span>;
+    return <span className="text-ink-disabled truncate text-xs">No messages yet</span>;
   }
   const fromMe = room.lastMessage.senderId === currentUserId;
   const shareCard = parseShareCard(room.lastMessage.content);
   if (shareCard) {
     return (
-      <span className="flex min-w-0 flex-1 items-center gap-1 text-xs text-ink-muted">
-        <span className="truncate">📎 Shared {shareCard.itemType}: {shareCard.title}</span>
+      <span className="text-ink-muted flex min-w-0 flex-1 items-center gap-1 text-xs">
+        <span className="truncate">
+          📎 Shared {shareCard.itemType}: {shareCard.title}
+        </span>
       </span>
     );
   }
@@ -443,18 +435,16 @@ function LastMessageSnippet({
           ? 'Missed call'
           : 'Call declined';
     return (
-      <span className="flex min-w-0 flex-1 items-center gap-1 text-xs text-ink-muted">
+      <span className="text-ink-muted flex min-w-0 flex-1 items-center gap-1 text-xs">
         <Phone className="h-3 w-3 shrink-0" aria-hidden />
         <span className="truncate">{label}</span>
       </span>
     );
   }
   return (
-    <span className="flex min-w-0 flex-1 items-center gap-1 text-xs text-ink-muted">
+    <span className="text-ink-muted flex min-w-0 flex-1 items-center gap-1 text-xs">
       {fromMe ? <StatusTick status={room.lastMessage.status} /> : null}
-      <span className="truncate">
-        {room.lastMessage.content ?? '[attachment]'}
-      </span>
+      <span className="truncate">{room.lastMessage.content ?? '[attachment]'}</span>
     </span>
   );
 }
@@ -468,10 +458,10 @@ function formatCallDuration(sec: number): string {
 
 function StatusTick({ status }: { status: MessageStatus }): ReactNode {
   if (status === 'READ') {
-    return <CheckCheck className="h-3.5 w-3.5 shrink-0 text-brand-teal" aria-label="Read" />;
+    return <CheckCheck className="text-brand-teal h-3.5 w-3.5 shrink-0" aria-label="Read" />;
   }
   if (status === 'DELIVERED') {
-    return <CheckCheck className="h-3.5 w-3.5 shrink-0 text-ink-muted" aria-label="Delivered" />;
+    return <CheckCheck className="text-ink-muted h-3.5 w-3.5 shrink-0" aria-label="Delivered" />;
   }
-  return <Check className="h-3.5 w-3.5 shrink-0 text-ink-muted" aria-label="Sent" />;
+  return <Check className="text-ink-muted h-3.5 w-3.5 shrink-0" aria-label="Sent" />;
 }

@@ -26,19 +26,21 @@ export function WorkspaceInfoForm({ workspace }: { workspace: Workspace }) {
     // Organization admins administer every workspace in their tenant.
     if (perms.isOrgAdmin) return true;
     // Effective permissions describe the ACTIVE workspace only.
-    return data.currentWorkspaceId === workspace.id && perms.workspace.includes('workspace.settings');
+    return (
+      data.currentWorkspaceId === workspace.id && perms.workspace.includes('workspace.settings')
+    );
   }, [session.data, workspace.id, perms.isOrgAdmin, perms.workspace]);
   const save = (input: Parameters<typeof update.mutate>[0]) => update.mutate(input);
 
   return (
     <section
       aria-labelledby="workspace-info-heading"
-      className="rounded-lg border border-line bg-white p-5"
+      className="border-line rounded-lg border bg-white p-5"
     >
-      <h2 id="workspace-info-heading" className="text-base font-semibold text-ink">
+      <h2 id="workspace-info-heading" className="text-ink text-base font-semibold">
         Workspace info
       </h2>
-      <p className="mt-1 text-sm text-ink-muted">
+      <p className="text-ink-muted mt-1 text-sm">
         {canEdit
           ? 'Changes save automatically.'
           : 'Only the workspace owner or an admin can edit these fields.'}
@@ -67,7 +69,7 @@ export function WorkspaceInfoForm({ workspace }: { workspace: Workspace }) {
             // any invite links a member already has. Keep it read-only until
             // there's a dedicated rename flow.
           />
-          <p className="text-xs text-ink-muted">URL slug - fixed once the workspace is created.</p>
+          <p className="text-ink-muted text-xs">URL slug - fixed once the workspace is created.</p>
         </div>
 
         <EditableTextarea

@@ -16,21 +16,16 @@ const buttonVariants = cva(
     variants: {
       variant: {
         // New brand gradient primary - pill, white text, soft shadow.
-        primary:
-          'bg-brand-gradient text-white shadow-soft hover:shadow-soft-lg',
-        gradient:
-          'bg-brand-gradient text-white shadow-soft hover:shadow-soft-lg',
+        primary: 'bg-brand-gradient text-white shadow-soft hover:shadow-soft-lg',
+        gradient: 'bg-brand-gradient text-white shadow-soft hover:shadow-soft-lg',
         secondary:
           'border border-line bg-white text-ink hover:bg-bg-subtle ' +
           'dark:border-slate-700 dark:bg-slate-800 dark:text-slate-100 dark:hover:bg-slate-700',
         // Dark variant carries explicit text + hover-bg colors so ghost icon
         // buttons (chat header Phone / Info, etc.) remain legible on dark
         // surfaces instead of disappearing into the background until hover.
-        ghost:
-          'text-ink hover:bg-bg-subtle ' +
-          'dark:text-slate-100 dark:hover:bg-slate-700',
-        destructive:
-          'bg-[#E5484D] text-white hover:bg-[#D03B40] shadow-soft',
+        ghost: 'text-ink hover:bg-bg-subtle ' + 'dark:text-slate-100 dark:hover:bg-slate-700',
+        destructive: 'bg-[#E5484D] text-white hover:bg-[#D03B40] shadow-soft',
         outline:
           'border border-line bg-transparent text-ink hover:bg-bg-subtle ' +
           'dark:border-slate-700 dark:text-slate-100 dark:hover:bg-slate-700',
@@ -47,8 +42,7 @@ const buttonVariants = cva(
 );
 
 export interface ButtonProps
-  extends ButtonHTMLAttributes<HTMLButtonElement>,
-    VariantProps<typeof buttonVariants> {
+  extends ButtonHTMLAttributes<HTMLButtonElement>, VariantProps<typeof buttonVariants> {
   asChild?: boolean;
 }
 

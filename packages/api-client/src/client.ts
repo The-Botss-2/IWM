@@ -83,7 +83,11 @@ export class HttpClient {
     method: string,
     path: string,
     schema: z.ZodSchema<T>,
-    init: { body?: unknown; query?: Record<string, unknown>; headers?: Record<string, string> } = {},
+    init: {
+      body?: unknown;
+      query?: Record<string, unknown>;
+      headers?: Record<string, string>;
+    } = {},
   ): Promise<T> {
     const headers: Record<string, string> = {
       Accept: 'application/json',
@@ -109,8 +113,7 @@ export class HttpClient {
         type: 'about:blank',
         title: 'Network error',
         status: 0,
-        detail:
-          "Couldn't reach the server. Check your internet connection and try again.",
+        detail: "Couldn't reach the server. Check your internet connection and try again.",
       });
     }
 
@@ -184,8 +187,7 @@ export class HttpClient {
         type: 'about:blank',
         title: 'Network error',
         status: 0,
-        detail:
-          "Couldn't reach the server. Check your internet connection and try again.",
+        detail: "Couldn't reach the server. Check your internet connection and try again.",
       });
     }
 
@@ -236,8 +238,7 @@ export class HttpClient {
         type: 'about:blank',
         title: 'Network error',
         status: 0,
-        detail:
-          "Couldn't reach the server. Check your internet connection and try again.",
+        detail: "Couldn't reach the server. Check your internet connection and try again.",
       });
     }
     if (!res.ok) {

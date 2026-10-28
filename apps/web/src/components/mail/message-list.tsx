@@ -84,9 +84,7 @@ export function MessageList({
   // the cursor that fetches page i (page 0 uses none). We remember each page's
   // cursor as the user advances so "Newer" steps back instantly without a
   // re-derivation, and the scroll resets to the top on every page change.
-  const [pageCursors, setPageCursors] = useState<(string | undefined)[]>([
-    undefined,
-  ]);
+  const [pageCursors, setPageCursors] = useState<(string | undefined)[]>([undefined]);
   const [pageIndex, setPageIndex] = useState(0);
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const [confirmEmpty, setConfirmEmpty] = useState(false);
@@ -189,8 +187,7 @@ export function MessageList({
 
   const selectionCount = selectedIds.size;
   const hasSelection = selectionCount > 0;
-  const allVisibleSelected =
-    items.length > 0 && items.every((m) => selectedIds.has(m.id));
+  const allVisibleSelected = items.length > 0 && items.every((m) => selectedIds.has(m.id));
   const someVisibleSelected = hasSelection && !allVisibleSelected;
   const selectionIds = useMemo(() => Array.from(selectedIds), [selectedIds]);
   const bulkPending = bulkMove.isPending || bulkDelete.isPending || bulkFlag.isPending;
@@ -272,13 +269,10 @@ export function MessageList({
     message: MailMessageListItem;
     position: { x: number; y: number };
   } | null>(null);
-  const handleRowContextMenu = useCallback(
-    (message: MailMessageListItem, e: React.MouseEvent) => {
-      e.preventDefault();
-      setRowMenu({ message, position: { x: e.clientX, y: e.clientY } });
-    },
-    [],
-  );
+  const handleRowContextMenu = useCallback((message: MailMessageListItem, e: React.MouseEvent) => {
+    e.preventDefault();
+    setRowMenu({ message, position: { x: e.clientX, y: e.clientY } });
+  }, []);
   const rowMenuItems = useMemo<ContextMenuItem[]>(() => {
     const m = rowMenu?.message;
     if (!m) return [];
@@ -359,7 +353,7 @@ export function MessageList({
 
   return (
     <div className="flex h-full flex-col">
-      <div className="border-b border-line p-3">
+      <div className="border-line border-b p-3">
         {hasSelection ? (
           <BulkActionBar
             count={selectionCount}
@@ -383,7 +377,7 @@ export function MessageList({
           <>
             <div className="relative">
               <Search
-                className="pointer-events-none absolute left-2 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-disabled"
+                className="text-ink-disabled pointer-events-none absolute left-2 top-1/2 h-4 w-4 -translate-y-1/2"
                 aria-hidden
               />
               <Input
@@ -398,7 +392,7 @@ export function MessageList({
             <div className="mt-2 flex flex-wrap items-center gap-1">
               {items.length > 0 ? (
                 <label
-                  className="whitespace-nowrap mr-1 inline-flex cursor-pointer items-center gap-1.5 rounded-full px-2 py-0.5 text-[11px] font-medium text-ink-muted hover:bg-line"
+                  className="text-ink-muted hover:bg-line mr-1 inline-flex cursor-pointer items-center gap-1.5 whitespace-nowrap rounded-full px-2 py-0.5 text-[11px] font-medium"
                   title="Select all messages in this folder"
                 >
                   <Checkbox
@@ -427,11 +421,9 @@ export function MessageList({
                   disabled={refreshing}
                   title="Refresh - fetch new mail now"
                   aria-label="Refresh mail"
-                  className="h-7 px-2 text-[11px] text-ink-muted"
+                  className="text-ink-muted h-7 px-2 text-[11px]"
                 >
-                  <RefreshCw
-                    className={cn('h-3.5 w-3.5', refreshing && 'animate-spin')}
-                  />
+                  <RefreshCw className={cn('h-3.5 w-3.5', refreshing && 'animate-spin')} />
                   Refresh
                 </Button>
                 {folderId ? (
@@ -442,7 +434,7 @@ export function MessageList({
                     disabled={markAllRead.isPending || items.length === 0}
                     title="Mark all as read"
                     aria-label="Mark all as read"
-                    className="h-7 px-2 text-[11px] text-ink-muted"
+                    className="text-ink-muted h-7 px-2 text-[11px]"
                   >
                     <CheckCheck className="h-3.5 w-3.5" />
                     Mark all read
@@ -456,7 +448,7 @@ export function MessageList({
                     disabled={resyncFolder.isPending}
                     title="Resync folder - fetch every message again to repair missing attachments or flags"
                     aria-label="Resync folder"
-                    className="h-7 px-2 text-[11px] text-ink-muted"
+                    className="text-ink-muted h-7 px-2 text-[11px]"
                   >
                     <RotateCcw
                       className={cn('h-3.5 w-3.5', resyncFolder.isPending && 'animate-spin')}
@@ -472,7 +464,7 @@ export function MessageList({
                     disabled={emptyFolder.isPending || items.length === 0}
                     title={isTrash ? 'Empty Trash' : 'Empty Spam'}
                     aria-label={isTrash ? 'Empty Trash' : 'Empty Spam'}
-                    className="h-7 px-2 text-[11px] text-state-error hover:text-state-error"
+                    className="text-state-error hover:text-state-error h-7 px-2 text-[11px]"
                   >
                     <Trash2 className="h-3.5 w-3.5" />
                     Empty {isTrash ? 'Trash' : 'Spam'}
@@ -521,9 +513,7 @@ export function MessageList({
       <ConfirmDialog
         open={confirmBulkDelete}
         onOpenChange={setConfirmBulkDelete}
-        title={`Permanently delete ${selectionCount} message${
-          selectionCount === 1 ? '' : 's'
-        }?`}
+        title={`Permanently delete ${selectionCount} message${selectionCount === 1 ? '' : 's'}?`}
         description="The selected messages will be removed from the server. This action cannot be undone."
         confirmLabel="Delete forever"
         variant="destructive"
@@ -539,7 +529,7 @@ export function MessageList({
           engages and the list grows past the pane. */}
       <div
         ref={scrollRef}
-        className="flex-1 min-h-0 overflow-y-auto"
+        className="min-h-0 flex-1 overflow-y-auto"
         role="list"
         aria-label="Messages"
       >
@@ -552,13 +542,11 @@ export function MessageList({
             <QueryError compact message="Couldn't load messages." onRetry={() => void refetch()} />
           </div>
         ) : items.length === 0 ? (
-          <p className="px-6 py-12 text-center text-sm text-ink-muted">
-            {debouncedSearch.trim()
-              ? 'No messages match that search.'
-              : 'This folder is empty.'}
+          <p className="text-ink-muted px-6 py-12 text-center text-sm">
+            {debouncedSearch.trim() ? 'No messages match that search.' : 'This folder is empty.'}
           </p>
         ) : (
-          <ul className="divide-y divide-line" role="list">
+          <ul className="divide-line divide-y" role="list">
             {items.map((m) => (
               <li key={m.id}>
                 <MessageRow
@@ -580,8 +568,8 @@ export function MessageList({
       {/* Pager - shown whenever there's a page to move to in either
           direction. Mirrors Gmail's 50-at-a-time Newer/Older stepping. */}
       {pageIndex > 0 || hasNextPage ? (
-        <div className="flex items-center justify-end gap-2 border-t border-line px-3 py-2">
-          <span className="mr-auto text-[11px] text-ink-muted">
+        <div className="border-line flex items-center justify-end gap-2 border-t px-3 py-2">
+          <span className="text-ink-muted mr-auto text-[11px]">
             {rangeStart}-{rangeEnd}
           </span>
           <Button
@@ -590,7 +578,7 @@ export function MessageList({
             onClick={goNewer}
             disabled={pageIndex === 0}
             aria-label="Newer messages"
-            className="h-7 px-2 text-[11px] text-ink-muted"
+            className="text-ink-muted h-7 px-2 text-[11px]"
           >
             <ChevronLeft className="h-3.5 w-3.5" />
             Newer
@@ -601,7 +589,7 @@ export function MessageList({
             onClick={goOlder}
             disabled={!hasNextPage}
             aria-label="Older messages"
-            className="h-7 px-2 text-[11px] text-ink-muted"
+            className="text-ink-muted h-7 px-2 text-[11px]"
           >
             Older
             <ChevronRight className="h-3.5 w-3.5" />
@@ -677,16 +665,12 @@ function BulkActionBar({
   return (
     <div className="flex items-center gap-1">
       <Checkbox
-        checked={
-          allVisibleSelected ? true : someVisibleSelected ? 'indeterminate' : false
-        }
+        checked={allVisibleSelected ? true : someVisibleSelected ? 'indeterminate' : false}
         onCheckedChange={onToggleSelectAll}
         aria-label={allVisibleSelected ? 'Clear selection' : 'Select all visible'}
         className="ml-1"
       />
-      <span className="ml-2 text-xs font-medium text-ink">
-        {count} selected
-      </span>
+      <span className="text-ink ml-2 text-xs font-medium">{count} selected</span>
       <div className="ml-2 flex flex-wrap items-center gap-0.5">
         <BulkActionButton
           icon={MailOpen}
@@ -700,16 +684,11 @@ function BulkActionBar({
           onClick={onMarkUnread}
           disabled={disabled}
         />
-        <div className="mx-1 h-4 w-px bg-line" aria-hidden />
+        <div className="bg-line mx-1 h-4 w-px" aria-hidden />
         {/* Archive is meaningful in every folder except Archive itself; we
             keep it visible everywhere for now and rely on the server's
             "already there" no-op behavior. */}
-        <BulkActionButton
-          icon={Archive}
-          label="Archive"
-          onClick={onArchive}
-          disabled={disabled}
-        />
+        <BulkActionButton icon={Archive} label="Archive" onClick={onArchive} disabled={disabled} />
         {isTrashOrSpam ? (
           <BulkActionButton
             icon={Inbox}
@@ -751,7 +730,7 @@ function BulkActionBar({
         aria-label="Clear selection"
         onClick={onClear}
         disabled={disabled}
-        className="ml-auto h-7 w-7 min-h-0 min-w-0 text-ink-muted hover:text-ink"
+        className="text-ink-muted hover:text-ink ml-auto h-7 min-h-0 w-7 min-w-0"
       >
         <X className="h-4 w-4" aria-hidden />
       </Button>
@@ -818,7 +797,7 @@ const MessageRow = memo(function MessageRow({
       onContextMenu={(e) => onContextMenu?.(message, e)}
       className={cn(
         'group flex w-full cursor-pointer items-start gap-2 px-3 py-3 text-left transition-colors',
-        'focus-visible:outline-none focus-visible:ring-2 focus-visible:shadow-focus',
+        'focus-visible:shadow-focus focus-visible:outline-none focus-visible:ring-2',
         checked ? 'bg-brand-50/60' : selected ? 'bg-brand-50' : 'hover:bg-bg-subtle',
       )}
     >
@@ -857,27 +836,30 @@ const MessageRow = memo(function MessageRow({
           <span
             className={cn(
               'min-w-0 truncate text-sm',
-              message.isUnread ? 'font-semibold text-ink' : 'text-ink',
+              message.isUnread ? 'text-ink font-semibold' : 'text-ink',
             )}
           >
             {sender}
           </span>
           {message.hasAttachments ? (
-            <Paperclip className="h-3 w-3 shrink-0 text-ink-disabled" aria-label="Has attachments" />
+            <Paperclip
+              className="text-ink-disabled h-3 w-3 shrink-0"
+              aria-label="Has attachments"
+            />
           ) : null}
-          <span className="ml-auto shrink-0 text-[11px] text-ink-disabled">
+          <span className="text-ink-disabled ml-auto shrink-0 text-[11px]">
             {relativeTime(message.receivedAt)}
           </span>
         </span>
         <span
           className={cn(
             'mt-0.5 block truncate text-sm',
-            message.isUnread ? 'font-medium text-ink' : 'text-ink-muted',
+            message.isUnread ? 'text-ink font-medium' : 'text-ink-muted',
           )}
         >
           {message.subject || '(no subject)'}
         </span>
-        <span className="mt-0.5 block truncate text-xs text-ink-muted">
+        <span className="text-ink-muted mt-0.5 block truncate text-xs">
           {message.bodyTextPreview}
         </span>
       </span>
@@ -888,7 +870,7 @@ const MessageRow = memo(function MessageRow({
           e.stopPropagation();
           onShare(message.id, message.subject || sender);
         }}
-        className="mt-0.5 hidden h-7 w-7 shrink-0 items-center justify-center rounded text-ink-disabled opacity-0 transition group-hover:opacity-100 hover:bg-bg-subtle hover:text-brand-teal sm:inline-flex"
+        className="text-ink-disabled hover:bg-bg-subtle hover:text-brand-teal mt-0.5 hidden h-7 w-7 shrink-0 items-center justify-center rounded opacity-0 transition group-hover:opacity-100 sm:inline-flex"
       >
         <Send className="h-3.5 w-3.5" />
       </button>
@@ -912,10 +894,8 @@ function FilterChip({
       aria-pressed={active}
       className={cn(
         'whitespace-nowrap rounded-full px-2.5 py-0.5 text-[11px] font-medium transition-colors',
-        'focus-visible:outline-none focus-visible:ring-2 focus-visible:shadow-focus',
-        active
-          ? 'bg-brand-100 text-brand-700'
-          : 'bg-bg-subtle text-ink-muted hover:bg-line',
+        'focus-visible:shadow-focus focus-visible:outline-none focus-visible:ring-2',
+        active ? 'bg-brand-100 text-brand-700' : 'bg-bg-subtle text-ink-muted hover:bg-line',
       )}
     >
       {label}

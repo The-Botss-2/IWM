@@ -1,8 +1,4 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import type {
   Contract,
   ContractListItem,
@@ -280,10 +276,7 @@ export class ContractsService {
   // Writes
   // ---------------------------------------------------------------------
 
-  async create(
-    scope: UserScope,
-    input: CreateContractInput,
-  ): Promise<ContractWithMilestones> {
+  async create(scope: UserScope, input: CreateContractInput): Promise<ContractWithMilestones> {
     const workspaceId = requireWorkspace(scope);
     await this.assertRefs(workspaceId, input.projectId, input.clientId);
 
@@ -302,7 +295,8 @@ export class ContractsService {
     const milestones = input.milestones ?? [];
     const currency = input.currency ?? 'USD';
     const baseCurrency = await this.baseCurrency(workspaceId);
-    const fxRateToBase = this.bookedRate(currency, baseCurrency, input.fxRateToBase, true) ?? new D(1);
+    const fxRateToBase =
+      this.bookedRate(currency, baseCurrency, input.fxRateToBase, true) ?? new D(1);
 
     // For milestone contracts the stage sum is authoritative; `totalValue` on
     // the input is ignored so the two can never disagree.

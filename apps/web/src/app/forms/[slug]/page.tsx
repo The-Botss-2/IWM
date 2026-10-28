@@ -51,21 +51,21 @@ export default function PublicFormPage({ params }: { params: Promise<{ slug: str
   if (state.kind === 'error') {
     return (
       <Shell>
-        <p className="text-sm text-ink-muted">{state.message}</p>
+        <p className="text-ink-muted text-sm">{state.message}</p>
       </Shell>
     );
   }
   if (state.kind === 'done') {
     return (
       <Shell>
-        <h1 className="text-lg font-semibold text-ink">Thanks!</h1>
-        <p className="mt-2 text-sm text-ink-muted">
+        <h1 className="text-ink text-lg font-semibold">Thanks!</h1>
+        <p className="text-ink-muted mt-2 text-sm">
           Your request has been recorded as <strong>{state.reference}</strong>. The project team
           will see it on their board.
         </p>
         <Link
           href={`/forms/${slug}`}
-          className="mt-4 inline-block text-sm text-brand-blue hover:underline"
+          className="text-brand-blue mt-4 inline-block text-sm hover:underline"
         >
           Submit another
         </Link>
@@ -107,11 +107,9 @@ export default function PublicFormPage({ params }: { params: Promise<{ slug: str
 
   return (
     <Shell>
-      <div className="text-xs uppercase tracking-wide text-ink-muted">{form.projectName}</div>
-      <h1 className="mt-1 text-lg font-semibold text-ink">{form.name}</h1>
-      {form.description ? (
-        <p className="mt-2 text-sm text-ink-muted">{form.description}</p>
-      ) : null}
+      <div className="text-ink-muted text-xs uppercase tracking-wide">{form.projectName}</div>
+      <h1 className="text-ink mt-1 text-lg font-semibold">{form.name}</h1>
+      {form.description ? <p className="text-ink-muted mt-2 text-sm">{form.description}</p> : null}
       <form className="mt-4 space-y-3" onSubmit={submit} noValidate>
         {form.fields.map((f) => (
           <FieldRow
@@ -134,15 +132,11 @@ export default function PublicFormPage({ params }: { params: Promise<{ slug: str
           />
         </div>
         {error ? (
-          <p className="rounded-md border border-red-100 bg-tint-error px-3 py-2 text-sm text-state-error">
+          <p className="bg-tint-error text-state-error rounded-md border border-red-100 px-3 py-2 text-sm">
             {error}
           </p>
         ) : null}
-        <button
-          type="submit"
-          className="btn-primary w-full"
-          disabled={state.kind === 'submitting'}
-        >
+        <button type="submit" className="btn-primary w-full" disabled={state.kind === 'submitting'}>
           {state.kind === 'submitting' ? 'Submitting…' : 'Submit'}
         </button>
       </form>
@@ -164,7 +158,7 @@ function FieldRow({
     <div className="space-y-1">
       <label className="label" htmlFor={id}>
         {field.label}
-        {field.required ? <span className="ml-1 text-state-error">*</span> : null}
+        {field.required ? <span className="text-state-error ml-1">*</span> : null}
       </label>
       {field.type === 'textarea' ? (
         <textarea
@@ -201,9 +195,7 @@ function FieldRow({
           className="input"
           value={typeof value === 'string' || typeof value === 'number' ? String(value) : ''}
           onChange={(e) =>
-            onChange(
-              field.type === 'number' ? Number(e.target.value) : e.target.value,
-            )
+            onChange(field.type === 'number' ? Number(e.target.value) : e.target.value)
           }
         />
       )}
@@ -214,12 +206,12 @@ function FieldRow({
 function Shell({ children }: { children: React.ReactNode }) {
   return (
     <div className="mx-auto flex min-h-screen max-w-md flex-col justify-center px-4 py-8">
-      <div className="rounded-lg border border-line bg-bg-surface p-6 shadow-sm">
+      <div className="border-line bg-bg-surface rounded-lg border p-6 shadow-sm">
         <div className="mb-5 flex justify-center">
           <Link
             href="/"
             aria-label="The Botss home"
-            className="rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:shadow-focus"
+            className="focus-visible:shadow-focus rounded focus-visible:outline-none focus-visible:ring-2"
           >
             <Logo variant="full" size="sm" />
           </Link>

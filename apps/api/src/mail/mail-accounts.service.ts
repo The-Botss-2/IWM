@@ -53,11 +53,7 @@ export class MailAccountsService {
    * CPANEL_API_TOKEN to be configured; throws otherwise so the UI can show
    * an actionable error.
    */
-  async selfSetup(
-    workspaceId: string,
-    userId: string,
-    password: string,
-  ): Promise<MailAccount> {
+  async selfSetup(workspaceId: string, userId: string, password: string): Promise<MailAccount> {
     const user = await this.prisma.client.user.findUnique({
       where: { id: userId },
       select: { email: true, name: true, organizationId: true },
@@ -146,11 +142,7 @@ export class MailAccountsService {
     return { items: rows.map((r) => toDto(r, r.signatures)) };
   }
 
-  async add(
-    workspaceId: string,
-    userId: string,
-    input: AddMailAccountInput,
-  ): Promise<MailAccount> {
+  async add(workspaceId: string, userId: string, input: AddMailAccountInput): Promise<MailAccount> {
     const existing = await this.prisma.client.mailAccount.findFirst({
       where: { userId, email: input.email.toLowerCase() },
       select: { id: true, deletedAt: true },
@@ -219,7 +211,11 @@ export class MailAccountsService {
 
     // Schedule verification asynchronously; the UI polls status afterwards.
     await this.queue
-      .add('verify-account', { kind: 'verify-account', accountId: account.id }, MAIL_VERIFY_JOB_OPTIONS)
+      .add(
+        'verify-account',
+        { kind: 'verify-account', accountId: account.id },
+        MAIL_VERIFY_JOB_OPTIONS,
+      )
       .catch((err) => {
         this.logger.error(
           `Failed to enqueue verify-account accountId=${account.id} message=${(err as Error)?.message ?? 'unknown'}`,
@@ -273,7 +269,8 @@ export class MailAccountsService {
       await this.assertSignatureOwned(accountId, input.replySignatureId);
       data['replySignatureId'] = input.replySignatureId;
     }
-    const triggerVerify = input.password !== undefined ||
+    const triggerVerify =
+      input.password !== undefined ||
       input.imapHost !== undefined ||
       input.imapPort !== undefined ||
       input.smtpHost !== undefined ||
@@ -299,11 +296,7 @@ export class MailAccountsService {
       // ensures the next sync opens a fresh login with the new creds.
       this.imapSync.evictPooledClient(accountId);
       await this.queue
-        .add(
-          'verify-account',
-          { kind: 'verify-account', accountId },
-          MAIL_VERIFY_JOB_OPTIONS,
-        )
+        .add('verify-account', { kind: 'verify-account', accountId }, MAIL_VERIFY_JOB_OPTIONS)
         .catch((err) =>
           this.logger.error(
             `Failed to enqueue verify-account accountId=${accountId} message=${(err as Error)?.message ?? 'unknown'}`,
@@ -392,10 +385,7 @@ export class MailAccountsService {
    * always allowed (clears the default); a non-null id must reference a
    * signature row owned by `accountId`.
    */
-  private async assertSignatureOwned(
-    accountId: string,
-    signatureId: string | null,
-  ): Promise<void> {
+  private async assertSignatureOwned(accountId: string, signatureId: string | null): Promise<void> {
     if (signatureId == null) return;
     const sig = await this.prisma.client.mailSignature.findUnique({
       where: { id: signatureId },

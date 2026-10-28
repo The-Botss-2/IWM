@@ -15,11 +15,7 @@ import * as FileSystem from 'expo-file-system';
 import * as Notifications from 'expo-notifications';
 import * as Sharing from 'expo-sharing';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import {
-  WebView,
-  type WebViewMessageEvent,
-  type WebViewNavigation,
-} from 'react-native-webview';
+import { WebView, type WebViewMessageEvent, type WebViewNavigation } from 'react-native-webview';
 
 import { ensureAndroidChannels, registerForPushTokenAsync } from '../lib/push';
 
@@ -40,10 +36,9 @@ import { ensureAndroidChannels, registerForPushTokenAsync } from '../lib/push';
 // The hosted web app, from EXPO_PUBLIC_APP_URL (inlined by the Expo bundler at
 // build time), e.g. https://app.example.com. The default only suits a simulator
 // on the dev machine: on a phone, use your computer's LAN address.
-const APP_URL: string = (String(process.env.EXPO_PUBLIC_APP_URL ?? '').trim() || 'http://localhost:3000').replace(
-  /\/+$/,
-  '',
-);
+const APP_URL: string = (
+  String(process.env.EXPO_PUBLIC_APP_URL ?? '').trim() || 'http://localhost:3000'
+).replace(/\/+$/, '');
 // Scheme + host (+ port) of APP_URL. Parsed by hand: React Native's URL
 // polyfill does not implement `origin`.
 const APP_ORIGIN = /^https?:\/\/[^/?#]+/i.exec(APP_URL)?.[0] ?? APP_URL;
@@ -127,7 +122,10 @@ function readResponse(
  */
 function safeFileName(raw: string): string {
   const base = (raw || 'download').split(/[\/]/).pop() || 'download';
-  const cleaned = base.replace(/[^A-Za-z0-9._ -]/g, '_').replace(/^\.+/, '').trim();
+  const cleaned = base
+    .replace(/[^A-Za-z0-9._ -]/g, '_')
+    .replace(/^\.+/, '')
+    .trim();
   return cleaned.slice(0, 120) || 'download';
 }
 
@@ -205,8 +203,8 @@ export default function HomeScreen() {
   // into a shell with no `onMessage` handler and losing the message.
   const announceCapabilities = useCallback(() => {
     webRef.current?.injectJavaScript(
-      "(function(){window.__BOTSS_NATIVE__=Object.assign(" +
-        "window.__BOTSS_NATIVE__||{},{canSaveFile:true});})();true;",
+      '(function(){window.__BOTSS_NATIVE__=Object.assign(' +
+        'window.__BOTSS_NATIVE__||{},{canSaveFile:true});})();true;',
     );
   }, []);
 
@@ -423,9 +421,7 @@ export default function HomeScreen() {
     () => (
       <View style={styles.errorScreen}>
         <Text style={styles.errorTitle}>Can't reach Botss</Text>
-        <Text style={styles.errorBody}>
-          Check your internet connection. We'll keep trying.
-        </Text>
+        <Text style={styles.errorBody}>Check your internet connection. We'll keep trying.</Text>
         <Pressable
           accessibilityRole="button"
           onPress={() => {
@@ -468,10 +464,7 @@ export default function HomeScreen() {
 
   return (
     <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
-      <Animated.View
-        pointerEvents="none"
-        style={[styles.barTrack, { opacity }]}
-      >
+      <Animated.View pointerEvents="none" style={[styles.barTrack, { opacity }]}>
         <Animated.View style={[styles.barFill, { width }]} />
       </Animated.View>
       {startUrl !== null && (

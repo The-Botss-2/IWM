@@ -1,8 +1,4 @@
-import {
-  WORKSPACE_PRESETS,
-  canAssignWorkspacePermissions,
-  workspacePresetFor,
-} from '@botss/auth';
+import { WORKSPACE_PRESETS, canAssignWorkspacePermissions, workspacePresetFor } from '@botss/auth';
 
 import {
   BadRequestException,
@@ -341,7 +337,11 @@ export class WorkspacesService {
     // where a cross-org WorkspaceMembership could be created - block it
     // here authoritatively. New users (existingUser === null) inherit the
     // workspace's org via the User creation below, so they're fine.
-    if (existingUser && existingUser.organizationId && existingUser.organizationId !== workspace.organizationId) {
+    if (
+      existingUser &&
+      existingUser.organizationId &&
+      existingUser.organizationId !== workspace.organizationId
+    ) {
       throw new ForbiddenException({
         title: 'Invitee belongs to another organization',
         status: 403,
@@ -635,7 +635,11 @@ export class WorkspacesService {
           select: { organizationId: true },
         });
         const role = await this.prisma.client.role.findFirst({
-          where: { id: customRoleId, scope: 'WORKSPACE', organizationId: ws?.organizationId ?? '__none__' },
+          where: {
+            id: customRoleId,
+            scope: 'WORKSPACE',
+            organizationId: ws?.organizationId ?? '__none__',
+          },
           select: { permissions: true },
         });
         if (!role) {
@@ -645,7 +649,11 @@ export class WorkspacesService {
           const actorEff = await loadEffectivePermissions(actingUserId, workspaceId);
           const verdict = canAssignWorkspacePermissions(actorEff, role.permissions);
           if (!verdict.ok) {
-            throw new ForbiddenException({ title: 'Cannot assign this role', status: 403, detail: verdict.reason });
+            throw new ForbiddenException({
+              title: 'Cannot assign this role',
+              status: 403,
+              detail: verdict.reason,
+            });
           }
         }
       }
@@ -690,7 +698,10 @@ export class WorkspacesService {
         metadata: {
           workspaceId,
           from: { role: membership.role, customRoleId: membership.customRoleId },
-          to: { role: input.role, customRoleId: customRoleId === undefined ? membership.customRoleId : customRoleId },
+          to: {
+            role: input.role,
+            customRoleId: customRoleId === undefined ? membership.customRoleId : customRoleId,
+          },
         },
       });
       if (input.role === 'ADMIN' && membership.role !== input.role) {
@@ -781,7 +792,11 @@ export class WorkspacesService {
    * Whether the actor holds a workspace permission in `workspaceId` (custom
    * roles and overrides included). Org admins of the owning org always do.
    */
-  private async actorHas(workspaceId: string, userId: string, permission: string): Promise<boolean> {
+  private async actorHas(
+    workspaceId: string,
+    userId: string,
+    permission: string,
+  ): Promise<boolean> {
     if (await this.isOrgAdminFor(workspaceId, userId)) return true;
     const eff = await loadEffectivePermissions(userId, workspaceId);
     return eff.workspace.includes(permission);
@@ -791,7 +806,11 @@ export class WorkspacesService {
    * A workspace manager may only hand out a preset whose permissions they
    * hold themselves (an OWNER / ADMIN holds them all). Org admins may give any.
    */
-  private async assertCanGrantPreset(workspaceId: string, actorId: string, role: string): Promise<void> {
+  private async assertCanGrantPreset(
+    workspaceId: string,
+    actorId: string,
+    role: string,
+  ): Promise<void> {
     if (await this.isOrgAdminFor(workspaceId, actorId)) return;
     const actorEff = await loadEffectivePermissions(actorId, workspaceId);
     const verdict = canAssignWorkspacePermissions(
@@ -799,7 +818,11 @@ export class WorkspacesService {
       WORKSPACE_PRESETS[workspacePresetFor(role)],
     );
     if (!verdict.ok) {
-      throw new ForbiddenException({ title: 'Cannot assign this role', status: 403, detail: verdict.reason });
+      throw new ForbiddenException({
+        title: 'Cannot assign this role',
+        status: 403,
+        detail: verdict.reason,
+      });
     }
   }
 

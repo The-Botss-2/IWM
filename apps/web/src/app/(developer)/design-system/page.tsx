@@ -57,16 +57,20 @@ export default function DesignSystemPage() {
   return (
     <main className="mx-auto flex min-h-screen max-w-6xl flex-col px-4 py-8 sm:px-6">
       <header className="mb-6 flex items-center justify-between gap-4">
-        <Link href="/" aria-label="Back to app" className="rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:shadow-focus">
+        <Link
+          href="/"
+          aria-label="Back to app"
+          className="focus-visible:shadow-focus rounded focus-visible:outline-none focus-visible:ring-2"
+        >
           <Logo variant="full" size="sm" />
         </Link>
-        <div className="text-xs text-ink-muted">Dev only · /design-system</div>
+        <div className="text-ink-muted text-xs">Dev only · /design-system</div>
       </header>
 
-      <h1 className="mb-1 text-2xl font-semibold text-ink">Design system</h1>
-      <p className="mb-6 text-sm text-ink-muted">
-        Live catalogue of every shared UI primitive shipped in <code>apps/web</code>. Click an
-        entry on the left to focus a single component.
+      <h1 className="text-ink mb-1 text-2xl font-semibold">Design system</h1>
+      <p className="text-ink-muted mb-6 text-sm">
+        Live catalogue of every shared UI primitive shipped in <code>apps/web</code>. Click an entry
+        on the left to focus a single component.
       </p>
 
       <div className="grid grid-cols-1 gap-6 md:grid-cols-[200px_1fr]">
@@ -90,10 +94,10 @@ export default function DesignSystemPage() {
         <div className="min-w-0">
           <section
             key={activeSection.id}
-            className="rounded-md border border-line bg-white p-6"
+            className="border-line rounded-md border bg-white p-6"
             aria-labelledby={`section-${activeSection.id}`}
           >
-            <h2 id={`section-${activeSection.id}`} className="mb-4 text-lg font-semibold text-ink">
+            <h2 id={`section-${activeSection.id}`} className="text-ink mb-4 text-lg font-semibold">
               {activeSection.title}
             </h2>
             {activeSection.Render()}
@@ -111,7 +115,7 @@ function Row({ children }: { children: ReactNode }) {
 function Field({ label, children }: { label: string; children: ReactNode }) {
   return (
     <div className="space-y-1.5">
-      <div className="text-xs font-medium uppercase tracking-wide text-ink-muted">{label}</div>
+      <div className="text-ink-muted text-xs font-medium uppercase tracking-wide">{label}</div>
       <div>{children}</div>
     </div>
   );
@@ -137,7 +141,9 @@ const SECTIONS: SectionDef[] = [
             <Button size="sm">Small</Button>
             <Button size="md">Medium</Button>
             <Button size="lg">Large</Button>
-            <Button size="icon" aria-label="Search"><Search className="h-4 w-4" /></Button>
+            <Button size="icon" aria-label="Search">
+              <Search className="h-4 w-4" />
+            </Button>
           </Row>
         </Field>
         <Field label="Loading / Disabled">
@@ -145,8 +151,12 @@ const SECTIONS: SectionDef[] = [
             <Button disabled>
               <Loader2 className="h-4 w-4 animate-spin" /> Loading
             </Button>
-            <Button disabled variant="secondary">Disabled</Button>
-            <Button variant="primary"><Star className="h-4 w-4" /> With icon</Button>
+            <Button disabled variant="secondary">
+              Disabled
+            </Button>
+            <Button variant="primary">
+              <Star className="h-4 w-4" /> With icon
+            </Button>
           </Row>
         </Field>
       </div>
@@ -182,7 +192,9 @@ const SECTIONS: SectionDef[] = [
         <div className="grid gap-4 sm:grid-cols-2">
           <Field label="Single select">
             <Select value={value} onValueChange={setValue}>
-              <SelectTrigger className="w-48"><SelectValue /></SelectTrigger>
+              <SelectTrigger className="w-48">
+                <SelectValue />
+              </SelectTrigger>
               <SelectContent>
                 <SelectItem value="a">Alpha</SelectItem>
                 <SelectItem value="b">Beta</SelectItem>
@@ -207,7 +219,7 @@ const SECTIONS: SectionDef[] = [
           </Row>
           <Row>
             <Checkbox disabled />
-            <span className="text-sm text-ink-muted">Disabled</span>
+            <span className="text-ink-muted text-sm">Disabled</span>
           </Row>
         </div>
       );
@@ -260,7 +272,9 @@ const SECTIONS: SectionDef[] = [
         <PopoverContent className="w-64">
           <div className="space-y-1">
             <div className="text-sm font-medium">Popover content</div>
-            <p className="text-xs text-ink-muted">Anchored to the trigger with arrow-key + ESC support.</p>
+            <p className="text-ink-muted text-xs">
+              Anchored to the trigger with arrow-key + ESC support.
+            </p>
           </div>
         </PopoverContent>
       </Popover>
@@ -281,9 +295,13 @@ const SECTIONS: SectionDef[] = [
                 <DialogDescription>Focus is trapped here. ESC closes.</DialogDescription>
               </DialogHeader>
               <div className="space-y-3">
-                <p className="text-sm">Use this for confirmations, short forms, and disambiguation.</p>
+                <p className="text-sm">
+                  Use this for confirmations, short forms, and disambiguation.
+                </p>
                 <Row>
-                  <Button variant="ghost" onClick={() => setOpen(false)}>Cancel</Button>
+                  <Button variant="ghost" onClick={() => setOpen(false)}>
+                    Cancel
+                  </Button>
                   <Button onClick={() => setOpen(false)}>Confirm</Button>
                 </Row>
               </div>
@@ -307,7 +325,7 @@ const SECTIONS: SectionDef[] = [
                 <SheetTitle>Example sheet</SheetTitle>
               </SheetHeader>
               <SheetBody>
-                <p className="text-sm text-ink-muted">
+                <p className="text-ink-muted text-sm">
                   Used for the task detail panel and other side-mounted forms.
                 </p>
               </SheetBody>
@@ -327,13 +345,13 @@ const SECTIONS: SectionDef[] = [
           <TabsTrigger value="b">Second</TabsTrigger>
           <TabsTrigger value="c">Third</TabsTrigger>
         </TabsList>
-        <TabsContent value="a" className="mt-3 text-sm text-ink-muted">
+        <TabsContent value="a" className="text-ink-muted mt-3 text-sm">
           First panel content.
         </TabsContent>
-        <TabsContent value="b" className="mt-3 text-sm text-ink-muted">
+        <TabsContent value="b" className="text-ink-muted mt-3 text-sm">
           Second panel content.
         </TabsContent>
-        <TabsContent value="c" className="mt-3 text-sm text-ink-muted">
+        <TabsContent value="c" className="text-ink-muted mt-3 text-sm">
           Third panel content.
         </TabsContent>
       </Tabs>
@@ -356,17 +374,17 @@ const SECTIONS: SectionDef[] = [
     Render: () => (
       <div className="space-y-4">
         <Field label="Full lockup">
-          <div className="rounded-md border border-line bg-white px-4 py-3">
+          <div className="border-line rounded-md border bg-white px-4 py-3">
             <Logo variant="full" size="lg" />
           </div>
         </Field>
         <Field label="Icon only">
-          <div className="rounded-md border border-line bg-white px-4 py-3">
+          <div className="border-line rounded-md border bg-white px-4 py-3">
             <Logo variant="icon" size="lg" />
           </div>
         </Field>
         <Field label="Inverse on dark surface">
-          <div className="rounded-md bg-ink px-4 py-3">
+          <div className="bg-ink rounded-md px-4 py-3">
             <Logo variant="full" size="md" inverse />
           </div>
         </Field>
@@ -378,10 +396,18 @@ const SECTIONS: SectionDef[] = [
     title: 'Icon sizing reference',
     Render: () => (
       <Row>
-        <span className="inline-flex items-center gap-1 text-xs"><Check className="h-3 w-3" /> 12px</span>
-        <span className="inline-flex items-center gap-1 text-xs"><Check className="h-3.5 w-3.5" /> 14px</span>
-        <span className="inline-flex items-center gap-1 text-sm"><Check className="h-4 w-4" /> 16px (default)</span>
-        <span className="inline-flex items-center gap-1 text-sm"><X className="h-5 w-5" /> 20px</span>
+        <span className="inline-flex items-center gap-1 text-xs">
+          <Check className="h-3 w-3" /> 12px
+        </span>
+        <span className="inline-flex items-center gap-1 text-xs">
+          <Check className="h-3.5 w-3.5" /> 14px
+        </span>
+        <span className="inline-flex items-center gap-1 text-sm">
+          <Check className="h-4 w-4" /> 16px (default)
+        </span>
+        <span className="inline-flex items-center gap-1 text-sm">
+          <X className="h-5 w-5" /> 20px
+        </span>
       </Row>
     ),
   },

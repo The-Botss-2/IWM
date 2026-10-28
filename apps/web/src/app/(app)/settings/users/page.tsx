@@ -129,8 +129,8 @@ export default function UsersAdminPage() {
   if (!canManageUsers) {
     return (
       <div className="py-12 text-center">
-        <h2 className="text-lg font-semibold text-ink">Admin only</h2>
-        <p className="mt-1 text-sm text-ink-muted">
+        <h2 className="text-ink text-lg font-semibold">Admin only</h2>
+        <p className="text-ink-muted mt-1 text-sm">
           You need administrator privileges to manage users.
         </p>
       </div>
@@ -141,10 +141,10 @@ export default function UsersAdminPage() {
     <div className="space-y-6">
       <header className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h2 className="text-lg font-semibold text-ink">Users</h2>
-          <p className="text-sm text-ink-muted">
-            Create, edit, and remove user accounts. The Botss is closed to
-            public sign-ups - every user starts here.
+          <h2 className="text-ink text-lg font-semibold">Users</h2>
+          <p className="text-ink-muted text-sm">
+            Create, edit, and remove user accounts. The Botss is closed to public sign-ups - every
+            user starts here.
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -161,7 +161,7 @@ export default function UsersAdminPage() {
         </div>
       </header>
 
-      <div className="rounded-lg border border-line bg-bg-surface p-4">
+      <div className="border-line bg-bg-surface rounded-lg border p-4">
         <div className="flex flex-wrap items-end gap-3">
           <Input
             type="search"
@@ -180,12 +180,10 @@ export default function UsersAdminPage() {
               <Skeleton className="h-14" />
             </div>
           ) : !users.data || users.data.items.length === 0 ? (
-            <p className="py-8 text-center text-sm text-ink-muted">
-              No users match.
-            </p>
+            <p className="text-ink-muted py-8 text-center text-sm">No users match.</p>
           ) : (
             <table className="w-full text-sm">
-              <thead className="text-left text-xs font-medium uppercase tracking-wide text-ink-muted">
+              <thead className="text-ink-muted text-left text-xs font-medium uppercase tracking-wide">
                 <tr>
                   <th className="px-3 py-2">User</th>
                   <th className="px-3 py-2">Role</th>
@@ -197,15 +195,13 @@ export default function UsersAdminPage() {
               </thead>
               <tbody>
                 {users.data.items.map((u) => (
-                  <tr key={u.id} className="border-t border-line">
+                  <tr key={u.id} className="border-line border-t">
                     <td className="px-3 py-3">
                       <div className="flex items-center gap-3">
                         <UserAvatar size="md" name={u.name} image={u.image} />
                         <div className="min-w-0">
-                          <div className="truncate text-sm font-medium text-ink">
-                            {u.name}
-                          </div>
-                          <div className="truncate text-xs text-ink-muted">{u.email}</div>
+                          <div className="text-ink truncate text-sm font-medium">{u.name}</div>
+                          <div className="text-ink-muted truncate text-xs">{u.email}</div>
                         </div>
                       </div>
                     </td>
@@ -214,10 +210,8 @@ export default function UsersAdminPage() {
                         {customRoleName(u.customRoleId) ?? ROLE_LABEL[u.systemRole]}
                       </Badge>
                     </td>
-                    <td className="px-3 py-3 text-xs text-ink-muted">
-                      <span title={absoluteTime(u.createdAt)}>
-                        {relativeTime(u.createdAt)}
-                      </span>
+                    <td className="text-ink-muted px-3 py-3 text-xs">
+                      <span title={absoluteTime(u.createdAt)}>{relativeTime(u.createdAt)}</span>
                     </td>
                     <td className="px-3 py-3 text-right">
                       <div className="flex justify-end gap-1">
@@ -230,7 +224,7 @@ export default function UsersAdminPage() {
                             aria-label={`Access for ${u.name}`}
                             onClick={() => setAccessTarget(u)}
                           >
-                            <ShieldCheck className="h-4 w-4 text-ink-muted" />
+                            <ShieldCheck className="text-ink-muted h-4 w-4" />
                           </Button>
                         ) : null}
                         {isAdmin ? (
@@ -241,7 +235,7 @@ export default function UsersAdminPage() {
                               aria-label={`Edit ${u.name}`}
                               onClick={() => setEditTarget(u)}
                             >
-                              <UserCog className="h-4 w-4 text-ink-muted" />
+                              <UserCog className="text-ink-muted h-4 w-4" />
                             </Button>
                             {u.id !== session.data?.user?.id ? (
                               <Button
@@ -251,7 +245,7 @@ export default function UsersAdminPage() {
                                 title="Sign out everywhere"
                                 onClick={() => setSignOutTarget(u)}
                               >
-                                <LogOut className="h-4 w-4 text-ink-muted" />
+                                <LogOut className="text-ink-muted h-4 w-4" />
                               </Button>
                             ) : null}
                             <Button
@@ -261,11 +255,11 @@ export default function UsersAdminPage() {
                               onClick={() => setDeleteTarget(u)}
                               disabled={isPrimaryAdminEmail(u.email)}
                             >
-                              <Trash2 className="h-4 w-4 text-ink-muted" />
+                              <Trash2 className="text-ink-muted h-4 w-4" />
                             </Button>
                           </>
                         ) : (
-                          <span className="text-xs text-ink-disabled">-</span>
+                          <span className="text-ink-disabled text-xs">-</span>
                         )}
                       </div>
                     </td>
@@ -357,8 +351,7 @@ function CreateUserDialog({
   });
   const [error, setError] = useState<string | null>(null);
 
-  const reset = () =>
-    setForm({ email: '', name: '', password: '', systemRole: 'EMPLOYEE' });
+  const reset = () => setForm({ email: '', name: '', password: '', systemRole: 'EMPLOYEE' });
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -435,9 +428,9 @@ function CreateUserDialog({
               required
             />
             {isCpanelManaged ? (
-              <p className="text-[11px] text-ink-muted">
-                Must match the user&apos;s webmail password - the system uses it to
-                sign in to their mailbox.
+              <p className="text-ink-muted text-[11px]">
+                Must match the user&apos;s webmail password - the system uses it to sign in to their
+                mailbox.
               </p>
             ) : null}
           </div>
@@ -445,9 +438,7 @@ function CreateUserDialog({
             <Label htmlFor="nu-role">Role</Label>
             <Select
               value={form.systemRole}
-              onValueChange={(v) =>
-                setForm((s) => ({ ...s, systemRole: v as SystemRole }))
-              }
+              onValueChange={(v) => setForm((s) => ({ ...s, systemRole: v as SystemRole }))}
             >
               <SelectTrigger id="nu-role">
                 <SelectValue />
@@ -459,21 +450,17 @@ function CreateUserDialog({
                 <SelectItem value="FINANCE">Finance</SelectItem>
                 {/* HR actors can't grant Admin (would be a self-escalation);
                     the server rejects it too. */}
-                {canGrantAdmin ? (
-                  <SelectItem value="ADMIN">Admin</SelectItem>
-                ) : null}
+                {canGrantAdmin ? <SelectItem value="ADMIN">Admin</SelectItem> : null}
                 {/* SUPER_ADMIN can only be granted by another SUPER_ADMIN,
                     and the target must end up in the root org. The DB
                     trigger backstops both rules - we hide the option for
                     everyone else to avoid a guaranteed-403 trip. */}
-                {isSuperAdmin ? (
-                  <SelectItem value="SUPER_ADMIN">Super admin</SelectItem>
-                ) : null}
+                {isSuperAdmin ? <SelectItem value="SUPER_ADMIN">Super admin</SelectItem> : null}
               </SelectContent>
             </Select>
           </div>
           {error ? (
-            <p className="rounded-md border border-red-100 bg-tint-error px-3 py-2 text-sm text-state-error">
+            <p className="bg-tint-error text-state-error rounded-md border border-red-100 px-3 py-2 text-sm">
               {error}
             </p>
           ) : null}
@@ -574,11 +561,7 @@ function EditUserDialog({
         <form className="space-y-3" onSubmit={submit} noValidate>
           <div className="space-y-1">
             <Label htmlFor="eu-name">Name</Label>
-            <Input
-              id="eu-name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-            />
+            <Input id="eu-name" value={name} onChange={(e) => setName(e.target.value)} />
           </div>
           <div className="space-y-1">
             <Label htmlFor="eu-password">New password</Label>
@@ -590,9 +573,9 @@ function EditUserDialog({
               placeholder="Leave blank to keep current password"
             />
             {user && isOnCpanelDomain(user.email) ? (
-              <p className="text-[11px] text-ink-muted">
-                Changing the password here also updates the user&apos;s Mail tab
-                credentials so webmail and CRM stay in sync.
+              <p className="text-ink-muted text-[11px]">
+                Changing the password here also updates the user&apos;s Mail tab credentials so
+                webmail and CRM stay in sync.
               </p>
             ) : null}
           </div>
@@ -615,18 +598,14 @@ function EditUserDialog({
                 {/* SUPER_ADMIN option only when the actor is a SUPER_ADMIN
                     themselves. Server-side check additionally requires the
                     target user to be in the Botss root org. */}
-                {isSuperAdmin ? (
-                  <SelectItem value="SUPER_ADMIN">Super admin</SelectItem>
-                ) : null}
+                {isSuperAdmin ? <SelectItem value="SUPER_ADMIN">Super admin</SelectItem> : null}
               </SelectContent>
             </Select>
             {isPrimaryAdmin ? (
-              <p className="text-[11px] text-ink-muted">
-                The primary admin role is locked.
-              </p>
+              <p className="text-ink-muted text-[11px]">The primary admin role is locked.</p>
             ) : null}
           </div>
-          <label className="flex cursor-pointer items-start gap-2 rounded-md border border-line p-3">
+          <label className="border-line flex cursor-pointer items-start gap-2 rounded-md border p-3">
             <Checkbox
               checked={timesheetExempt}
               onCheckedChange={(v) => setTimesheetExempt(v === true)}
@@ -634,15 +613,15 @@ function EditUserDialog({
               aria-label="Exempt from timesheets"
             />
             <span className="text-sm">
-              <span className="font-medium text-ink">Exempt from timesheets</span>
-              <span className="mt-0.5 block text-[11px] text-ink-muted">
-                Skip this user in the timesheet-warning checks. Use for people
-                not obligated to submit timesheets.
+              <span className="text-ink font-medium">Exempt from timesheets</span>
+              <span className="text-ink-muted mt-0.5 block text-[11px]">
+                Skip this user in the timesheet-warning checks. Use for people not obligated to
+                submit timesheets.
               </span>
             </span>
           </label>
           {error ? (
-            <p className="rounded-md border border-red-100 bg-tint-error px-3 py-2 text-sm text-state-error">
+            <p className="bg-tint-error text-state-error rounded-md border border-red-100 px-3 py-2 text-sm">
               {error}
             </p>
           ) : null}
@@ -705,9 +684,10 @@ function ImportWebmailDialog({
       // Default the display name to the local part of the email, title-cased,
       // so the admin only has to retype if they want something nicer.
       name:
-        c.email.split('@')[0]?.replace(/[._-]+/g, ' ').replace(/\b\w/g, (m) =>
-          m.toUpperCase(),
-        ) ?? '',
+        c.email
+          .split('@')[0]
+          ?.replace(/[._-]+/g, ' ')
+          .replace(/\b\w/g, (m) => m.toUpperCase()) ?? '',
     }));
   };
 
@@ -743,9 +723,9 @@ function ImportWebmailDialog({
         <DialogHeader>
           <DialogTitle>Import existing webmail user</DialogTitle>
           <DialogDescription>
-            Pick a mailbox that already exists in cPanel webmail. The password
-            you choose will be applied to both the CRM credential and the
-            webmail mailbox so the user signs in with the same secret in both.
+            Pick a mailbox that already exists in cPanel webmail. The password you choose will be
+            applied to both the CRM credential and the webmail mailbox so the user signs in with the
+            same secret in both.
           </DialogDescription>
         </DialogHeader>
 
@@ -758,37 +738,25 @@ function ImportWebmailDialog({
                 <Skeleton className="h-10" />
               </div>
             ) : candidates.isError ? (
-              <p className="rounded-md border border-red-100 bg-tint-error px-3 py-2 text-sm text-state-error">
+              <p className="bg-tint-error text-state-error rounded-md border border-red-100 px-3 py-2 text-sm">
                 Couldn&apos;t reach cPanel. Check the CPANEL_API_TOKEN configuration.
               </p>
             ) : !candidates.data || candidates.data.items.length === 0 ? (
-              <p className="py-6 text-center text-sm text-ink-muted">
-                No unlinked mailboxes found. Every webmail account is already
-                in the CRM.
+              <p className="text-ink-muted py-6 text-center text-sm">
+                No unlinked mailboxes found. Every webmail account is already in the CRM.
               </p>
             ) : (
-              <ul className="divide-y divide-line" role="list">
+              <ul className="divide-line divide-y" role="list">
                 {candidates.data.items.map((c) => (
-                  <li
-                    key={c.email}
-                    className="flex items-center justify-between gap-3 py-2"
-                  >
+                  <li key={c.email} className="flex items-center justify-between gap-3 py-2">
                     <div className="min-w-0">
-                      <div className="truncate text-sm font-medium text-ink">
-                        {c.email}
-                      </div>
-                      <div className="text-xs text-ink-muted">
+                      <div className="text-ink truncate text-sm font-medium">{c.email}</div>
+                      <div className="text-ink-muted text-xs">
                         {formatBytes(c.diskUsedBytes)} used
-                        {c.quotaMb > 0
-                          ? ` of ${c.quotaMb} MB`
-                          : ' (unlimited quota)'}
+                        {c.quotaMb > 0 ? ` of ${c.quotaMb} MB` : ' (unlimited quota)'}
                       </div>
                     </div>
-                    <Button
-                      size="sm"
-                      variant="secondary"
-                      onClick={() => pick(c)}
-                    >
+                    <Button size="sm" variant="secondary" onClick={() => pick(c)}>
                       Import
                     </Button>
                   </li>
@@ -798,9 +766,9 @@ function ImportWebmailDialog({
           </div>
         ) : (
           <form className="space-y-3" onSubmit={submit} noValidate>
-            <div className="rounded-md border border-line bg-bg-subtle px-3 py-2 text-sm">
-              <div className="text-xs text-ink-muted">Importing</div>
-              <div className="font-mono text-ink">{selected.email}</div>
+            <div className="border-line bg-bg-subtle rounded-md border px-3 py-2 text-sm">
+              <div className="text-ink-muted text-xs">Importing</div>
+              <div className="text-ink font-mono">{selected.email}</div>
             </div>
             <div className="space-y-1">
               <Label htmlFor="iw-name">Name</Label>
@@ -817,24 +785,19 @@ function ImportWebmailDialog({
                 id="iw-password"
                 autoComplete="new-password"
                 value={form.password}
-                onChange={(e) =>
-                  setForm((s) => ({ ...s, password: e.target.value }))
-                }
+                onChange={(e) => setForm((s) => ({ ...s, password: e.target.value }))}
                 required
               />
-              <p className="text-[11px] text-ink-muted">
-                This sets the user&apos;s CRM password AND replaces their
-                current webmail password. Give them the new password after
-                import.
+              <p className="text-ink-muted text-[11px]">
+                This sets the user&apos;s CRM password AND replaces their current webmail password.
+                Give them the new password after import.
               </p>
             </div>
             <div className="space-y-1">
               <Label htmlFor="iw-role">Role</Label>
               <Select
                 value={form.systemRole}
-                onValueChange={(v) =>
-                  setForm((s) => ({ ...s, systemRole: v as SystemRole }))
-                }
+                onValueChange={(v) => setForm((s) => ({ ...s, systemRole: v as SystemRole }))}
               >
                 <SelectTrigger id="iw-role">
                   <SelectValue />
@@ -848,7 +811,7 @@ function ImportWebmailDialog({
               </Select>
             </div>
             {error ? (
-              <p className="rounded-md border border-red-100 bg-tint-error px-3 py-2 text-sm text-state-error">
+              <p className="bg-tint-error text-state-error rounded-md border border-red-100 px-3 py-2 text-sm">
                 {error}
               </p>
             ) : null}

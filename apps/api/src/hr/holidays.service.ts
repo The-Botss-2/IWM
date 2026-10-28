@@ -1,9 +1,4 @@
-import {
-  ForbiddenException,
-  Injectable,
-  Logger,
-  NotFoundException,
-} from '@nestjs/common';
+import { ForbiddenException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import type {
   ApplyHolidayResponse,
   CreateHolidayInput,
@@ -66,10 +61,7 @@ export class HolidaysService {
     return actor.organizationId;
   }
 
-  async list(
-    actingUserId: string,
-    query: ListHolidaysQuery,
-  ): Promise<HolidayListResponse> {
+  async list(actingUserId: string, query: ListHolidaysQuery): Promise<HolidayListResponse> {
     // Any signed-in user can read holidays for their own org (the
     // attendance grid surfaces them). Cross-org reads are blocked
     // implicitly by the orgId filter.
@@ -99,10 +91,7 @@ export class HolidaysService {
    * the existing row and only writes attendance rows for users who
    * didn't have one yet.
    */
-  async create(
-    actingUserId: string,
-    input: CreateHolidayInput,
-  ): Promise<ApplyHolidayResponse> {
+  async create(actingUserId: string, input: CreateHolidayInput): Promise<ApplyHolidayResponse> {
     await this.admin.assertAdminOrHR(actingUserId);
     const orgId = await this.actorOrgId(actingUserId);
     const date = startOfDay(input.date);
@@ -352,10 +341,7 @@ export class HolidaysService {
    * — the cron handles future dates automatically but a one-click
    * "re-apply" makes the workflow explicit.
    */
-  async apply(
-    actingUserId: string,
-    holidayId: string,
-  ): Promise<ApplyHolidayResponse> {
+  async apply(actingUserId: string, holidayId: string): Promise<ApplyHolidayResponse> {
     await this.admin.assertAdminOrHR(actingUserId);
     const orgId = await this.actorOrgId(actingUserId);
     const holiday = await this.prisma.client.holiday.findUnique({

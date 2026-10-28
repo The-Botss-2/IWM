@@ -34,9 +34,7 @@ export const SOURCE_KIND_LABEL: Record<PaymentSourceKind, string> = {
   OTHER: 'Other',
 };
 
-export const SOURCE_KIND_OPTIONS = Object.keys(
-  SOURCE_KIND_LABEL,
-) as PaymentSourceKind[];
+export const SOURCE_KIND_OPTIONS = Object.keys(SOURCE_KIND_LABEL) as PaymentSourceKind[];
 
 /**
  * Payment-source picker with an inline "add a new one" escape hatch.
@@ -129,10 +127,7 @@ export function PaymentSourceCombobox({
             </div>
             <div>
               <Label>Kind</Label>
-              <Select
-                value={kind}
-                onValueChange={(v) => setKind(v as PaymentSourceKind)}
-              >
+              <Select value={kind} onValueChange={(v) => setKind(v as PaymentSourceKind)}>
                 <SelectTrigger className="mt-1">
                   <SelectValue />
                 </SelectTrigger>

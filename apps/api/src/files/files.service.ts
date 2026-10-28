@@ -112,8 +112,7 @@ export class FilesService {
     // doesn't set the flag. Production R2-with-custom-domain deployments
     // should set this to `false` explicitly.
     this.publicUrlIncludesBucket =
-      (process.env.S3_PUBLIC_URL_INCLUDES_BUCKET ?? 'true').toLowerCase() !==
-      'false';
+      (process.env.S3_PUBLIC_URL_INCLUDES_BUCKET ?? 'true').toLowerCase() !== 'false';
     this.s3 = new S3Client({
       // Path-style addressing keeps MinIO + R2 happy with a single config; the
       // virtual-host style requires DNS routing that local dev doesn't have.
@@ -208,10 +207,7 @@ export class FilesService {
     return { ...file, sizeBytes: file.sizeBytes.toString() };
   }
 
-  async presign(
-    workspaceId: string,
-    input: PresignUploadInput,
-  ): Promise<PresignUploadResponse> {
+  async presign(workspaceId: string, input: PresignUploadInput): Promise<PresignUploadResponse> {
     // Random key prefixed by workspace so a presigned URL can't be replayed
     // against another tenant's prefix even if the URL leaks. NOTE: reads are
     // NOT signed today. `confirmUpload` stores a plain public URL, so the
@@ -285,10 +281,7 @@ export class FilesService {
     // The key we presign is always `workspaces/<workspaceId>/...` in our own
     // bucket. Reject anything else so a member can't register a FileObject
     // pointing at another tenant's object (or an arbitrary bucket/key).
-    if (
-      !input.objectKey.startsWith(`workspaces/${workspaceId}/`) ||
-      input.bucket !== this.bucket
-    ) {
+    if (!input.objectKey.startsWith(`workspaces/${workspaceId}/`) || input.bucket !== this.bucket) {
       throw new ForbiddenException({
         title: 'Invalid upload reference',
         status: 403,
@@ -423,7 +416,11 @@ export class FilesService {
     const notFound = () => new NotFoundException({ title: 'File not found', status: 404 });
     if (workspaceIds.length === 0) throw notFound();
     const file = await this.prisma.client.fileObject.findFirst({
-      where: { id, workspaceId: { in: [...workspaceIds] }, ...generalFileVisibility(opts.financeAccess) },
+      where: {
+        id,
+        workspaceId: { in: [...workspaceIds] },
+        ...generalFileVisibility(opts.financeAccess),
+      },
       select: { bucket: true, objectKey: true, mimeType: true, filename: true, url: true },
     });
     if (!file) throw notFound();
@@ -432,7 +429,9 @@ export class FilesService {
     try {
       res = await this.s3.send(new GetObjectCommand({ Bucket: file.bucket, Key: file.objectKey }));
     } catch (err) {
-      this.logger.warn(`File content read failed id=${id} message=${(err as Error)?.message ?? 'unknown'}`);
+      this.logger.warn(
+        `File content read failed id=${id} message=${(err as Error)?.message ?? 'unknown'}`,
+      );
       throw notFound();
     }
     const body = res.Body as unknown as Readable | undefined;
@@ -453,9 +452,11 @@ export class FilesService {
   ): Promise<{ body: Buffer; mimeType: string; filename: string } | null> {
     // `includeDeleted`: a signature request's frozen PDF must stay readable
     // even if someone removes the FileObject from the Files list.
-    const file = await (this.prisma.client.fileObject.findFirst as unknown as (
-      args: unknown,
-    ) => Promise<{ bucket: string; objectKey: string; mimeType: string; filename: string } | null>)({
+    const file = await (
+      this.prisma.client.fileObject.findFirst as unknown as (
+        args: unknown,
+      ) => Promise<{ bucket: string; objectKey: string; mimeType: string; filename: string } | null>
+    )({
       where: { id: fileId, workspaceId },
       select: { bucket: true, objectKey: true, mimeType: true, filename: true },
       ...(opts.includeDeleted ? { includeDeleted: true } : {}),
@@ -487,7 +488,8 @@ export class FilesService {
       throw new ForbiddenException({
         title: 'Forbidden',
         status: 403,
-        detail: 'Only the person who uploaded this file, or someone who manages all files, can delete it.',
+        detail:
+          'Only the person who uploaded this file, or someone who manages all files, can delete it.',
         code: 'insufficient_permissions',
       });
     }

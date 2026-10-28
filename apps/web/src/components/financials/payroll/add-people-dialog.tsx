@@ -102,8 +102,8 @@ export function AddPeopleDialog({
         <DialogHeader>
           <DialogTitle>Add people to payroll</DialogTitle>
           <DialogDescription>
-            Select people and enter the monthly salary (PKR) each one is paid. Bank details can be added
-            afterwards from the list.
+            Select people and enter the monthly salary (PKR) each one is paid. Bank details can be
+            added afterwards from the list.
           </DialogDescription>
         </DialogHeader>
 
@@ -133,7 +133,7 @@ export function AddPeopleDialog({
                 />
               </li>
             ) : people.length === 0 ? (
-              <li role="presentation" className="px-2 py-6 text-center text-sm text-ink-muted">
+              <li role="presentation" className="text-ink-muted px-2 py-6 text-center text-sm">
                 Nobody matches that search.
               </li>
             ) : (
@@ -160,11 +160,13 @@ export function AddPeopleDialog({
                     >
                       <UserAvatar size="sm" name={p.name || p.email} image={p.image} />
                       <span className="min-w-0 flex-1">
-                        <span className="block truncate text-sm font-medium text-ink">{p.name || p.email}</span>
-                        <span className="block truncate text-xs text-ink-muted">{p.email}</span>
+                        <span className="text-ink block truncate text-sm font-medium">
+                          {p.name || p.email}
+                        </span>
+                        <span className="text-ink-muted block truncate text-xs">{p.email}</span>
                       </span>
                       {onPayroll ? (
-                        <span className="shrink-0 text-xs text-ink-muted">On payroll</span>
+                        <span className="text-ink-muted shrink-0 text-xs">On payroll</span>
                       ) : active ? (
                         <Check className="h-4 w-4 shrink-0" aria-hidden />
                       ) : null}
@@ -176,15 +178,18 @@ export function AddPeopleDialog({
           </ul>
 
           {selected.size > 0 ? (
-            <div className="space-y-2 border-t border-line pt-3">
-              <p className="text-xs font-medium uppercase tracking-wide text-ink-muted">
+            <div className="border-line space-y-2 border-t pt-3">
+              <p className="text-ink-muted text-xs font-medium uppercase tracking-wide">
                 Monthly salary (PKR)
               </p>
               {[...selected.entries()].map(([id, value]) => {
                 const inputId = `salary-${id}`;
                 return (
                   <div key={id} className="flex items-center gap-3">
-                    <Label htmlFor={inputId} className="min-w-0 flex-1 truncate text-sm font-normal">
+                    <Label
+                      htmlFor={inputId}
+                      className="min-w-0 flex-1 truncate text-sm font-normal"
+                    >
                       {nameOf.get(id)}
                     </Label>
                     <Input
@@ -202,7 +207,7 @@ export function AddPeopleDialog({
           ) : null}
 
           {error ? (
-            <p role="alert" className="text-sm text-state-error">
+            <p role="alert" className="text-state-error text-sm">
               {error}
             </p>
           ) : null}

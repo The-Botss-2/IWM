@@ -40,12 +40,9 @@ export function TaskComments({ taskId }: TaskCommentsProps) {
   const items = list.data?.items ?? [];
 
   return (
-    <section
-      aria-label="Comments"
-      className="space-y-4 border-t border-line pt-4"
-    >
+    <section aria-label="Comments" className="border-line space-y-4 border-t pt-4">
       <div className="flex items-center justify-between">
-        <h3 className="text-xs font-semibold uppercase tracking-wide text-ink-muted">
+        <h3 className="text-ink-muted text-xs font-semibold uppercase tracking-wide">
           Comments {items.length > 0 ? `(${items.length})` : null}
         </h3>
       </div>
@@ -57,18 +54,18 @@ export function TaskComments({ taskId }: TaskCommentsProps) {
           </li>
         ) : list.isError && !list.data ? (
           <li>
-            <QueryError compact message="Couldn't load comments." onRetry={() => void list.refetch()} />
+            <QueryError
+              compact
+              message="Couldn't load comments."
+              onRetry={() => void list.refetch()}
+            />
           </li>
         ) : items.length === 0 ? (
-          <li className="text-sm text-ink-disabled">No comments yet.</li>
+          <li className="text-ink-disabled text-sm">No comments yet.</li>
         ) : (
           items.map((c) => (
             <li key={c.id}>
-              <CommentItem
-                comment={c}
-                taskId={taskId}
-                currentUserId={user?.id ?? null}
-              />
+              <CommentItem comment={c} taskId={taskId} currentUserId={user?.id ?? null} />
             </li>
           ))
         )}
@@ -141,15 +138,13 @@ function CommentItem({ comment, taskId, currentUserId }: CommentItemProps) {
       />
       <div className="min-w-0 flex-1">
         <header className="flex items-center gap-2 text-xs">
-          <span className="font-medium text-ink">
+          <span className="text-ink font-medium">
             {comment.author.name || comment.author.email}
           </span>
           <Tooltip content={absoluteTime(comment.createdAt)}>
             <span className="text-ink-muted">{relativeTime(comment.createdAt)}</span>
           </Tooltip>
-          {comment.editedAt ? (
-            <span className="text-ink-disabled">· edited</span>
-          ) : null}
+          {comment.editedAt ? <span className="text-ink-disabled">· edited</span> : null}
           {isMine ? (
             <div className="relative ml-auto">
               <button
@@ -157,12 +152,12 @@ function CommentItem({ comment, taskId, currentUserId }: CommentItemProps) {
                 aria-label="Comment actions"
                 onClick={() => setMenuOpen((o) => !o)}
                 onBlur={() => setTimeout(() => setMenuOpen(false), 100)}
-                className="rounded p-1 text-ink-disabled hover:bg-bg-subtle hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:shadow-focus"
+                className="text-ink-disabled hover:bg-bg-subtle hover:text-ink focus-visible:shadow-focus rounded p-1 focus-visible:outline-none focus-visible:ring-2"
               >
                 <MoreHorizontal className="h-3.5 w-3.5" />
               </button>
               {menuOpen ? (
-                <div className="absolute right-0 z-10 mt-1 w-max min-w-[8rem] rounded-md border border-line bg-white py-1 shadow-md">
+                <div className="border-line absolute right-0 z-10 mt-1 w-max min-w-[8rem] rounded-md border bg-white py-1 shadow-md">
                   <button
                     type="button"
                     onMouseDown={(e) => e.preventDefault()}
@@ -170,7 +165,7 @@ function CommentItem({ comment, taskId, currentUserId }: CommentItemProps) {
                       setMenuOpen(false);
                       setEditing(true);
                     }}
-                    className="flex w-full items-center gap-2 px-3 py-1.5 text-left text-xs text-ink hover:bg-bg-subtle"
+                    className="text-ink hover:bg-bg-subtle flex w-full items-center gap-2 px-3 py-1.5 text-left text-xs"
                   >
                     <Pencil className="h-3 w-3" />
                     Edit
@@ -182,7 +177,7 @@ function CommentItem({ comment, taskId, currentUserId }: CommentItemProps) {
                       setMenuOpen(false);
                       remove.mutate(comment.id);
                     }}
-                    className="flex w-full items-center gap-2 px-3 py-1.5 text-left text-xs text-state-error hover:bg-tint-error"
+                    className="text-state-error hover:bg-tint-error flex w-full items-center gap-2 px-3 py-1.5 text-left text-xs"
                   >
                     <Trash2 className="h-3 w-3" />
                     Delete
@@ -192,7 +187,7 @@ function CommentItem({ comment, taskId, currentUserId }: CommentItemProps) {
             </div>
           ) : null}
         </header>
-        <div className="prose prose-sm mt-1 max-w-none text-ink">
+        <div className="prose prose-sm text-ink mt-1 max-w-none">
           <EditorContent editor={editor} />
         </div>
       </div>
@@ -254,15 +249,16 @@ function CommentEditor({
   const fileIdsRef = useRef<Set<string>>(new Set(seedIds));
 
   const editor = useEditor({
-    extensions: [...baseExtensions({ includeImage: false, placeholder: 'Add a comment…' }), CustomImage],
+    extensions: [
+      ...baseExtensions({ includeImage: false, placeholder: 'Add a comment…' }),
+      CustomImage,
+    ],
     content: (initialContent as object | null) ?? EMPTY_DOC,
     editable: true,
     immediatelyRender: false,
     editorProps: {
       attributes: {
-        class: cn(
-          'prose prose-sm max-w-none focus:outline-none min-h-[60px] px-3 py-2',
-        ),
+        class: cn('prose prose-sm max-w-none focus:outline-none min-h-[60px] px-3 py-2'),
       },
       handlePaste: (_view, event) => handlePastedFiles(event.clipboardData?.files),
       handleDrop: (_view, event) => {
@@ -391,15 +387,15 @@ function CommentEditor({
   return (
     <div className="flex gap-3">
       <UserAvatar size="sm" name={author.name || author.email} image={author.image} />
-      <div className="min-w-0 flex-1 rounded-md border border-line bg-white">
+      <div className="border-line min-w-0 flex-1 rounded-md border bg-white">
         <EditorContent editor={editor} />
-        <div className="flex items-center justify-between gap-2 border-t border-line px-2 py-1.5">
+        <div className="border-line flex items-center justify-between gap-2 border-t px-2 py-1.5">
           <div className="flex items-center gap-1">
             <button
               type="button"
               aria-label="Attach image"
               onClick={() => fileInputRef.current?.click()}
-              className="inline-flex h-7 w-7 items-center justify-center rounded text-ink-muted hover:bg-bg-subtle hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:shadow-focus"
+              className="text-ink-muted hover:bg-bg-subtle hover:text-ink focus-visible:shadow-focus inline-flex h-7 w-7 items-center justify-center rounded focus-visible:outline-none focus-visible:ring-2"
             >
               <ImagePlus className="h-4 w-4" />
             </button>
@@ -414,7 +410,7 @@ function CommentEditor({
                 e.target.value = '';
               }}
             />
-            <span className="text-[10px] text-ink-disabled hidden sm:inline">
+            <span className="text-ink-disabled hidden text-[10px] sm:inline">
               Ctrl/Cmd+Enter to send
             </span>
           </div>

@@ -80,8 +80,9 @@ export function useLivekitRoom() {
   const [micEnabled, setMicEnabled] = useState(true);
   const [cameraEnabled, setCameraEnabled] = useState(false);
   const [screenShareEnabled, setScreenShareEnabled] = useState(false);
-  const [screenShareQuality, setScreenShareQualityState] =
-    useState<ScreenShareQuality>(DEFAULT_SCREEN_SHARE_QUALITY);
+  const [screenShareQuality, setScreenShareQualityState] = useState<ScreenShareQuality>(
+    DEFAULT_SCREEN_SHARE_QUALITY,
+  );
   const [roomName, setRoomName] = useState<string | null>(null);
   const [activeRoomId, setActiveRoomId] = useState<string | null>(null);
 
@@ -125,9 +126,7 @@ export function useLivekitRoom() {
     // Keep the local screen-share flag in sync with what LiveKit actually
     // reports, so the UI button doesn't get stuck "on" if the OS-level
     // share-picker was cancelled or the share track was removed externally.
-    const localScreenPub = room.localParticipant.getTrackPublication(
-      Track.Source.ScreenShare,
-    );
+    const localScreenPub = room.localParticipant.getTrackPublication(Track.Source.ScreenShare);
     setScreenShareEnabled(localScreenPub != null && !localScreenPub.isMuted);
   }, []);
 
@@ -150,11 +149,7 @@ export function useLivekitRoom() {
   }, []);
 
   const connect = useCallback(
-    async (input: {
-      kind: 'chat-room' | 'voice-channel';
-      roomId: string;
-      withVideo?: boolean;
-    }) => {
+    async (input: { kind: 'chat-room' | 'voice-channel'; roomId: string; withVideo?: boolean }) => {
       if (roomRef.current) {
         // Already in a room - disconnect first so we don't stack sessions
         // and end up with two media engines competing for the mic.
@@ -185,7 +180,9 @@ export function useLivekitRoom() {
         room
           .on(RoomEvent.ParticipantConnected, refresh)
           .on(RoomEvent.ParticipantDisconnected, refresh)
-          .on(RoomEvent.TrackSubscribed, (_track: RemoteTrack, _pub: RemoteTrackPublication) => refresh())
+          .on(RoomEvent.TrackSubscribed, (_track: RemoteTrack, _pub: RemoteTrackPublication) =>
+            refresh(),
+          )
           .on(RoomEvent.TrackUnsubscribed, () => refresh())
           .on(RoomEvent.TrackMuted, (_pub: TrackPublication) => refresh())
           .on(RoomEvent.TrackUnmuted, (_pub: TrackPublication) => refresh())
@@ -203,7 +200,8 @@ export function useLivekitRoom() {
             else if (
               state === ConnectionState.Reconnecting ||
               state === ConnectionState.SignalReconnecting
-            ) setPhase('reconnecting');
+            )
+              setPhase('reconnecting');
             else if (state === ConnectionState.Connecting) setPhase('connecting');
             else if (state === ConnectionState.Disconnected) {
               setPhase('idle');
@@ -215,17 +213,16 @@ export function useLivekitRoom() {
             // SIGNAL_CLOSE here; the user-driven one (we called disconnect)
             // is CLIENT_INITIATED. Only show a toast in the unexpected
             // cases - quitting normally shouldn't yell at the user.
-            if (
-              reason !== undefined &&
-              reason !== DisconnectReason.CLIENT_INITIATED
-            ) {
-              toastErrorMessage("Call disconnected", { description: "The connection to the call was lost. Check your network and rejoin." });
+            if (reason !== undefined && reason !== DisconnectReason.CLIENT_INITIATED) {
+              toastErrorMessage('Call disconnected', {
+                description: 'The connection to the call was lost. Check your network and rejoin.',
+              });
             }
             void teardown();
           })
           .on(RoomEvent.MediaDevicesError, (err: Error) => {
             console.error('[livekit] media device error:', err);
-            toastError(err, "Microphone or camera unavailable");
+            toastError(err, 'Microphone or camera unavailable');
           })
           .on(RoomEvent.SignalConnected, () => refresh());
 
@@ -237,10 +234,7 @@ export function useLivekitRoom() {
           autoSubscribe: true,
         });
         const watchdog = new Promise<never>((_, reject) => {
-          setTimeout(
-            () => reject(new Error('Connection timed out.')),
-            20_000,
-          );
+          setTimeout(() => reject(new Error('Connection timed out.')), 20_000);
         });
         await Promise.race([connectPromise, watchdog]);
         await room.localParticipant.setMicrophoneEnabled(true);
@@ -320,11 +314,7 @@ export function useLivekitRoom() {
       // capture resolution/fps and the publish encoding.
       if (next) {
         const profile = SCREEN_SHARE_QUALITY_PROFILES[screenShareQuality];
-        await room.localParticipant.setScreenShareEnabled(
-          true,
-          profile.capture,
-          profile.publish,
-        );
+        await room.localParticipant.setScreenShareEnabled(true, profile.capture, profile.publish);
       } else {
         await room.localParticipant.setScreenShareEnabled(false);
       }
@@ -356,11 +346,7 @@ export function useLivekitRoom() {
       const profile = SCREEN_SHARE_QUALITY_PROFILES[quality];
       try {
         await room.localParticipant.setScreenShareEnabled(false);
-        await room.localParticipant.setScreenShareEnabled(
-          true,
-          profile.capture,
-          profile.publish,
-        );
+        await room.localParticipant.setScreenShareEnabled(true, profile.capture, profile.publish);
         setScreenShareEnabled(true);
         refresh();
       } catch (err) {
@@ -434,10 +420,7 @@ export function useLivekitRoom() {
  * toasting "Couldn't connect."
  */
 function isBenignCancellation(err: unknown): boolean {
-  if (
-    err instanceof ConnectionError &&
-    err.reason === ConnectionErrorReason.Cancelled
-  ) {
+  if (err instanceof ConnectionError && err.reason === ConnectionErrorReason.Cancelled) {
     return true;
   }
   const msg = (err as { message?: string })?.message ?? '';

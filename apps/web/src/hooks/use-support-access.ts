@@ -46,7 +46,10 @@ export function useCreateSupportGrant(options: { onSuccess?: () => void } = {}) 
 export function useRevokeSupportGrant() {
   const qc = useQueryClient();
   return useMutation({
-    meta: { errorTitle: "Couldn't revoke support access", successMessage: 'Support access revoked' },
+    meta: {
+      errorTitle: "Couldn't revoke support access",
+      successMessage: 'Support access revoked',
+    },
     mutationFn: (grantId: string) => getApi().support.revokeGrant(grantId),
     onSuccess: () => void qc.invalidateQueries({ queryKey: grantsKey }),
   });

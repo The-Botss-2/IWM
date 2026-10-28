@@ -162,7 +162,6 @@ assert.equal(render(prismaError('P2034')).status, 500);
   assert.equal(body.detail, 'Not allowed.');
 }
 
-
 // Static scan: RFC 7807 `title` / `detail` string literals under src must not
 // use " - ", en dashes or em dashes (log lines are not scanned).
 {
@@ -201,7 +200,8 @@ assert.equal(render(prismaError('P2034')).status, 500);
     };
     const visit = (node: ts.Node): void => {
       if (ts.isPropertyAssignment(node)) {
-        const key = ts.isIdentifier(node.name) || ts.isStringLiteral(node.name) ? node.name.text : '';
+        const key =
+          ts.isIdentifier(node.name) || ts.isStringLiteral(node.name) ? node.name.text : '';
         if (key === 'title' || key === 'detail') {
           // Skip log lines such as logger.warn({ title: ... }).
           const call = node.parent.parent;
@@ -215,7 +215,11 @@ assert.equal(render(prismaError('P2034')).status, 500);
     };
     visit(sf);
   }
-  assert.deepEqual(offenders, [], `Problem details text must not use dashes:\n${offenders.join('\n')}`);
+  assert.deepEqual(
+    offenders,
+    [],
+    `Problem details text must not use dashes:\n${offenders.join('\n')}`,
+  );
 }
 
 console.log('problem-details: OK');

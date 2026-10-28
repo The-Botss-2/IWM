@@ -104,9 +104,7 @@ export class AttendanceService implements OnApplicationBootstrap {
    * HR in Org A could pull the attendance matrix for Org B's staff. An
    * org-less actor matches nobody.
    */
-  private async resolveOrgFilter(
-    actingUserId: string,
-  ): Promise<{ organizationId: string }> {
+  private async resolveOrgFilter(actingUserId: string): Promise<{ organizationId: string }> {
     // AuthGuard already read the actor's role and org for this request.
     const actor =
       requestAuthFor(actingUserId) ??
@@ -381,16 +379,11 @@ export class AttendanceService implements OnApplicationBootstrap {
     // which users to stamp without re-querying.
     const usersByOrg = new Map<string, string[]>();
     for (const u of inScopeUsers) {
-      const list = usersByOrg.get(
-        (u as { organizationId?: string | null }).organizationId ?? '',
-      );
+      const list = usersByOrg.get((u as { organizationId?: string | null }).organizationId ?? '');
       if (list) {
         list.push(u.id);
       } else {
-        usersByOrg.set(
-          (u as { organizationId?: string | null }).organizationId ?? '',
-          [u.id],
-        );
+        usersByOrg.set((u as { organizationId?: string | null }).organizationId ?? '', [u.id]);
       }
     }
     const byUser = new Map<string, Map<string, AttendanceStatus>>();
@@ -456,10 +449,7 @@ export class AttendanceService implements OnApplicationBootstrap {
    * unique index makes this idempotent - repeated saves overwrite the
    * earlier row's status + notes + timestamp.
    */
-  async override(
-    actingUserId: string,
-    input: OverrideAttendanceInput,
-  ): Promise<{ ok: true }> {
+  async override(actingUserId: string, input: OverrideAttendanceInput): Promise<{ ok: true }> {
     await this.admin.assertAdminOrHR(actingUserId);
     // HR/ADMIN/SUPER_ADMIN may only override attendance for users in their
     // own org. Without this, HR in Org A could forge attendance for a user
@@ -530,9 +520,7 @@ export class AttendanceService implements OnApplicationBootstrap {
       where: { date: day },
       select: { organizationId: true },
     });
-    const orgsOnHoliday = new Set(
-      holidaysForDay.map((h) => h.organizationId),
-    );
+    const orgsOnHoliday = new Set(holidaysForDay.map((h) => h.organizationId));
 
     // Users who logged at least one entry that day.
     const entries = await this.prisma.client.timeEntry.groupBy({

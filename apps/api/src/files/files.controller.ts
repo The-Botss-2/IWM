@@ -83,7 +83,10 @@ export class FilesController {
     // The link may carry a support token; never pass it on as a Referer.
     res.setHeader('Referrer-Policy', 'no-referrer');
     // Served from the API origin: never let a stored document run script.
-    res.setHeader('Content-Security-Policy', "default-src 'none'; img-src 'self'; media-src 'self'; style-src 'unsafe-inline'; sandbox");
+    res.setHeader(
+      'Content-Security-Policy',
+      "default-src 'none'; img-src 'self'; media-src 'self'; style-src 'unsafe-inline'; sandbox",
+    );
     return new StreamableFile(file.stream, {
       type: inlineType ?? 'application/octet-stream',
       disposition: contentDisposition(inlineType ? 'inline' : 'attachment', file.filename),

@@ -47,9 +47,10 @@ export function countByStatus(items: TaskWithPeople[]) {
   const counts = new Map<TaskStatus, number>();
   for (const s of STATUS_ORDER) counts.set(s, 0);
   for (const t of items) counts.set(t.status, (counts.get(t.status) ?? 0) + 1);
-  const rows: StatusCount[] = STATUS_ORDER.filter((s) => (counts.get(s) ?? 0) > 0).map(
-    (s) => ({ status: s, value: counts.get(s) ?? 0 }),
-  );
+  const rows: StatusCount[] = STATUS_ORDER.filter((s) => (counts.get(s) ?? 0) > 0).map((s) => ({
+    status: s,
+    value: counts.get(s) ?? 0,
+  }));
   const total = rows.reduce((a, r) => a + r.value, 0);
   return { rows, total };
 }
@@ -318,7 +319,6 @@ function isoWeekWindow(now: Date): TimeWindow {
   return { start: start.getTime(), end: end.getTime() };
 }
 
-
 export type CompletionGranularity = 'day' | 'week' | 'month';
 
 /** Days up to a month, weeks up to ~half a year, months beyond. */
@@ -475,7 +475,8 @@ export function useCompletedThisWeek() {
     delta: computeDelta(counts.thisWeek, counts.prevWeek),
     isLoading: range ? currentQ.isLoading || prevQ.isLoading : listQ.isLoading,
     isError: range
-      ? (currentQ.isError && currentQ.data === undefined) || (prevQ.isError && prevQ.data === undefined)
+      ? (currentQ.isError && currentQ.data === undefined) ||
+        (prevQ.isError && prevQ.data === undefined)
       : listQ.isError && !listQ.data,
     refetch: () => {
       if (range) {

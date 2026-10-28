@@ -4,7 +4,6 @@ import Link from 'next/link';
 
 import { Check, Droplet, Monitor, Moon, Sparkles, Sun, Type } from 'lucide-react';
 
-
 import {
   type AppBodyMode,
   type AppNavLayout,
@@ -59,14 +58,11 @@ export default function AppearanceSettingsPage() {
   return (
     <div className="space-y-10">
       <section>
-        <h2 className="mb-1 text-lg font-semibold text-ink dark:text-slate-100">
-          Navigation
-        </h2>
-        <p className="mb-4 text-sm text-ink-muted">
-          Where primary navigation lives, and how the pages around it look. Both
-          layouts show the same pages with the same permissions, and you can
-          switch back at any time. Saved to your account. To choose which
-          sections appear, see{' '}
+        <h2 className="text-ink mb-1 text-lg font-semibold dark:text-slate-100">Navigation</h2>
+        <p className="text-ink-muted mb-4 text-sm">
+          Where primary navigation lives, and how the pages around it look. Both layouts show the
+          same pages with the same permissions, and you can switch back at any time. Saved to your
+          account. To choose which sections appear, see{' '}
           <Link href="/settings/navigation" className="underline">
             Navigation
           </Link>
@@ -83,21 +79,21 @@ export default function AppearanceSettingsPage() {
                 aria-pressed={active}
                 className={cn(
                   'group relative flex flex-col gap-3 rounded-lg border p-3 text-left transition-all',
-                  'focus-visible:outline-none focus-visible:shadow-focus',
+                  'focus-visible:shadow-focus focus-visible:outline-none',
                   active
                     ? 'border-brand-purple bg-brand-gradient-soft shadow-soft'
-                    : 'border-line bg-white hover:border-line-strong dark:border-slate-700 dark:bg-slate-800 dark:hover:border-slate-600',
+                    : 'border-line hover:border-line-strong bg-white dark:border-slate-700 dark:bg-slate-800 dark:hover:border-slate-600',
                 )}
               >
                 <NavLayoutPreview layout={n.id} />
                 <span>
-                  <span className="block text-sm font-medium text-ink dark:text-slate-100">
+                  <span className="text-ink block text-sm font-medium dark:text-slate-100">
                     {n.label}
                   </span>
-                  <span className="block text-xs text-ink-muted">{n.description}</span>
+                  <span className="text-ink-muted block text-xs">{n.description}</span>
                 </span>
                 {active ? (
-                  <span className="absolute right-3 top-3 rounded-full bg-brand-purple p-1 text-white">
+                  <span className="bg-brand-purple absolute right-3 top-3 rounded-full p-1 text-white">
                     <Check className="h-3 w-3" aria-hidden />
                   </span>
                 ) : null}
@@ -108,10 +104,10 @@ export default function AppearanceSettingsPage() {
       </section>
 
       <section>
-        <h2 className="mb-1 text-lg font-semibold text-ink dark:text-slate-100">Display size</h2>
-        <p className="mb-4 text-sm text-ink-muted">
-          Scales the whole app - text, spacing, and controls - like a zoom level. Applies
-          instantly to every page and follows you to every device.
+        <h2 className="text-ink mb-1 text-lg font-semibold dark:text-slate-100">Display size</h2>
+        <p className="text-ink-muted mb-4 text-sm">
+          Scales the whole app - text, spacing, and controls - like a zoom level. Applies instantly
+          to every page and follows you to every device.
         </p>
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {UI_SCALES.map((s) => {
@@ -124,10 +120,10 @@ export default function AppearanceSettingsPage() {
                 aria-pressed={active}
                 className={cn(
                   'group relative flex flex-col items-start gap-2 rounded-lg border px-4 py-3 text-left transition-all',
-                  'focus-visible:outline-none focus-visible:shadow-focus',
+                  'focus-visible:shadow-focus focus-visible:outline-none',
                   active
                     ? 'border-brand-purple bg-brand-gradient-soft shadow-soft'
-                    : 'border-line bg-white hover:border-line-strong dark:border-slate-700 dark:bg-slate-800 dark:hover:border-slate-600',
+                    : 'border-line hover:border-line-strong bg-white dark:border-slate-700 dark:bg-slate-800 dark:hover:border-slate-600',
                 )}
               >
                 <Type
@@ -137,12 +133,12 @@ export default function AppearanceSettingsPage() {
                   style={{ width: s.rootPx, height: s.rootPx }}
                   aria-hidden
                 />
-                <span className="block text-sm font-medium text-ink dark:text-slate-100">
+                <span className="text-ink block text-sm font-medium dark:text-slate-100">
                   {s.label}
                 </span>
-                <span className="block text-xs text-ink-muted">{s.description}</span>
+                <span className="text-ink-muted block text-xs">{s.description}</span>
                 {active ? (
-                  <span className="absolute right-3 top-3 rounded-full bg-brand-purple p-1 text-white">
+                  <span className="bg-brand-purple absolute right-3 top-3 rounded-full p-1 text-white">
                     <Check className="h-3 w-3" aria-hidden />
                   </span>
                 ) : null}
@@ -153,10 +149,10 @@ export default function AppearanceSettingsPage() {
       </section>
 
       <section>
-        <h2 className="mb-1 text-lg font-semibold text-ink dark:text-slate-100">Theme</h2>
-        <p className="mb-4 text-sm text-ink-muted">
-          Affects every page in the CRM. Components without dark-mode styling yet will keep
-          their light look - coverage rolls out incrementally.
+        <h2 className="text-ink mb-1 text-lg font-semibold dark:text-slate-100">Theme</h2>
+        <p className="text-ink-muted mb-4 text-sm">
+          Affects every page in the CRM. Components without dark-mode styling yet will keep their
+          light look - coverage rolls out incrementally.
         </p>
         <div className="grid gap-3 sm:grid-cols-3">
           {THEMES.map((t) => {
@@ -170,10 +166,10 @@ export default function AppearanceSettingsPage() {
                 aria-pressed={active}
                 className={cn(
                   'group relative flex flex-col items-start gap-2 rounded-lg border px-4 py-3 text-left transition-all',
-                  'focus-visible:outline-none focus-visible:shadow-focus',
+                  'focus-visible:shadow-focus focus-visible:outline-none',
                   active
                     ? 'border-brand-purple bg-brand-gradient-soft shadow-soft'
-                    : 'border-line bg-white hover:border-line-strong dark:border-slate-700 dark:bg-slate-800 dark:hover:border-slate-600',
+                    : 'border-line hover:border-line-strong bg-white dark:border-slate-700 dark:bg-slate-800 dark:hover:border-slate-600',
                 )}
               >
                 <Icon
@@ -183,12 +179,12 @@ export default function AppearanceSettingsPage() {
                   )}
                   aria-hidden
                 />
-                <span className="block text-sm font-medium text-ink dark:text-slate-100">
+                <span className="text-ink block text-sm font-medium dark:text-slate-100">
                   {t.label}
                 </span>
-                <span className="block text-xs text-ink-muted">{t.description}</span>
+                <span className="text-ink-muted block text-xs">{t.description}</span>
                 {active ? (
-                  <span className="absolute right-3 top-3 rounded-full bg-brand-purple p-1 text-white">
+                  <span className="bg-brand-purple absolute right-3 top-3 rounded-full p-1 text-white">
                     <Check className="h-3 w-3" aria-hidden />
                   </span>
                 ) : null}
@@ -199,12 +195,10 @@ export default function AppearanceSettingsPage() {
       </section>
 
       <section>
-        <h2 className="mb-1 text-lg font-semibold text-ink dark:text-slate-100">
-          Brand gradient
-        </h2>
-        <p className="mb-4 text-sm text-ink-muted">
-          Used by every primary button, the floating action button, settings nav, and the
-          sign-in panel. Changes apply instantly to every page.
+        <h2 className="text-ink mb-1 text-lg font-semibold dark:text-slate-100">Brand gradient</h2>
+        <p className="text-ink-muted mb-4 text-sm">
+          Used by every primary button, the floating action button, settings nav, and the sign-in
+          panel. Changes apply instantly to every page.
         </p>
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {GRADIENT_PRESETS.map((preset) => {
@@ -217,7 +211,7 @@ export default function AppearanceSettingsPage() {
                 aria-pressed={active}
                 className={cn(
                   'group relative overflow-hidden rounded-lg border p-1 text-left transition-all',
-                  'focus-visible:outline-none focus-visible:shadow-focus',
+                  'focus-visible:shadow-focus focus-visible:outline-none',
                   active
                     ? 'border-brand-purple shadow-soft'
                     : 'border-line hover:border-line-strong dark:border-slate-700 dark:hover:border-slate-600',
@@ -229,11 +223,11 @@ export default function AppearanceSettingsPage() {
                   aria-hidden
                 />
                 <div className="flex items-center justify-between px-2 py-2">
-                  <span className="text-sm font-medium text-ink dark:text-slate-100">
+                  <span className="text-ink text-sm font-medium dark:text-slate-100">
                     {preset.label}
                   </span>
                   {active ? (
-                    <span className="rounded-full bg-brand-purple p-1 text-white">
+                    <span className="bg-brand-purple rounded-full p-1 text-white">
                       <Check className="h-3 w-3" aria-hidden />
                     </span>
                   ) : null}
@@ -245,11 +239,10 @@ export default function AppearanceSettingsPage() {
       </section>
 
       <section>
-        <h2 className="mb-1 text-lg font-semibold text-ink">Body background</h2>
-        <p className="mb-4 text-sm text-ink-muted">
-          Solid uses the theme&rsquo;s neutral surface (blush on light, dark on
-          dark). Gradient washes the whole CRM in the active brand gradient -
-          cards and panels still read on top.
+        <h2 className="text-ink mb-1 text-lg font-semibold">Body background</h2>
+        <p className="text-ink-muted mb-4 text-sm">
+          Solid uses the theme&rsquo;s neutral surface (blush on light, dark on dark). Gradient
+          washes the whole CRM in the active brand gradient - cards and panels still read on top.
         </p>
         <div className="grid gap-3 sm:grid-cols-2">
           {BODY_MODES.map((m) => {
@@ -263,29 +256,22 @@ export default function AppearanceSettingsPage() {
                 aria-pressed={active}
                 className={cn(
                   'group relative flex items-center gap-3 rounded-lg border px-4 py-3 text-left transition-all',
-                  'focus-visible:outline-none focus-visible:shadow-focus',
+                  'focus-visible:shadow-focus focus-visible:outline-none',
                   active
                     ? 'border-brand-purple bg-brand-gradient-soft shadow-soft'
                     : 'border-line bg-bg-surface hover:border-line-strong',
                 )}
               >
                 <Icon
-                  className={cn(
-                    'h-5 w-5',
-                    active ? 'text-brand-purple' : 'text-ink-muted',
-                  )}
+                  className={cn('h-5 w-5', active ? 'text-brand-purple' : 'text-ink-muted')}
                   aria-hidden
                 />
                 <div className="flex-1">
-                  <span className="block text-sm font-medium text-ink">
-                    {m.label}
-                  </span>
-                  <span className="block text-xs text-ink-muted">
-                    {m.description}
-                  </span>
+                  <span className="text-ink block text-sm font-medium">{m.label}</span>
+                  <span className="text-ink-muted block text-xs">{m.description}</span>
                 </div>
                 {active ? (
-                  <span className="rounded-full bg-brand-purple p-1 text-white">
+                  <span className="bg-brand-purple rounded-full p-1 text-white">
                     <Check className="h-3 w-3" aria-hidden />
                   </span>
                 ) : null}
@@ -294,8 +280,6 @@ export default function AppearanceSettingsPage() {
           })}
         </div>
       </section>
-
-
     </div>
   );
 }
@@ -308,35 +292,32 @@ export default function AppearanceSettingsPage() {
 function NavLayoutPreview({ layout }: { layout: AppNavLayout }) {
   if (layout === 'rail') {
     return (
-      <span
-        aria-hidden
-        className="flex h-20 w-full overflow-hidden rounded-md border border-line"
-      >
+      <span aria-hidden className="border-line flex h-20 w-full overflow-hidden rounded-md border">
         <span className="flex w-[9%] flex-col items-center gap-1 bg-[#14161A] py-1.5">
-          <span className="h-1.5 w-1.5 rounded-sm bg-brand-gradient" />
+          <span className="bg-brand-gradient h-1.5 w-1.5 rounded-sm" />
           <span className="h-1 w-2 rounded-sm bg-white/25" />
           <span className="h-1 w-2 rounded-sm bg-white/15" />
           <span className="h-1 w-2 rounded-sm bg-white/15" />
         </span>
         <span className="flex w-[30%] flex-col gap-1 bg-[#1B1E24] p-1.5">
           <span className="h-1.5 w-full rounded-sm bg-white/10" />
-          <span className="h-1 w-3/4 rounded-sm bg-brand-gradient" />
+          <span className="bg-brand-gradient h-1 w-3/4 rounded-sm" />
           <span className="h-1 w-2/3 rounded-sm bg-white/10" />
           <span className="h-1 w-3/5 rounded-sm bg-white/10" />
         </span>
-        <span className="flex-1 bg-bg-subtle" />
+        <span className="bg-bg-subtle flex-1" />
       </span>
     );
   }
   return (
     <span
       aria-hidden
-      className="flex h-20 w-full flex-col overflow-hidden rounded-md border border-line"
+      className="border-line flex h-20 w-full flex-col overflow-hidden rounded-md border"
     >
-      <span className="flex items-center justify-center bg-bg-subtle py-2">
-        <span className="h-2 w-1/2 rounded-full bg-brand-gradient" />
+      <span className="bg-bg-subtle flex items-center justify-center py-2">
+        <span className="bg-brand-gradient h-2 w-1/2 rounded-full" />
       </span>
-      <span className="flex-1 bg-bg-subtle" />
+      <span className="bg-bg-subtle flex-1" />
     </span>
   );
 }

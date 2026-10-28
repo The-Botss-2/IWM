@@ -64,10 +64,7 @@ export class WorkspacesResource {
   /** Revoke a *pending* invitation - deletes membership + token. For
    * accepted members use `removeCurrentMember`. */
   revokeInvitation(membershipId: string) {
-    return this.http.delete(
-      `/workspaces/current/members/${membershipId}/invite`,
-      okSchema,
-    );
+    return this.http.delete(`/workspaces/current/members/${membershipId}/invite`, okSchema);
   }
   /** Members of the workspace owning the given project - works even when the
    * caller's current workspace is something different (e.g. an outside

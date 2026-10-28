@@ -54,13 +54,19 @@ export function PayrollPanel({
             <h2 id="payroll-runs-heading" className="text-base font-semibold">
               Payroll runs
             </h2>
-            <p className="text-sm text-ink-muted">One per month. Paying a run records the salaries as expenses.</p>
+            <p className="text-ink-muted text-sm">
+              One per month. Paying a run records the salaries as expenses.
+            </p>
           </div>
           <div className="flex flex-wrap gap-2">
             <Button variant="secondary" onClick={() => setImportOpen(true)}>
               <FileUp className="h-4 w-4" /> Import sheet
             </Button>
-            <Button variant="secondary" onClick={() => setNewRunOpen(true)} disabled={active.length === 0}>
+            <Button
+              variant="secondary"
+              onClick={() => setNewRunOpen(true)}
+              disabled={active.length === 0}
+            >
               <CalendarPlus className="h-4 w-4" /> New payroll run
             </Button>
           </div>
@@ -77,13 +83,16 @@ export function PayrollPanel({
               : 'No payroll runs yet. Start one for this month.'}
           </Empty>
         ) : (
-          <ul className="divide-y divide-line rounded-md border border-line bg-bg-surface" role="list">
+          <ul
+            className="divide-line border-line bg-bg-surface divide-y rounded-md border"
+            role="list"
+          >
             {runs.data!.items.map((r) => (
               <li key={r.id}>
                 <button
                   type="button"
                   onClick={() => setOpenRunId(r.id)}
-                  className="flex w-full flex-wrap items-center gap-x-4 gap-y-1 px-4 py-3 text-left hover:bg-bg-subtle focus-visible:bg-bg-subtle focus-visible:outline-none"
+                  className="hover:bg-bg-subtle focus-visible:bg-bg-subtle flex w-full flex-wrap items-center gap-x-4 gap-y-1 px-4 py-3 text-left focus-visible:outline-none"
                 >
                   <span className="min-w-[9rem] font-medium">{payrollPeriod(r.year, r.month)}</span>
                   {r.status === 'PAID' ? (
@@ -91,11 +100,11 @@ export function PayrollPanel({
                   ) : (
                     <Badge tone="neutral">Not paid yet</Badge>
                   )}
-                  <span className="text-sm text-ink-muted">
+                  <span className="text-ink-muted text-sm">
                     {r.people === 1 ? '1 person' : `${r.people} people`}
                   </span>
                   <span className="ml-auto font-medium tabular-nums">{pkr(r.totalNet)}</span>
-                  <ChevronRight className="h-4 w-4 text-ink-muted" aria-hidden />
+                  <ChevronRight className="text-ink-muted h-4 w-4" aria-hidden />
                 </button>
               </li>
             ))}
@@ -109,7 +118,7 @@ export function PayrollPanel({
             <h2 id="payroll-people-heading" className="text-base font-semibold">
               People on payroll
             </h2>
-            <p className="text-sm text-ink-muted">
+            <p className="text-ink-muted text-sm">
               {active.length === 0
                 ? 'Nobody yet.'
                 : `${active.length === 1 ? '1 person' : `${active.length} people`}, ${pkr(monthlyTotal)} a month.`}
@@ -120,18 +129,21 @@ export function PayrollPanel({
         {employees.isLoading ? (
           <ListSkeleton />
         ) : employees.isError ? (
-          <QueryError message="Couldn't load people on payroll." onRetry={() => void employees.refetch()} />
+          <QueryError
+            message="Couldn't load people on payroll."
+            onRetry={() => void employees.refetch()}
+          />
         ) : roster.length === 0 ? (
           <Empty>
-            Add the people you pay each month from your team, or import a sheet: people without a platform
-            account are added from it too.
+            Add the people you pay each month from your team, or import a sheet: people without a
+            platform account are added from it too.
           </Empty>
         ) : (
           <>
             <div className="hidden overflow-x-auto md:block">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-line text-left text-xs uppercase tracking-wide text-ink-muted">
+                  <tr className="border-line text-ink-muted border-b text-left text-xs uppercase tracking-wide">
                     <th className="px-3 py-2 font-medium">Person</th>
                     <th className="px-3 py-2 font-medium">Designation</th>
                     <th className="px-3 py-2 font-medium">Payment</th>
@@ -142,7 +154,7 @@ export function PayrollPanel({
                   {roster.map((e) => (
                     <tr
                       key={e.id}
-                      className="cursor-pointer border-b border-line last:border-0 hover:bg-bg-subtle"
+                      className="border-line hover:bg-bg-subtle cursor-pointer border-b last:border-0"
                       onClick={() => setEditing(e)}
                     >
                       <td className="px-3 py-2">
@@ -157,7 +169,7 @@ export function PayrollPanel({
                           <UserAvatar size="sm" name={e.name || e.email || '?'} image={e.image} />
                           <span>
                             <span className="block font-medium">{e.name}</span>
-                            <span className="block text-xs text-ink-muted">
+                            <span className="text-ink-muted block text-xs">
                               {e.email ?? 'No email'}
                               {!e.userId ? ' · no platform account' : ''}
                             </span>
@@ -165,17 +177,23 @@ export function PayrollPanel({
                           {!e.isActive ? <Badge tone="neutral">Paused</Badge> : null}
                         </button>
                       </td>
-                      <td className="px-3 py-2 text-ink-muted">{e.designation ?? '-'}</td>
+                      <td className="text-ink-muted px-3 py-2">{e.designation ?? '-'}</td>
                       <td className="px-3 py-2">
                         {e.paymentMethod !== 'BANK_TRANSFER' ? (
-                          <span className="text-ink-muted">{PAYMENT_METHOD_LABELS[e.paymentMethod]}</span>
+                          <span className="text-ink-muted">
+                            {PAYMENT_METHOD_LABELS[e.paymentMethod]}
+                          </span>
                         ) : e.accountNumber ? (
-                          <span className="text-ink-muted">{e.bankName ?? 'Bank account added'}</span>
+                          <span className="text-ink-muted">
+                            {e.bankName ?? 'Bank account added'}
+                          </span>
                         ) : (
                           <span className="text-state-warning">Add bank details</span>
                         )}
                       </td>
-                      <td className="px-3 py-2 text-right font-medium tabular-nums">{pkr(e.monthlySalary)}</td>
+                      <td className="px-3 py-2 text-right font-medium tabular-nums">
+                        {pkr(e.monthlySalary)}
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -188,19 +206,23 @@ export function PayrollPanel({
                   <button
                     type="button"
                     onClick={() => setEditing(e)}
-                    className="flex w-full items-center gap-3 rounded-md border border-line bg-bg-surface p-3 text-left"
+                    className="border-line bg-bg-surface flex w-full items-center gap-3 rounded-md border p-3 text-left"
                   >
                     <UserAvatar size="sm" name={e.name || e.email || '?'} image={e.image} />
                     <span className="min-w-0 flex-1">
                       <span className="block truncate font-medium">{e.name}</span>
-                      <span className="block truncate text-xs text-ink-muted">
+                      <span className="text-ink-muted block truncate text-xs">
                         {e.designation ?? e.email ?? PAYMENT_METHOD_LABELS[e.paymentMethod]}
-                        {e.paymentMethod === 'BANK_TRANSFER' && !e.accountNumber ? ' · no bank details' : ''}
+                        {e.paymentMethod === 'BANK_TRANSFER' && !e.accountNumber
+                          ? ' · no bank details'
+                          : ''}
                       </span>
                     </span>
                     <span className="text-right">
                       <span className="block font-medium tabular-nums">{pkr(e.monthlySalary)}</span>
-                      {!e.isActive ? <span className="block text-xs text-ink-muted">Paused</span> : null}
+                      {!e.isActive ? (
+                        <span className="text-ink-muted block text-xs">Paused</span>
+                      ) : null}
                     </span>
                   </button>
                 </li>
@@ -243,7 +265,7 @@ function ListSkeleton() {
 
 function Empty({ children }: { children: ReactNode }) {
   return (
-    <div className="rounded-md border border-dashed border-line bg-bg-surface p-8 text-center text-sm text-ink-muted">
+    <div className="border-line bg-bg-surface text-ink-muted rounded-md border border-dashed p-8 text-center text-sm">
       {children}
     </div>
   );

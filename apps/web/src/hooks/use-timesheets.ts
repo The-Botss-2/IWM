@@ -1,10 +1,6 @@
 'use client';
 
-import {
-  useMutation,
-  useQuery,
-  useQueryClient,
-} from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useMemo } from 'react';
 import type {
   CreateTimeEntryInput,
@@ -22,15 +18,16 @@ export interface UseTimesheetsArgs {
   running?: boolean;
 }
 
-const timesheetsKey = (args: UseTimesheetsArgs) => [
-  'timesheets',
-  'list',
-  {
-    ...args,
-    from: args.from?.toISOString() ?? null,
-    to: args.to?.toISOString() ?? null,
-  },
-] as const;
+const timesheetsKey = (args: UseTimesheetsArgs) =>
+  [
+    'timesheets',
+    'list',
+    {
+      ...args,
+      from: args.from?.toISOString() ?? null,
+      to: args.to?.toISOString() ?? null,
+    },
+  ] as const;
 
 export function useTimesheets(args: UseTimesheetsArgs = {}) {
   return useQuery({

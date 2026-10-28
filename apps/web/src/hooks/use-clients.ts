@@ -156,7 +156,7 @@ function applyClientPatch<T extends ClientWithOwner>(
   if (input.tags !== undefined) next.tags = input.tags;
   if (input.assigneeId !== undefined) {
     next.assigneeId = input.assigneeId ?? null;
-    next.assignee = input.assigneeId == null ? null : cachedAssignee ?? prev.assignee;
+    next.assignee = input.assigneeId == null ? null : (cachedAssignee ?? prev.assignee);
   }
   next.updatedAt = new Date();
   return next;
@@ -171,7 +171,7 @@ export function useUpdateClient() {
     onMutate: async ({ id, input }) => {
       await qc.cancelQueries({ queryKey: ['clients'] });
       const cachedAssignee =
-        input.assigneeId != null ? findCachedUser(qc, input.assigneeId) ?? null : undefined;
+        input.assigneeId != null ? (findCachedUser(qc, input.assigneeId) ?? null) : undefined;
 
       // Patch the single-client cache used by the detail page. The detail
       // shape is a superset of ClientWithOwner; applyClientPatch is generic

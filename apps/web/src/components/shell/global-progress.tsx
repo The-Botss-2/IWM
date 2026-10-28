@@ -39,7 +39,7 @@ export function GlobalProgress() {
       aria-busy={active > 0}
       className="pointer-events-none fixed left-0 right-0 top-0 z-[60] h-0.5 overflow-hidden bg-transparent"
     >
-      <div className="h-full w-1/3 animate-progress-slide bg-brand-gradient" />
+      <div className="animate-progress-slide bg-brand-gradient h-full w-1/3" />
     </div>
   );
 }

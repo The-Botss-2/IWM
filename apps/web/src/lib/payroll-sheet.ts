@@ -65,7 +65,10 @@ export class PayrollSheetError extends Error {}
 
 /** "Payment_Method", "CNIC #" and "payment method" all become "payment method" / "cnic". */
 function headerKey(value: string): string {
-  return value.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+  return value
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, ' ')
+    .trim();
 }
 
 /** A cell as text. Excel date cells become "YYYY-MM-DD" (they are UTC dates). */
@@ -157,7 +160,9 @@ export function sheetFromGrid(grid: unknown[][]): PayrollSheet {
   }
   if (rows.length === 0) throw new PayrollSheetError('The sheet has a header but no people.');
   if (rows.length > MAX_ROWS) {
-    throw new PayrollSheetError(`The sheet has ${rows.length} people; import at most ${MAX_ROWS} at a time.`);
+    throw new PayrollSheetError(
+      `The sheet has ${rows.length} people; import at most ${MAX_ROWS} at a time.`,
+    );
   }
   return { rows, ignoredColumns };
 }
@@ -181,7 +186,9 @@ export async function readPayrollSheet(file: File): Promise<PayrollSheet> {
     return sheetFromGrid(grid);
   }
   if (name.endsWith('.xls')) {
-    throw new PayrollSheetError('Old .xls files are not supported. Save the sheet as .xlsx or .csv.');
+    throw new PayrollSheetError(
+      'Old .xls files are not supported. Save the sheet as .xlsx or .csv.',
+    );
   }
   throw new PayrollSheetError('Choose a .csv or .xlsx file.');
 }

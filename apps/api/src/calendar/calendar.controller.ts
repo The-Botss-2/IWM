@@ -1,8 +1,5 @@
 import { Controller, Get, Query } from '@nestjs/common';
-import {
-  type CalendarEventsQuery,
-  calendarEventsQuerySchema,
-} from '@botss/shared-types';
+import { type CalendarEventsQuery, calendarEventsQuerySchema } from '@botss/shared-types';
 
 import { RequestUserScope, type UserScope } from '../common/decorators/user-scope.decorator';
 import { SkipPermissions } from '../common/decorators/skip-permissions.decorator';

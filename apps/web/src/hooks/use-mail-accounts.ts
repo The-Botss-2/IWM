@@ -79,9 +79,7 @@ export function useUpdateMailAccount() {
       qc.setQueryData<AccountList>(mailAccountsKey, (curr) => {
         if (!curr) return curr;
         return {
-          items: curr.items.map((a) =>
-            a.id === id ? { ...a, ...stripPassword(input) } : a,
-          ),
+          items: curr.items.map((a) => (a.id === id ? { ...a, ...stripPassword(input) } : a)),
         };
       });
       return { previous };
@@ -137,13 +135,8 @@ export function useAddMailSignature() {
   const replace = useReplaceAccountInCache();
   return useMutation({
     meta: { errorTitle: "Couldn't add signature" },
-    mutationFn: ({
-      accountId,
-      input,
-    }: {
-      accountId: string;
-      input: CreateMailSignatureInput;
-    }) => getApi().mail.addSignature(accountId, input),
+    mutationFn: ({ accountId, input }: { accountId: string; input: CreateMailSignatureInput }) =>
+      getApi().mail.addSignature(accountId, input),
     onSuccess: replace,
   });
 }
@@ -169,13 +162,8 @@ export function useRemoveMailSignature() {
   const replace = useReplaceAccountInCache();
   return useMutation({
     meta: { errorTitle: "Couldn't delete signature" },
-    mutationFn: ({
-      accountId,
-      signatureId,
-    }: {
-      accountId: string;
-      signatureId: string;
-    }) => getApi().mail.removeSignature(accountId, signatureId),
+    mutationFn: ({ accountId, signatureId }: { accountId: string; signatureId: string }) =>
+      getApi().mail.removeSignature(accountId, signatureId),
     onSuccess: replace,
   });
 }
@@ -183,7 +171,10 @@ export function useRemoveMailSignature() {
 export function useRemoveMailAccount() {
   const qc = useQueryClient();
   return useMutation({
-    meta: { errorTitle: "Couldn't disconnect mail account", successMessage: 'Mail account disconnected' },
+    meta: {
+      errorTitle: "Couldn't disconnect mail account",
+      successMessage: 'Mail account disconnected',
+    },
     mutationFn: (id: string) => getApi().mail.removeAccount(id),
     onMutate: async (id) => {
       await qc.cancelQueries({ queryKey: mailAccountsKey });

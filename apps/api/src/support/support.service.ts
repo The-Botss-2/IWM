@@ -81,7 +81,11 @@ export class SupportService {
     }
   }
 
-  async listGrants(actorId: string, organizationId: string, now = new Date()): Promise<SupportGrantListResponse> {
+  async listGrants(
+    actorId: string,
+    organizationId: string,
+    now = new Date(),
+  ): Promise<SupportGrantListResponse> {
     await this.assertOrgAdmin(actorId);
     const rows: GrantRow[] = await this.prisma.client.supportGrant.findMany({
       where: { organizationId },

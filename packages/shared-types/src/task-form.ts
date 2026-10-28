@@ -65,10 +65,7 @@ export const submitTaskFormSchema = z.object({
    *  Bounded here so an anonymous visitor cannot store an arbitrarily large
    *  blob; the API additionally drops keys that are not fields of the form. */
   payload: z
-    .record(
-      z.string().max(80),
-      z.union([z.string().max(5000), z.number(), z.boolean()]),
-    )
+    .record(z.string().max(80), z.union([z.string().max(5000), z.number(), z.boolean()]))
     .refine((p) => Object.keys(p).length <= 100, {
       message: 'Too many fields in submission',
     }),

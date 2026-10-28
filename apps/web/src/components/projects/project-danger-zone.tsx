@@ -21,22 +21,22 @@ export function ProjectDangerZone({ project }: { project: ProjectWithCreator }) 
   return (
     <section
       aria-labelledby="danger-heading"
-      className="rounded-lg border-2 border-state-error/30 bg-state-error/10 p-5"
+      className="border-state-error/30 bg-state-error/10 rounded-lg border-2 p-5"
     >
-      <h2 id="danger-heading" className="text-base font-semibold text-state-error">
+      <h2 id="danger-heading" className="text-state-error text-base font-semibold">
         Danger zone
       </h2>
-      <p className="mt-1 text-sm text-state-error">
+      <p className="text-state-error mt-1 text-sm">
         These actions are not reversible from the UI. Proceed carefully.
       </p>
 
       <div className="mt-4 space-y-3">
-        <div className="flex flex-col gap-3 rounded-md border border-state-error/30 bg-white p-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="border-state-error/30 flex flex-col gap-3 rounded-md border bg-white p-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <div className="text-sm font-medium text-ink">
+            <div className="text-ink text-sm font-medium">
               {archived ? 'Project archived' : 'Archive project'}
             </div>
-            <div className="text-sm text-ink-muted">
+            <div className="text-ink-muted text-sm">
               {archived
                 ? 'It will no longer appear in active lists. You can change the status back any time.'
                 : 'Hide this project from active lists. Members keep access.'}
@@ -53,10 +53,10 @@ export function ProjectDangerZone({ project }: { project: ProjectWithCreator }) 
           </Button>
         </div>
 
-        <div className="flex flex-col gap-3 rounded-md border border-state-error/30 bg-white p-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="border-state-error/30 flex flex-col gap-3 rounded-md border bg-white p-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <div className="text-sm font-medium text-ink">Delete project</div>
-            <div className="text-sm text-ink-muted">
+            <div className="text-ink text-sm font-medium">Delete project</div>
+            <div className="text-ink-muted text-sm">
               Soft-deletes the project and all its tasks. Recovery requires admin tools.
             </div>
           </div>

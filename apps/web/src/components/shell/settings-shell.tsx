@@ -236,16 +236,16 @@ export function SettingsShell({ children }: { children: ReactNode }) {
   // lights "Attendance summary", not the shorter "Attendance").
   const activeHref = useMemo(() => {
     if (!pathname) return undefined;
-    return ITEMS.filter(
-      (i) => pathname === i.href || pathname.startsWith(`${i.href}/`),
-    ).sort((a, b) => b.href.length - a.href.length)[0]?.href;
+    return ITEMS.filter((i) => pathname === i.href || pathname.startsWith(`${i.href}/`)).sort(
+      (a, b) => b.href.length - a.href.length,
+    )[0]?.href;
   }, [pathname]);
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
       <header className="mb-8">
-        <h1 className="text-2xl font-semibold text-ink">Settings</h1>
-        <p className="mt-1 text-sm text-ink-muted">
+        <h1 className="text-ink text-2xl font-semibold">Settings</h1>
+        <p className="text-ink-muted mt-1 text-sm">
           Manage your workspace, mailboxes, team, and admin tools.
         </p>
       </header>
@@ -253,13 +253,11 @@ export function SettingsShell({ children }: { children: ReactNode }) {
         <aside aria-label="Settings sections">
           <nav className="space-y-4" role="list">
             {GROUPS.map((group) => {
-              const items = ITEMS.filter(
-                (i) => i.group === group.key && canSee(i, perms, role),
-              );
+              const items = ITEMS.filter((i) => i.group === group.key && canSee(i, perms, role));
               if (items.length === 0) return null;
               return (
                 <div key={group.key} className="space-y-1">
-                  <p className="px-4 text-[11px] font-semibold uppercase tracking-wide text-ink-muted">
+                  <p className="text-ink-muted px-4 text-[11px] font-semibold uppercase tracking-wide">
                     {group.label}
                   </p>
                   {items.map((item) => {
@@ -272,9 +270,9 @@ export function SettingsShell({ children }: { children: ReactNode }) {
                         aria-current={active ? 'page' : undefined}
                         className={cn(
                           'flex items-start gap-2 rounded-full px-4 py-2.5 text-sm transition-all duration-200',
-                          'focus-visible:outline-none focus-visible:shadow-focus',
+                          'focus-visible:shadow-focus focus-visible:outline-none',
                           active
-                            ? 'bg-brand-gradient text-white shadow-soft'
+                            ? 'bg-brand-gradient shadow-soft text-white'
                             : 'text-ink hover:bg-bg-subtle',
                         )}
                       >

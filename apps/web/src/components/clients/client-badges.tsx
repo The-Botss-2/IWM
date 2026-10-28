@@ -16,12 +16,7 @@ const STATUS_LABEL: Record<ClientStatus, string> = {
   CHURNED: 'Churned',
 };
 
-export const CLIENT_STATUS_OPTIONS: ClientStatus[] = [
-  'PROSPECT',
-  'ACTIVE',
-  'PAUSED',
-  'CHURNED',
-];
+export const CLIENT_STATUS_OPTIONS: ClientStatus[] = ['PROSPECT', 'ACTIVE', 'PAUSED', 'CHURNED'];
 
 export function statusLabel(s: ClientStatus): string {
   return STATUS_LABEL[s];

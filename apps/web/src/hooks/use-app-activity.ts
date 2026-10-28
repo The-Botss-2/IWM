@@ -101,9 +101,5 @@ export function subscribeAppActivity(listener: () => void): () => void {
 
 /** React binding. SSR-safe: renders as 'active' on the server. */
 export function useAppActivity(): AppActivity {
-  return useSyncExternalStore(
-    subscribeAppActivity,
-    getAppActivity,
-    () => 'active',
-  );
+  return useSyncExternalStore(subscribeAppActivity, getAppActivity, () => 'active');
 }

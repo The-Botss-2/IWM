@@ -75,10 +75,7 @@ export class AuditLogService {
    * cross-org parameter: SUPER_ADMIN reads only the root org's log here and
    * uses {@link listPlatform} for organization-level events.
    */
-  async list(
-    actingUserId: string,
-    query: ListAuditLogQuery,
-  ): Promise<AuditLogListResponse> {
+  async list(actingUserId: string, query: ListAuditLogQuery): Promise<AuditLogListResponse> {
     // The request's organization (AuthGuard's snapshot when it is this
     // user's request): in a read only support session that is the granted
     // organization, otherwise the user's own, exactly as before.
@@ -89,10 +86,7 @@ export class AuditLogService {
         status: 403,
       });
     }
-    const page = await this.queryPage(
-      { organizationId: organizationId ?? '__none__' },
-      query,
-    );
+    const page = await this.queryPage({ organizationId: organizationId ?? '__none__' }, query);
     // No global response interceptor validates output, so check it here.
     return auditLogListResponseSchema.parse({
       items: page.items.map(({ row: _row, ...entry }) => entry),
@@ -275,21 +269,33 @@ export class AuditLogService {
           user: { select: { name: true, email: true } },
           client: { select: { workspace: { select: { organizationId: true } } } },
         }),
-        findManyIncludingDeleted<{ id: string; name: string; workspace: { organizationId: string } }>(
-          db.client.findMany,
-          idsFor('client'),
-          { id: true, name: true, workspace: { select: { organizationId: true } } },
-        ),
-        findManyIncludingDeleted<{ id: string; name: string; workspace: { organizationId: string } }>(
-          db.project.findMany,
-          idsFor('project'),
-          { id: true, name: true, workspace: { select: { organizationId: true } } },
-        ),
-        findManyIncludingDeleted<{ id: string; title: string; workspace: { organizationId: string } }>(
-          db.document.findMany,
-          idsFor('document'),
-          { id: true, title: true, workspace: { select: { organizationId: true } } },
-        ),
+        findManyIncludingDeleted<{
+          id: string;
+          name: string;
+          workspace: { organizationId: string };
+        }>(db.client.findMany, idsFor('client'), {
+          id: true,
+          name: true,
+          workspace: { select: { organizationId: true } },
+        }),
+        findManyIncludingDeleted<{
+          id: string;
+          name: string;
+          workspace: { organizationId: string };
+        }>(db.project.findMany, idsFor('project'), {
+          id: true,
+          name: true,
+          workspace: { select: { organizationId: true } },
+        }),
+        findManyIncludingDeleted<{
+          id: string;
+          title: string;
+          workspace: { organizationId: string };
+        }>(db.document.findMany, idsFor('document'), {
+          id: true,
+          title: true,
+          workspace: { select: { organizationId: true } },
+        }),
         findManyIncludingDeleted<{ id: string; name: string; organizationId: string }>(
           db.workspace.findMany,
           idsFor('workspace'),
@@ -368,8 +374,10 @@ function redactSecurityAlert<T extends AuditLogEntry>(entry: T): T {
 export function platformSafeEntry(entry: AuditLogEntry): AuditLogEntry {
   if (!entry.action.startsWith('support.')) return entry;
   const metadata: Record<string, unknown> = {};
-  if (typeof entry.metadata['expiresAt'] === 'string') metadata['expiresAt'] = entry.metadata['expiresAt'];
-  if (typeof entry.metadata['readOnly'] === 'boolean') metadata['readOnly'] = entry.metadata['readOnly'];
+  if (typeof entry.metadata['expiresAt'] === 'string')
+    metadata['expiresAt'] = entry.metadata['expiresAt'];
+  if (typeof entry.metadata['readOnly'] === 'boolean')
+    metadata['readOnly'] = entry.metadata['readOnly'];
   return {
     ...entry,
     actorUserId: null,

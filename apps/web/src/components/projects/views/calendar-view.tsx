@@ -45,10 +45,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import {
-  priorityLabel,
-  statusLabel,
-} from '@/components/tasks/task-badges';
+import { priorityLabel, statusLabel } from '@/components/tasks/task-badges';
 import { useProject } from '@/hooks/use-projects';
 import { useTasks, useUpdateTask } from '@/hooks/use-tasks';
 import { cn } from '@/lib/utils';
@@ -100,11 +97,7 @@ function pickAssigneeColor(userId: string): string {
   return ASSIGNEE_PALETTE[hashId(userId) % ASSIGNEE_PALETTE.length]!;
 }
 
-function colorFor(
-  task: TaskWithPeople,
-  mode: ColorMode,
-  projectColor: string,
-): string {
+function colorFor(task: TaskWithPeople, mode: ColorMode, projectColor: string): string {
   if (mode === 'status') return STATUS_COLORS[task.status];
   if (mode === 'priority') return PRIORITY_COLORS[task.priority];
   if (mode === 'assignee') {
@@ -133,10 +126,7 @@ export default function CalendarView({
 
   // Partition tasks into segments per week so a multi-day bar can render
   // across days inside a week, breaking at the weekly boundary.
-  const segments = useMemo(
-    () => buildSegments(tasks.data?.items ?? [], grid),
-    [tasks.data, grid],
-  );
+  const segments = useMemo(() => buildSegments(tasks.data?.items ?? [], grid), [tasks.data, grid]);
 
   const sensors = useSensors(
     useSensor(MouseSensor, { activationConstraint: { distance: 4 } }),
@@ -161,11 +151,7 @@ export default function CalendarView({
         const start = startOfDay(task.startDate);
         const end = startOfDay(task.dueDate);
         // The drag id encodes which edge or body was active.
-        const handle = e.active.data.current?.handle as
-          | 'body'
-          | 'start'
-          | 'end'
-          | undefined;
+        const handle = e.active.data.current?.handle as 'body' | 'start' | 'end' | undefined;
         if (handle === 'start') {
           const cappedStart = targetDay.getTime() > end.getTime() ? end : targetDay;
           update.mutate({ id, input: { startDate: cappedStart } });
@@ -191,7 +177,7 @@ export default function CalendarView({
 
   if (tasks.isLoading) {
     return (
-      <section className="rounded-lg border border-line bg-white p-4">
+      <section className="border-line rounded-lg border bg-white p-4">
         <Skeleton className="mt-4 h-96" />
       </section>
     );
@@ -202,8 +188,13 @@ export default function CalendarView({
   }
 
   return (
-    <DndContext sensors={sensors} collisionDetection={closestCorners} onDragStart={onDragStart} onDragEnd={onDragEnd}>
-      <section className="rounded-lg border border-line bg-white p-4">
+    <DndContext
+      sensors={sensors}
+      collisionDetection={closestCorners}
+      onDragStart={onDragStart}
+      onDragEnd={onDragEnd}
+    >
+      <section className="border-line rounded-lg border bg-white p-4">
         <header className="flex flex-wrap items-center justify-between gap-2">
           <div className="flex items-center gap-2">
             <Button
@@ -240,11 +231,11 @@ export default function CalendarView({
           </Select>
         </header>
 
-        <div className="mt-4 grid grid-cols-7 gap-px overflow-hidden rounded-md bg-line text-xs">
+        <div className="bg-line mt-4 grid grid-cols-7 gap-px overflow-hidden rounded-md text-xs">
           {WEEKDAYS.map((d) => (
             <div
               key={d}
-              className="bg-bg-subtle px-2 py-1 text-xs font-medium uppercase tracking-wide text-ink-muted"
+              className="bg-bg-subtle text-ink-muted px-2 py-1 text-xs font-medium uppercase tracking-wide"
             >
               {d}
             </div>
@@ -287,10 +278,7 @@ interface Segment {
   isEnd: boolean;
 }
 
-function buildSegments(
-  tasks: TaskWithPeople[],
-  grid: Date[],
-): Map<string, Segment[]> {
+function buildSegments(tasks: TaskWithPeople[], grid: Date[]): Map<string, Segment[]> {
   const map = new Map<string, Segment[]>();
   if (grid.length === 0) return map;
   const firstGrid = startOfDay(grid[0]!);
@@ -348,13 +336,13 @@ function DayCell({
       className={cn(
         'min-h-[88px] bg-white p-1.5',
         !isCurrentMonth && 'opacity-50',
-        isOver && 'ring-2 ring-inset ring-brand-400',
+        isOver && 'ring-brand-400 ring-2 ring-inset',
       )}
     >
       <div
         className={cn(
           'mb-1 text-right text-xs',
-          isToday ? 'font-semibold text-brand-blue' : 'text-ink-muted',
+          isToday ? 'text-brand-blue font-semibold' : 'text-ink-muted',
         )}
       >
         {format(day, 'd')}
@@ -403,14 +391,14 @@ function DayOverflowPopover({
       <PopoverTrigger asChild>
         <button
           type="button"
-          className="rounded px-1 text-[11px] text-ink-muted hover:bg-bg-subtle hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:shadow-focus"
+          className="text-ink-muted hover:bg-bg-subtle hover:text-ink focus-visible:shadow-focus rounded px-1 text-[11px] focus-visible:outline-none focus-visible:ring-2"
           aria-label={`Show ${overflow.length} more task${overflow.length === 1 ? '' : 's'} for ${format(day, 'd MMM yyyy')}`}
         >
           +{overflow.length} more
         </button>
       </PopoverTrigger>
       <PopoverContent className="w-64 p-2">
-        <div className="px-2 pb-1 text-[11px] font-medium uppercase tracking-wide text-ink-muted">
+        <div className="text-ink-muted px-2 pb-1 text-[11px] font-medium uppercase tracking-wide">
           {format(day, 'EEE d MMM')}
         </div>
         <ul className="space-y-1">
@@ -420,7 +408,7 @@ function DayOverflowPopover({
                 type="button"
                 onClick={() => onSelectTask?.(seg.taskId)}
                 disabled={!onSelectTask}
-                className="flex w-full items-center gap-2 rounded px-2 py-1.5 text-left text-xs hover:bg-bg-subtle disabled:cursor-default focus-visible:outline-none focus-visible:ring-2 focus-visible:shadow-focus"
+                className="hover:bg-bg-subtle focus-visible:shadow-focus flex w-full items-center gap-2 rounded px-2 py-1.5 text-left text-xs focus-visible:outline-none focus-visible:ring-2 disabled:cursor-default"
               >
                 <span
                   className="inline-block h-2.5 w-2.5 shrink-0 rounded-sm"
@@ -486,8 +474,8 @@ function CalendarChip({
       onKeyDown={handleKeyDown}
       aria-label={`${segment.task.title} - drag to reschedule, Enter to open`}
       className={cn(
-        'truncate px-1.5 py-0.5 text-[11px] cursor-grab active:cursor-grabbing',
-        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500/60',
+        'cursor-grab truncate px-1.5 py-0.5 text-[11px] active:cursor-grabbing',
+        'focus-visible:ring-brand-500/60 focus-visible:outline-none focus-visible:ring-2',
       )}
     >
       {segment.isStart ? segment.task.title : '…'}
@@ -495,16 +483,10 @@ function CalendarChip({
   );
 }
 
-function Legend({
-  colorMode,
-  tasks,
-}: {
-  colorMode: ColorMode;
-  tasks: TaskWithPeople[];
-}) {
+function Legend({ colorMode, tasks }: { colorMode: ColorMode; tasks: TaskWithPeople[] }) {
   if (colorMode === 'status') {
     return (
-      <ul className="mt-3 flex flex-wrap items-center gap-3 text-xs text-ink-muted">
+      <ul className="text-ink-muted mt-3 flex flex-wrap items-center gap-3 text-xs">
         {(Object.keys(STATUS_COLORS) as TaskStatus[]).map((s) => (
           <li key={s} className="flex items-center gap-1.5">
             <span
@@ -520,7 +502,7 @@ function Legend({
   }
   if (colorMode === 'priority') {
     return (
-      <ul className="mt-3 flex flex-wrap items-center gap-3 text-xs text-ink-muted">
+      <ul className="text-ink-muted mt-3 flex flex-wrap items-center gap-3 text-xs">
         {(Object.keys(PRIORITY_COLORS) as TaskPriority[]).map((p) => (
           <li key={p} className="flex items-center gap-1.5">
             <span
@@ -543,7 +525,7 @@ function Legend({
     });
   }
   return (
-    <ul className="mt-3 flex flex-wrap items-center gap-3 text-xs text-ink-muted">
+    <ul className="text-ink-muted mt-3 flex flex-wrap items-center gap-3 text-xs">
       {[...seen.entries()].map(([id, info]) => (
         <li key={id} className="flex items-center gap-1.5">
           <span
@@ -551,7 +533,7 @@ function Legend({
             style={{ background: info.color }}
             aria-hidden
           />
-          <span className="truncate max-w-[160px]">{info.name}</span>
+          <span className="max-w-[160px] truncate">{info.name}</span>
         </li>
       ))}
       <li className="flex items-center gap-1.5">

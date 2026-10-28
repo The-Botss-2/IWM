@@ -21,10 +21,7 @@ export class FinanceSummaryService {
    * finance-summary-cache.ts for the epoch invalidation). The cache is an
    * optimization only: with Redis down or slow this computes, as before.
    */
-  async summary(
-    scope: UserScope,
-    q: FinanceSummaryQuery,
-  ): Promise<FinanceSummary> {
+  async summary(scope: UserScope, q: FinanceSummaryQuery): Promise<FinanceSummary> {
     const workspaceId = requireWorkspace(scope);
     // Read only support session: salaries are payroll data, which support
     // never sees, so they are left out of every expense figure. Computed
@@ -246,10 +243,7 @@ export class FinanceSummaryService {
    * `prisma.raw` is the BARE client with no soft-delete extension, so the
    * `"deletedAt" IS NULL` below is manual and mandatory.
    */
-  private async outstandingBase(
-    workspaceId: string,
-    filter: Record<string, unknown>,
-  ) {
+  private async outstandingBase(workspaceId: string, filter: Record<string, unknown>) {
     const rows = await this.prisma.raw.$queryRaw<Array<{ total: Prisma.Decimal | null }>>`
       SELECT COALESCE(SUM(("totalValue" - "amountPaid") * "fxRateToBase"), 0) AS total
       FROM "Contract"
@@ -273,10 +267,7 @@ export class FinanceSummaryService {
    * `ContractMilestone` is not soft-deleted; its contract is, and `prisma.raw`
    * has no soft-delete extension, so `c."deletedAt" IS NULL` stays manual.
    */
-  private async awaitingBase(
-    workspaceId: string,
-    filter: Record<string, unknown>,
-  ) {
+  private async awaitingBase(workspaceId: string, filter: Record<string, unknown>) {
     const projectId = (filter['projectId'] as string) ?? null;
     const clientId = (filter['clientId'] as string) ?? null;
     const rows = await this.prisma.raw.$queryRaw<Array<{ total: Prisma.Decimal | null }>>`
@@ -295,10 +286,7 @@ export class FinanceSummaryService {
   }
 
   /** Milestones past their due date that are not fully paid. */
-  private async overdueBase(
-    workspaceId: string,
-    filter: Record<string, unknown>,
-  ) {
+  private async overdueBase(workspaceId: string, filter: Record<string, unknown>) {
     const rows = await this.prisma.raw.$queryRaw<Array<{ total: Prisma.Decimal | null }>>`
       SELECT COALESCE(SUM((m."amount" - m."amountPaid") * c."fxRateToBase"), 0) AS total
       FROM "ContractMilestone" m
@@ -399,10 +387,7 @@ export class FinanceSummaryService {
    * Exact per-currency outstanding with NO FX applied. The base figure above
    * is a booked-rate estimate; this is the number to quote a client.
    */
-  private async outstandingByCurrency(
-    workspaceId: string,
-    filter: Record<string, unknown>,
-  ) {
+  private async outstandingByCurrency(workspaceId: string, filter: Record<string, unknown>) {
     const rows = await this.prisma.client.contract.groupBy({
       by: ['currency'],
       where: { workspaceId, status: 'ACTIVE', ...filter },

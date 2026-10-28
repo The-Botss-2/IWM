@@ -100,7 +100,7 @@ export function PayrollRunSheet({
                 )
               ) : null}
             </div>
-            <SheetDescription className="text-sm text-ink-muted">
+            <SheetDescription className="text-ink-muted text-sm">
               {run
                 ? run.status === 'PAID'
                   ? `Salaries are recorded as expenses${run.paymentSource ? `, paid from ${run.paymentSource.name}` : ''}.`
@@ -115,7 +115,10 @@ export function PayrollRunSheet({
                 <Loader label="Loading payroll" />
               </div>
             ) : runQuery.isError || !run ? (
-              <QueryError message="Couldn't load this payroll run." onRetry={() => void runQuery.refetch()} />
+              <QueryError
+                message="Couldn't load this payroll run."
+                onRetry={() => void runQuery.refetch()}
+              />
             ) : (
               <>
                 <dl className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
@@ -129,8 +132,8 @@ export function PayrollRunSheet({
                       ['Net pay', run.totalNet],
                     ] as const
                   ).map(([label, value]) => (
-                    <div key={label} className="rounded-md border border-line px-3 py-2">
-                      <dt className="text-xs text-ink-muted">{label}</dt>
+                    <div key={label} className="border-line rounded-md border px-3 py-2">
+                      <dt className="text-ink-muted text-xs">{label}</dt>
                       <dd
                         className={
                           label === 'Net pay'
@@ -192,14 +195,14 @@ export function PayrollRunSheet({
                 </div>
 
                 {run.items.length === 0 ? (
-                  <p className="rounded-md border border-dashed border-line p-6 text-center text-sm text-ink-muted">
+                  <p className="border-line text-ink-muted rounded-md border border-dashed p-6 text-center text-sm">
                     Nobody is in this run.
                   </p>
                 ) : (
                   <div className="overflow-x-auto">
                     <table className="w-full text-sm">
                       <thead>
-                        <tr className="border-b border-line text-left text-xs uppercase tracking-wide text-ink-muted">
+                        <tr className="border-line text-ink-muted border-b text-left text-xs uppercase tracking-wide">
                           <th className="px-2 py-2 font-medium">Name</th>
                           <th className="px-2 py-2 font-medium">Designation</th>
                           <th className="px-2 py-2 font-medium">DOJ</th>
@@ -220,7 +223,10 @@ export function PayrollRunSheet({
                       </thead>
                       <tbody>
                         {run.items.map((item) => (
-                          <tr key={item.id} className="whitespace-nowrap border-b border-line last:border-0">
+                          <tr
+                            key={item.id}
+                            className="border-line whitespace-nowrap border-b last:border-0"
+                          >
                             <td className="px-2 py-2">
                               {isDraft ? (
                                 <button
@@ -234,12 +240,23 @@ export function PayrollRunSheet({
                                 <span className="font-medium">{item.employeeName}</span>
                               )}
                             </td>
-                            <td className="px-2 py-2 text-ink-muted">{item.designation ?? '-'}</td>
-                            <td className="px-2 py-2 tabular-nums text-ink-muted">{dmy(item.dateOfJoining)}</td>
-                            <td className="px-2 py-2 text-ink-muted">{payrollPeriod(run.year, run.month)}</td>
-                            <td className="px-2 py-2 tabular-nums text-ink-muted">{item.cnic ?? '-'}</td>
-                            <td className="px-2 py-2 text-right tabular-nums">{pkr(item.salary)}</td>
-                            <td className="px-2 py-2 text-right tabular-nums" title={item.bonusNote ?? undefined}>
+                            <td className="text-ink-muted px-2 py-2">{item.designation ?? '-'}</td>
+                            <td className="text-ink-muted px-2 py-2 tabular-nums">
+                              {dmy(item.dateOfJoining)}
+                            </td>
+                            <td className="text-ink-muted px-2 py-2">
+                              {payrollPeriod(run.year, run.month)}
+                            </td>
+                            <td className="text-ink-muted px-2 py-2 tabular-nums">
+                              {item.cnic ?? '-'}
+                            </td>
+                            <td className="px-2 py-2 text-right tabular-nums">
+                              {pkr(item.salary)}
+                            </td>
+                            <td
+                              className="px-2 py-2 text-right tabular-nums"
+                              title={item.bonusNote ?? undefined}
+                            >
                               {pkrOrDash(item.bonus)}
                             </td>
                             <td
@@ -248,12 +265,18 @@ export function PayrollRunSheet({
                             >
                               {pkrOrDash(item.deduction)}
                             </td>
-                            <td className="px-2 py-2 text-right tabular-nums">{pkrOrDash(item.commission)}</td>
-                            <td className="px-2 py-2 text-right tabular-nums">{pkrOrDash(item.tax)}</td>
+                            <td className="px-2 py-2 text-right tabular-nums">
+                              {pkrOrDash(item.commission)}
+                            </td>
+                            <td className="px-2 py-2 text-right tabular-nums">
+                              {pkrOrDash(item.tax)}
+                            </td>
                             <td className="px-2 py-2">
                               {PAYMENT_METHOD_LABELS[item.paymentMethod]}
                               {item.paymentMethod === 'BANK_TRANSFER' && !item.accountNumber ? (
-                                <span className="block text-xs text-state-warning">No bank account</span>
+                                <span className="text-state-warning block text-xs">
+                                  No bank account
+                                </span>
                               ) : null}
                             </td>
                             <td className="px-2 py-2">
@@ -264,14 +287,16 @@ export function PayrollRunSheet({
                               )}
                               {item.payslipSentAt ? (
                                 <span
-                                  className="block text-xs text-brand-teal"
+                                  className="text-brand-teal block text-xs"
                                   title={`Sent to ${item.payslipSentTo ?? ''} on ${new Date(item.payslipSentAt).toLocaleString()}`}
                                 >
                                   Payslip emailed
                                 </span>
                               ) : null}
                             </td>
-                            <td className="px-2 py-2 text-right font-medium tabular-nums">{pkr(item.net)}</td>
+                            <td className="px-2 py-2 text-right font-medium tabular-nums">
+                              {pkr(item.net)}
+                            </td>
                             <td className="px-2 py-2">
                               <div className="flex justify-end gap-1">
                                 <Button
@@ -311,7 +336,11 @@ export function PayrollRunSheet({
             <SheetFooter className="justify-between">
               {isDraft ? (
                 <>
-                  <Button variant="ghost" className="text-state-error" onClick={() => setConfirmDelete(true)}>
+                  <Button
+                    variant="ghost"
+                    className="text-state-error"
+                    onClick={() => setConfirmDelete(true)}
+                  >
                     Delete run
                   </Button>
                   <Button onClick={() => setPaying(true)} disabled={run.items.length === 0}>
@@ -319,7 +348,11 @@ export function PayrollRunSheet({
                   </Button>
                 </>
               ) : (
-                <Button variant="secondary" className="ml-auto" onClick={() => setConfirmUnpay(true)}>
+                <Button
+                  variant="secondary"
+                  className="ml-auto"
+                  onClick={() => setConfirmUnpay(true)}
+                >
                   <Undo2 className="h-4 w-4" /> Undo payment
                 </Button>
               )}
@@ -330,8 +363,17 @@ export function PayrollRunSheet({
 
       {run ? (
         <>
-          <PayrollItemDialog runId={run.id} item={editing} onOpenChange={(o) => !o && setEditing(null)} />
-          <MarkPaidDialog run={run} open={paying} onOpenChange={setPaying} baseCurrency={baseCurrency} />
+          <PayrollItemDialog
+            runId={run.id}
+            item={editing}
+            onOpenChange={(o) => !o && setEditing(null)}
+          />
+          <MarkPaidDialog
+            run={run}
+            open={paying}
+            onOpenChange={setPaying}
+            baseCurrency={baseCurrency}
+          />
           {run.status === 'PAID' ? (
             <SendPayslipsDialog run={run} open={emailing} onOpenChange={setEmailing} />
           ) : null}

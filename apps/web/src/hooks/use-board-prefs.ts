@@ -168,10 +168,7 @@ export function useListColumns(projectId: string): {
     }
     try {
       const parsed = JSON.parse(raw);
-      if (
-        Array.isArray(parsed) &&
-        parsed.every(isListColumn)
-      ) {
+      if (Array.isArray(parsed) && parsed.every(isListColumn)) {
         setColumns(parsed as ListColumn[]);
         return;
       }

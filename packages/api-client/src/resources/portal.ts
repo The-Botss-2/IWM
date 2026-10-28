@@ -72,7 +72,10 @@ export class PortalResource {
     return this.http.get(`${base(clientId)}/signatures`, portalSignatureListSchema);
   }
   signatureSession(clientId: string, signerId: string): Promise<PublicSignatureSession> {
-    return this.http.get(`${base(clientId)}/signatures/${enc(signerId)}`, publicSignatureSessionSchema);
+    return this.http.get(
+      `${base(clientId)}/signatures/${enc(signerId)}`,
+      publicSignatureSessionSchema,
+    );
   }
   signatureSourceFile(clientId: string, signerId: string) {
     return this.http.getBlob(`${base(clientId)}/signatures/${enc(signerId)}/file`);
@@ -88,7 +91,11 @@ export class PortalResource {
     );
   }
   decline(clientId: string, signerId: string, input: DeclinePublicInput): Promise<PortalOk> {
-    return this.http.post(`${base(clientId)}/signatures/${enc(signerId)}/decline`, portalOkSchema, input);
+    return this.http.post(
+      `${base(clientId)}/signatures/${enc(signerId)}/decline`,
+      portalOkSchema,
+      input,
+    );
   }
 
   invoices(clientId: string): Promise<PortalInvoiceList> {

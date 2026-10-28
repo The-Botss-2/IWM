@@ -53,10 +53,7 @@ export function incomingRequestWhere(
     requester: {
       deletedAt: null,
       accountType: 'STAFF',
-      AND: [
-        { organizationId: { not: null } },
-        { organizationId: { not: viewer.organizationId } },
-      ],
+      AND: [{ organizationId: { not: null } }, { organizationId: { not: viewer.organizationId } }],
       organization: { isActive: true, deletedAt: null },
       chatRequestBlocksReceived: { none: { blockerId: viewer.id } },
     },

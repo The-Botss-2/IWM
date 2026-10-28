@@ -50,14 +50,18 @@ export function UserAccessDialog({
         <DialogHeader>
           <DialogTitle>Access for {user?.name}</DialogTitle>
           <DialogDescription>
-            Company role and per-person extras. Workspace access is set per workspace on its
-            Members screen.
+            Company role and per-person extras. Workspace access is set per workspace on its Members
+            screen.
           </DialogDescription>
         </DialogHeader>
         {!perms.data ? (
           <Skeleton className="h-48" />
         ) : (
-          <UserAccessForm key={perms.data.userId} data={perms.data} onDone={() => onOpenChange(false)} />
+          <UserAccessForm
+            key={perms.data.userId}
+            data={perms.data}
+            onDone={() => onOpenChange(false)}
+          />
         )}
       </DialogContent>
     </Dialog>
@@ -114,15 +118,15 @@ function UserAccessForm({ data, onDone }: { data: UserPermissionsResponse; onDon
             ))}
           </SelectContent>
         </Select>
-        <p className="text-[11px] text-ink-muted">
+        <p className="text-ink-muted text-[11px]">
           {isSuper
             ? 'Super admins always hold every permission.'
-            : 'The preset follows the user\'s system role, which you change in Edit user.'}
+            : "The preset follows the user's system role, which you change in Edit user."}
         </p>
       </div>
       {isSuper ? null : (
         <div className="space-y-2">
-          <h3 className="text-sm font-semibold text-ink">Extras for this person</h3>
+          <h3 className="text-ink text-sm font-semibold">Extras for this person</h3>
           <OverrideEditor
             groups={groups}
             overrides={overrides}

@@ -25,7 +25,9 @@ const ASSET_MIME: Record<string, string> = {
 };
 
 export interface LoadedTemplate {
-  meta: InvoiceTemplate & { marginsMm: { top: number; right: number; bottom: number; left: number } };
+  meta: InvoiceTemplate & {
+    marginsMm: { top: number; right: number; bottom: number; left: number };
+  };
   compiled: CompiledTemplate;
   /** Template CSS with `url(assets/...)` references inlined as data URIs. */
   css: string;
@@ -212,7 +214,10 @@ export const TEMPLATE_HELPERS = {
     if (!Number.isFinite(n)) return '';
     const code = typeof currency === 'string' && /^[A-Z]{3}$/.test(currency) ? currency : 'USD';
     const digits = Number.isInteger(Math.round(n * 100) / 100) ? 0 : 2;
-    const text = new Intl.NumberFormat('en-US', { minimumFractionDigits: digits, maximumFractionDigits: digits }).format(n);
+    const text = new Intl.NumberFormat('en-US', {
+      minimumFractionDigits: digits,
+      maximumFractionDigits: digits,
+    }).format(n);
     return `${code} ${text}`;
   },
   /** {{number line.quantity 2}} -> "1.50" */
@@ -253,8 +258,10 @@ export const TEMPLATE_HELPERS = {
       .replace(/'/g, '&#39;');
     return new SafeString(escaped.replace(/\r?\n/g, '<br>'));
   },
-  upper: (value: unknown) => (value === null || value === undefined ? '' : String(value).toUpperCase()),
-  lower: (value: unknown) => (value === null || value === undefined ? '' : String(value).toLowerCase()),
+  upper: (value: unknown) =>
+    value === null || value === undefined ? '' : String(value).toUpperCase(),
+  lower: (value: unknown) =>
+    value === null || value === undefined ? '' : String(value).toLowerCase(),
   /** {{default client.email "No email"}} */
   default: (value: unknown, fallback: unknown) =>
     value === null || value === undefined || value === '' ? fallback : value,

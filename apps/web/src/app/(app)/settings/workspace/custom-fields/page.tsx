@@ -55,13 +55,13 @@ export default function CustomFieldsPage() {
     <div className="mx-auto max-w-3xl space-y-6 p-6">
       <header>
         <h1 className="text-xl font-semibold">Custom fields</h1>
-        <p className="text-sm text-ink-muted">
+        <p className="text-ink-muted text-sm">
           Define typed fields that can be attached to tasks, projects, leads, or clients.
         </p>
       </header>
 
       <div className="flex items-center gap-2">
-        <Label className="text-xs uppercase tracking-wide text-ink-muted">Scope</Label>
+        <Label className="text-ink-muted text-xs uppercase tracking-wide">Scope</Label>
         <Select value={scope} onValueChange={(v) => setScope(v as CustomFieldScope)}>
           <SelectTrigger className="w-40">
             <SelectValue />
@@ -94,7 +94,7 @@ export default function CustomFieldsPage() {
             />
           </li>
         ) : definitions.data && definitions.data.length === 0 ? (
-          <li className="rounded-md border border-dashed border-line bg-bg-surface p-4 text-xs text-ink-muted">
+          <li className="border-line bg-bg-surface text-ink-muted rounded-md border border-dashed p-4 text-xs">
             No {scope.toLowerCase()} fields yet.
           </li>
         ) : (
@@ -160,7 +160,7 @@ function CreateForm({
   };
 
   return (
-    <div className="rounded-md border border-line bg-bg-subtle p-3">
+    <div className="border-line bg-bg-subtle rounded-md border p-3">
       <div className="grid grid-cols-1 gap-2 sm:grid-cols-4">
         <Input placeholder="Name" value={name} onChange={(e) => setName(e.target.value)} />
         <Input
@@ -222,7 +222,7 @@ function DefinitionRow({
   const remove = useDeleteCustomFieldDefinition();
 
   return (
-    <li className="flex items-center gap-3 rounded-md border border-line bg-bg-surface px-3 py-2">
+    <li className="border-line bg-bg-surface flex items-center gap-3 rounded-md border px-3 py-2">
       <Input
         defaultValue={def.name}
         onBlur={(e) => {
@@ -233,20 +233,18 @@ function DefinitionRow({
         className="flex-1"
       />
       {projectName ? (
-        <span className="max-w-[10rem] truncate text-[11px] text-ink-muted" title={projectName}>
+        <span className="text-ink-muted max-w-[10rem] truncate text-[11px]" title={projectName}>
           {projectName}
         </span>
       ) : null}
-      <span className="font-mono text-[11px] text-ink-disabled">{def.key}</span>
-      <span className="text-[11px] uppercase tracking-wide text-ink-muted">{def.type}</span>
-      <label className="flex items-center gap-1 text-xs text-ink-muted">
+      <span className="text-ink-disabled font-mono text-[11px]">{def.key}</span>
+      <span className="text-ink-muted text-[11px] uppercase tracking-wide">{def.type}</span>
+      <label className="text-ink-muted flex items-center gap-1 text-xs">
         <input
           type="checkbox"
           checked={def.required}
-          onChange={(e) =>
-            update.mutate({ id: def.id, input: { required: e.target.checked } })
-          }
-          className="h-3.5 w-3.5 accent-brand-600"
+          onChange={(e) => update.mutate({ id: def.id, input: { required: e.target.checked } })}
+          className="accent-brand-600 h-3.5 w-3.5"
         />
         Required
       </label>
@@ -258,7 +256,7 @@ function DefinitionRow({
             remove.mutate(def.id);
           }
         }}
-        className="rounded p-1.5 text-ink-disabled hover:bg-tint-error hover:text-state-error focus-visible:outline-none focus-visible:ring-2 focus-visible:shadow-focus"
+        className="text-ink-disabled hover:bg-tint-error hover:text-state-error focus-visible:shadow-focus rounded p-1.5 focus-visible:outline-none focus-visible:ring-2"
       >
         <Trash2 className="h-3.5 w-3.5" />
       </button>

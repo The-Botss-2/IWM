@@ -2,11 +2,7 @@
 
 import { mergeAttributes } from '@tiptap/core';
 import { Image } from '@tiptap/extension-image';
-import {
-  type NodeViewProps,
-  NodeViewWrapper,
-  ReactNodeViewRenderer,
-} from '@tiptap/react';
+import { type NodeViewProps, NodeViewWrapper, ReactNodeViewRenderer } from '@tiptap/react';
 import {
   AlignCenter,
   AlignLeft,
@@ -79,9 +75,7 @@ export const CustomImage = Image.extend({
         default: 'center' as Align,
         parseHTML: (el): Align => {
           const raw = el.getAttribute('data-align');
-          return (ALIGNS as readonly string[]).includes(raw ?? '')
-            ? (raw as Align)
-            : 'center';
+          return (ALIGNS as readonly string[]).includes(raw ?? '') ? (raw as Align) : 'center';
         },
         // Stored as data-align + an inline margin/display style on the rendered
         // img. The visual margin shift is also applied by the wrapper in the
@@ -119,13 +113,7 @@ export const CustomImage = Image.extend({
   },
 });
 
-function ImageNodeView({
-  node,
-  selected,
-  updateAttributes,
-  deleteNode,
-  editor,
-}: NodeViewProps) {
+function ImageNodeView({ node, selected, updateAttributes, deleteNode, editor }: NodeViewProps) {
   const {
     src,
     alt,
@@ -140,15 +128,11 @@ function ImageNodeView({
     uploading: boolean;
   };
   const width = clampWidth(rawWidth);
-  const align: Align = (ALIGNS as readonly string[]).includes(rawAlign)
-    ? rawAlign
-    : 'center';
+  const align: Align = (ALIGNS as readonly string[]).includes(rawAlign) ? rawAlign : 'center';
 
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [hoverWidth, setHoverWidth] = useState<number | null>(null);
-  const [loadState, setLoadState] = useState<'loading' | 'loaded' | 'error'>(
-    'loading',
-  );
+  const [loadState, setLoadState] = useState<'loading' | 'loaded' | 'error'>('loading');
 
   useEffect(() => {
     setLoadState('loading');
@@ -209,14 +193,9 @@ function ImageNodeView({
   // edge of the column. Full-width (100%) ignores alignment visually but the
   // attribute is still saved.
   const alignClass =
-    align === 'left'
-      ? 'ml-0 mr-auto'
-      : align === 'right'
-      ? 'ml-auto mr-0'
-      : 'mx-auto';
+    align === 'left' ? 'ml-0 mr-auto' : align === 'right' ? 'ml-auto mr-0' : 'mx-auto';
 
-  const showToolbar =
-    selected && editor.isEditable && !uploading && loadState !== 'loading';
+  const showToolbar = selected && editor.isEditable && !uploading && loadState !== 'loading';
 
   return (
     <NodeViewWrapper
@@ -233,7 +212,7 @@ function ImageNodeView({
           <div
             role="toolbar"
             aria-label="Image formatting"
-            className="absolute -top-10 left-1/2 z-10 flex -translate-x-1/2 items-center gap-0.5 rounded-md border border-line bg-white p-1 shadow-md"
+            className="border-line absolute -top-10 left-1/2 z-10 flex -translate-x-1/2 items-center gap-0.5 rounded-md border bg-white p-1 shadow-md"
             onMouseDown={(e) => e.preventDefault()}
           >
             <ToolButton
@@ -264,8 +243,8 @@ function ImageNodeView({
                 onClick={() => updateAttributes({ width: w })}
                 title={`${w}%`}
                 className={cn(
-                  'inline-flex h-7 min-w-[32px] items-center justify-center rounded px-1.5 text-[11px] font-medium text-ink-muted hover:bg-bg-subtle hover:text-ink',
-                  'focus-visible:outline-none focus-visible:ring-2 focus-visible:shadow-focus',
+                  'text-ink-muted hover:bg-bg-subtle hover:text-ink inline-flex h-7 min-w-[32px] items-center justify-center rounded px-1.5 text-[11px] font-medium',
+                  'focus-visible:shadow-focus focus-visible:outline-none focus-visible:ring-2',
                   width === w ? 'bg-brand-50 text-brand-700' : '',
                 )}
               >
@@ -291,7 +270,7 @@ function ImageNodeView({
 
         {showSkeleton ? (
           <div
-            className="flex aspect-[16/9] w-full min-h-[120px] items-center justify-center rounded-md border border-dashed border-line-strong bg-bg-subtle text-ink-disabled"
+            className="border-line-strong bg-bg-subtle text-ink-disabled flex aspect-[16/9] min-h-[120px] w-full items-center justify-center rounded-md border border-dashed"
             role="status"
             aria-label={uploading ? 'Uploading image' : 'Loading image'}
           >
@@ -301,7 +280,7 @@ function ImageNodeView({
 
         {showError ? (
           <div
-            className="flex aspect-[16/9] w-full min-h-[120px] flex-col items-center justify-center gap-1 rounded-md border border-dashed border-state-error/30 bg-tint-error text-xs text-state-error"
+            className="border-state-error/30 bg-tint-error text-state-error flex aspect-[16/9] min-h-[120px] w-full flex-col items-center justify-center gap-1 rounded-md border border-dashed text-xs"
             role="alert"
           >
             <ImageOff className="h-5 w-5" aria-hidden />
@@ -321,9 +300,7 @@ function ImageNodeView({
               loadState === 'loading' || loadState === 'error'
                 ? 'absolute inset-0 opacity-0'
                 : 'opacity-100',
-              selected && loadState === 'loaded'
-                ? 'outline outline-2 outline-brand-500'
-                : '',
+              selected && loadState === 'loaded' ? 'outline-brand-500 outline outline-2' : '',
             )}
             style={{ height: 'auto' }}
             draggable={false}
@@ -340,9 +317,9 @@ function ImageNodeView({
               aria-valuenow={displayWidth}
               tabIndex={0}
               onPointerDown={startResize}
-              className="absolute right-0 top-1/2 h-6 w-2 -translate-y-1/2 cursor-ew-resize rounded-full bg-brand-500 opacity-0 transition-opacity group-hover:opacity-100 focus-visible:opacity-100 focus-visible:outline-none"
+              className="bg-brand-500 absolute right-0 top-1/2 h-6 w-2 -translate-y-1/2 cursor-ew-resize rounded-full opacity-0 transition-opacity focus-visible:opacity-100 focus-visible:outline-none group-hover:opacity-100"
             />
-            <div className="pointer-events-none absolute left-2 top-2 rounded bg-ink/70 px-1.5 py-0.5 text-[10px] font-medium text-white opacity-0 transition-opacity group-hover:opacity-100">
+            <div className="bg-ink/70 pointer-events-none absolute left-2 top-2 rounded px-1.5 py-0.5 text-[10px] font-medium text-white opacity-0 transition-opacity group-hover:opacity-100">
               {displayWidth}%
             </div>
           </>
@@ -376,7 +353,7 @@ function ToolButton({
       title={label}
       className={cn(
         'inline-flex h-7 w-7 items-center justify-center rounded transition-colors',
-        'focus-visible:outline-none focus-visible:ring-2 focus-visible:shadow-focus',
+        'focus-visible:shadow-focus focus-visible:outline-none focus-visible:ring-2',
         tone === 'danger'
           ? 'text-ink-muted hover:bg-tint-error hover:text-state-error'
           : 'text-ink-muted hover:bg-bg-subtle hover:text-ink',
@@ -389,7 +366,7 @@ function ToolButton({
 }
 
 function Divider() {
-  return <span aria-hidden className="mx-0.5 h-4 w-px bg-line" />;
+  return <span aria-hidden className="bg-line mx-0.5 h-4 w-px" />;
 }
 
 // Free-form width, with a light magnetic pull toward a preset when the drag

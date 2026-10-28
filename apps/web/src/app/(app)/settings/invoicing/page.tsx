@@ -104,18 +104,18 @@ export default function InvoicingSettingsPage() {
   return (
     <div className="space-y-6">
       <header>
-        <h2 className="text-lg font-semibold text-ink">Invoicing</h2>
-        <p className="mt-1 text-sm text-ink-muted">
-          Company details every invoice template prints, the default template, and invoice
-          defaults. Templates themselves are HTML files in the app, see{' '}
-          <code className="rounded bg-bg-subtle px-1 text-xs">apps/api/invoice-templates</code>.
+        <h2 className="text-ink text-lg font-semibold">Invoicing</h2>
+        <p className="text-ink-muted mt-1 text-sm">
+          Company details every invoice template prints, the default template, and invoice defaults.
+          Templates themselves are HTML files in the app, see{' '}
+          <code className="bg-bg-subtle rounded px-1 text-xs">apps/api/invoice-templates</code>.
         </p>
       </header>
 
       {settings.isLoading ? (
         <PageLoader label="Loading invoice settings" className="min-h-[12rem]" />
       ) : settings.isError ? (
-        <div className="rounded-md border border-line bg-bg-surface p-6 text-sm text-ink-muted">
+        <div className="border-line bg-bg-surface text-ink-muted rounded-md border p-6 text-sm">
           Couldn&apos;t load invoice settings.{' '}
           <button type="button" className="underline" onClick={() => void settings.refetch()}>
             Try again
@@ -130,15 +130,19 @@ export default function InvoicingSettingsPage() {
           }}
           noValidate
         >
-          <section className="space-y-4 rounded-lg border border-line bg-bg-surface p-4">
-            <h3 className="text-sm font-semibold text-ink">Company</h3>
+          <section className="border-line bg-bg-surface space-y-4 rounded-lg border p-4">
+            <h3 className="text-ink text-sm font-semibold">Company</h3>
             <div className="flex flex-wrap items-center gap-4">
-              <div className="grid h-16 w-40 place-items-center overflow-hidden rounded-md border border-dashed border-line bg-bg-subtle">
+              <div className="border-line bg-bg-subtle grid h-16 w-40 place-items-center overflow-hidden rounded-md border border-dashed">
                 {logoUrl ? (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img src={logoUrl} alt="Company logo" className="max-h-14 max-w-36 object-contain" />
+                  <img
+                    src={logoUrl}
+                    alt="Company logo"
+                    className="max-h-14 max-w-36 object-contain"
+                  />
                 ) : (
-                  <span className="text-xs text-ink-disabled">No logo</span>
+                  <span className="text-ink-disabled text-xs">No logo</span>
                 )}
               </div>
               <div className="flex gap-2">
@@ -156,7 +160,11 @@ export default function InvoicingSettingsPage() {
                   onClick={() => fileInput.current?.click()}
                   disabled={upload.isPending}
                 >
-                  {upload.isPending ? <Loader size="xs" label="Uploading" /> : <ImagePlus className="h-4 w-4" />}
+                  {upload.isPending ? (
+                    <Loader size="xs" label="Uploading" />
+                  ) : (
+                    <ImagePlus className="h-4 w-4" />
+                  )}
                   {logoUrl ? 'Replace logo' : 'Upload logo'}
                 </Button>
                 {form.logoFileId ? (
@@ -175,7 +183,11 @@ export default function InvoicingSettingsPage() {
               </div>
             </div>
             <div className="grid gap-4 sm:grid-cols-2">
-              <TextField label="Company name" value={form.companyName} onChange={setText('companyName')} />
+              <TextField
+                label="Company name"
+                value={form.companyName}
+                onChange={setText('companyName')}
+              />
               <TextField
                 label="Billing email"
                 value={form.email}
@@ -194,7 +206,7 @@ export default function InvoicingSettingsPage() {
                     aria-label="Pick accent color"
                     value={form.accentColor ?? '#7b6fe8'}
                     onChange={(e) => setForm((prev) => ({ ...prev, accentColor: e.target.value }))}
-                    className="h-10 w-12 cursor-pointer rounded-md border border-line bg-bg-surface"
+                    className="border-line bg-bg-surface h-10 w-12 cursor-pointer rounded-md border"
                   />
                   <Input
                     id="accent"
@@ -207,11 +219,16 @@ export default function InvoicingSettingsPage() {
                 </div>
               </div>
             </div>
-            <AreaField label="Address" value={form.address} onChange={setText('address')} rows={3} />
+            <AreaField
+              label="Address"
+              value={form.address}
+              onChange={setText('address')}
+              rows={3}
+            />
           </section>
 
-          <section className="space-y-4 rounded-lg border border-line bg-bg-surface p-4">
-            <h3 className="text-sm font-semibold text-ink">Payment</h3>
+          <section className="border-line bg-bg-surface space-y-4 rounded-lg border p-4">
+            <h3 className="text-ink text-sm font-semibold">Payment</h3>
             <AreaField
               label="Bank details"
               value={form.bankDetails}
@@ -234,8 +251,8 @@ export default function InvoicingSettingsPage() {
             />
           </section>
 
-          <section className="space-y-4 rounded-lg border border-line bg-bg-surface p-4">
-            <h3 className="text-sm font-semibold text-ink">Defaults</h3>
+          <section className="border-line bg-bg-surface space-y-4 rounded-lg border p-4">
+            <h3 className="text-ink text-sm font-semibold">Defaults</h3>
             <div className="grid gap-4 sm:grid-cols-3">
               <div>
                 <Label>Default template</Label>
@@ -299,7 +316,7 @@ export default function InvoicingSettingsPage() {
             </div>
           </section>
 
-          {error ? <p className="text-sm text-state-error">{error}</p> : null}
+          {error ? <p className="text-state-error text-sm">{error}</p> : null}
 
           <div className="flex justify-end">
             <Button type="submit" disabled={save.isPending || upload.isPending}>
@@ -327,8 +344,13 @@ function TextField({
   return (
     <div>
       <Label htmlFor={id}>{label}</Label>
-      <Input id={id} className="mt-1" value={value ?? ''} onChange={(e) => onChange(e.target.value)} />
-      {hint ? <p className="mt-1 text-xs text-ink-muted">{hint}</p> : null}
+      <Input
+        id={id}
+        className="mt-1"
+        value={value ?? ''}
+        onChange={(e) => onChange(e.target.value)}
+      />
+      {hint ? <p className="text-ink-muted mt-1 text-xs">{hint}</p> : null}
     </div>
   );
 }
@@ -357,7 +379,7 @@ function AreaField({
         value={value ?? ''}
         onChange={(e) => onChange(e.target.value)}
       />
-      {hint ? <p className="mt-1 text-xs text-ink-muted">{hint}</p> : null}
+      {hint ? <p className="text-ink-muted mt-1 text-xs">{hint}</p> : null}
     </div>
   );
 }

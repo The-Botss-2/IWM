@@ -11,9 +11,7 @@ const MAX_AGE_SECONDS = 60 * 60 * 24 * 365; // 1 year
 
 export function readWorkspaceCookie(): string | null {
   if (typeof document === 'undefined') return null;
-  const match = document.cookie.match(
-    new RegExp(`(?:^|;\\s*)${CURRENT_WORKSPACE_COOKIE}=([^;]+)`),
-  );
+  const match = document.cookie.match(new RegExp(`(?:^|;\\s*)${CURRENT_WORKSPACE_COOKIE}=([^;]+)`));
   return match ? decodeURIComponent(match[1] ?? '') || null : null;
 }
 

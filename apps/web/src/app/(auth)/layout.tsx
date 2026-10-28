@@ -10,48 +10,44 @@ import { Logo } from '@/components/branding/logo';
  */
 export default function AuthLayout({ children }: { children: ReactNode }) {
   return (
-    <main className="min-h-screen flex bg-bg-app">
+    <main className="bg-bg-app flex min-h-screen">
       {/* Left - brand panel (hidden on mobile) */}
-      <aside className="relative hidden md:flex md:w-3/5 items-center justify-center overflow-hidden p-12">
+      <aside className="relative hidden items-center justify-center overflow-hidden p-12 md:flex md:w-3/5">
+        <div aria-hidden className="bg-brand-gradient absolute inset-0 opacity-[0.08]" />
         <div
           aria-hidden
-          className="absolute inset-0 bg-brand-gradient opacity-[0.08]"
+          className="bg-brand-magenta/20 absolute -left-32 -top-32 h-96 w-96 rounded-full blur-3xl"
         />
         <div
           aria-hidden
-          className="absolute -left-32 -top-32 h-96 w-96 rounded-full bg-brand-magenta/20 blur-3xl"
-        />
-        <div
-          aria-hidden
-          className="absolute -bottom-32 -right-24 h-[28rem] w-[28rem] rounded-full bg-brand-orange/20 blur-3xl"
+          className="bg-brand-orange/20 absolute -bottom-32 -right-24 h-[28rem] w-[28rem] rounded-full blur-3xl"
         />
         <div className="relative z-10 max-w-md">
           <Link
             href="/"
             aria-label="The Botss home"
-            className="rounded focus-visible:outline-none focus-visible:shadow-focus inline-block"
+            className="focus-visible:shadow-focus inline-block rounded focus-visible:outline-none"
           >
             <Logo variant="full" size="lg" />
           </Link>
-          <h1 className="mt-10 text-3xl font-semibold text-ink leading-tight">
-            One workspace.{' '}
-            <span className="text-brand-gradient">Every workflow.</span>
+          <h1 className="text-ink mt-10 text-3xl font-semibold leading-tight">
+            One workspace. <span className="text-brand-gradient">Every workflow.</span>
           </h1>
-          <p className="mt-4 text-base text-ink-muted leading-relaxed">
-            Project management, leads, mail, chat, and documents - built for
-            The Botss team across Pakistan.
+          <p className="text-ink-muted mt-4 text-base leading-relaxed">
+            Project management, leads, mail, chat, and documents - built for The Botss team across
+            Pakistan.
           </p>
         </div>
       </aside>
 
       {/* Right - form card */}
-      <section className="flex w-full md:w-2/5 items-center justify-center p-6">
-        <div className="w-full max-w-[480px] rounded-xl bg-white p-8 shadow-soft">
+      <section className="flex w-full items-center justify-center p-6 md:w-2/5">
+        <div className="shadow-soft w-full max-w-[480px] rounded-xl bg-white p-8">
           <div className="mb-8 flex justify-center md:hidden">
             <Link
               href="/"
               aria-label="The Botss home"
-              className="rounded focus-visible:outline-none focus-visible:shadow-focus"
+              className="focus-visible:shadow-focus rounded focus-visible:outline-none"
             >
               <Logo variant="full" size="md" />
             </Link>

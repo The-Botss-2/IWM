@@ -1,18 +1,6 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Patch,
-  Post,
-  UseGuards,
-} from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, UseGuards } from '@nestjs/common';
 
-import {
-  CurrentUser,
-  type AuthedUser,
-} from '../common/decorators/current-user.decorator';
+import { CurrentUser, type AuthedUser } from '../common/decorators/current-user.decorator';
 import {
   createOrganizationSchema,
   type CreateOrganizationInput,

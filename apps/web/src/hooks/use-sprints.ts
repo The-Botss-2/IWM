@@ -174,13 +174,8 @@ export function useRemoveSprintTask(projectId: string) {
 export function useReorderSprintTask(projectId: string) {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: ({
-      sprintId,
-      input,
-    }: {
-      sprintId: string;
-      input: ReorderSprintTaskInput;
-    }) => getApi().sprints.reorderTask(sprintId, input),
+    mutationFn: ({ sprintId, input }: { sprintId: string; input: ReorderSprintTaskInput }) =>
+      getApi().sprints.reorderTask(sprintId, input),
     onMutate: ({ sprintId, input }) => {
       const prev = qc.getQueryData<SprintWithStats[] | undefined>(sprintsKey(projectId));
       qc.setQueryData<SprintWithStats[] | undefined>(sprintsKey(projectId), (current) =>
@@ -227,11 +222,7 @@ export function useMoveSprintTask(projectId: string) {
             return {
               ...s,
               taskCount: s.taskCount + 1,
-              taskIds: [
-                ...without.slice(0, insertAt),
-                input.taskId,
-                ...without.slice(insertAt),
-              ],
+              taskIds: [...without.slice(0, insertAt), input.taskId, ...without.slice(insertAt)],
             };
           }
           return s;

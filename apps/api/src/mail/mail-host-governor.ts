@@ -1,10 +1,4 @@
-import {
-  Inject,
-  Injectable,
-  Logger,
-  Optional,
-  ServiceUnavailableException,
-} from '@nestjs/common';
+import { Inject, Injectable, Logger, Optional, ServiceUnavailableException } from '@nestjs/common';
 
 /**
  * Every IMAP login we make goes through here, keyed by mail host.
@@ -314,7 +308,9 @@ export class MailHostGovernor {
     // step by step, and the breaker does the real gating.
     const prev = this.accounts.get(accountId)?.failures ?? 0;
     const failures = hostLevel ? prev + 1 : ACCOUNT_BACKOFF_MS.length;
-    const delay = this.jitter(ACCOUNT_BACKOFF_MS[Math.min(failures, ACCOUNT_BACKOFF_MS.length) - 1]!);
+    const delay = this.jitter(
+      ACCOUNT_BACKOFF_MS[Math.min(failures, ACCOUNT_BACKOFF_MS.length) - 1]!,
+    );
     this.accounts.set(accountId, { failures, nextAllowedAt: now + delay });
     this.env.log(
       'warn',
@@ -344,10 +340,7 @@ export class MailHostGovernor {
       // Our probe failed: the host is still unreachable, stay open longer.
       h.probe = null;
       this.openBreaker(key, h, h.openStep + 1, err);
-    } else if (
-      h.openStep === 0 &&
-      (h.consecutiveFailures >= HOST_TRIP_FAILURES || authFailed)
-    ) {
+    } else if (h.openStep === 0 && (h.consecutiveFailures >= HOST_TRIP_FAILURES || authFailed)) {
       this.openBreaker(key, h, 1, err);
     }
   }

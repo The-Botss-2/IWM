@@ -268,11 +268,7 @@ export class ExpensesService {
     return this.serialize(created);
   }
 
-  async update(
-    scope: UserScope,
-    id: string,
-    input: UpdateExpenseInput,
-  ): Promise<ExpenseWithRefs> {
+  async update(scope: UserScope, id: string, input: UpdateExpenseInput): Promise<ExpenseWithRefs> {
     const workspaceId = requireWorkspace(scope);
     const existing = await this.prisma.client.expense.findFirst({
       where: { id, workspaceId },

@@ -10,10 +10,7 @@ import { OrgMailFields } from '@/components/organization/org-mail-fields';
 import { Button } from '@/components/ui/button';
 import { Loader } from '@/components/ui/loader';
 import { QueryError } from '@/components/ui/query-error';
-import {
-  useOrgMailConfig,
-  useUpsertOrgMailConfig,
-} from '@/hooks/use-org-mail-config';
+import { useOrgMailConfig, useUpsertOrgMailConfig } from '@/hooks/use-org-mail-config';
 
 /**
  * Form schema for the in-app editor. Passwords are blank-able: an empty string
@@ -82,29 +79,26 @@ export default function OrganizationMailSettingsPage() {
   return (
     <div className="space-y-6">
       <header>
-        <h2 className="text-lg font-semibold text-ink">Organization email</h2>
-        <p className="mt-1 text-sm text-ink-muted">
-          SMTP/IMAP credentials your organization uses to send and receive mail
-          (workspace invitations, password resets, and the Mail feature). Only
-          the workspace owner and admins can change these.
+        <h2 className="text-ink text-lg font-semibold">Organization email</h2>
+        <p className="text-ink-muted mt-1 text-sm">
+          SMTP/IMAP credentials your organization uses to send and receive mail (workspace
+          invitations, password resets, and the Mail feature). Only the workspace owner and admins
+          can change these.
         </p>
       </header>
 
       {config.isLoading ? (
-        <div className="rounded-md border border-line bg-bg-surface p-6 text-center">
+        <div className="border-line bg-bg-surface rounded-md border p-6 text-center">
           <Loader size="sm" label="Loading" />
         </div>
       ) : config.isError && !config.data ? (
-        <QueryError
-          message="Couldn't load email settings."
-          onRetry={() => void config.refetch()}
-        />
+        <QueryError message="Couldn't load email settings." onRetry={() => void config.refetch()} />
       ) : (
         <form className="space-y-5" onSubmit={handleSubmit(onSubmit)} noValidate>
           {!existing ? (
-            <p className="rounded-md border border-line bg-bg-subtle px-3 py-2 text-xs text-ink-muted">
-              No email configured yet. Fill in both SMTP and IMAP details
-              (including passwords) to enable mail for your organization.
+            <p className="border-line bg-bg-subtle text-ink-muted rounded-md border px-3 py-2 text-xs">
+              No email configured yet. Fill in both SMTP and IMAP details (including passwords) to
+              enable mail for your organization.
             </p>
           ) : null}
 
@@ -123,11 +117,11 @@ export default function OrganizationMailSettingsPage() {
         </form>
       )}
 
-      <section className="rounded-md border border-line bg-bg-subtle px-4 py-3 text-xs text-ink-muted">
-        <p className="font-medium text-ink">Security</p>
+      <section className="border-line bg-bg-subtle text-ink-muted rounded-md border px-4 py-3 text-xs">
+        <p className="text-ink font-medium">Security</p>
         <p className="mt-1">
-          Passwords are encrypted with AES-256-GCM before storage and are never
-          returned by the API. Leave a password blank to keep the stored value.
+          Passwords are encrypted with AES-256-GCM before storage and are never returned by the API.
+          Leave a password blank to keep the stored value.
         </p>
       </section>
     </div>

@@ -4,8 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 
 import { getApi } from '@/lib/api';
 
-const projectSummaryKey = (projectId: string) =>
-  ['project-summary', projectId] as const;
+const projectSummaryKey = (projectId: string) => ['project-summary', projectId] as const;
 
 export function useProjectSummary(projectId: string) {
   return useQuery({

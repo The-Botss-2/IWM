@@ -92,7 +92,7 @@ export function InvoiceStatusMenu({
                 type="button"
                 onClick={() => choose(action)}
                 className={cn(
-                  'flex w-full items-center gap-2 whitespace-nowrap rounded-md px-3 py-2 text-left text-sm hover:bg-bg-subtle',
+                  'hover:bg-bg-subtle flex w-full items-center gap-2 whitespace-nowrap rounded-md px-3 py-2 text-left text-sm',
                   action === 'cancel' ? 'text-[#E5484D]' : 'text-ink',
                 )}
               >
@@ -106,7 +106,11 @@ export function InvoiceStatusMenu({
       <ConfirmDialog
         open={pending === 'cancel' || pending === 'back-to-draft'}
         onOpenChange={(open) => !open && setPendingAction(null)}
-        title={pending === 'cancel' ? `Cancel ${invoice.number}?` : `Move ${invoice.number} back to draft?`}
+        title={
+          pending === 'cancel'
+            ? `Cancel ${invoice.number}?`
+            : `Move ${invoice.number} back to draft?`
+        }
         description={
           pending === 'cancel'
             ? 'A cancelled invoice cannot be sent or paid. Raise a new invoice if you need one.'
@@ -158,9 +162,7 @@ function MarkPaidDialog({ invoice, onClose }: { invoice: MenuInvoice; onClose: (
         id: invoice.id,
         input: {
           amount,
-          ...(needsRate && fxRate !== ''
-            ? { fxRate, receivedCurrency: invoice.currency }
-            : {}),
+          ...(needsRate && fxRate !== '' ? { fxRate, receivedCurrency: invoice.currency } : {}),
           ...(paidAt ? { paidAt } : {}),
           ...(reference.trim() ? { reference: reference.trim() } : {}),
         },

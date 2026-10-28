@@ -6,12 +6,7 @@ import { getApi } from '@/lib/api';
 import { getChatSocket } from '@/lib/chat-socket';
 import { toast, toastError, toastErrorMessage } from '@/lib/toast';
 
-export type CallPhase =
-  | 'idle'
-  | 'outgoing'
-  | 'incoming'
-  | 'connecting'
-  | 'connected';
+export type CallPhase = 'idle' | 'outgoing' | 'incoming' | 'connecting' | 'connected';
 
 interface IncomingCall {
   callId: string;
@@ -101,69 +96,63 @@ export function useWhatsAppCall(selfUserId: string) {
     setPhase('idle');
   }, [stopLocal]);
 
-  const buildPeer = useCallback(
-    (remoteUserId: string) => {
-      const pc = new RTCPeerConnection({ iceServers: ICE_SERVERS });
-      const session = sessionRef.current;
-      pc.onicecandidate = (e) => {
-        if (!e.candidate || !session) return;
-        getChatSocket().emit('webrtc_ice_candidate', {
-          callId: session.callId,
-          toUserId: remoteUserId,
-          candidate: e.candidate.toJSON(),
-        });
-      };
-      // Build a *single* remote MediaStream on the receiver side. Some
-      // browsers (notably Firefox) fire `ontrack` with `streams: []` for
-      // m-lines we created from transceivers, so we can't rely on the
-      // event's `streams[0]`. Adding tracks to one stable stream gives
-      // the overlay a single ref to bind both audio and video to.
-      const remoteMediaStream = new MediaStream();
-      pc.ontrack = (e) => {
-        if (!remoteMediaStream.getTracks().some((t) => t.id === e.track.id)) {
-          remoteMediaStream.addTrack(e.track);
-        }
-        setRemoteStream(remoteMediaStream);
-      };
-      pc.onconnectionstatechange = () => {
-        if (pc.connectionState === 'connected') {
-          setPhase('connected');
-        } else if (
-          pc.connectionState === 'failed' ||
-          pc.connectionState === 'disconnected'
-        ) {
-          // The actual call media runs over LiveKit now - this peer
-          // connection is a signaling-era leftover whose stream is no longer
-          // rendered anywhere. If its ICE fails (e.g. the public TURN relay is
-          // flaky), that must NOT cancel the call: tearing down here flipped
-          // `phase` to 'idle', which made <GlobalRealtime> disconnect LiveKit
-          // *mid-connect* and surfaced as "could not establish pc connection"
-          // / "client initiated disconnect". Log and leave the call alive -
-          // real termination comes from call_end/reject + the safety timeouts.
-          console.warn(
-            '[call] p2p peer connection',
-            pc.connectionState,
-            '- ignoring (LiveKit carries call media)',
-          );
-        }
-      };
-      // Pre-create transceivers for both kinds in 'sendrecv' direction.
-      // The audio transceiver carries the mic from the moment the call
-      // connects; the video transceiver starts with a null track and only
-      // gets a real track when the user toggles the camera on. Because the
-      // m-line is already negotiated, the camera toggle is a no-op for SDP
-      // and the peer sees video immediately via the established RTP flow.
-      audioTransceiverRef.current = pc.addTransceiver('audio', {
-        direction: 'sendrecv',
+  const buildPeer = useCallback((remoteUserId: string) => {
+    const pc = new RTCPeerConnection({ iceServers: ICE_SERVERS });
+    const session = sessionRef.current;
+    pc.onicecandidate = (e) => {
+      if (!e.candidate || !session) return;
+      getChatSocket().emit('webrtc_ice_candidate', {
+        callId: session.callId,
+        toUserId: remoteUserId,
+        candidate: e.candidate.toJSON(),
       });
-      videoTransceiverRef.current = pc.addTransceiver('video', {
-        direction: 'sendrecv',
-      });
-      pcRef.current = pc;
-      return pc;
-    },
-    [],
-  );
+    };
+    // Build a *single* remote MediaStream on the receiver side. Some
+    // browsers (notably Firefox) fire `ontrack` with `streams: []` for
+    // m-lines we created from transceivers, so we can't rely on the
+    // event's `streams[0]`. Adding tracks to one stable stream gives
+    // the overlay a single ref to bind both audio and video to.
+    const remoteMediaStream = new MediaStream();
+    pc.ontrack = (e) => {
+      if (!remoteMediaStream.getTracks().some((t) => t.id === e.track.id)) {
+        remoteMediaStream.addTrack(e.track);
+      }
+      setRemoteStream(remoteMediaStream);
+    };
+    pc.onconnectionstatechange = () => {
+      if (pc.connectionState === 'connected') {
+        setPhase('connected');
+      } else if (pc.connectionState === 'failed' || pc.connectionState === 'disconnected') {
+        // The actual call media runs over LiveKit now - this peer
+        // connection is a signaling-era leftover whose stream is no longer
+        // rendered anywhere. If its ICE fails (e.g. the public TURN relay is
+        // flaky), that must NOT cancel the call: tearing down here flipped
+        // `phase` to 'idle', which made <GlobalRealtime> disconnect LiveKit
+        // *mid-connect* and surfaced as "could not establish pc connection"
+        // / "client initiated disconnect". Log and leave the call alive -
+        // real termination comes from call_end/reject + the safety timeouts.
+        console.warn(
+          '[call] p2p peer connection',
+          pc.connectionState,
+          '- ignoring (LiveKit carries call media)',
+        );
+      }
+    };
+    // Pre-create transceivers for both kinds in 'sendrecv' direction.
+    // The audio transceiver carries the mic from the moment the call
+    // connects; the video transceiver starts with a null track and only
+    // gets a real track when the user toggles the camera on. Because the
+    // m-line is already negotiated, the camera toggle is a no-op for SDP
+    // and the peer sees video immediately via the established RTP flow.
+    audioTransceiverRef.current = pc.addTransceiver('audio', {
+      direction: 'sendrecv',
+    });
+    videoTransceiverRef.current = pc.addTransceiver('video', {
+      direction: 'sendrecv',
+    });
+    pcRef.current = pc;
+    return pc;
+  }, []);
 
   const attachLocalTracks = useCallback(async (withVideo: boolean) => {
     const stream = await navigator.mediaDevices.getUserMedia({
@@ -348,11 +337,7 @@ export function useWhatsAppCall(selfUserId: string) {
       if (phase === 'outgoing') setPhase('outgoing');
     };
 
-    const onAccepted = async (payload: {
-      callId: string;
-      roomId: string;
-      byUserId: string;
-    }) => {
+    const onAccepted = async (payload: { callId: string; roomId: string; byUserId: string }) => {
       const session = sessionRef.current;
       if (!session || !session.initiated) return;
       // Ignore a duplicate `call_accepted`. Building a second peer here would
@@ -388,7 +373,7 @@ export function useWhatsAppCall(selfUserId: string) {
     };
 
     const onRejected = () => {
-      toastErrorMessage("Call declined", { description: "The other person declined the call." });
+      toastErrorMessage('Call declined', { description: 'The other person declined the call.' });
       teardown();
     };
 
@@ -531,7 +516,7 @@ export function useWhatsAppCall(selfUserId: string) {
           setIncoming(null);
         }
         teardown();
-        toastErrorMessage("Missed call", { description: "You did not answer in time." });
+        toastErrorMessage('Missed call', { description: 'You did not answer in time.' });
       }, RING_TIMEOUT_MS);
       return () => clearTimeout(t);
     }
@@ -546,7 +531,7 @@ export function useWhatsAppCall(selfUserId: string) {
           }
         }
         teardown();
-        toastErrorMessage("No answer", { description: "The other person did not pick up." });
+        toastErrorMessage('No answer', { description: 'The other person did not pick up.' });
       }, OUTGOING_TIMEOUT_MS);
       return () => clearTimeout(t);
     }

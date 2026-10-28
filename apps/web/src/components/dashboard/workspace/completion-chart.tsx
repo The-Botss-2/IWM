@@ -26,30 +26,31 @@ const WEEKS_BACK = 8;
  * todo lists - keeps the work within the existing API surface.
  */
 export function WeeklyCompletionChartWidget() {
-  const { data, isLoading: loading, isError, refetch, granularity, rangeLabel, truncated } =
-    useWeeklyCompletion(WEEKS_BACK);
+  const {
+    data,
+    isLoading: loading,
+    isError,
+    refetch,
+    granularity,
+    rangeLabel,
+    truncated,
+  } = useWeeklyCompletion(WEEKS_BACK);
   const title =
     granularity === 'day'
       ? 'Daily completion'
       : granularity === 'month'
         ? 'Monthly completion'
         : 'Weekly completion';
-  const empty =
-    !loading && data.every((b) => b.tasks === 0 && b.todos === 0);
+  const empty = !loading && data.every((b) => b.tasks === 0 && b.todos === 0);
 
   return (
-    <WidgetShell
-      id="widget-ws-completion"
-      title={title}
-      subtitle={rangeLabel}
-      icon={BarChart3}
-    >
+    <WidgetShell id="widget-ws-completion" title={title} subtitle={rangeLabel} icon={BarChart3}>
       {loading ? (
         <Skeleton className="h-44 w-full" />
       ) : isError ? (
         <QueryError compact message="Couldn't load completions." onRetry={refetch} />
       ) : empty ? (
-        <div className="grid h-44 place-items-center text-xs text-ink-muted">
+        <div className="text-ink-muted grid h-44 place-items-center text-xs">
           {rangeLabel
             ? `No completions in ${rangeLabel}.`
             : `No completions in the last ${WEEKS_BACK} weeks.`}
@@ -73,11 +74,7 @@ export function WeeklyCompletionChartWidget() {
                     <stop offset="100%" stopColor={CHART_COLORS.magenta} />
                   </linearGradient>
                 </defs>
-                <CartesianGrid
-                  vertical={false}
-                  stroke={CHART_COLORS.line}
-                  strokeDasharray="3 3"
-                />
+                <CartesianGrid vertical={false} stroke={CHART_COLORS.line} strokeDasharray="3 3" />
                 <XAxis
                   dataKey="label"
                   tickLine={false}
@@ -102,22 +99,12 @@ export function WeeklyCompletionChartWidget() {
                   }}
                   labelStyle={{ color: CHART_COLORS.ink, fontWeight: 600 }}
                 />
-                <Bar
-                  dataKey="tasks"
-                  name="Tasks"
-                  radius={[6, 6, 0, 0]}
-                  fill="url(#ws-comp-tasks)"
-                >
+                <Bar dataKey="tasks" name="Tasks" radius={[6, 6, 0, 0]} fill="url(#ws-comp-tasks)">
                   {data.map((d) => (
                     <Cell key={`t-${d.weekStart}`} fill="url(#ws-comp-tasks)" />
                   ))}
                 </Bar>
-                <Bar
-                  dataKey="todos"
-                  name="Todos"
-                  radius={[6, 6, 0, 0]}
-                  fill="url(#ws-comp-todos)"
-                >
+                <Bar dataKey="todos" name="Todos" radius={[6, 6, 0, 0]} fill="url(#ws-comp-todos)">
                   {data.map((d) => (
                     <Cell key={`d-${d.weekStart}`} fill="url(#ws-comp-todos)" />
                   ))}
@@ -125,14 +112,14 @@ export function WeeklyCompletionChartWidget() {
               </BarChart>
             </ResponsiveContainer>
           </div>
-          <div className="mt-3 flex items-center gap-4 text-xs text-ink-muted">
+          <div className="text-ink-muted mt-3 flex items-center gap-4 text-xs">
             <LegendDot color={CHART_COLORS.purple} label="Tasks" />
             <LegendDot color={CHART_COLORS.orange} label="Todos" />
           </div>
           {truncated ? (
-            <p className="mt-2 text-xs text-ink-muted">
-              Partial data: this range has more completed tasks than the chart loads. Pick a
-              shorter range for full counts.
+            <p className="text-ink-muted mt-2 text-xs">
+              Partial data: this range has more completed tasks than the chart loads. Pick a shorter
+              range for full counts.
             </p>
           ) : null}
         </>
@@ -144,13 +131,8 @@ export function WeeklyCompletionChartWidget() {
 function LegendDot({ color, label }: { color: string; label: string }) {
   return (
     <span className="inline-flex items-center gap-1.5">
-      <span
-        aria-hidden
-        className="h-2 w-2 rounded-full"
-        style={{ backgroundColor: color }}
-      />
+      <span aria-hidden className="h-2 w-2 rounded-full" style={{ backgroundColor: color }} />
       {label}
     </span>
   );
 }
-

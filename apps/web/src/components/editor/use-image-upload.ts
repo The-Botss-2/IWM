@@ -46,9 +46,7 @@ export function useImageUpload() {
   }, []);
 }
 
-function readImageDimensions(
-  file: File,
-): Promise<{ width: number | null; height: number | null }> {
+function readImageDimensions(file: File): Promise<{ width: number | null; height: number | null }> {
   return new Promise((resolve) => {
     const url = URL.createObjectURL(file);
     const img = new window.Image();

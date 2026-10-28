@@ -54,7 +54,7 @@ export function LeadViewTabs({
 }) {
   return (
     <Tabs value={view} onValueChange={(v) => onChange(v as LeadView)}>
-      <TabsList className="-mx-1 px-1 w-full sm:w-auto">
+      <TabsList className="-mx-1 w-full px-1 sm:w-auto">
         {LEAD_VIEWS.map((v) => {
           const Icon = ICONS[v];
           return (

@@ -53,14 +53,8 @@ export class OrganizationsResource {
    * emails the owner an invitation to set their password - the response
    * deliberately carries no invitation URL.
    */
-  signup(
-    input: PublicOrganizationSignupInput,
-  ): Promise<PublicOrganizationSignupResponse> {
-    return this.http.post(
-      '/org-signup',
-      publicOrganizationSignupResponseSchema,
-      input,
-    );
+  signup(input: PublicOrganizationSignupInput): Promise<PublicOrganizationSignupResponse> {
+    return this.http.post('/org-signup', publicOrganizationSignupResponseSchema, input);
   }
 
   update(orgId: string, input: UpdateOrganizationInput): Promise<Organization> {
@@ -89,11 +83,7 @@ export class OrganizationsResource {
 
   /** Restore an archived (soft-deleted) tenant. */
   restore(orgId: string): Promise<Organization> {
-    return this.http.post(
-      `/organizations/${orgId}/restore`,
-      organizationSchema,
-      {},
-    );
+    return this.http.post(`/organizations/${orgId}/restore`, organizationSchema, {});
   }
 
   /** Irreversible hard cascade delete. Distinct method so consumer code is

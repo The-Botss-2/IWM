@@ -133,9 +133,7 @@ export class AuthContextCache implements OnModuleInit {
   /** Cached rows for a user, or null on miss / stale / Redis trouble. The
    *  returned epoch must be passed to `set` after loading from the DB. */
   async get(userId: string): Promise<{ rows: AuthContextRows | null; epoch: string | null }> {
-    const res = await this.withTimeout(
-      (c) => c.mget(KEY_PREFIX + userId, EPOCH_KEY),
-    );
+    const res = await this.withTimeout((c) => c.mget(KEY_PREFIX + userId, EPOCH_KEY));
     if (!res) return { rows: null, epoch: null };
     const [raw, epochRaw] = res;
     const epoch = epochRaw ?? '0';

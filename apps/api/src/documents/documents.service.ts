@@ -130,10 +130,7 @@ export class DocumentsService {
     const accessFilter: Record<string, unknown> = isAdmin
       ? {}
       : {
-          OR: [
-            { createdById: ctx.userId },
-            { access: { some: { userId: ctx.userId } } },
-          ],
+          OR: [{ createdById: ctx.userId }, { access: { some: { userId: ctx.userId } } }],
         };
 
     const where = isAdmin ? baseWhere : { AND: [baseWhere, accessFilter] };
@@ -257,8 +254,7 @@ export class DocumentsService {
         parentId: input.parentId,
         icon: input.icon,
         coverUrl: input.coverUrl,
-        content:
-          input.content === undefined ? undefined : (input.content as Prisma.InputJsonValue),
+        content: input.content === undefined ? undefined : (input.content as Prisma.InputJsonValue),
         // Plain-text copy of the content, kept in step on every write so
         // search can match inside documents, not only titles.
         contentText: input.content === undefined ? undefined : tiptapToText(input.content),
@@ -337,7 +333,16 @@ export class DocumentsService {
       clientId: input.clientId ?? null,
     });
     const data: Record<string, unknown> = {};
-    for (const k of ['title', 'projectId', 'clientId', 'parentId', 'icon', 'coverUrl', 'visibility', 'publicReadOnly'] as const) {
+    for (const k of [
+      'title',
+      'projectId',
+      'clientId',
+      'parentId',
+      'icon',
+      'coverUrl',
+      'visibility',
+      'publicReadOnly',
+    ] as const) {
       const v = (input as Record<string, unknown>)[k];
       if (v !== undefined) data[k] = v;
     }

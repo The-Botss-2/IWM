@@ -5,10 +5,7 @@ import {
   type UpsertOrganizationMailConfigInput,
 } from '@botss/shared-types';
 
-import {
-  CurrentUser,
-  type AuthedUser,
-} from '../common/decorators/current-user.decorator';
+import { CurrentUser, type AuthedUser } from '../common/decorators/current-user.decorator';
 import { SkipPermissions } from '../common/decorators/skip-permissions.decorator';
 import { ZodValidationPipe } from '../common/pipes/zod-validation.pipe';
 import { OrganizationsService } from './organizations.service';

@@ -10,8 +10,7 @@ const badgeVariants = cva(
       tone: {
         neutral: 'bg-bg-subtle text-ink',
         info: 'bg-bg-subtle text-brand-blue',
-        success:
-          'border border-brand-teal/30 text-gradient-success',
+        success: 'border border-brand-teal/30 text-gradient-success',
         warning: 'bg-tint-warning text-brand-orange',
         danger: 'bg-tint-error text-state-error',
         brand: 'bg-brand-gradient text-white',
@@ -24,8 +23,7 @@ const badgeVariants = cva(
 );
 
 export interface BadgeProps
-  extends HTMLAttributes<HTMLSpanElement>,
-    VariantProps<typeof badgeVariants> {}
+  extends HTMLAttributes<HTMLSpanElement>, VariantProps<typeof badgeVariants> {}
 
 export function Badge({ className, tone, ...rest }: BadgeProps) {
   return <span className={cn(badgeVariants({ tone }), className)} {...rest} />;

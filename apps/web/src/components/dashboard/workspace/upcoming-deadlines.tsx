@@ -49,11 +49,7 @@ export function UpcomingDeadlinesWidget() {
   }, [q.data]);
 
   return (
-    <WidgetShell
-      id="widget-ws-upcoming"
-      title="Upcoming deadlines"
-      icon={CalendarRange}
-    >
+    <WidgetShell id="widget-ws-upcoming" title="Upcoming deadlines" icon={CalendarRange}>
       {q.isLoading ? (
         <div className="space-y-2">
           {Array.from({ length: 4 }).map((_, i) => (
@@ -61,7 +57,11 @@ export function UpcomingDeadlinesWidget() {
           ))}
         </div>
       ) : q.isError && !q.data ? (
-        <QueryError compact message="Couldn't load upcoming deadlines." onRetry={() => void q.refetch()} />
+        <QueryError
+          compact
+          message="Couldn't load upcoming deadlines."
+          onRetry={() => void q.refetch()}
+        />
       ) : items.length === 0 ? (
         <WidgetEmpty icon={CalendarRange} message="Nothing due in the next 14 days." />
       ) : (
@@ -74,12 +74,12 @@ export function UpcomingDeadlinesWidget() {
               <li key={t.id}>
                 <Link
                   href={`/projects/${t.projectId}`}
-                  className="flex items-center justify-between gap-2 rounded-lg px-2 py-1.5 text-sm transition-colors hover:bg-bg-subtle"
+                  className="hover:bg-bg-subtle flex items-center justify-between gap-2 rounded-lg px-2 py-1.5 text-sm transition-colors"
                 >
-                  <span className="min-w-0 flex-1 truncate text-ink">
+                  <span className="text-ink min-w-0 flex-1 truncate">
                     {overdue ? (
                       <AlertTriangle
-                        className="mr-1 inline h-3 w-3 text-state-error align-text-bottom"
+                        className="text-state-error mr-1 inline h-3 w-3 align-text-bottom"
                         aria-label="Overdue"
                       />
                     ) : null}
@@ -98,9 +98,9 @@ export function UpcomingDeadlinesWidget() {
                         className={cn(
                           'text-[11px] tabular-nums',
                           overdue
-                            ? 'font-medium text-state-error'
+                            ? 'text-state-error font-medium'
                             : today
-                              ? 'font-medium text-brand-orange'
+                              ? 'text-brand-orange font-medium'
                               : 'text-ink-muted',
                         )}
                       >
@@ -128,9 +128,7 @@ function isSameDay(a: Date, b: Date): boolean {
 
 function dueLabel(d: Date): string {
   const now = new Date();
-  const diffDays = Math.round(
-    (d.getTime() - now.getTime()) / (1000 * 60 * 60 * 24),
-  );
+  const diffDays = Math.round((d.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
   if (diffDays < 0) return `${Math.abs(diffDays)}d late`;
   if (diffDays === 0) return 'today';
   if (diffDays === 1) return 'tomorrow';

@@ -100,8 +100,7 @@ export class ProjectPortalService {
       throw new ForbiddenException({
         title: 'Forbidden',
         status: 403,
-        detail:
-          'Only workspace owners and admins or the project lead decide what a client sees.',
+        detail: 'Only workspace owners and admins or the project lead decide what a client sees.',
       });
     }
     return {

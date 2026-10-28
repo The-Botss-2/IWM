@@ -62,8 +62,7 @@ function buildOptimisticComment(
 export function useCreateComment(taskId: string, author: OptimisticAuthor) {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (input: CreateCommentInput) =>
-      getApi().comments.create(taskId, input),
+    mutationFn: (input: CreateCommentInput) => getApi().comments.create(taskId, input),
     onMutate: async (input) => {
       await qc.cancelQueries({ queryKey: commentsKey(taskId) });
       const previous = qc.getQueryData<CommentListResponse>(commentsKey(taskId));

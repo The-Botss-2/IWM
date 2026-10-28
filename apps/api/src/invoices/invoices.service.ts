@@ -165,7 +165,15 @@ export class InvoicesService {
     return { description: input.description, quantity, unitPrice, taxRate, discountRate, amount };
   }
 
-  private computeTotals(lineItems: { amount: Decimal; quantity: Decimal; unitPrice: Decimal; discountRate: Decimal; taxRate: Decimal }[]) {
+  private computeTotals(
+    lineItems: {
+      amount: Decimal;
+      quantity: Decimal;
+      unitPrice: Decimal;
+      discountRate: Decimal;
+      taxRate: Decimal;
+    }[],
+  ) {
     let subtotal = new D(0);
     let discountAmount = new D(0);
     let taxAmount = new D(0);
@@ -392,7 +400,11 @@ export class InvoicesService {
    * Re-sending a SENT, PARTIALLY_PAID or OVERDUE invoice is allowed, which is
    * how reminders go out. Cancelled and refunded invoices cannot be sent.
    */
-  async send(scope: UserScope, id: string, input: SendInvoiceInput = { via: 'mailbox' }): Promise<InvoiceWithItems> {
+  async send(
+    scope: UserScope,
+    id: string,
+    input: SendInvoiceInput = { via: 'mailbox' },
+  ): Promise<InvoiceWithItems> {
     const invoice = await this.requireInvoice(scope, id);
     if (invoice.status === 'CANCELLED' || invoice.status === 'REFUNDED') {
       throw new BadRequestException({
@@ -594,7 +606,10 @@ export class InvoicesService {
       }
     }
 
-    const bytes = await this.pdf.htmlToPdf(doc.html, { paper: doc.paper, marginsMm: doc.marginsMm });
+    const bytes = await this.pdf.htmlToPdf(doc.html, {
+      paper: doc.paper,
+      marginsMm: doc.marginsMm,
+    });
     const stored = await this.files.putBuffer({
       workspaceId: invoice.workspaceId,
       uploadedById,
@@ -609,7 +624,8 @@ export class InvoicesService {
     });
     // Raw update: a plain `update` would bump `updatedAt`, which would make
     // every PDF look stale to the list's "edited since" badge.
-    await this.prisma.raw.$executeRaw`UPDATE "Invoice" SET "pdfFileId" = ${stored.id} WHERE "id" = ${id}`;
+    await this.prisma.raw
+      .$executeRaw`UPDATE "Invoice" SET "pdfFileId" = ${stored.id} WHERE "id" = ${id}`;
     return { fileId: stored.id, url: stored.url ?? '', filename: stored.filename };
   }
 
@@ -733,9 +749,11 @@ export class InvoicesService {
   // Serialization - Decimal → string round-trip for the wire schema.
   // -------------------------------------------------------------------------
 
-  private serialize(invoice: Prisma.InvoiceGetPayload<{
-    include: { lineItems: true; payments: true };
-  }>): InvoiceWithItems {
+  private serialize(
+    invoice: Prisma.InvoiceGetPayload<{
+      include: { lineItems: true; payments: true };
+    }>,
+  ): InvoiceWithItems {
     return {
       id: invoice.id,
       workspaceId: invoice.workspaceId,

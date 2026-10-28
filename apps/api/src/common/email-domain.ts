@@ -16,7 +16,12 @@ import { ForbiddenException } from '@nestjs/common';
 
 export function emailDomainOf(email: string): string {
   const at = email.lastIndexOf('@');
-  return at >= 0 ? email.slice(at + 1).trim().toLowerCase() : '';
+  return at >= 0
+    ? email
+        .slice(at + 1)
+        .trim()
+        .toLowerCase()
+    : '';
 }
 
 export function cpanelDomain(): string | null {

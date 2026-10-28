@@ -186,9 +186,7 @@ export function useNavPrefs(userId: string): NavPrefs {
     (id: string) => {
       if (navById(id)?.alwaysOn) return;
       setHiddenState((prev) => {
-        const next = prev.includes(id)
-          ? prev.filter((x) => x !== id)
-          : [...prev, id];
+        const next = prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id];
         write(userId, next);
         return next;
       });

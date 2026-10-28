@@ -43,7 +43,9 @@ export async function unregisterNativePush(): Promise<void> {
   knownToken = null;
   lastRegistered = null;
   // Best-effort during sign-out - a failure here must never block signing out.
-  await getApi().notifications.unregisterPushDevice(token).catch(() => {});
+  await getApi()
+    .notifications.unregisterPushDevice(token)
+    .catch(() => {});
 }
 
 export function useNativePush(enabled: boolean): void {
@@ -61,8 +63,7 @@ export function useNativePush(enabled: boolean): void {
     window.addEventListener('botss:push-token', onToken);
 
     // The shell may have injected the token before this mounted; pick it up.
-    const existing = (window as unknown as { __BOTSS_PUSH_TOKEN__?: unknown })
-      .__BOTSS_PUSH_TOKEN__;
+    const existing = (window as unknown as { __BOTSS_PUSH_TOKEN__?: unknown }).__BOTSS_PUSH_TOKEN__;
     if (typeof existing === 'string') register(existing, 'android');
 
     return () => window.removeEventListener('botss:push-token', onToken);

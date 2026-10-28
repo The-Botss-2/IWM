@@ -49,7 +49,11 @@ export class SignaturesResource {
     );
   }
   send(id: string, input: Partial<SendSignatureRequestInput>): Promise<SigningLinksResponse> {
-    return this.http.post(`/signatures/${encodeURIComponent(id)}/send`, signingLinksResponseSchema, input);
+    return this.http.post(
+      `/signatures/${encodeURIComponent(id)}/send`,
+      signingLinksResponseSchema,
+      input,
+    );
   }
   resend(id: string, signerId: string): Promise<SigningLinksResponse> {
     return this.http.post(
@@ -59,10 +63,18 @@ export class SignaturesResource {
     );
   }
   cancel(id: string, input: CancelSignatureRequestInput = {}): Promise<SignatureRequestDetails> {
-    return this.http.post(`/signatures/${encodeURIComponent(id)}/cancel`, signatureRequestDetailsSchema, input);
+    return this.http.post(
+      `/signatures/${encodeURIComponent(id)}/cancel`,
+      signatureRequestDetailsSchema,
+      input,
+    );
   }
   retrySeal(id: string): Promise<SignatureRequestDetails> {
-    return this.http.post(`/signatures/${encodeURIComponent(id)}/seal`, signatureRequestDetailsSchema, {});
+    return this.http.post(
+      `/signatures/${encodeURIComponent(id)}/seal`,
+      signatureRequestDetailsSchema,
+      {},
+    );
   }
   /** Discard a request that was never sent. */
   removeDraft(id: string) {
