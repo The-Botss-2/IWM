@@ -53,7 +53,7 @@
     "@tiptap/html": "^2.10.3",
     "@tiptap/pm": "^2.10.3",
     "@tiptap/react": "^2.10.3",
-    "@tiptap/starter-kit": "^2.10.3",
+    "@tiptap/starter-kit": "^3.32.0",
     "@tiptap/suggestion": "^2.10.3",
     "better-auth": "1.6.33",
     "class-variance-authority": "^0.7.1",
