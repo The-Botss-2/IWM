@@ -194,6 +194,4 @@ export const adminImportWebmailUserSchema = z.object({
   workspaceId: cuid.optional(),
   workspaceRole: z.enum(['OWNER', 'ADMIN', 'MEMBER', 'VIEWER']).optional(),
 });
-export type AdminImportWebmailUserInput = z.infer<
-  typeof adminImportWebmailUserSchema
->;
+export type AdminImportWebmailUserInput = z.infer<typeof adminImportWebmailUserSchema>;

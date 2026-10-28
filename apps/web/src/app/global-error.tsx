@@ -30,23 +30,18 @@ export default function GlobalError({
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          fontFamily:
-            'system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif',
+          fontFamily: 'system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif',
           background: '#FDF0F5',
           color: '#1a1a2e',
         }}
       >
         <div style={{ textAlign: 'center', padding: '24px', maxWidth: 440 }}>
-          <h1 style={{ fontSize: 20, fontWeight: 600, margin: 0 }}>
-            Something went wrong
-          </h1>
+          <h1 style={{ fontSize: 20, fontWeight: 600, margin: 0 }}>Something went wrong</h1>
           <p style={{ marginTop: 8, fontSize: 14, opacity: 0.7 }}>
             The application hit an unexpected error. Please try reloading.
           </p>
           {error.digest ? (
-            <p style={{ marginTop: 8, fontSize: 12, opacity: 0.5 }}>
-              Reference: {error.digest}
-            </p>
+            <p style={{ marginTop: 8, fontSize: 12, opacity: 0.5 }}>Reference: {error.digest}</p>
           ) : null}
           <button
             type="button"

@@ -59,18 +59,15 @@ export function ClientActivityFeed({ clientId }: { clientId: string }) {
 
   if (feed.isError && feed.items.length === 0) {
     return (
-      <QueryError
-        message="Couldn't load the activity feed."
-        onRetry={() => void feed.refetch()}
-      />
+      <QueryError message="Couldn't load the activity feed." onRetry={() => void feed.refetch()} />
     );
   }
 
   if (feed.items.length === 0) {
     return (
-      <div className="rounded-lg border border-dashed border-line bg-white p-10 text-center">
-        <p className="text-sm font-medium text-ink">Nothing has happened here yet.</p>
-        <p className="mt-1 text-sm text-ink-muted">
+      <div className="border-line rounded-lg border border-dashed bg-white p-10 text-center">
+        <p className="text-ink text-sm font-medium">Nothing has happened here yet.</p>
+        <p className="text-ink-muted mt-1 text-sm">
           New projects, documents, portal invites and signatures will show up here.
         </p>
       </div>
@@ -79,7 +76,7 @@ export function ClientActivityFeed({ clientId }: { clientId: string }) {
 
   return (
     <section aria-label="Client activity" className="space-y-3">
-      <ol className="divide-y divide-line rounded-lg border border-line bg-white">
+      <ol className="divide-line border-line divide-y rounded-lg border bg-white">
         {feed.items.map((item) => (
           <ActivityRow key={item.id} item={item} />
         ))}
@@ -112,11 +109,11 @@ function ActivityRow({ item }: { item: ClientActivityItem }) {
   const href = activityHref(item);
   return (
     <li className="flex items-start gap-3 p-3">
-      <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-bg-subtle text-ink-muted">
+      <span className="bg-bg-subtle text-ink-muted mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full">
         <Icon className="h-4 w-4" aria-hidden />
       </span>
       <div className="min-w-0 flex-1">
-        <p className="text-sm text-ink">
+        <p className="text-ink text-sm">
           <span className="font-medium">{activityVerb(item.kind)}</span>
           {item.title ? (
             <>
@@ -124,7 +121,7 @@ function ActivityRow({ item }: { item: ClientActivityItem }) {
               {href ? (
                 <Link
                   href={href}
-                  className="break-words text-brand-700 hover:underline focus-visible:outline-none focus-visible:shadow-focus rounded"
+                  className="text-brand-700 focus-visible:shadow-focus break-words rounded hover:underline focus-visible:outline-none"
                 >
                   {item.title}
                 </Link>
@@ -134,7 +131,7 @@ function ActivityRow({ item }: { item: ClientActivityItem }) {
             </>
           ) : null}
         </p>
-        <p className="mt-0.5 flex flex-wrap items-center gap-x-2 text-xs text-ink-muted">
+        <p className="text-ink-muted mt-0.5 flex flex-wrap items-center gap-x-2 text-xs">
           {item.actor ? <span>by {item.actor.name}</span> : null}
           {item.detail ? <span className="break-all">{item.detail}</span> : null}
         </p>
@@ -142,7 +139,7 @@ function ActivityRow({ item }: { item: ClientActivityItem }) {
       <Tooltip content={absoluteTime(item.at)}>
         <time
           dateTime={new Date(item.at).toISOString()}
-          className="shrink-0 whitespace-nowrap text-xs text-ink-muted"
+          className="text-ink-muted shrink-0 whitespace-nowrap text-xs"
         >
           {relativeTime(item.at)}
         </time>

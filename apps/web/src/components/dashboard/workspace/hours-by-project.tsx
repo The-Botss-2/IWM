@@ -2,18 +2,9 @@
 
 import { Target } from 'lucide-react';
 import { useMemo } from 'react';
-import {
-  Cell,
-  Pie,
-  PieChart,
-  ResponsiveContainer,
-  Tooltip,
-} from 'recharts';
+import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from 'recharts';
 
-import {
-  CATEGORICAL_PALETTE,
-  CHART_COLORS,
-} from '@/components/dashboard/workspace/colors';
+import { CATEGORICAL_PALETTE, CHART_COLORS } from '@/components/dashboard/workspace/colors';
 import { WidgetEmpty, WidgetShell } from '@/components/dashboard/widget-shell';
 import { QueryError } from '@/components/ui/query-error';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -28,7 +19,10 @@ import { useTimesheetSummary } from '@/hooks/use-timesheets';
  */
 export function HoursByProjectWidget() {
   const period = useDashboardHoursWindow();
-  const { data, isLoading, isError, refetch } = useTimesheetSummary({ from: period.from, to: period.to });
+  const { data, isLoading, isError, refetch } = useTimesheetSummary({
+    from: period.from,
+    to: period.to,
+  });
   const rows = useMemo(() => {
     const items = data?.byProject ?? [];
     return items
@@ -60,7 +54,9 @@ export function HoursByProjectWidget() {
         <WidgetEmpty
           icon={Target}
           message={
-            period.rangeLabel ? `No tracked time in ${period.rangeLabel}.` : 'No tracked time this week.'
+            period.rangeLabel
+              ? `No tracked time in ${period.rangeLabel}.`
+              : 'No tracked time this week.'
           }
         />
       ) : (
@@ -102,8 +98,8 @@ export function HoursByProjectWidget() {
             </ResponsiveContainer>
             <div className="pointer-events-none absolute inset-0 grid place-items-center">
               <div className="text-center">
-                <div className="text-xl font-bold text-ink">{fmt(total)}</div>
-                <div className="text-[10px] uppercase tracking-wide text-ink-muted">
+                <div className="text-ink text-xl font-bold">{fmt(total)}</div>
+                <div className="text-ink-muted text-[10px] uppercase tracking-wide">
                   {period.rangeLabel ? 'in range' : 'this week'}
                 </div>
               </div>
@@ -111,19 +107,16 @@ export function HoursByProjectWidget() {
           </div>
           <ul className="flex-1 space-y-1.5" role="list">
             {rows.slice(0, 6).map((r) => (
-              <li
-                key={r.projectId}
-                className="flex items-center justify-between gap-2 text-xs"
-              >
+              <li key={r.projectId} className="flex items-center justify-between gap-2 text-xs">
                 <span className="inline-flex min-w-0 items-center gap-1.5">
                   <span
                     aria-hidden
                     className="h-2 w-2 shrink-0 rounded-full"
                     style={{ backgroundColor: r.color }}
                   />
-                  <span className="truncate text-ink">{r.label}</span>
+                  <span className="text-ink truncate">{r.label}</span>
                 </span>
-                <span className="shrink-0 font-medium text-ink">{fmt(r.value)}</span>
+                <span className="text-ink shrink-0 font-medium">{fmt(r.value)}</span>
               </li>
             ))}
           </ul>

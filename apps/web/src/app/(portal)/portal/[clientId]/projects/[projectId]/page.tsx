@@ -2,7 +2,12 @@
 
 import { Check } from 'lucide-react';
 import { use } from 'react';
-import type { MilestoneStatus, PortalMilestone, PortalProgress, PortalTask } from '@botss/shared-types';
+import type {
+  MilestoneStatus,
+  PortalMilestone,
+  PortalProgress,
+  PortalTask,
+} from '@botss/shared-types';
 
 import {
   dateRangeLabel,
@@ -87,7 +92,7 @@ export default function PortalProjectPage({
             aria-labelledby="project-milestones"
             className="card p-5 sm:p-6 lg:order-2 lg:col-span-1"
           >
-            <h2 id="project-milestones" className="text-base font-semibold text-ink">
+            <h2 id="project-milestones" className="text-ink text-base font-semibold">
               Milestones
             </h2>
             <MilestoneTimeline milestones={p.milestones} />
@@ -99,17 +104,17 @@ export default function PortalProjectPage({
           className={cn('card p-5 sm:p-6', hasMilestones && 'lg:order-1 lg:col-span-2')}
         >
           <div className="flex items-baseline justify-between gap-3">
-            <h2 id="project-tasks" className="text-base font-semibold text-ink">
+            <h2 id="project-tasks" className="text-ink text-base font-semibold">
               {p.taskMode === 'MARKED' ? 'Tasks your team has shared with you' : 'All tasks'}
             </h2>
             {tasks.length > 0 ? (
-              <span className="shrink-0 text-sm tabular-nums text-ink-muted">
+              <span className="text-ink-muted shrink-0 text-sm tabular-nums">
                 {tasks.length} {plural(tasks.length, 'task', 'tasks')}
               </span>
             ) : null}
           </div>
           {tasks.length === 0 ? (
-            <p className="mt-3 text-sm text-ink-muted">
+            <p className="text-ink-muted mt-3 text-sm">
               {p.taskMode === 'MARKED'
                 ? "Your team hasn't shared individual tasks yet."
                 : 'There are no tasks on this project yet.'}
@@ -134,24 +139,24 @@ function ProgressSection({ progress }: { progress: PortalProgress }) {
     <section aria-labelledby="project-progress" className="card p-5 sm:p-6">
       <div className="flex flex-wrap items-end justify-between gap-x-6 gap-y-2">
         <div>
-          <h2 id="project-progress" className="text-sm font-medium text-ink-muted">
+          <h2 id="project-progress" className="text-ink-muted text-sm font-medium">
             Progress
           </h2>
-          <p className="mt-1 text-3xl font-bold tabular-nums text-ink">{progress.percent}%</p>
+          <p className="text-ink mt-1 text-3xl font-bold tabular-nums">{progress.percent}%</p>
         </div>
-        <p className="text-sm text-ink-muted">{tasksDoneLabel(progress.done, progress.total)}</p>
+        <p className="text-ink-muted text-sm">{tasksDoneLabel(progress.done, progress.total)}</p>
       </div>
       <PortalProgressBar className="mt-4" percent={progress.percent} label="Project progress" />
       <dl className="mt-5 grid grid-cols-2 gap-4 sm:grid-cols-4">
         {stats.map((stat) => (
           <div key={stat.label}>
-            <dt className="text-xs text-ink-muted">{stat.label}</dt>
-            <dd className="mt-0.5 text-lg font-semibold tabular-nums text-ink">{stat.value}</dd>
+            <dt className="text-ink-muted text-xs">{stat.label}</dt>
+            <dd className="text-ink mt-0.5 text-lg font-semibold tabular-nums">{stat.value}</dd>
           </div>
         ))}
       </dl>
       {progress.cancelled > 0 ? (
-        <p className="mt-4 text-xs text-ink-muted">
+        <p className="text-ink-muted mt-4 text-xs">
           The total includes {progress.cancelled} cancelled{' '}
           {plural(progress.cancelled, 'task', 'tasks')}.
         </p>
@@ -168,17 +173,20 @@ function MilestoneTimeline({ milestones }: { milestones: PortalMilestone[] }) {
         return (
           <li key={m.id} className="relative pb-6 pl-7 last:pb-0">
             {i < milestones.length - 1 ? (
-              <span aria-hidden className="absolute bottom-0 left-[7px] top-[1.125rem] w-px bg-line" />
+              <span
+                aria-hidden
+                className="bg-line absolute bottom-0 left-[7px] top-[1.125rem] w-px"
+              />
             ) : null}
             <MilestoneMarker status={m.status} />
             <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-              <h3 className="text-sm font-medium text-ink">{m.title}</h3>
+              <h3 className="text-ink text-sm font-medium">{m.title}</h3>
               <MilestoneStatusBadge status={m.status} />
             </div>
-            {dates ? <p className="mt-1 text-xs text-ink-muted">{dates}</p> : null}
+            {dates ? <p className="text-ink-muted mt-1 text-xs">{dates}</p> : null}
             {m.amount !== null && m.currency !== null ? (
               <div className="mt-2 flex flex-wrap items-center gap-2">
-                <span className="text-sm tabular-nums text-ink">
+                <span className="text-ink text-sm tabular-nums">
                   {formatCurrency(m.amount, m.currency)}
                 </span>
                 {m.paymentStatus ? <PaymentStatusBadge status={m.paymentStatus} /> : null}
@@ -196,7 +204,7 @@ function MilestoneMarker({ status }: { status: MilestoneStatus }) {
     return (
       <span
         aria-hidden
-        className="absolute left-0 top-0.5 grid h-4 w-4 place-items-center rounded-full bg-brand-purple text-white"
+        className="bg-brand-purple absolute left-0 top-0.5 grid h-4 w-4 place-items-center rounded-full text-white"
       >
         <Check className="h-2.5 w-2.5" strokeWidth={3} />
       </span>
@@ -206,7 +214,7 @@ function MilestoneMarker({ status }: { status: MilestoneStatus }) {
     <span
       aria-hidden
       className={cn(
-        'absolute left-0 top-0.5 h-4 w-4 rounded-full border-2 bg-bg-surface',
+        'bg-bg-surface absolute left-0 top-0.5 h-4 w-4 rounded-full border-2',
         status === 'IN_PROGRESS' ? 'border-brand-purple' : 'border-line-strong',
       )}
     />
@@ -215,7 +223,7 @@ function MilestoneMarker({ status }: { status: MilestoneStatus }) {
 
 function TaskList({ tasks }: { tasks: PortalTask[] }) {
   return (
-    <ul className="mt-3 divide-y divide-line">
+    <ul className="divide-line mt-3 divide-y">
       {tasks.map((task) => {
         const date = taskDateLabel(task);
         return (
@@ -233,7 +241,7 @@ function TaskList({ tasks }: { tasks: PortalTask[] }) {
             </p>
             <div className="flex shrink-0 items-center gap-3">
               <TaskStatusBadge status={task.status} />
-              <span className="text-xs tabular-nums text-ink-muted sm:w-36 sm:text-right">
+              <span className="text-ink-muted text-xs tabular-nums sm:w-36 sm:text-right">
                 {date}
               </span>
             </div>

@@ -1,8 +1,4 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import type {
   CreatePaymentInput,
   ListPaymentsQuery,
@@ -121,8 +117,7 @@ export class PaymentsService {
     const amount = round2(
       input.amount !== undefined ? toDecimal(input.amount, 0) : new D(prior?.amount ?? 0),
     );
-    const receivedCurrency =
-      input.receivedCurrency ?? prior?.receivedCurrency ?? input.currency;
+    const receivedCurrency = input.receivedCurrency ?? prior?.receivedCurrency ?? input.currency;
     const receivedAmount = round2(
       input.receivedAmount !== undefined
         ? toDecimal(input.receivedAmount, 0)
@@ -131,9 +126,7 @@ export class PaymentsService {
           : amount,
     );
     const feeAmount = round2(
-      input.feeAmount !== undefined
-        ? toDecimal(input.feeAmount, 0)
-        : new D(prior?.feeAmount ?? 0),
+      input.feeAmount !== undefined ? toDecimal(input.feeAmount, 0) : new D(prior?.feeAmount ?? 0),
     );
 
     // A rate of anything but 1 between a currency and itself is nonsense, and
@@ -178,7 +171,12 @@ export class PaymentsService {
     tx: TxClient,
     workspaceId: string,
     input: { contractId?: string; milestoneId?: string; invoiceId?: string },
-  ): Promise<{ contractId: string | null; milestoneId: string | null; invoiceId: string | null; currency: string }> {
+  ): Promise<{
+    contractId: string | null;
+    milestoneId: string | null;
+    invoiceId: string | null;
+    currency: string;
+  }> {
     let contractId = input.contractId ?? null;
     let currency: string | null = null;
 
@@ -327,10 +325,7 @@ export class PaymentsService {
   // Writes
   // ---------------------------------------------------------------------
 
-  async create(
-    scope: UserScope,
-    input: CreatePaymentInput,
-  ): Promise<PaymentWithSource> {
+  async create(scope: UserScope, input: CreatePaymentInput): Promise<PaymentWithSource> {
     const workspaceId = requireWorkspace(scope);
     const baseCurrency = await this.baseCurrency(workspaceId);
     // Same organization as the workspace, or 400 invalid_payment_source.
@@ -502,11 +497,7 @@ export class PaymentsService {
    * Void, never delete. The row stays queryable so the audit trail survives;
    * every aggregate filters on `voidedAt: null`.
    */
-  async void(
-    scope: UserScope,
-    id: string,
-    input: VoidPaymentInput,
-  ): Promise<PaymentWithSource> {
+  async void(scope: UserScope, id: string, input: VoidPaymentInput): Promise<PaymentWithSource> {
     const workspaceId = requireWorkspace(scope);
     const existing = await this.prisma.client.payment.findFirst({
       where: { id, workspaceId },

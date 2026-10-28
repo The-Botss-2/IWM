@@ -43,12 +43,12 @@ function AcceptInvitationInner() {
   if (state.kind === 'missing') {
     return (
       <Shell title="Open the link from your email">
-        <p className="text-sm text-ink-muted">
+        <p className="text-ink-muted text-sm">
           Use the button or link in your invitation email. The page it opens asks for the 6-digit
           code printed in the same email. If your link no longer works, ask whoever invited you to
           send a new one.
         </p>
-        <Link className="mt-4 inline-block text-sm text-brand-blue hover:underline" href="/sign-in">
+        <Link className="text-brand-blue mt-4 inline-block text-sm hover:underline" href="/sign-in">
           Go to sign-in
         </Link>
       </Shell>
@@ -74,8 +74,8 @@ function AcceptInvitationInner() {
   if (state.kind === 'invalid') {
     return (
       <Shell title={state.title}>
-        <p className="text-sm text-ink-muted">{state.message}</p>
-        <Link className="mt-4 inline-block text-sm text-brand-blue hover:underline" href="/sign-in">
+        <p className="text-ink-muted text-sm">{state.message}</p>
+        <Link className="text-brand-blue mt-4 inline-block text-sm hover:underline" href="/sign-in">
           Go to sign-in
         </Link>
       </Shell>
@@ -85,7 +85,7 @@ function AcceptInvitationInner() {
   if (state.kind === 'success') {
     return (
       <Shell title="You're in.">
-        <p className="text-sm text-ink-muted">Redirecting…</p>
+        <p className="text-ink-muted text-sm">Redirecting…</p>
       </Shell>
     );
   }
@@ -103,10 +103,10 @@ function CodeForm({ error, onSubmit }: { error: string | null; onSubmit: (code: 
       }}
       className="space-y-4"
     >
-      <p className="text-sm text-ink-muted">Type the 6-digit code from your invitation email.</p>
+      <p className="text-ink-muted text-sm">Type the 6-digit code from your invitation email.</p>
       <div>
         <label
-          className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-ink-muted"
+          className="text-ink-muted mb-1.5 block text-xs font-semibold uppercase tracking-wider"
           htmlFor="inviteCode"
         >
           Code
@@ -120,13 +120,13 @@ function CodeForm({ error, onSubmit }: { error: string | null; onSubmit: (code: 
           maxLength={7}
           value={code}
           onChange={(e) => setCode(e.target.value)}
-          className="w-full rounded-lg border border-line bg-surface px-4 py-2.5 text-center font-mono text-xl tracking-widest text-ink focus:outline-none focus:ring-2 focus:ring-brand-purple"
+          className="border-line bg-surface text-ink focus:ring-brand-purple w-full rounded-lg border px-4 py-2.5 text-center font-mono text-xl tracking-widest focus:outline-none focus:ring-2"
           autoFocus
           required
         />
       </div>
       {error ? (
-        <p role="alert" className="text-sm text-state-error">
+        <p role="alert" className="text-state-error text-sm">
           {error}
         </p>
       ) : null}
@@ -160,14 +160,17 @@ function ReadyView({
   // where someone with a password still picks a new one.
   if (info.hasPassword && !isReset) {
     return (
-      <Shell title={isPortal ? `Your ${info.workspaceName} client portal` : `Join ${info.workspaceName}`}>
-        <p className="text-sm text-ink-muted">
+      <Shell
+        title={isPortal ? `Your ${info.workspaceName} client portal` : `Join ${info.workspaceName}`}
+      >
+        <p className="text-ink-muted text-sm">
           {isPortal ? (
             <>
               Your account <strong>{info.email}</strong> is already set up
               {info.clientName ? (
                 <>
-                  {' '}and now includes <strong>{info.clientName}</strong>
+                  {' '}
+                  and now includes <strong>{info.clientName}</strong>
                 </>
               ) : null}
               . Sign in to continue.
@@ -215,17 +218,23 @@ function ReadyView({
             : `Welcome to ${info.workspaceName}`
       }
     >
-      <p className="text-sm text-ink-muted">
+      <p className="text-ink-muted text-sm">
         {isReset ? (
           <>
-            Pick a new password for <strong>{info.email}</strong>. It replaces your current one
-            and signs you out on your other devices.
+            Pick a new password for <strong>{info.email}</strong>. It replaces your current one and
+            signs you out on your other devices.
           </>
         ) : isPortal ? (
           <>
             {info.inviterName ? `${info.inviterName} invited you` : 'You were invited'} to the
-            client portal{info.clientName ? <> for <strong>{info.clientName}</strong></> : null} as{' '}
-            <strong>{info.email}</strong>. Pick a password to finish setting up your account.
+            client portal
+            {info.clientName ? (
+              <>
+                {' '}
+                for <strong>{info.clientName}</strong>
+              </>
+            ) : null}{' '}
+            as <strong>{info.email}</strong>. Pick a password to finish setting up your account.
           </>
         ) : (
           <>
@@ -248,7 +257,7 @@ function ReadyView({
             required
           />
           {!passwordValid && password.length > 0 ? (
-            <p className="text-xs text-state-error">At least 8 characters.</p>
+            <p className="text-state-error text-xs">At least 8 characters.</p>
           ) : null}
         </div>
         <div className="space-y-1">
@@ -264,11 +273,11 @@ function ReadyView({
             required
           />
           {!passwordsMatch && confirm.length > 0 ? (
-            <p className="text-xs text-state-error">Passwords don&apos;t match.</p>
+            <p className="text-state-error text-xs">Passwords don&apos;t match.</p>
           ) : null}
         </div>
         {submitError ? (
-          <p className="rounded-md border border-red-100 bg-tint-error px-3 py-2 text-sm text-state-error">
+          <p className="bg-tint-error text-state-error rounded-md border border-red-100 px-3 py-2 text-sm">
             {submitError}
           </p>
         ) : null}
@@ -283,17 +292,17 @@ function ReadyView({
 function Shell({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div className="mx-auto flex min-h-screen max-w-md flex-col justify-center px-4 py-8">
-      <div className="rounded-lg border border-line bg-bg-surface p-6 shadow-sm">
+      <div className="border-line bg-bg-surface rounded-lg border p-6 shadow-sm">
         <div className="mb-5 flex justify-center">
           <Link
             href="/"
             aria-label="The Botss home"
-            className="rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:shadow-focus"
+            className="focus-visible:shadow-focus rounded focus-visible:outline-none focus-visible:ring-2"
           >
             <Logo variant="full" size="sm" />
           </Link>
         </div>
-        <h1 className="text-lg font-semibold text-ink">{title}</h1>
+        <h1 className="text-ink text-lg font-semibold">{title}</h1>
         <div className="mt-3">{children}</div>
       </div>
     </div>

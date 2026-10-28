@@ -36,12 +36,14 @@ export const portalKeys = {
   me: ['portal', 'me'] as const,
   overview: (clientId: string) => ['portal', clientId, 'overview'] as const,
   projects: (clientId: string) => ['portal', clientId, 'projects'] as const,
-  project: (clientId: string, projectId: string) => ['portal', clientId, 'projects', projectId] as const,
+  project: (clientId: string, projectId: string) =>
+    ['portal', clientId, 'projects', projectId] as const,
   documents: (clientId: string) => ['portal', clientId, 'documents'] as const,
   document: (clientId: string, documentId: string) =>
     ['portal', clientId, 'documents', documentId] as const,
   invoices: (clientId: string) => ['portal', clientId, 'invoices'] as const,
-  invoice: (clientId: string, invoiceId: string) => ['portal', clientId, 'invoices', invoiceId] as const,
+  invoice: (clientId: string, invoiceId: string) =>
+    ['portal', clientId, 'invoices', invoiceId] as const,
   contracts: (clientId: string) => ['portal', clientId, 'contracts'] as const,
   payments: (clientId: string) => ['portal', clientId, 'payments'] as const,
 };
@@ -200,7 +202,9 @@ export function parsePortalPath(pathname: string): PortalLocation {
   if (first === 'account') return { clientId: null, section: null, account: true };
   const section = !second
     ? 'overview'
-    : ((PORTAL_SECTIONS as readonly string[]).includes(second) ? (second as PortalSection) : null);
+    : (PORTAL_SECTIONS as readonly string[]).includes(second)
+      ? (second as PortalSection)
+      : null;
   return { clientId: safeDecode(first), section, account: false };
 }
 
@@ -260,12 +264,14 @@ export function usePortalNav(client: PortalClientSummary | null): PortalNavItem[
   const location = usePortalLocation();
   return useMemo(() => {
     if (!client) return [];
-    return PORTAL_SECTIONS.filter((s) => s !== 'billing' || client.canSeeBilling).map((section) => ({
-      section,
-      label: SECTION_LABEL[section],
-      href: portalHref(client.id, section),
-      active: location.clientId === client.id && location.section === section,
-    }));
+    return PORTAL_SECTIONS.filter((s) => s !== 'billing' || client.canSeeBilling).map(
+      (section) => ({
+        section,
+        label: SECTION_LABEL[section],
+        href: portalHref(client.id, section),
+        active: location.clientId === client.id && location.section === section,
+      }),
+    );
   }, [client, location]);
 }
 
@@ -394,8 +400,13 @@ function isPositive(amount: string): boolean {
 }
 
 /** What is still owed on an invoice, or null when nothing is. */
-export function invoiceAmountDue(invoice: { status: InvoiceStatus; balance: string }): string | null {
-  return invoiceShowsBalance(invoice.status) && isPositive(invoice.balance) ? invoice.balance : null;
+export function invoiceAmountDue(invoice: {
+  status: InvoiceStatus;
+  balance: string;
+}): string | null {
+  return invoiceShowsBalance(invoice.status) && isPositive(invoice.balance)
+    ? invoice.balance
+    : null;
 }
 
 function negate(amount: string): string {
@@ -418,7 +429,9 @@ export interface InvoiceTotalRow {
 export function usePortalInvoiceBreakdown(invoice: PortalInvoiceDetail | undefined) {
   return useMemo(() => {
     if (!invoice) return null;
-    const totals: InvoiceTotalRow[] = [{ key: 'subtotal', label: 'Subtotal', amount: invoice.subtotal }];
+    const totals: InvoiceTotalRow[] = [
+      { key: 'subtotal', label: 'Subtotal', amount: invoice.subtotal },
+    ];
     if (isPositive(invoice.discountAmount)) {
       totals.push({ key: 'discount', label: 'Discount', amount: negate(invoice.discountAmount) });
     }

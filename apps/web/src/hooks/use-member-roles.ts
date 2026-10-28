@@ -34,7 +34,9 @@ export function memberRoleUpdate(
   return { role: value as Exclude<WorkspaceRole, 'CLIENT'>, customRoleId: null };
 }
 
-export function customRoleOptions(roles: RoleDto[] | undefined): { value: string; label: string }[] {
+export function customRoleOptions(
+  roles: RoleDto[] | undefined,
+): { value: string; label: string }[] {
   return (roles ?? [])
     .filter((r) => !r.preset)
     .map((r) => ({ value: `${CUSTOM_PREFIX}${r.id}`, label: r.name }));

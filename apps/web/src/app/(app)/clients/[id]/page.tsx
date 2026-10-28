@@ -52,11 +52,7 @@ function parseTab(value: string | null | undefined, canSeeBilling: boolean): Cli
   return value as ClientTab;
 }
 
-export default function ClientDetailPage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
+export default function ClientDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const client = useClient(id);
   const router = useRouter();
@@ -88,7 +84,7 @@ export default function ClientDetailPage({
 
   if (client.isError || !client.data) {
     return (
-      <div className="mx-auto max-w-7xl px-4 py-6 text-sm text-state-error sm:px-6 lg:px-8">
+      <div className="text-state-error mx-auto max-w-7xl px-4 py-6 text-sm sm:px-6 lg:px-8">
         Couldn&apos;t load client.{' '}
         <Link href="/clients" className="underline">
           Back to clients
@@ -102,7 +98,7 @@ export default function ClientDetailPage({
   return (
     <div className="mx-auto max-w-7xl space-y-5 px-4 py-6 sm:px-6 lg:px-8">
       <div className="flex items-center gap-3">
-        <Link href="/clients" className="text-sm text-ink-muted hover:text-ink">
+        <Link href="/clients" className="text-ink-muted hover:text-ink text-sm">
           ← Clients
         </Link>
       </div>
@@ -112,14 +108,12 @@ export default function ClientDetailPage({
             <h1 className="text-xl font-semibold">{c.name}</h1>
             <ClientStatusBadge status={c.status} />
           </div>
-          {c.legalName ? (
-            <p className="mt-1 text-sm text-ink-muted">{c.legalName}</p>
-          ) : null}
+          {c.legalName ? <p className="text-ink-muted mt-1 text-sm">{c.legalName}</p> : null}
         </div>
       </header>
 
       <Tabs value={tab} onValueChange={(v) => setTab(v as ClientTab)}>
-        <TabsList className="-mx-1 px-1 w-full sm:w-auto">
+        <TabsList className="-mx-1 w-full px-1 sm:w-auto">
           <TabsTrigger value="overview">
             <Info className="h-4 w-4" aria-hidden />
             <span>Overview</span>

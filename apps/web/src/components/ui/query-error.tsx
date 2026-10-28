@@ -23,12 +23,12 @@ export function QueryError({
     <div
       role="alert"
       className={cn(
-        'rounded-md border border-line bg-bg-surface',
+        'border-line bg-bg-surface rounded-md border',
         compact ? 'p-2 text-xs' : 'p-4',
         className,
       )}
     >
-      <p className="text-sm text-ink-muted">{message}</p>
+      <p className="text-ink-muted text-sm">{message}</p>
       {onRetry ? (
         <Button variant="secondary" size="sm" onClick={onRetry} className="mt-2">
           Try again

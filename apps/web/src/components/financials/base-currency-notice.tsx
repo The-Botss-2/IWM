@@ -8,15 +8,11 @@ import type { useFinanceBaseCurrency } from '@/hooks/use-client-billing';
  * known: "waiting" while it loads, or the failure with a Retry. Renders
  * nothing once it is known.
  */
-export function BaseCurrencyNotice({
-  base,
-}: {
-  base: ReturnType<typeof useFinanceBaseCurrency>;
-}) {
+export function BaseCurrencyNotice({ base }: { base: ReturnType<typeof useFinanceBaseCurrency> }) {
   if (base.baseCurrency) return null;
   if (base.isError) {
     return (
-      <div className="flex items-center gap-2 text-xs text-state-error" role="alert">
+      <div className="text-state-error flex items-center gap-2 text-xs" role="alert">
         <span>Couldn&apos;t load the organisation&apos;s base currency. Saving is paused.</span>
         <Button type="button" size="sm" variant="secondary" onClick={base.retry}>
           Retry
@@ -25,7 +21,7 @@ export function BaseCurrencyNotice({
     );
   }
   return (
-    <p className="text-xs text-ink-muted" role="status">
+    <p className="text-ink-muted text-xs" role="status">
       Waiting for the organisation&apos;s base currency. Saving is paused until it loads.
     </p>
   );

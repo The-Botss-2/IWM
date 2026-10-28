@@ -30,7 +30,12 @@ export class PortalOverviewService {
       // Money is billing: main contact only.
       contact.role === 'PRIMARY' ? this.billing.outstanding(contact) : Promise.resolve(null),
     ]);
-    return portalOverviewSchema.parse({ projects, pendingSignatures, sharedDocuments, outstanding });
+    return portalOverviewSchema.parse({
+      projects,
+      pendingSignatures,
+      sharedDocuments,
+      outstanding,
+    });
   }
 }
 

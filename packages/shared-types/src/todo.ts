@@ -34,10 +34,7 @@ export type Todo = z.infer<typeof todoSchema>;
  * render the badges without N+1 lookups.
  */
 export const todoWithRefsSchema = todoSchema.extend({
-  workspace: z
-    .object({ id: cuid, name: z.string() })
-    .nullable()
-    .optional(),
+  workspace: z.object({ id: cuid, name: z.string() }).nullable().optional(),
   project: z
     .object({ id: cuid, name: z.string(), color: z.string().nullable() })
     .nullable()

@@ -76,10 +76,7 @@ export function PaymentSourceManager() {
 
   if (sources.isError && !sources.data) {
     return (
-      <QueryError
-        message="Couldn't load payment sources."
-        onRetry={() => void sources.refetch()}
-      />
+      <QueryError message="Couldn't load payment sources." onRetry={() => void sources.refetch()} />
     );
   }
 
@@ -88,22 +85,24 @@ export function PaymentSourceManager() {
   // within the active-only view would leave hidden rows where they were.
   const reorderable = canReorder && showInactive && items.length > 1;
   const move = (index: number, by: -1 | 1) =>
-    reorder.mutate({ ids: arrayMove(items.map((s) => s.id), index, index + by) });
+    reorder.mutate({
+      ids: arrayMove(
+        items.map((s) => s.id),
+        index,
+        index + by,
+      ),
+    });
 
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <p className="text-sm text-ink-muted">
-          Where money arrives from and goes out through. Shared across every
-          workspace in the organisation.
+        <p className="text-ink-muted text-sm">
+          Where money arrives from and goes out through. Shared across every workspace in the
+          organisation.
           {canReorder && !showInactive ? ' Show inactive sources to change the order.' : ''}
         </p>
         <div className="flex items-center gap-2">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setShowInactive((v) => !v)}
-          >
+          <Button variant="ghost" size="sm" onClick={() => setShowInactive((v) => !v)}>
             {showInactive ? 'Hide inactive' : 'Show inactive'}
           </Button>
           <Button size="sm" onClick={() => setAdding(true)}>
@@ -112,7 +111,7 @@ export function PaymentSourceManager() {
         </div>
       </div>
 
-      <ul className="divide-y divide-line rounded-md border border-line bg-bg-surface" role="list">
+      <ul className="divide-line border-line bg-bg-surface divide-y rounded-md border" role="list">
         {items.map((s, index) => (
           <li key={s.id} className="flex flex-wrap items-center gap-3 px-3 py-2.5">
             {reorderable ? (
@@ -145,37 +144,31 @@ export function PaymentSourceManager() {
               {REGION_LABEL[s.defaultRegion ?? '__any__']}
             </Badge>
             {s.defaultFeePercent ? (
-              <span className="text-xs text-ink-muted">
+              <span className="text-ink-muted text-xs">
                 {Number(s.defaultFeePercent)}% typical fee
               </span>
             ) : null}
-            <span className="ml-auto text-xs text-ink-muted">
+            <span className="text-ink-muted ml-auto text-xs">
               {s.usageCount > 0 ? `${s.usageCount} used` : 'unused'}
             </span>
             <Button
               variant="ghost"
               size="sm"
-              onClick={() =>
-                update.mutate({ id: s.id, input: { isActive: !s.isActive } })
-              }
+              onClick={() => update.mutate({ id: s.id, input: { isActive: !s.isActive } })}
             >
               {s.isActive ? 'Deactivate' : 'Reactivate'}
             </Button>
             <Button
               variant="ghost"
               size="sm"
-              onClick={() =>
-                setConfirming({ id: s.id, name: s.name, used: s.usageCount > 0 })
-              }
+              onClick={() => setConfirming({ id: s.id, name: s.name, used: s.usageCount > 0 })}
             >
               Remove
             </Button>
           </li>
         ))}
         {items.length === 0 ? (
-          <li className="px-3 py-8 text-center text-sm text-ink-muted">
-            No payment sources yet.
-          </li>
+          <li className="text-ink-muted px-3 py-8 text-center text-sm">No payment sources yet.</li>
         ) : null}
       </ul>
 
@@ -244,8 +237,8 @@ function SourceDialog({
         <DialogHeader>
           <DialogTitle>New payment source</DialogTitle>
           <DialogDescription>
-            A rail money moves through. Defaults here just prefill the payment
-            form; every field stays editable per payment.
+            A rail money moves through. Defaults here just prefill the payment form; every field
+            stays editable per payment.
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-4">

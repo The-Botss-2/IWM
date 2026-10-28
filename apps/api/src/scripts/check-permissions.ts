@@ -33,7 +33,11 @@ function check(name: string, fn: () => void): void {
   }
 }
 
-const ability = (systemRole: SystemRole, role: WorkspaceRole | null, permissions?: EffectivePermissions) =>
+const ability = (
+  systemRole: SystemRole,
+  role: WorkspaceRole | null,
+  permissions?: EffectivePermissions,
+) =>
   defineAbilityFor({
     userId: 'u1',
     systemRole,
@@ -88,7 +92,9 @@ check('EMPLOYEE MEMBER: no money, assignee-scoped sales, no create Workspace', (
   assert.ok(!a.can('update', 'WorkspaceMembership'));
   assert.ok(a.can('create', 'SignatureRequest'));
   assert.ok(!a.can('create', 'Workspace'), 'MEMBER lost create Workspace');
-  assert.ok(!hasFullSalesAccess({ systemRole: 'EMPLOYEE', workspaceMemberships: [{ role: 'MEMBER' }] }));
+  assert.ok(
+    !hasFullSalesAccess({ systemRole: 'EMPLOYEE', workspaceMemberships: [{ role: 'MEMBER' }] }),
+  );
 });
 
 check('EMPLOYEE VIEWER: read only', () => {
@@ -107,7 +113,10 @@ check('Workspace OWNER/ADMIN: manage workspace + (new) all sales there, still no
     assert.ok(!a.can('read', 'Contract'), r);
     assert.ok(!a.can('read', 'Payroll'), r);
     assert.ok(!a.can('create', 'Workspace'), r);
-    assert.ok(hasFullLeadAccess({ systemRole: 'EMPLOYEE', workspaceMemberships: [{ role: r }] }), r);
+    assert.ok(
+      hasFullLeadAccess({ systemRole: 'EMPLOYEE', workspaceMemberships: [{ role: r }] }),
+      r,
+    );
   }
 });
 
@@ -118,9 +127,18 @@ check('no membership: nothing in the workspace', () => {
 });
 
 check('MANAGER/EDITOR map to MEMBER, CLIENT to VIEWER', () => {
-  assert.deepEqual(resolveWorkspacePermissions({ role: 'MANAGER' }), resolveWorkspacePermissions({ role: 'MEMBER' }));
-  assert.deepEqual(resolveWorkspacePermissions({ role: 'EDITOR' }), resolveWorkspacePermissions({ role: 'MEMBER' }));
-  assert.deepEqual(resolveWorkspacePermissions({ role: 'CLIENT' }), resolveWorkspacePermissions({ role: 'VIEWER' }));
+  assert.deepEqual(
+    resolveWorkspacePermissions({ role: 'MANAGER' }),
+    resolveWorkspacePermissions({ role: 'MEMBER' }),
+  );
+  assert.deepEqual(
+    resolveWorkspacePermissions({ role: 'EDITOR' }),
+    resolveWorkspacePermissions({ role: 'MEMBER' }),
+  );
+  assert.deepEqual(
+    resolveWorkspacePermissions({ role: 'CLIENT' }),
+    resolveWorkspacePermissions({ role: 'VIEWER' }),
+  );
 });
 
 check('presetPermissions equals explicit resolution', () => {
@@ -132,9 +150,15 @@ check('presetPermissions equals explicit resolution', () => {
 // ─── Custom roles and overrides ───────────────────────────────────────────
 
 check('custom company role replaces the preset', () => {
-  const company = resolveCompanyPermissions({ systemRole: 'EMPLOYEE', customRolePermissions: ['finance.view'] });
+  const company = resolveCompanyPermissions({
+    systemRole: 'EMPLOYEE',
+    customRolePermissions: ['finance.view'],
+  });
   assert.deepEqual(company, ['finance.view']);
-  const a = ability('EMPLOYEE', 'MEMBER', { company, workspace: resolveWorkspacePermissions({ role: 'MEMBER' }) });
+  const a = ability('EMPLOYEE', 'MEMBER', {
+    company,
+    workspace: resolveWorkspacePermissions({ role: 'MEMBER' }),
+  });
   assert.ok(a.can('read', 'Contract'));
   assert.ok(!a.can('create', 'Contract'), 'view-only finance');
   assert.ok(!a.can('read', 'Payroll'));
@@ -176,8 +200,16 @@ check('overrides: grants add, denies remove, wrong scope ignored', () => {
 
 check('workspace overrides only apply to their workspace', () => {
   const overrides = [{ permission: 'sales.leads.all', grant: true, workspaceId: 'w1' }];
-  assert.ok(resolveWorkspacePermissions({ role: 'MEMBER', overrides, workspaceId: 'w1' }).includes('sales.leads.all'));
-  assert.ok(!resolveWorkspacePermissions({ role: 'MEMBER', overrides, workspaceId: 'w2' }).includes('sales.leads.all'));
+  assert.ok(
+    resolveWorkspacePermissions({ role: 'MEMBER', overrides, workspaceId: 'w1' }).includes(
+      'sales.leads.all',
+    ),
+  );
+  assert.ok(
+    !resolveWorkspacePermissions({ role: 'MEMBER', overrides, workspaceId: 'w2' }).includes(
+      'sales.leads.all',
+    ),
+  );
 });
 
 check('workspace sales.leads.all only: full leads, assignee-scoped clients', () => {
@@ -194,7 +226,10 @@ check('workspace sales.leads.all only: full leads, assignee-scoped clients', () 
 });
 
 check('custom workspace role: create leads without seeing all', () => {
-  const eff: EffectivePermissions = { company: [], workspace: ['workspace.view', 'sales.leads.create'] };
+  const eff: EffectivePermissions = {
+    company: [],
+    workspace: ['workspace.view', 'sales.leads.create'],
+  };
   const a = ability('EMPLOYEE', 'MEMBER', eff);
   assert.ok(a.can('create', 'Lead'));
   assert.ok(!a.can('delete', 'Lead'));
@@ -204,8 +239,14 @@ check('custom workspace role: create leads without seeing all', () => {
 
 // ─── Guardrails ───────────────────────────────────────────────────────────
 
-const ownerEff = presetPermissions({ systemRole: 'EMPLOYEE', workspaceMemberships: [{ role: 'OWNER' }] });
-const memberEff = presetPermissions({ systemRole: 'EMPLOYEE', workspaceMemberships: [{ role: 'MEMBER' }] });
+const ownerEff = presetPermissions({
+  systemRole: 'EMPLOYEE',
+  workspaceMemberships: [{ role: 'OWNER' }],
+});
+const memberEff = presetPermissions({
+  systemRole: 'EMPLOYEE',
+  workspaceMemberships: [{ role: 'MEMBER' }],
+});
 const adminEff = presetPermissions({ systemRole: 'ADMIN', workspaceMemberships: [] });
 
 check('workspace owner may assign workspace permissions they hold', () => {
@@ -221,7 +262,10 @@ check('member without members.manage may assign nothing', () => {
 });
 
 check('manager may not hand out permissions they lack', () => {
-  const limited: EffectivePermissions = { company: [], workspace: ['members.manage', 'tasks.create'] };
+  const limited: EffectivePermissions = {
+    company: [],
+    workspace: ['members.manage', 'tasks.create'],
+  };
   assert.ok(canAssignWorkspacePermissions(limited, ['tasks.create']).ok);
   assert.ok(!canAssignWorkspacePermissions(limited, ['projects.delete']).ok);
 });

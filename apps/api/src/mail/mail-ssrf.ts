@@ -30,9 +30,7 @@ export function isPrivateIp(ip: string): boolean {
     if (isIP(inner) === 4) return isPrivateIp(inner);
     const hex = inner.replace(/:/g, '');
     if (/^[0-9a-f]{8}$/.test(hex)) {
-      const quad = [0, 2, 4, 6]
-        .map((i) => parseInt(hex.slice(i, i + 2), 16))
-        .join('.');
+      const quad = [0, 2, 4, 6].map((i) => parseInt(hex.slice(i, i + 2), 16)).join('.');
       return isPrivateIp(quad);
     }
   }

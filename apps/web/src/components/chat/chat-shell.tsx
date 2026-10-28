@@ -9,10 +9,7 @@ import { useCall } from '@/components/chat/call-context';
 import { ChatRequestDialog } from '@/components/chat/chat-request-dialog';
 import { ChatSidebar } from '@/components/chat/chat-sidebar';
 import { NewChatDialog } from '@/components/chat/new-chat-dialog';
-import {
-  NavPanelPortal,
-  useNavPanelAvailable,
-} from '@/components/shell/nav-panel-slot';
+import { NavPanelPortal, useNavPanelAvailable } from '@/components/shell/nav-panel-slot';
 import { useChatRooms, useCreateChatRoom } from '@/hooks/use-chat';
 import { usePresence } from '@/hooks/use-chat-socket';
 import { cn } from '@/lib/utils';
@@ -98,7 +95,7 @@ export function ChatShell({ children }: Props) {
       ) : (
         <aside
           className={cn(
-            'min-h-0 overflow-hidden border-r border-line bg-bg-surface md:flex md:flex-col',
+            'border-line bg-bg-surface min-h-0 overflow-hidden border-r md:flex md:flex-col',
             onChatIndex ? 'flex flex-col' : 'hidden md:flex',
           )}
         >
@@ -107,15 +104,13 @@ export function ChatShell({ children }: Props) {
       )}
       <section
         className={cn(
-          'min-h-0 min-w-0 flex-col overflow-hidden bg-bg-app md:flex',
+          'bg-bg-app min-h-0 min-w-0 flex-col overflow-hidden md:flex',
           // With the sidebar in the panel there is no second column to fall
           // back to on a phone, so the room content always shows.
           inNavPanel ? 'flex' : onChatIndex ? 'hidden md:flex' : 'flex',
         )}
       >
-        <ChatShellContext.Provider value={{ onStartCall }}>
-          {children}
-        </ChatShellContext.Provider>
+        <ChatShellContext.Provider value={{ onStartCall }}>{children}</ChatShellContext.Provider>
       </section>
 
       {newChatOpen ? (
@@ -131,9 +126,7 @@ export function ChatShell({ children }: Props) {
         />
       ) : null}
 
-      {requestOpen ? (
-        <ChatRequestDialog open={requestOpen} onOpenChange={setRequestOpen} />
-      ) : null}
+      {requestOpen ? <ChatRequestDialog open={requestOpen} onOpenChange={setRequestOpen} /> : null}
     </div>
   );
 }

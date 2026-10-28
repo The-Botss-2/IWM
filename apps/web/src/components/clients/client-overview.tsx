@@ -39,12 +39,12 @@ export function ClientOverview({ client }: Props) {
     <div className="space-y-5">
       <section
         aria-labelledby="client-identity-heading"
-        className="rounded-lg border border-line bg-white p-5"
+        className="border-line rounded-lg border bg-white p-5"
       >
-        <h2 id="client-identity-heading" className="text-base font-semibold text-ink">
+        <h2 id="client-identity-heading" className="text-ink text-base font-semibold">
           Identity
         </h2>
-        <p className="mt-1 text-sm text-ink-muted">Changes save automatically.</p>
+        <p className="text-ink-muted mt-1 text-sm">Changes save automatically.</p>
 
         <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
           <EditableField
@@ -122,7 +122,7 @@ export function ClientOverview({ client }: Props) {
               Assignee is the live field and decides who can see the client. */}
           <div className="space-y-1.5">
             <Label htmlFor="client-owner">Owner</Label>
-            <p id="client-owner" className="flex h-9 items-center text-sm text-ink">
+            <p id="client-owner" className="text-ink flex h-9 items-center text-sm">
               {client.owner?.name || client.owner?.email || (
                 <span className="text-ink-muted">Unknown</span>
               )}
@@ -141,9 +141,9 @@ export function ClientOverview({ client }: Props) {
 
       <section
         aria-labelledby="client-address-heading"
-        className="rounded-lg border border-line bg-white p-5"
+        className="border-line rounded-lg border bg-white p-5"
       >
-        <h2 id="client-address-heading" className="text-base font-semibold text-ink">
+        <h2 id="client-address-heading" className="text-ink text-base font-semibold">
           Address
         </h2>
         <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -194,9 +194,9 @@ export function ClientOverview({ client }: Props) {
 
       <section
         aria-labelledby="client-meta-heading"
-        className="rounded-lg border border-line bg-white p-5"
+        className="border-line rounded-lg border bg-white p-5"
       >
-        <h2 id="client-meta-heading" className="text-base font-semibold text-ink">
+        <h2 id="client-meta-heading" className="text-ink text-base font-semibold">
           Tags & references
         </h2>
         <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -223,9 +223,9 @@ export function ClientOverview({ client }: Props) {
 
       <section
         aria-labelledby="client-meta-readonly"
-        className="rounded-lg border border-line bg-white p-5"
+        className="border-line rounded-lg border bg-white p-5"
       >
-        <h2 id="client-meta-readonly" className="text-base font-semibold text-ink">
+        <h2 id="client-meta-readonly" className="text-ink text-base font-semibold">
           Metadata
         </h2>
         <dl className="mt-4 grid grid-cols-1 gap-4 text-sm md:grid-cols-2">
@@ -246,7 +246,7 @@ export function ClientOverview({ client }: Props) {
             <ReadOnly label="Converted from lead">
               <Link
                 href={`/leads?focus=${client.convertedFromLead.id}`}
-                className="inline-flex items-center gap-1 text-brand-700 hover:text-brand-800 focus-visible:outline-none focus-visible:ring-2 focus-visible:shadow-focus rounded"
+                className="text-brand-700 hover:text-brand-800 focus-visible:shadow-focus inline-flex items-center gap-1 rounded focus-visible:outline-none focus-visible:ring-2"
               >
                 <ExternalLink className="h-3.5 w-3.5" aria-hidden />
                 {client.convertedFromLead.name}
@@ -329,8 +329,8 @@ function EditableField({
 function ReadOnly({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="space-y-1">
-      <dt className="text-xs font-medium uppercase tracking-wide text-ink-muted">{label}</dt>
-      <dd className="text-sm text-ink">{children}</dd>
+      <dt className="text-ink-muted text-xs font-medium uppercase tracking-wide">{label}</dt>
+      <dd className="text-ink text-sm">{children}</dd>
     </div>
   );
 }

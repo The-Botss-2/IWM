@@ -119,7 +119,20 @@ export function parseCnic(value: string): string | null {
 /** Bank transfer, cash or cheque, from the ways people write them. */
 export function parsePaymentMethod(value: string): PayrollPaymentMethod | null {
   const key = value.toLowerCase().replace(/[^a-z]/g, '');
-  if (['bank', 'banktransfer', 'transfer', 'ibft', 'ift', 'online', 'onlinetransfer', 'bankaccount', 'wire', 'wiretransfer'].includes(key)) {
+  if (
+    [
+      'bank',
+      'banktransfer',
+      'transfer',
+      'ibft',
+      'ift',
+      'online',
+      'onlinetransfer',
+      'bankaccount',
+      'wire',
+      'wiretransfer',
+    ].includes(key)
+  ) {
     return 'BANK_TRANSFER';
   }
   if (key === 'cash') return 'CASH';
@@ -132,8 +145,18 @@ function monthIndex(word: string): number | null {
   // "Sept" and full names are fine; anything else must be exactly a month.
   if (i < 0) return null;
   const full = [
-    'january', 'february', 'march', 'april', 'may', 'june',
-    'july', 'august', 'september', 'october', 'november', 'december',
+    'january',
+    'february',
+    'march',
+    'april',
+    'may',
+    'june',
+    'july',
+    'august',
+    'september',
+    'october',
+    'november',
+    'december',
   ][i]!;
   const w = word.toLowerCase().replace(/\.$/, '');
   return full.startsWith(w) && w.length >= 3 ? i + 1 : null;
@@ -415,13 +438,17 @@ export function planImport(input: {
       }
     } else if (sameName.size > 1) {
       // Guessing would pay the wrong person or create a duplicate.
-      errors.push(`More than one person is named "${v.name}". Add their email or CNIC to this row.`);
+      errors.push(
+        `More than one person is named "${v.name}". Add their email or CNIC to this row.`,
+      );
     } else if (sameName.size === 1) {
       const only = [...sameName.values()][0]!;
       const person = only.roster ?? (only.staff ? rosterByUser.get(only.staff.id) : undefined);
       if (person?.cnic && v.cnic && person.cnic !== v.cnic) {
         // Same name, different CNIC: a different person, or a typo.
-        errors.push(`Name matches ${person.name}, but the CNIC is different. Check the CNIC or add their email.`);
+        errors.push(
+          `Name matches ${person.name}, but the CNIC is different. Check the CNIC or add their email.`,
+        );
       } else if (person) onPayroll(person, 'name');
       else {
         target_ = { match: 'PLATFORM_USER', userId: only.staff!.id };
@@ -436,7 +463,11 @@ export function planImport(input: {
     // The row's CNIC must not belong to someone other than the person matched.
     const cnicOwner = v.cnic ? rosterByCnic.get(v.cnic) : undefined;
     const matched = target_ as ImportTarget | null;
-    if (cnicOwner && matched && !(matched.match === 'ON_PAYROLL' && matched.employeeId === cnicOwner.id)) {
+    if (
+      cnicOwner &&
+      matched &&
+      !(matched.match === 'ON_PAYROLL' && matched.employeeId === cnicOwner.id)
+    ) {
       errors.push(`CNIC ${v.cnic} belongs to ${cnicOwner.name}, not the person this row matches.`);
       target_ = null;
     }
@@ -447,9 +478,12 @@ export function planImport(input: {
       const sameAccount =
         afterCnic.match === 'PLATFORM_USER'
           ? afterCnic.userId === staffEmail.id
-          : afterCnic.match === 'ON_PAYROLL' && rosterById.get(afterCnic.employeeId)?.userId === staffEmail.id;
+          : afterCnic.match === 'ON_PAYROLL' &&
+            rosterById.get(afterCnic.employeeId)?.userId === staffEmail.id;
       if (!sameAccount) {
-        errors.push(`Email ${v.email} belongs to ${staffEmail.name}, not the person this row matches.`);
+        errors.push(
+          `Email ${v.email} belongs to ${staffEmail.name}, not the person this row matches.`,
+        );
         target_ = null;
       }
     }

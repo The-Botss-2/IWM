@@ -13,10 +13,7 @@ import {
 import { CurrentUser, type AuthedUser } from '../common/decorators/current-user.decorator';
 import { Public } from '../common/decorators/public.decorator';
 import { RequireAbility } from '../common/decorators/required-ability.decorator';
-import {
-  RequestUserScope,
-  type UserScope,
-} from '../common/decorators/user-scope.decorator';
+import { RequestUserScope, type UserScope } from '../common/decorators/user-scope.decorator';
 import { ZodValidationPipe } from '../common/pipes/zod-validation.pipe';
 import { TaskFormsService } from './task-forms.service';
 
@@ -48,10 +45,7 @@ export class TaskFormsController {
 
   @Get('forms/:id')
   @RequireAbility('read', 'Project')
-  get(
-    @RequestUserScope() scope: UserScope,
-    @Param('id', new ZodValidationPipe(cuid)) id: string,
-  ) {
+  get(@RequestUserScope() scope: UserScope, @Param('id', new ZodValidationPipe(cuid)) id: string) {
     return this.forms.get(scope, id);
   }
 

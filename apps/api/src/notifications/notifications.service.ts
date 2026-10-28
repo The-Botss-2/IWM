@@ -100,11 +100,7 @@ export class NotificationsService {
    * a mail message, a task, a todo, a project) so the bell doesn't keep
    * surfacing something they've already seen.
    */
-  async markReadByEntity(
-    userId: string,
-    entityType: NotificationEntityType,
-    entityId: string,
-  ) {
+  async markReadByEntity(userId: string, entityType: NotificationEntityType, entityId: string) {
     await this.prisma.client.notification.updateMany({
       where: { userId, entityType, entityId, readAt: null },
       data: { readAt: new Date() },
@@ -162,9 +158,7 @@ export class NotificationsService {
         type: args.pushType ?? 'generic',
         url: (args.url && args.url.length > 0 ? args.url : '/').slice(0, 2048),
         // Collapse repeated banners about the same entity into one.
-        ...(args.entityType && args.entityId
-          ? { tag: `${args.entityType}:${args.entityId}` }
-          : {}),
+        ...(args.entityType && args.entityId ? { tag: `${args.entityType}:${args.entityId}` } : {}),
         data: {
           notificationId: row.id,
           ...(args.entityType ? { entityType: args.entityType } : {}),

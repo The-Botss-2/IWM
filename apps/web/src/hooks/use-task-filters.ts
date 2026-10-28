@@ -150,7 +150,16 @@ export function useTaskFilters() {
     });
   }, [updateUrl]);
 
-  return { filters, setSearch, setStatus, setPriority, setAssigneeIds, setDueDate, setAll, clearAll };
+  return {
+    filters,
+    setSearch,
+    setStatus,
+    setPriority,
+    setAssigneeIds,
+    setDueDate,
+    setAll,
+    clearAll,
+  };
 }
 
 /** True if any filter is non-empty. */

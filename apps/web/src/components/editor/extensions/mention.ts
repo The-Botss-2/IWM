@@ -30,14 +30,12 @@ export const Mention = Node.create({
       userId: {
         default: null as string | null,
         parseHTML: (el) => el.getAttribute('data-user-id'),
-        renderHTML: (attrs) =>
-          attrs.userId ? { 'data-user-id': attrs.userId as string } : {},
+        renderHTML: (attrs) => (attrs.userId ? { 'data-user-id': attrs.userId as string } : {}),
       },
       label: {
         default: null as string | null,
         parseHTML: (el) => el.getAttribute('data-label') ?? el.textContent,
-        renderHTML: (attrs) =>
-          attrs.label ? { 'data-label': attrs.label as string } : {},
+        renderHTML: (attrs) => (attrs.label ? { 'data-label': attrs.label as string } : {}),
       },
     };
   },

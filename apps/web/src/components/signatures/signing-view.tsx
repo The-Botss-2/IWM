@@ -1,6 +1,13 @@
 'use client';
 
-import { CalendarDays, CheckCircle2, Download, FileSignature, PenLine, XCircle } from 'lucide-react';
+import {
+  CalendarDays,
+  CheckCircle2,
+  Download,
+  FileSignature,
+  PenLine,
+  XCircle,
+} from 'lucide-react';
 import { useState, type ReactNode } from 'react';
 import type { SignatureFieldKind } from '@botss/shared-types';
 
@@ -81,9 +88,9 @@ export function SigningView({ source }: { source: SigningSource }) {
   if (s.state.kind === 'gone') {
     return (
       <Frame>
-        <XCircle className="mx-auto h-10 w-10 text-ink-disabled" aria-hidden />
-        <h1 className="mt-3 text-center text-lg font-semibold text-ink">{s.state.title}</h1>
-        <p className="mt-2 text-center text-sm text-ink-muted">{s.state.message}</p>
+        <XCircle className="text-ink-disabled mx-auto h-10 w-10" aria-hidden />
+        <h1 className="text-ink mt-3 text-center text-lg font-semibold">{s.state.title}</h1>
+        <p className="text-ink-muted mt-2 text-center text-sm">{s.state.message}</p>
       </Frame>
     );
   }
@@ -94,9 +101,9 @@ export function SigningView({ source }: { source: SigningSource }) {
   if (session.requestStatus === 'COMPLETED') {
     return (
       <Frame>
-        <CheckCircle2 className="mx-auto h-10 w-10 text-state-success" aria-hidden />
-        <h1 className="mt-3 text-center text-lg font-semibold text-ink">Everyone has signed</h1>
-        <p className="mt-2 text-center text-sm text-ink-muted">
+        <CheckCircle2 className="text-state-success mx-auto h-10 w-10" aria-hidden />
+        <h1 className="text-ink mt-3 text-center text-lg font-semibold">Everyone has signed</h1>
+        <p className="text-ink-muted mt-2 text-center text-sm">
           &ldquo;{session.title}&rdquo; is complete. A copy was emailed to every signer.
         </p>
         <div className="mt-5 flex justify-center">
@@ -111,13 +118,13 @@ export function SigningView({ source }: { source: SigningSource }) {
   if (status === 'SIGNED') {
     return (
       <Frame>
-        <CheckCircle2 className="mx-auto h-10 w-10 text-state-success" aria-hidden />
-        <h1 className="mt-3 text-center text-lg font-semibold text-ink">
+        <CheckCircle2 className="text-state-success mx-auto h-10 w-10" aria-hidden />
+        <h1 className="text-ink mt-3 text-center text-lg font-semibold">
           {s.done === 'signed' ? 'Thank you, you have signed' : 'You have already signed'}
         </h1>
-        <p className="mt-2 text-center text-sm text-ink-muted">
-          {session.signersSigned} of {session.signersTotal} people have signed &ldquo;{session.title}&rdquo;.{' '}
-          {copy.afterSigning}
+        <p className="text-ink-muted mt-2 text-center text-sm">
+          {session.signersSigned} of {session.signersTotal} people have signed &ldquo;
+          {session.title}&rdquo;. {copy.afterSigning}
         </p>
       </Frame>
     );
@@ -125,11 +132,11 @@ export function SigningView({ source }: { source: SigningSource }) {
   if (status === 'DECLINED' || session.requestStatus === 'DECLINED') {
     return (
       <Frame>
-        <XCircle className="mx-auto h-10 w-10 text-state-error" aria-hidden />
-        <h1 className="mt-3 text-center text-lg font-semibold text-ink">
+        <XCircle className="text-state-error mx-auto h-10 w-10" aria-hidden />
+        <h1 className="text-ink mt-3 text-center text-lg font-semibold">
           {status === 'DECLINED' ? 'You declined to sign' : 'This request was declined'}
         </h1>
-        <p className="mt-2 text-center text-sm text-ink-muted">
+        <p className="text-ink-muted mt-2 text-center text-sm">
           {status === 'DECLINED'
             ? `${session.requesterName} has been told.`
             : 'Another signer declined, so this request is closed.'}
@@ -140,10 +147,14 @@ export function SigningView({ source }: { source: SigningSource }) {
 
   const signatureFill = s.adopted ? (
     // eslint-disable-next-line @next/next/no-img-element
-    <img src={s.adopted.imageDataUrl} alt="Your signature" className="h-full w-full object-contain" />
+    <img
+      src={s.adopted.imageDataUrl}
+      alt="Your signature"
+      className="h-full w-full object-contain"
+    />
   ) : null;
   const dateFill = s.adopted ? (
-    <span className="truncate px-1 text-[11px] font-medium text-ink">{formatDate(new Date())}</span>
+    <span className="text-ink truncate px-1 text-[11px] font-medium">{formatDate(new Date())}</span>
   ) : null;
 
   const needsName = !session.signer.name;
@@ -151,26 +162,28 @@ export function SigningView({ source }: { source: SigningSource }) {
   return (
     <div className={standalone ? 'pb-28' : undefined}>
       {standalone ? (
-        <header className="border-b border-line bg-bg-surface">
+        <header className="border-line bg-bg-surface border-b">
           <div className="mx-auto flex max-w-4xl items-center justify-between gap-3 px-4 py-3 sm:px-6">
             <Logo variant="full" size="sm" />
-            <span className="truncate text-xs text-ink-muted">Signing as {session.signer.email}</span>
+            <span className="text-ink-muted truncate text-xs">
+              Signing as {session.signer.email}
+            </span>
           </div>
         </header>
       ) : null}
 
       <Body className={standalone ? 'mx-auto max-w-4xl space-y-4 px-4 py-5 sm:px-6' : 'space-y-4'}>
-        <section className="rounded-lg border border-line bg-bg-surface p-5 shadow-sm">
-          <p className="text-[11px] font-medium uppercase tracking-[0.16em] text-ink-disabled">
+        <section className="border-line bg-bg-surface rounded-lg border p-5 shadow-sm">
+          <p className="text-ink-disabled text-[11px] font-medium uppercase tracking-[0.16em]">
             {session.workspaceName}
           </p>
-          <h1 className="mt-1 text-xl font-semibold text-ink">{session.title}</h1>
-          <p className="mt-1 text-sm text-ink-muted">
+          <h1 className="text-ink mt-1 text-xl font-semibold">{session.title}</h1>
+          <p className="text-ink-muted mt-1 text-sm">
             {session.requesterName} asked you to sign this document. {copy.until}{' '}
             {formatDate(new Date(session.expiresAt))}.
           </p>
           {session.message ? (
-            <p className="mt-3 whitespace-pre-wrap rounded-md bg-bg-subtle p-3 text-sm text-ink">
+            <p className="bg-bg-subtle text-ink mt-3 whitespace-pre-wrap rounded-md p-3 text-sm">
               {session.message}
             </p>
           ) : null}
@@ -186,7 +199,7 @@ export function SigningView({ source }: { source: SigningSource }) {
               />
             </div>
           ) : null}
-          <ol className="mt-4 space-y-1 text-sm text-ink">
+          <ol className="text-ink mt-4 space-y-1 text-sm">
             {s.canPlace ? (
               <li>1. Pick Signature or Date below, then click the page where it should go.</li>
             ) : (
@@ -198,7 +211,11 @@ export function SigningView({ source }: { source: SigningSource }) {
         </section>
 
         {s.canPlace ? (
-          <div className="flex flex-wrap items-center gap-2" role="radiogroup" aria-label="Field to place">
+          <div
+            className="flex flex-wrap items-center gap-2"
+            role="radiogroup"
+            aria-label="Field to place"
+          >
             {(['SIGNATURE', 'DATE'] as const).map((k) => (
               <button
                 key={k}
@@ -213,11 +230,17 @@ export function SigningView({ source }: { source: SigningSource }) {
                     : 'border-line bg-bg-surface text-ink-muted hover:text-ink',
                 )}
               >
-                {k === 'SIGNATURE' ? <PenLine className="h-4 w-4" aria-hidden /> : <CalendarDays className="h-4 w-4" aria-hidden />}
+                {k === 'SIGNATURE' ? (
+                  <PenLine className="h-4 w-4" aria-hidden />
+                ) : (
+                  <CalendarDays className="h-4 w-4" aria-hidden />
+                )}
                 {k === 'SIGNATURE' ? 'Signature' : 'Date'}
               </button>
             ))}
-            <span className="text-xs text-ink-muted">Click the page to place it. Drag to adjust.</span>
+            <span className="text-ink-muted text-xs">
+              Click the page to place it. Drag to adjust.
+            </span>
           </div>
         ) : null}
 
@@ -246,7 +269,10 @@ export function SigningView({ source }: { source: SigningSource }) {
             }
           />
         ) : pdf.status === 'error' ? (
-          <p role="alert" className="rounded-md border border-line bg-bg-surface p-4 text-sm text-state-error">
+          <p
+            role="alert"
+            className="border-line bg-bg-surface text-state-error rounded-md border p-4 text-sm"
+          >
             {pdf.message}
           </p>
         ) : (
@@ -257,8 +283,8 @@ export function SigningView({ source }: { source: SigningSource }) {
       <div
         className={
           standalone
-            ? 'fixed inset-x-0 bottom-0 z-30 border-t border-line bg-bg-surface/95 backdrop-blur [padding-bottom:env(safe-area-inset-bottom)]'
-            : 'sticky bottom-3 z-20 mt-4 rounded-lg border border-line bg-bg-surface/95 shadow-soft backdrop-blur [padding-bottom:env(safe-area-inset-bottom)]'
+            ? 'border-line bg-bg-surface/95 fixed inset-x-0 bottom-0 z-30 border-t backdrop-blur [padding-bottom:env(safe-area-inset-bottom)]'
+            : 'border-line bg-bg-surface/95 shadow-soft sticky bottom-3 z-20 mt-4 rounded-lg border backdrop-blur [padding-bottom:env(safe-area-inset-bottom)]'
         }
       >
         <div
@@ -268,7 +294,12 @@ export function SigningView({ source }: { source: SigningSource }) {
               : 'flex flex-wrap items-center gap-2 px-4 py-3'
           }
         >
-          <Button variant="ghost" size="sm" onClick={() => setDeclineOpen(true)} disabled={s.submitting}>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setDeclineOpen(true)}
+            disabled={s.submitting}
+          >
             Decline
           </Button>
           <div className="flex-1" />
@@ -303,7 +334,7 @@ export function SigningView({ source }: { source: SigningSource }) {
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle className="text-lg font-semibold">Decline to sign?</DialogTitle>
-            <DialogDescription className="text-sm text-ink-muted">
+            <DialogDescription className="text-ink-muted text-sm">
               {session.requesterName} will see your reason. The request closes for everyone.
             </DialogDescription>
           </DialogHeader>
@@ -348,8 +379,8 @@ function CodeForm({ error, onSubmit }: { error: string | null; onSubmit: (code: 
       }}
       className="space-y-4"
     >
-      <h1 className="text-center text-lg font-semibold text-ink">Enter your code</h1>
-      <p className="text-center text-sm text-ink-muted">
+      <h1 className="text-ink text-center text-lg font-semibold">Enter your code</h1>
+      <p className="text-ink-muted text-center text-sm">
         Type the 6-digit code from the email that brought you here.
       </p>
       <div className="space-y-1.5">
@@ -367,7 +398,7 @@ function CodeForm({ error, onSubmit }: { error: string | null; onSubmit: (code: 
         />
       </div>
       {error ? (
-        <p role="alert" className="text-sm text-state-error">
+        <p role="alert" className="text-state-error text-sm">
           {error}
         </p>
       ) : null}
@@ -382,7 +413,7 @@ function CodeForm({ error, onSubmit }: { error: string | null; onSubmit: (code: 
 function Centered({ children }: { children: ReactNode }) {
   return (
     <div className="mx-auto flex min-h-screen max-w-md flex-col justify-center px-4 py-8">
-      <div className="rounded-lg border border-line bg-bg-surface p-6 shadow-sm">
+      <div className="border-line bg-bg-surface rounded-lg border p-6 shadow-sm">
         <div className="mb-5 flex justify-center">
           <Logo variant="full" size="sm" />
         </div>
@@ -396,7 +427,7 @@ function Centered({ children }: { children: ReactNode }) {
 function Inline({ children }: { children: ReactNode }) {
   return (
     <div className="mx-auto max-w-md py-6">
-      <div className="rounded-lg border border-line bg-bg-surface p-6 shadow-sm">{children}</div>
+      <div className="border-line bg-bg-surface rounded-lg border p-6 shadow-sm">{children}</div>
     </div>
   );
 }

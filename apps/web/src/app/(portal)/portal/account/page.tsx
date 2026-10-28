@@ -22,29 +22,30 @@ export default function PortalAccountPage() {
       <PortalPageHeader title="Account" description="How you sign in to the client portal." />
 
       <section aria-labelledby="account-profile" className="card p-5 sm:p-6">
-        <h2 id="account-profile" className="text-base font-semibold text-ink">
+        <h2 id="account-profile" className="text-ink text-base font-semibold">
           Profile
         </h2>
         <dl className="mt-4 grid gap-4 sm:grid-cols-2">
           <div className="min-w-0">
-            <dt className="text-xs text-ink-muted">Name</dt>
-            <dd className="mt-0.5 text-sm font-medium text-ink">{me.user.name || '-'}</dd>
+            <dt className="text-ink-muted text-xs">Name</dt>
+            <dd className="text-ink mt-0.5 text-sm font-medium">{me.user.name || '-'}</dd>
           </div>
           <div className="min-w-0">
-            <dt className="text-xs text-ink-muted">Email</dt>
-            <dd className="mt-0.5 text-sm font-medium text-ink">{me.user.email}</dd>
+            <dt className="text-ink-muted text-xs">Email</dt>
+            <dd className="text-ink mt-0.5 text-sm font-medium">{me.user.email}</dd>
           </div>
         </dl>
-        <p className="mt-4 text-sm text-ink-muted">
-          To change your name or email, contact {client ? client.agency.name : 'the team that invited you'}.
+        <p className="text-ink-muted mt-4 text-sm">
+          To change your name or email, contact{' '}
+          {client ? client.agency.name : 'the team that invited you'}.
         </p>
       </section>
 
       <section aria-labelledby="account-password" className="card p-5 sm:p-6">
-        <h2 id="account-password" className="text-base font-semibold text-ink">
+        <h2 id="account-password" className="text-ink text-base font-semibold">
           Password
         </h2>
-        <p className="mt-1 text-sm text-ink-muted">
+        <p className="text-ink-muted mt-1 text-sm">
           Changing your password signs you out on your other devices. You stay signed in here.
         </p>
         <form className="mt-5 space-y-4" onSubmit={onSubmit} noValidate>
@@ -57,7 +58,11 @@ export default function PortalAccountPage() {
             readOnly
             hidden
           />
-          <Field id="current-password" label="Current password" error={errors.currentPassword?.message}>
+          <Field
+            id="current-password"
+            label="Current password"
+            error={errors.currentPassword?.message}
+          >
             <PasswordInput
               id="current-password"
               autoComplete="current-password"
@@ -80,7 +85,11 @@ export default function PortalAccountPage() {
               {...register('newPassword')}
             />
           </Field>
-          <Field id="confirm-password" label="Confirm new password" error={errors.confirmPassword?.message}>
+          <Field
+            id="confirm-password"
+            label="Confirm new password"
+            error={errors.confirmPassword?.message}
+          >
             <PasswordInput
               id="confirm-password"
               autoComplete="new-password"
@@ -121,11 +130,11 @@ function Field({
       </label>
       {children}
       {error ? (
-        <p id={`${id}-error`} className="text-xs text-state-error">
+        <p id={`${id}-error`} className="text-state-error text-xs">
           {error}
         </p>
       ) : hint ? (
-        <p id={`${id}-hint`} className="text-xs text-ink-muted">
+        <p id={`${id}-hint`} className="text-ink-muted text-xs">
           {hint}
         </p>
       ) : null}

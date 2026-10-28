@@ -21,7 +21,7 @@ export const PopoverContent = forwardRef<
         align={align}
         sideOffset={sideOffset}
         className={cn(
-          'z-50 w-72 rounded-lg border border-line bg-white p-1.5 shadow-popover outline-none',
+          'border-line shadow-popover z-50 w-72 rounded-lg border bg-white p-1.5 outline-none',
           'data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95',
           'data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95',
           className,

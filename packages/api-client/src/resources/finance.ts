@@ -73,11 +73,7 @@ export class FinanceResource {
     return this.http.post('/finance/contracts', contractWithMilestonesSchema, input);
   }
   updateContract(id: string, input: UpdateContractInput) {
-    return this.http.patch(
-      `/finance/contracts/${id}`,
-      contractWithMilestonesSchema,
-      input,
-    );
+    return this.http.patch(`/finance/contracts/${id}`, contractWithMilestonesSchema, input);
   }
   deleteContract(id: string) {
     return this.http.delete(`/finance/contracts/${id}`, okSchema);
@@ -92,36 +88,20 @@ export class FinanceResource {
     );
   }
   updateMilestone(id: string, input: UpdateMilestoneInput) {
-    return this.http.patch(
-      `/finance/milestones/${id}`,
-      contractMilestoneWithWorkSchema,
-      input,
-    );
+    return this.http.patch(`/finance/milestones/${id}`, contractMilestoneWithWorkSchema, input);
   }
   deleteMilestone(id: string) {
     return this.http.delete(`/finance/milestones/${id}`, okSchema);
   }
   reorderMilestones(contractId: string, input: ReorderMilestonesInput) {
-    return this.http.patch(
-      `/finance/contracts/${contractId}/milestones/reorder`,
-      okSchema,
-      input,
-    );
+    return this.http.patch(`/finance/contracts/${contractId}/milestones/reorder`, okSchema, input);
   }
   /** Replaces the milestone's linked sprint / tasks - does not merge. */
   linkMilestoneWork(id: string, input: LinkMilestoneWorkInput) {
-    return this.http.put(
-      `/finance/milestones/${id}/work`,
-      contractMilestoneWithWorkSchema,
-      input,
-    );
+    return this.http.put(`/finance/milestones/${id}/work`, contractMilestoneWithWorkSchema, input);
   }
   deliverMilestone(id: string) {
-    return this.http.post(
-      `/finance/milestones/${id}/deliver`,
-      contractMilestoneWithWorkSchema,
-      {},
-    );
+    return this.http.post(`/finance/milestones/${id}/deliver`, contractMilestoneWithWorkSchema, {});
   }
   awaitingPayment() {
     return this.http.get('/finance/awaiting-payment', awaitingSchema);
@@ -138,11 +118,7 @@ export class FinanceResource {
     return this.http.patch(`/finance/payments/${id}`, paymentWithSourceSchema, input);
   }
   voidPayment(id: string, input: VoidPaymentInput) {
-    return this.http.post(
-      `/finance/payments/${id}/void`,
-      paymentWithSourceSchema,
-      input,
-    );
+    return this.http.post(`/finance/payments/${id}/void`, paymentWithSourceSchema, input);
   }
 
   // --- expenses ---
@@ -164,18 +140,10 @@ export class FinanceResource {
     return this.http.get('/finance/payment-sources', sourceListSchema, query);
   }
   createPaymentSource(input: CreatePaymentSourceInput) {
-    return this.http.post(
-      '/finance/payment-sources',
-      paymentSourceWithUsageSchema,
-      input,
-    );
+    return this.http.post('/finance/payment-sources', paymentSourceWithUsageSchema, input);
   }
   updatePaymentSource(id: string, input: UpdatePaymentSourceInput) {
-    return this.http.patch(
-      `/finance/payment-sources/${id}`,
-      paymentSourceWithUsageSchema,
-      input,
-    );
+    return this.http.patch(`/finance/payment-sources/${id}`, paymentSourceWithUsageSchema, input);
   }
   reorderPaymentSources(input: ReorderPaymentSourcesInput) {
     return this.http.patch('/finance/payment-sources/reorder', okSchema, input);

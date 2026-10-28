@@ -190,7 +190,7 @@ function PanelInner({ lead, onClose }: { lead: LeadWithOwner; onClose: () => voi
   return (
     <>
       <SheetHeader>
-        <SheetTitle className="text-xs uppercase tracking-wide text-ink-muted">Lead</SheetTitle>
+        <SheetTitle className="text-ink-muted text-xs uppercase tracking-wide">Lead</SheetTitle>
         <Input
           aria-label="Lead name"
           value={name}
@@ -208,15 +208,13 @@ function PanelInner({ lead, onClose }: { lead: LeadWithOwner; onClose: () => voi
           onKeyDown={(e) => {
             if (e.key === 'Enter') (e.target as HTMLInputElement).blur();
           }}
-          className="text-lg font-semibold border-transparent shadow-none px-2 -mx-2 hover:bg-bg-subtle focus:bg-white focus:border-brand-purple"
+          className="hover:bg-bg-subtle focus:border-brand-purple -mx-2 border-transparent px-2 text-lg font-semibold shadow-none focus:bg-white"
         />
-        {lead.company ? (
-          <p className="text-sm text-ink-muted">{lead.company}</p>
-        ) : null}
+        {lead.company ? <p className="text-ink-muted text-sm">{lead.company}</p> : null}
       </SheetHeader>
       <SheetBody>
         <div className="space-y-5">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <Field label="Email" htmlFor="lead-email">
               <Input
                 id="lead-email"
@@ -325,10 +323,7 @@ function PanelInner({ lead, onClose }: { lead: LeadWithOwner; onClose: () => voi
               />
             </Field>
             <Field label="Currency" htmlFor="lead-currency">
-              <Select
-                value={lead.currency}
-                onValueChange={(v) => save({ currency: v })}
-              >
+              <Select value={lead.currency} onValueChange={(v) => save({ currency: v })}>
                 <SelectTrigger id="lead-currency">
                   <SelectValue />
                 </SelectTrigger>
@@ -345,10 +340,7 @@ function PanelInner({ lead, onClose }: { lead: LeadWithOwner; onClose: () => voi
             {/* Owner is whoever captured the lead - historical, so read-only.
                 Assignee is the live field and decides who can see the lead. */}
             <Field label="Owner" htmlFor="lead-owner">
-              <p
-                id="lead-owner"
-                className="flex h-9 items-center text-sm text-ink"
-              >
+              <p id="lead-owner" className="text-ink flex h-9 items-center text-sm">
                 {lead.owner?.name || lead.owner?.email || (
                   <span className="text-ink-muted">Unknown</span>
                 )}
@@ -372,7 +364,7 @@ function PanelInner({ lead, onClose }: { lead: LeadWithOwner; onClose: () => voi
               onChange={(e) => setFollowupInput(e.target.value)}
               onBlur={() => commitFollowup(followupInput)}
             />
-            <label className="mt-2 flex cursor-pointer select-none items-center gap-2 text-xs text-ink-muted">
+            <label className="text-ink-muted mt-2 flex cursor-pointer select-none items-center gap-2 text-xs">
               <Checkbox
                 checked={scheduleTodo}
                 onCheckedChange={(v) => setScheduleTodo(v === true)}
@@ -404,32 +396,31 @@ function PanelInner({ lead, onClose }: { lead: LeadWithOwner; onClose: () => voi
             />
           </Field>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 border-t border-line pt-4">
+          <div className="border-line grid grid-cols-1 gap-4 border-t pt-4 sm:grid-cols-2">
             <ReadOnly label="Created">
               <Tooltip content={absoluteTime(lead.createdAt)}>
-                <span className="text-sm text-ink">{relativeTime(lead.createdAt)}</span>
+                <span className="text-ink text-sm">{relativeTime(lead.createdAt)}</span>
               </Tooltip>
             </ReadOnly>
             <ReadOnly label="Updated">
               <Tooltip content={absoluteTime(lead.updatedAt)}>
-                <span className="text-sm text-ink">{relativeTime(lead.updatedAt)}</span>
+                <span className="text-ink text-sm">{relativeTime(lead.updatedAt)}</span>
               </Tooltip>
             </ReadOnly>
             {lead.convertedAt ? (
               <ReadOnly label="Converted">
                 <Tooltip content={absoluteTime(lead.convertedAt)}>
-                  <span className="text-sm text-ink">{relativeTime(lead.convertedAt)}</span>
+                  <span className="text-ink text-sm">{relativeTime(lead.convertedAt)}</span>
                 </Tooltip>
               </ReadOnly>
             ) : null}
           </div>
 
-          <div className="flex flex-col gap-2 border-t border-line pt-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="border-line flex flex-col gap-2 border-t pt-4 sm:flex-row sm:items-center sm:justify-between">
             {lead.convertedToClientId ? (
               <Link
                 href={`/clients?focus=${lead.convertedToClientId}`}
-                className="inline-flex items-center gap-1.5 text-sm font-medium text-brand-700 hover:text-brand-800 sm:order-1
-                           focus-visible:outline-none focus-visible:ring-2 focus-visible:shadow-focus rounded"
+                className="text-brand-700 hover:text-brand-800 focus-visible:shadow-focus inline-flex items-center gap-1.5 rounded text-sm font-medium focus-visible:outline-none focus-visible:ring-2 sm:order-1"
               >
                 <ExternalLink className="h-4 w-4" aria-hidden />
                 View client
@@ -440,7 +431,7 @@ function PanelInner({ lead, onClose }: { lead: LeadWithOwner; onClose: () => voi
                 Convert to client
               </Button>
             ) : (
-              <span className="text-xs text-ink-muted sm:order-1">Move to Won to convert.</span>
+              <span className="text-ink-muted text-xs sm:order-1">Move to Won to convert.</span>
             )}
             <Button
               variant="destructive"
@@ -515,7 +506,7 @@ function Field({
 function ReadOnly({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="space-y-1">
-      <div className="text-xs font-medium uppercase tracking-wide text-ink-muted">{label}</div>
+      <div className="text-ink-muted text-xs font-medium uppercase tracking-wide">{label}</div>
       {children}
     </div>
   );

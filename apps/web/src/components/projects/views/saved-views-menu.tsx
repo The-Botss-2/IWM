@@ -12,11 +12,7 @@ import {
 } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import type {
-  CreateSavedViewInput,
-  SavedView,
-  SavedViewConfig,
-} from '@botss/shared-types';
+import type { CreateSavedViewInput, SavedView, SavedViewConfig } from '@botss/shared-types';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -73,13 +69,10 @@ export function SavedViewsMenu({ projectId, snapshot, onApply }: Props) {
     () => (list.data ?? []).filter((v) => !v.isShared && v.createdById === userId),
     [list.data, userId],
   );
-  const sharedViews = useMemo(
-    () => (list.data ?? []).filter((v) => v.isShared),
-    [list.data],
-  );
+  const sharedViews = useMemo(() => (list.data ?? []).filter((v) => v.isShared), [list.data]);
 
   const activeView = useMemo(
-    () => (activeViewId ? list.data?.find((v) => v.id === activeViewId) ?? null : null),
+    () => (activeViewId ? (list.data?.find((v) => v.id === activeViewId) ?? null) : null),
     [list.data, activeViewId],
   );
 
@@ -123,7 +116,7 @@ export function SavedViewsMenu({ projectId, snapshot, onApply }: Props) {
         <PopoverTrigger asChild>
           <Button variant="outline" size="sm" className="gap-1.5">
             <Bookmark className="h-3.5 w-3.5" />
-            <span className="truncate max-w-[10rem]">
+            <span className="max-w-[10rem] truncate">
               {activeView ? `${activeView.icon ?? ''} ${activeView.name}`.trim() : 'Views'}
             </span>
             {activeView && isDirty ? (
@@ -138,7 +131,7 @@ export function SavedViewsMenu({ projectId, snapshot, onApply }: Props) {
           <div className="max-h-[60vh] overflow-y-auto px-1">
             <SectionHeader label="My views" />
             {myViews.length === 0 ? (
-              <p className="px-2 py-1.5 text-xs text-ink-muted">No saved views yet.</p>
+              <p className="text-ink-muted px-2 py-1.5 text-xs">No saved views yet.</p>
             ) : (
               <ul className="space-y-0.5">
                 {myViews.map((v) => (
@@ -149,13 +142,16 @@ export function SavedViewsMenu({ projectId, snapshot, onApply }: Props) {
                     onPick={() => onPickView(v)}
                     onRename={() => setEditing(v)}
                     onDuplicate={() =>
-                      create.mutate({
-                        name: `${v.name} (copy)`,
-                        icon: v.icon ?? undefined,
-                        scope: v.scope,
-                        isShared: v.isShared,
-                        config: v.config,
-                      }, { onSuccess: (dup) => toast.success(`Duplicated as "${dup.name}".`) })
+                      create.mutate(
+                        {
+                          name: `${v.name} (copy)`,
+                          icon: v.icon ?? undefined,
+                          scope: v.scope,
+                          isShared: v.isShared,
+                          config: v.config,
+                        },
+                        { onSuccess: (dup) => toast.success(`Duplicated as "${dup.name}".`) },
+                      )
                     }
                     onDelete={() => setDeleting(v)}
                   />
@@ -164,7 +160,7 @@ export function SavedViewsMenu({ projectId, snapshot, onApply }: Props) {
             )}
             <SectionHeader label="Shared with project" />
             {sharedViews.length === 0 ? (
-              <p className="px-2 py-1.5 text-xs text-ink-muted">No shared views.</p>
+              <p className="text-ink-muted px-2 py-1.5 text-xs">No shared views.</p>
             ) : (
               <ul className="space-y-0.5">
                 {sharedViews.map((v) => (
@@ -175,23 +171,26 @@ export function SavedViewsMenu({ projectId, snapshot, onApply }: Props) {
                     onPick={() => onPickView(v)}
                     onRename={v.createdById === userId ? () => setEditing(v) : undefined}
                     onDuplicate={() =>
-                      create.mutate({
-                        name: `${v.name} (copy)`,
-                        icon: v.icon ?? undefined,
-                        scope: v.scope,
-                        isShared: false,
-                        config: v.config,
-                      }, { onSuccess: (dup) => toast.success(`Duplicated as "${dup.name}".`) })
+                      create.mutate(
+                        {
+                          name: `${v.name} (copy)`,
+                          icon: v.icon ?? undefined,
+                          scope: v.scope,
+                          isShared: false,
+                          config: v.config,
+                        },
+                        { onSuccess: (dup) => toast.success(`Duplicated as "${dup.name}".`) },
+                      )
                     }
                     onDelete={v.createdById === userId ? () => setDeleting(v) : undefined}
                   />
                 ))}
               </ul>
             )}
-            <div className="my-1 border-t border-line" />
+            <div className="border-line my-1 border-t" />
             <button
               type="button"
-              className="flex w-full items-center gap-2 rounded px-2 py-1.5 text-sm text-ink hover:bg-bg-subtle"
+              className="text-ink hover:bg-bg-subtle flex w-full items-center gap-2 rounded px-2 py-1.5 text-sm"
               onClick={onResetDefault}
             >
               <RotateCcw className="h-3.5 w-3.5" />
@@ -297,7 +296,7 @@ export function SavedViewsMenu({ projectId, snapshot, onApply }: Props) {
 
 function SectionHeader({ label }: { label: string }) {
   return (
-    <div className="px-2 pt-2 pb-1 text-[10px] font-semibold uppercase tracking-wide text-ink-muted">
+    <div className="text-ink-muted px-2 pb-1 pt-2 text-[10px] font-semibold uppercase tracking-wide">
       {label}
     </div>
   );
@@ -319,16 +318,21 @@ function ViewItem({
   onDelete?: () => void;
 }) {
   return (
-    <li className={cn('group flex items-center rounded text-sm hover:bg-bg-subtle', active && 'bg-brand-50')}>
+    <li
+      className={cn(
+        'hover:bg-bg-subtle group flex items-center rounded text-sm',
+        active && 'bg-brand-50',
+      )}
+    >
       <button
         type="button"
         onClick={onPick}
         className="flex flex-1 items-center gap-2 px-2 py-1.5 text-left"
       >
         <span className="text-base leading-none">{view.icon || '📌'}</span>
-        <span className="flex-1 truncate text-ink">{view.name}</span>
+        <span className="text-ink flex-1 truncate">{view.name}</span>
         {view.isShared ? (
-          <Share2 className="h-3 w-3 text-ink-disabled" aria-label="Shared" />
+          <Share2 className="text-ink-disabled h-3 w-3" aria-label="Shared" />
         ) : null}
       </button>
       <div className="flex items-center gap-0.5 px-1 opacity-0 group-hover:opacity-100">
@@ -337,7 +341,7 @@ function ViewItem({
             type="button"
             aria-label={`Rename ${view.name}`}
             onClick={onRename}
-            className="rounded p-1 text-ink-muted hover:bg-line hover:text-ink"
+            className="text-ink-muted hover:bg-line hover:text-ink rounded p-1"
           >
             <Pencil className="h-3 w-3" />
           </button>
@@ -346,7 +350,7 @@ function ViewItem({
           type="button"
           aria-label={`Duplicate ${view.name}`}
           onClick={onDuplicate}
-          className="rounded p-1 text-ink-muted hover:bg-line hover:text-ink"
+          className="text-ink-muted hover:bg-line hover:text-ink rounded p-1"
         >
           <Copy className="h-3 w-3" />
         </button>
@@ -355,7 +359,7 @@ function ViewItem({
             type="button"
             aria-label={`Delete ${view.name}`}
             onClick={onDelete}
-            className="rounded p-1 text-ink-muted hover:bg-tint-error hover:text-state-error"
+            className="text-ink-muted hover:bg-tint-error hover:text-state-error rounded p-1"
           >
             <Trash2 className="h-3 w-3" />
           </button>
@@ -457,7 +461,7 @@ function RenameDialog({
       role="dialog"
       aria-modal="true"
       aria-label="Rename view"
-      className="fixed inset-0 z-50 flex items-center justify-center bg-ink/40 p-4"
+      className="bg-ink/40 fixed inset-0 z-50 flex items-center justify-center p-4"
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
@@ -497,5 +501,7 @@ function snapshotToConfig(s: ViewSnapshot): SavedViewConfig {
  */
 function configMatches(s: ViewSnapshot, c: SavedViewConfig): boolean {
   const a = snapshotToConfig(s);
-  return JSON.stringify({ ...a, viewType: undefined }) === JSON.stringify({ ...c, viewType: undefined });
+  return (
+    JSON.stringify({ ...a, viewType: undefined }) === JSON.stringify({ ...c, viewType: undefined })
+  );
 }

@@ -62,23 +62,23 @@ export function PortalShell({ children }: { children: ReactNode }) {
     <div className="flex min-h-screen flex-col">
       <a
         href="#portal-main"
-        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-bg-surface focus:px-3 focus:py-2 focus:text-sm focus:font-medium focus:text-ink focus:shadow-popover"
+        className="focus:bg-bg-surface focus:text-ink focus:shadow-popover sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:px-3 focus:py-2 focus:text-sm focus:font-medium"
       >
         Skip to content
       </a>
 
-      <header className="sticky top-0 z-30 border-b border-line bg-bg-surface">
+      <header className="border-line bg-bg-surface sticky top-0 z-30 border-b">
         <div className="mx-auto flex h-14 max-w-6xl items-center gap-3 px-4 sm:px-6">
           {client ? (
             <Link href={portalHref(client.id)} className={cn('shrink-0 rounded-md', FOCUS_RING)}>
               <AgencyMark key={client.agency.logoUrl ?? 'text'} agency={client.agency} />
             </Link>
           ) : null}
-          {client ? <span aria-hidden className="h-5 w-px shrink-0 bg-line" /> : null}
+          {client ? <span aria-hidden className="bg-line h-5 w-px shrink-0" /> : null}
           {client && me.clients.length > 1 ? (
             <ClientSwitcher clients={me.clients} active={client} />
           ) : client ? (
-            <span className="min-w-0 truncate text-sm font-medium text-ink">{client.name}</span>
+            <span className="text-ink min-w-0 truncate text-sm font-medium">{client.name}</span>
           ) : null}
           <div className="ml-auto shrink-0">
             <AccountMenu user={me.user} />
@@ -115,7 +115,7 @@ function AgencyMark({ agency }: { agency: PortalClientSummary['agency'] }) {
     );
   }
   return (
-    <span className="block max-w-[7.5rem] truncate text-sm font-semibold text-ink sm:max-w-[12rem]">
+    <span className="text-ink block max-w-[7.5rem] truncate text-sm font-semibold sm:max-w-[12rem]">
       {agency.name}
     </span>
   );
@@ -137,16 +137,16 @@ function ClientSwitcher({
           type="button"
           aria-label={`${active.name}, switch client`}
           className={cn(
-            'inline-flex min-w-0 items-center gap-1.5 rounded-md px-2 py-1.5 text-sm font-medium text-ink transition-colors hover:bg-bg-subtle',
+            'text-ink hover:bg-bg-subtle inline-flex min-w-0 items-center gap-1.5 rounded-md px-2 py-1.5 text-sm font-medium transition-colors',
             FOCUS_RING,
           )}
         >
           <span className="truncate">{active.name}</span>
-          <ChevronDown className="h-4 w-4 shrink-0 text-ink-muted" aria-hidden />
+          <ChevronDown className="text-ink-muted h-4 w-4 shrink-0" aria-hidden />
         </button>
       </PopoverTrigger>
       <PopoverContent align="start" className="w-64 max-w-[calc(100vw-2rem)]">
-        <p className="px-3 pb-1.5 pt-1 text-xs font-medium text-ink-muted">Switch client</p>
+        <p className="text-ink-muted px-3 pb-1.5 pt-1 text-xs font-medium">Switch client</p>
         <ul>
           {clients.map((c) => {
             const current = c.id === active.id;
@@ -159,7 +159,9 @@ function ClientSwitcher({
                   className={cn(MENU_ITEM, current && 'font-medium')}
                 >
                   <span className="min-w-0 flex-1 truncate">{c.name}</span>
-                  {current ? <Check className="h-4 w-4 shrink-0 text-brand-purple" aria-hidden /> : null}
+                  {current ? (
+                    <Check className="text-brand-purple h-4 w-4 shrink-0" aria-hidden />
+                  ) : null}
                 </Link>
               </li>
             );
@@ -195,10 +197,10 @@ function PortalNav({ items }: { items: PortalNavItem[] }) {
                 className={cn(
                   'relative inline-flex items-center gap-2 whitespace-nowrap rounded-t-md px-3 py-2.5 text-sm font-medium transition-colors',
                   'after:absolute after:inset-x-2 after:bottom-0 after:h-0.5 after:rounded-full',
-                  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-purple/50',
+                  'focus-visible:ring-brand-purple/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset',
                   item.active
                     ? 'text-ink after:bg-brand-gradient'
-                    : 'text-ink-muted after:bg-transparent hover:text-ink',
+                    : 'text-ink-muted hover:text-ink after:bg-transparent',
                 )}
               >
                 <Icon className="hidden h-4 w-4 sm:block" aria-hidden />
@@ -227,13 +229,13 @@ function AccountMenu({ user }: { user: PortalMe['user'] }) {
         </button>
       </PopoverTrigger>
       <PopoverContent align="end" className="w-64 max-w-[calc(100vw-2rem)]">
-        <div className="border-b border-line px-3 pb-2.5 pt-1.5">
-          <p className="truncate text-sm font-semibold text-ink">{user.name || 'Your account'}</p>
-          <p className="truncate text-xs text-ink-muted">{user.email}</p>
+        <div className="border-line border-b px-3 pb-2.5 pt-1.5">
+          <p className="text-ink truncate text-sm font-semibold">{user.name || 'Your account'}</p>
+          <p className="text-ink-muted truncate text-xs">{user.email}</p>
         </div>
         <div className="pt-1.5">
           <Link href={PORTAL_ACCOUNT_HREF} onClick={() => setOpen(false)} className={MENU_ITEM}>
-            <UserRound className="h-4 w-4 text-ink-muted" aria-hidden />
+            <UserRound className="text-ink-muted h-4 w-4" aria-hidden />
             Account
           </Link>
           <button

@@ -50,17 +50,17 @@ Details and status for each item are in [ARCHITECTURE.md](ARCHITECTURE.md).
 
 ## 2. Tech stack and repository layout
 
-| Area | Tools |
-| --- | --- |
-| API | NestJS, Prisma, PostgreSQL, Redis, BullMQ, Socket.IO |
-| Web | Next.js 15 (App Router), TanStack Query, Zustand, Tailwind |
-| Desktop and mobile | Electron, Expo + Expo Router |
-| Auth and permissions | Better Auth, CASL |
-| Documents | Tiptap (ProseMirror) |
-| Calls | LiveKit (WebRTC) |
-| Storage and PDFs | MinIO or any S3-compatible store, Gotenberg |
-| Validation | Zod, shared across the stack |
-| Tooling | pnpm workspaces, Turborepo, TypeScript strict mode |
+| Area                 | Tools                                                      |
+| -------------------- | ---------------------------------------------------------- |
+| API                  | NestJS, Prisma, PostgreSQL, Redis, BullMQ, Socket.IO       |
+| Web                  | Next.js 15 (App Router), TanStack Query, Zustand, Tailwind |
+| Desktop and mobile   | Electron, Expo + Expo Router                               |
+| Auth and permissions | Better Auth, CASL                                          |
+| Documents            | Tiptap (ProseMirror)                                       |
+| Calls                | LiveKit (WebRTC)                                           |
+| Storage and PDFs     | MinIO or any S3-compatible store, Gotenberg                |
+| Validation           | Zod, shared across the stack                               |
+| Tooling              | pnpm workspaces, Turborepo, TypeScript strict mode         |
 
 ```
 apps/
@@ -141,8 +141,8 @@ docker-compose.yml  Local Postgres, Redis, MinIO, Gotenberg, LiveKit
 
 8. Open http://localhost:3000 and sign in.
 
-   | Email | Password |
-   | --- | --- |
+   | Email               | Password              |
+   | ------------------- | --------------------- |
    | `admin@example.com` | `demo-admin-password` |
 
    This account is for local development only. Change the password or delete the account before any real use.
@@ -157,152 +157,152 @@ Never put real secrets in the example files or in git. In production, pass them 
 
 ### Core
 
-| Name | Required | What it does | Example |
-| --- | --- | --- | --- |
-| `DATABASE_URL` | Required | PostgreSQL connection string. In production add `connection_limit` so all API processes stay under Postgres `max_connections` (at least 10). | `postgresql://botss:botss@localhost:5433/botss?schema=public` |
-| `REDIS_URL` | Required | Redis for cache, queues, presence. | `redis://localhost:6380` |
-| `PUBLIC_APP_URL` | Required | Public web URL, used to build invitation and reset links. No trailing slash. | `https://app.example.com` |
-| `BETTER_AUTH_SECRET` | Required | Secret for sessions. | output of `openssl rand -hex 32` |
-| `BETTER_AUTH_URL` | Required | Public URL of the API as browsers see it. Use HTTPS in production so cookies can be Secure. | `https://api.example.com` |
-| `AUTH_COOKIE_DOMAIN` | Optional | Parent domain for the session cookie when API and web are on different subdomains. Leave blank locally. | `.example.com` |
-| `AUTH_COOKIE_PREFIX` | Optional | Session cookie name prefix. Leave blank in production (changing it signs everyone out). Set it for a staging install on the same parent domain. | `iwm-staging` |
-| `API_PORT` | Optional | Port the API listens on. | `4000` |
-| `API_BASE_PATH` | Optional | URL prefix for all API routes. | `/api/v1` |
-| `WEB_ORIGIN` | Required | Comma-separated origins allowed to make credentialed requests (CORS). | `http://localhost:3000` |
-| `LOG_LEVEL` | Optional | Minimum log level: `verbose`, `debug`, `log`, `warn`, `error`, `fatal`. Blank means debug in development and log in production. | `warn` |
-| `ADMIN_EMAIL` | Optional | Address of the primary admin. The admin panel refuses to demote or delete it. Unset: no account is protected. | `admin@example.com` |
-| `TRUST_PROXY_HOPS` | Optional | Number of reverse proxies in front of the API (Caddy is 1). Rate limits use the client IP, so this must be right. | `1` |
-| `MAX_UPLOAD_BYTES` | Optional | Largest single upload in bytes (default 250 MB). | `262144000` |
-| `CHAT_ATTACHMENT_URL_PREFIXES` | Optional | Extra URL prefixes accepted for chat attachments besides `S3_PUBLIC_URL` and `S3_ENDPOINT`, comma separated. Usually empty. | `https://cdn.example.com/` |
-| `ROLE` | Optional | Process role: `all`, `api` or `worker`. Read from the real process environment only, not from `.env`. See [Process roles](#7-process-roles). | `worker` |
-| `WORKER_HEALTH_PORT` | Optional | Health check port of a `worker` process (default 4100). Real process environment only. Not in `.env.example`. | `4100` |
+| Name                           | Required | What it does                                                                                                                                    | Example                                                       |
+| ------------------------------ | -------- | ----------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
+| `DATABASE_URL`                 | Required | PostgreSQL connection string. In production add `connection_limit` so all API processes stay under Postgres `max_connections` (at least 10).    | `postgresql://botss:botss@localhost:5433/botss?schema=public` |
+| `REDIS_URL`                    | Required | Redis for cache, queues, presence.                                                                                                              | `redis://localhost:6380`                                      |
+| `PUBLIC_APP_URL`               | Required | Public web URL, used to build invitation and reset links. No trailing slash.                                                                    | `https://app.example.com`                                     |
+| `BETTER_AUTH_SECRET`           | Required | Secret for sessions.                                                                                                                            | output of `openssl rand -hex 32`                              |
+| `BETTER_AUTH_URL`              | Required | Public URL of the API as browsers see it. Use HTTPS in production so cookies can be Secure.                                                     | `https://api.example.com`                                     |
+| `AUTH_COOKIE_DOMAIN`           | Optional | Parent domain for the session cookie when API and web are on different subdomains. Leave blank locally.                                         | `.example.com`                                                |
+| `AUTH_COOKIE_PREFIX`           | Optional | Session cookie name prefix. Leave blank in production (changing it signs everyone out). Set it for a staging install on the same parent domain. | `iwm-staging`                                                 |
+| `API_PORT`                     | Optional | Port the API listens on.                                                                                                                        | `4000`                                                        |
+| `API_BASE_PATH`                | Optional | URL prefix for all API routes.                                                                                                                  | `/api/v1`                                                     |
+| `WEB_ORIGIN`                   | Required | Comma-separated origins allowed to make credentialed requests (CORS).                                                                           | `http://localhost:3000`                                       |
+| `LOG_LEVEL`                    | Optional | Minimum log level: `verbose`, `debug`, `log`, `warn`, `error`, `fatal`. Blank means debug in development and log in production.                 | `warn`                                                        |
+| `ADMIN_EMAIL`                  | Optional | Address of the primary admin. The admin panel refuses to demote or delete it. Unset: no account is protected.                                   | `admin@example.com`                                           |
+| `TRUST_PROXY_HOPS`             | Optional | Number of reverse proxies in front of the API (Caddy is 1). Rate limits use the client IP, so this must be right.                               | `1`                                                           |
+| `MAX_UPLOAD_BYTES`             | Optional | Largest single upload in bytes (default 250 MB).                                                                                                | `262144000`                                                   |
+| `CHAT_ATTACHMENT_URL_PREFIXES` | Optional | Extra URL prefixes accepted for chat attachments besides `S3_PUBLIC_URL` and `S3_ENDPOINT`, comma separated. Usually empty.                     | `https://cdn.example.com/`                                    |
+| `ROLE`                         | Optional | Process role: `all`, `api` or `worker`. Read from the real process environment only, not from `.env`. See [Process roles](#7-process-roles).    | `worker`                                                      |
+| `WORKER_HEALTH_PORT`           | Optional | Health check port of a `worker` process (default 4100). Real process environment only. Not in `.env.example`.                                   | `4100`                                                        |
 
 ### HR and payroll
 
-| Name | Required | What it does | Example |
-| --- | --- | --- | --- |
-| `HR_EMAIL_DOMAIN` | Optional | Turns on the daily timesheet warnings for the organization with this email domain; only users on this domain are scanned and notified. Unset: warnings off. | `example.com` |
-| `HR_SENDER_EMAIL` | Optional | Existing user the timesheet warnings are sent from. Needed together with `HR_EMAIL_DOMAIN`. Unset: warnings off. | `hr@example.com` |
-| `PAYSLIP_SIGNATORY_NAME` | Optional | Signatory printed on the root (platform) organization's own payslips. Other organizations never get it. Unset: no signatory block. | `Jane Doe` |
-| `PAYSLIP_SIGNATORY_TITLE` | Optional | Signatory's title. Unset: blank. | `CEO` |
-| `PAYSLIP_TEMPLATES_DIR` | Optional | Where the payslip template lives. Unset: `apps/api/payslip-templates/default`. | `/srv/iwm/payslip-templates` |
+| Name                      | Required | What it does                                                                                                                                                | Example                      |
+| ------------------------- | -------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------- |
+| `HR_EMAIL_DOMAIN`         | Optional | Turns on the daily timesheet warnings for the organization with this email domain; only users on this domain are scanned and notified. Unset: warnings off. | `example.com`                |
+| `HR_SENDER_EMAIL`         | Optional | Existing user the timesheet warnings are sent from. Needed together with `HR_EMAIL_DOMAIN`. Unset: warnings off.                                            | `hr@example.com`             |
+| `PAYSLIP_SIGNATORY_NAME`  | Optional | Signatory printed on the root (platform) organization's own payslips. Other organizations never get it. Unset: no signatory block.                          | `Jane Doe`                   |
+| `PAYSLIP_SIGNATORY_TITLE` | Optional | Signatory's title. Unset: blank.                                                                                                                            | `CEO`                        |
+| `PAYSLIP_TEMPLATES_DIR`   | Optional | Where the payslip template lives. Unset: `apps/api/payslip-templates/default`.                                                                              | `/srv/iwm/payslip-templates` |
 
 ### Website lead intake
 
-| Name | Required | What it does | Example |
-| --- | --- | --- | --- |
-| `CHATBOT_INTAKE_SECRET` | Optional | HMAC secret your website signs with for `POST /api/v1/leads/external`. Blank disables the endpoint (it returns 503). | output of `openssl rand -hex 32` |
-| `CHATBOT_INTAKE_WORKSPACE_ID` | Optional | Fixed workspace that receives the leads. Create a "Website Leads" workspace first. | `cm...` |
-| `CHATBOT_INTAKE_USER_ID` | Optional | Fixed no-login bot user (member of that workspace) that creates the leads. | `cm...` |
+| Name                          | Required | What it does                                                                                                         | Example                          |
+| ----------------------------- | -------- | -------------------------------------------------------------------------------------------------------------------- | -------------------------------- |
+| `CHATBOT_INTAKE_SECRET`       | Optional | HMAC secret your website signs with for `POST /api/v1/leads/external`. Blank disables the endpoint (it returns 503). | output of `openssl rand -hex 32` |
+| `CHATBOT_INTAKE_WORKSPACE_ID` | Optional | Fixed workspace that receives the leads. Create a "Website Leads" workspace first.                                   | `cm...`                          |
+| `CHATBOT_INTAKE_USER_ID`      | Optional | Fixed no-login bot user (member of that workspace) that creates the leads.                                           | `cm...`                          |
 
 ### Web app
 
-| Name | Required | What it does | Example |
-| --- | --- | --- | --- |
-| `NEXT_PUBLIC_API_URL` | Required | Where the browser reaches the API. In both `.env.example` and `apps/web/.env.example`. | `http://localhost:4000` |
-| `NEXT_PUBLIC_API_BASE_PATH` | Required | API path prefix, same as `API_BASE_PATH`. In both files. | `/api/v1` |
-| `NEXT_PUBLIC_WEB_URL` | Optional | Public origin of the web app, used for absolute OG and Twitter image URLs. | `https://app.example.com` |
-| `NEXT_PUBLIC_VAPID_PUBLIC_KEY` | Optional | Browser Web Push public key. Must equal `VAPID_PUBLIC_KEY`. Lives in `apps/web/.env.example`, needed at build time. Blank disables closed-tab push. | `BN...` |
-| `NEXT_PUBLIC_CPANEL_DOMAIN` | Optional | Domain cPanel-managed mailboxes live under, mirrors `CPANEL_DOMAIN`. Unset: no one is offered self-serve mailbox setup. In `apps/web/.env.example`. | `example.com` |
-| `NEXT_PUBLIC_ADMIN_EMAIL` | Optional | Mirrors `ADMIN_EMAIL` so the users page shows that account as protected. Unset: none shown as protected. In `apps/web/.env.example`. | `admin@example.com` |
-| `NEXT_PUBLIC_MAIL_DEFAULT_IMAP_HOST` | Optional | IMAP host pre-filled in the Add mail account form. Unset: empty field. In `apps/web/.env.example`. | `mail.example.com` |
-| `NEXT_PUBLIC_MAIL_DEFAULT_SMTP_HOST` | Optional | SMTP host pre-filled in the Add mail account form. Unset: empty field. In `apps/web/.env.example`. | `mail.example.com` |
+| Name                                 | Required | What it does                                                                                                                                        | Example                   |
+| ------------------------------------ | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------- |
+| `NEXT_PUBLIC_API_URL`                | Required | Where the browser reaches the API. In both `.env.example` and `apps/web/.env.example`.                                                              | `http://localhost:4000`   |
+| `NEXT_PUBLIC_API_BASE_PATH`          | Required | API path prefix, same as `API_BASE_PATH`. In both files.                                                                                            | `/api/v1`                 |
+| `NEXT_PUBLIC_WEB_URL`                | Optional | Public origin of the web app, used for absolute OG and Twitter image URLs.                                                                          | `https://app.example.com` |
+| `NEXT_PUBLIC_VAPID_PUBLIC_KEY`       | Optional | Browser Web Push public key. Must equal `VAPID_PUBLIC_KEY`. Lives in `apps/web/.env.example`, needed at build time. Blank disables closed-tab push. | `BN...`                   |
+| `NEXT_PUBLIC_CPANEL_DOMAIN`          | Optional | Domain cPanel-managed mailboxes live under, mirrors `CPANEL_DOMAIN`. Unset: no one is offered self-serve mailbox setup. In `apps/web/.env.example`. | `example.com`             |
+| `NEXT_PUBLIC_ADMIN_EMAIL`            | Optional | Mirrors `ADMIN_EMAIL` so the users page shows that account as protected. Unset: none shown as protected. In `apps/web/.env.example`.                | `admin@example.com`       |
+| `NEXT_PUBLIC_MAIL_DEFAULT_IMAP_HOST` | Optional | IMAP host pre-filled in the Add mail account form. Unset: empty field. In `apps/web/.env.example`.                                                  | `mail.example.com`        |
+| `NEXT_PUBLIC_MAIL_DEFAULT_SMTP_HOST` | Optional | SMTP host pre-filled in the Add mail account form. Unset: empty field. In `apps/web/.env.example`.                                                  | `mail.example.com`        |
 
 ### System email (invitations, resets, invoices sent from the platform)
 
-| Name | Required | What it does | Example |
-| --- | --- | --- | --- |
-| `SMTP_HOST` | Optional | SMTP server for system email. When blank, only organizations with their own mail config can send; everything else is logged (fine for local dev). | `mail.example.com` |
-| `SMTP_PORT` | Optional | SMTP port. | `587` |
-| `SMTP_SECURE` | Optional | `true` for implicit TLS (port 465). | `false` |
-| `SMTP_USER` | Optional | SMTP login. | `no-reply@example.com` |
-| `SMTP_PASSWORD` | Optional | SMTP password. | (secret) |
-| `MAIL_FROM` | Optional | From header for system email. Unset: `no-reply@localhost`. | `"IWM <no-reply@example.com>"` |
-| `SMTP_SKIP_VERIFY` | Optional | `true` skips the SMTP check at boot. Use it when you know the credentials are wrong and do not want each restart to count as a failed login on your mail host. | `false` |
+| Name               | Required | What it does                                                                                                                                                   | Example                        |
+| ------------------ | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------ |
+| `SMTP_HOST`        | Optional | SMTP server for system email. When blank, only organizations with their own mail config can send; everything else is logged (fine for local dev).              | `mail.example.com`             |
+| `SMTP_PORT`        | Optional | SMTP port.                                                                                                                                                     | `587`                          |
+| `SMTP_SECURE`      | Optional | `true` for implicit TLS (port 465).                                                                                                                            | `false`                        |
+| `SMTP_USER`        | Optional | SMTP login.                                                                                                                                                    | `no-reply@example.com`         |
+| `SMTP_PASSWORD`    | Optional | SMTP password.                                                                                                                                                 | (secret)                       |
+| `MAIL_FROM`        | Optional | From header for system email. Unset: `no-reply@localhost`.                                                                                                     | `"IWM <no-reply@example.com>"` |
+| `SMTP_SKIP_VERIFY` | Optional | `true` skips the SMTP check at boot. Use it when you know the credentials are wrong and do not want each restart to count as a failed login on your mail host. | `false`                        |
 
 ### User mail (IMAP/SMTP client)
 
-| Name | Required | What it does | Example |
-| --- | --- | --- | --- |
-| `MAIL_ENCRYPTION_KEY` | Required | 64 hex characters (32 bytes). Encrypts stored IMAP/SMTP passwords. Do not rotate on an install that has mail accounts. | `openssl rand -hex 32` |
-| `MAIL_DEFAULT_IMAP_HOST` | Optional | IMAP host used when the server auto-provisions a mail account for a cPanel-managed user. Needs `MAIL_DEFAULT_SMTP_HOST` too. Unset: no auto-provisioning. | `mail.example.com` |
-| `MAIL_DEFAULT_SMTP_HOST` | Optional | SMTP host for auto-provisioned mail accounts. Unset: no auto-provisioning. | `mail.example.com` |
-| `MAIL_SYNC_BATCH` | Optional | Messages fetched per IMAP round trip. | `25` |
-| `MAIL_INITIAL_SYNC_LIMIT` | Optional | Most messages imported per run (the rest continue in the background). | `200` |
-| `MAIL_MAX_SOURCE_BYTES` | Optional | Above this size only a message's text parts are downloaded, not attachments. | `15728640` |
-| `MAIL_SEND_CONCURRENCY` | Optional | Parallel outbound sends on the mail queue. | `5` |
-| `MAIL_RELAY_HOST` | Optional | Send all outbound user mail through this SMTP relay instead of each account's own SMTP. Useful when a mail host rate-limits your server's IP. | `smtp-relay.brevo.com` |
-| `MAIL_RELAY_PORT` | Optional | Relay port. | `587` |
-| `MAIL_RELAY_SECURE` | Optional | `true` for implicit TLS. | `false` |
-| `MAIL_RELAY_USER` | Optional | Relay login. | (relay user) |
-| `MAIL_RELAY_PASSWORD` | Optional | Relay password. | (secret) |
+| Name                      | Required | What it does                                                                                                                                              | Example                |
+| ------------------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------- |
+| `MAIL_ENCRYPTION_KEY`     | Required | 64 hex characters (32 bytes). Encrypts stored IMAP/SMTP passwords. Do not rotate on an install that has mail accounts.                                    | `openssl rand -hex 32` |
+| `MAIL_DEFAULT_IMAP_HOST`  | Optional | IMAP host used when the server auto-provisions a mail account for a cPanel-managed user. Needs `MAIL_DEFAULT_SMTP_HOST` too. Unset: no auto-provisioning. | `mail.example.com`     |
+| `MAIL_DEFAULT_SMTP_HOST`  | Optional | SMTP host for auto-provisioned mail accounts. Unset: no auto-provisioning.                                                                                | `mail.example.com`     |
+| `MAIL_SYNC_BATCH`         | Optional | Messages fetched per IMAP round trip.                                                                                                                     | `25`                   |
+| `MAIL_INITIAL_SYNC_LIMIT` | Optional | Most messages imported per run (the rest continue in the background).                                                                                     | `200`                  |
+| `MAIL_MAX_SOURCE_BYTES`   | Optional | Above this size only a message's text parts are downloaded, not attachments.                                                                              | `15728640`             |
+| `MAIL_SEND_CONCURRENCY`   | Optional | Parallel outbound sends on the mail queue.                                                                                                                | `5`                    |
+| `MAIL_RELAY_HOST`         | Optional | Send all outbound user mail through this SMTP relay instead of each account's own SMTP. Useful when a mail host rate-limits your server's IP.             | `smtp-relay.brevo.com` |
+| `MAIL_RELAY_PORT`         | Optional | Relay port.                                                                                                                                               | `587`                  |
+| `MAIL_RELAY_SECURE`       | Optional | `true` for implicit TLS.                                                                                                                                  | `false`                |
+| `MAIL_RELAY_USER`         | Optional | Relay login.                                                                                                                                              | (relay user)           |
+| `MAIL_RELAY_PASSWORD`     | Optional | Relay password.                                                                                                                                           | (secret)               |
 
 ### cPanel mailbox provisioning
 
-| Name | Required | What it does | Example |
-| --- | --- | --- | --- |
-| `CPANEL_HOST` | Optional | cPanel server hostname. Leave any cPanel var blank to disable the integration. | `cpanel.example.com` |
-| `CPANEL_PORT` | Optional | cPanel UAPI port. | `2083` |
-| `CPANEL_USER` | Optional | cPanel account that owns the domain (not an email address). | `myaccount` |
-| `CPANEL_API_TOKEN` | Optional | API token with Email scope. | (secret) |
-| `CPANEL_DOMAIN` | Optional | Domain the mailboxes live under. Unset: integration off. | `example.com` |
+| Name               | Required | What it does                                                                   | Example              |
+| ------------------ | -------- | ------------------------------------------------------------------------------ | -------------------- |
+| `CPANEL_HOST`      | Optional | cPanel server hostname. Leave any cPanel var blank to disable the integration. | `cpanel.example.com` |
+| `CPANEL_PORT`      | Optional | cPanel UAPI port.                                                              | `2083`               |
+| `CPANEL_USER`      | Optional | cPanel account that owns the domain (not an email address).                    | `myaccount`          |
+| `CPANEL_API_TOKEN` | Optional | API token with Email scope.                                                    | (secret)             |
+| `CPANEL_DOMAIN`    | Optional | Domain the mailboxes live under. Unset: integration off.                       | `example.com`        |
 
 ### Object storage (S3 compatible)
 
-| Name | Required | What it does | Example |
-| --- | --- | --- | --- |
-| `S3_ENDPOINT` | Required | S3 API endpoint (MinIO locally, R2 or S3 in production). | `http://localhost:9100` |
-| `S3_REGION` | Required | Region name. Use `auto` for R2. | `us-east-1` |
-| `S3_ACCESS_KEY_ID` | Required | Access key. | `botss-local` |
-| `S3_SECRET_ACCESS_KEY` | Required | Secret key. | (secret) |
-| `S3_BUCKET` | Required | Bucket for uploads. | `botss-files` |
-| `S3_FORCE_PATH_STYLE` | Optional | `true` for MinIO and R2's raw S3 API. | `true` |
-| `S3_PUBLIC_URL` | Optional | Public base URL for files. Leave unset locally; set to your CDN host in production. | `https://files.example.com` |
-| `S3_PUBLIC_URL_INCLUDES_BUCKET` | Optional | `true` (default) builds `<host>/<bucket>/<key>`. `false` builds `<host>/<key>`, needed for a custom domain mapped to one R2 bucket. A wrong value shows up as files returning 404. | `false` |
+| Name                            | Required | What it does                                                                                                                                                                       | Example                     |
+| ------------------------------- | -------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------- |
+| `S3_ENDPOINT`                   | Required | S3 API endpoint (MinIO locally, R2 or S3 in production).                                                                                                                           | `http://localhost:9100`     |
+| `S3_REGION`                     | Required | Region name. Use `auto` for R2.                                                                                                                                                    | `us-east-1`                 |
+| `S3_ACCESS_KEY_ID`              | Required | Access key.                                                                                                                                                                        | `botss-local`               |
+| `S3_SECRET_ACCESS_KEY`          | Required | Secret key.                                                                                                                                                                        | (secret)                    |
+| `S3_BUCKET`                     | Required | Bucket for uploads.                                                                                                                                                                | `botss-files`               |
+| `S3_FORCE_PATH_STYLE`           | Optional | `true` for MinIO and R2's raw S3 API.                                                                                                                                              | `true`                      |
+| `S3_PUBLIC_URL`                 | Optional | Public base URL for files. Leave unset locally; set to your CDN host in production.                                                                                                | `https://files.example.com` |
+| `S3_PUBLIC_URL_INCLUDES_BUCKET` | Optional | `true` (default) builds `<host>/<bucket>/<key>`. `false` builds `<host>/<key>`, needed for a custom domain mapped to one R2 bucket. A wrong value shows up as files returning 404. | `false`                     |
 
 ### PDFs
 
-| Name | Required | What it does | Example |
-| --- | --- | --- | --- |
-| `GOTENBERG_URL` | Required for PDFs | Gotenberg service that renders invoice and payslip PDFs. | `http://127.0.0.1:3100` |
-| `INVOICE_TEMPLATES_DIR` | Optional | Where invoice templates live. Defaults to `apps/api/invoice-templates`. | `/srv/iwm/invoice-templates` |
+| Name                    | Required          | What it does                                                            | Example                      |
+| ----------------------- | ----------------- | ----------------------------------------------------------------------- | ---------------------------- |
+| `GOTENBERG_URL`         | Required for PDFs | Gotenberg service that renders invoice and payslip PDFs.                | `http://127.0.0.1:3100`      |
+| `INVOICE_TEMPLATES_DIR` | Optional          | Where invoice templates live. Defaults to `apps/api/invoice-templates`. | `/srv/iwm/invoice-templates` |
 
 ### Calls (LiveKit)
 
-| Name | Required | What it does | Example |
-| --- | --- | --- | --- |
-| `LIVEKIT_URL` | Optional | `ws://` or `wss://` endpoint clients connect to. | `wss://livekit.example.com` |
-| `LIVEKIT_API_KEY` | Optional | Key; must match the LiveKit server's keys. | `devkey` |
-| `LIVEKIT_API_SECRET` | Optional | Secret; must match the LiveKit server. | (secret) |
+| Name                 | Required | What it does                                     | Example                     |
+| -------------------- | -------- | ------------------------------------------------ | --------------------------- |
+| `LIVEKIT_URL`        | Optional | `ws://` or `wss://` endpoint clients connect to. | `wss://livekit.example.com` |
+| `LIVEKIT_API_KEY`    | Optional | Key; must match the LiveKit server's keys.       | `devkey`                    |
+| `LIVEKIT_API_SECRET` | Optional | Secret; must match the LiveKit server.           | (secret)                    |
 
 ### Web Push
 
-| Name | Required | What it does | Example |
-| --- | --- | --- | --- |
-| `VAPID_SUBJECT` | Optional | Contact URL push services require. All three VAPID values must be set or push is disabled. | `mailto:admin@example.com` |
-| `VAPID_PUBLIC_KEY` | Optional | Public key. Generate a pair with `npx web-push generate-vapid-keys`. | `BN...` |
-| `VAPID_PRIVATE_KEY` | Optional | Private key. | (secret) |
+| Name                | Required | What it does                                                                               | Example                    |
+| ------------------- | -------- | ------------------------------------------------------------------------------------------ | -------------------------- |
+| `VAPID_SUBJECT`     | Optional | Contact URL push services require. All three VAPID values must be set or push is disabled. | `mailto:admin@example.com` |
+| `VAPID_PUBLIC_KEY`  | Optional | Public key. Generate a pair with `npx web-push generate-vapid-keys`.                       | `BN...`                    |
+| `VAPID_PRIVATE_KEY` | Optional | Private key.                                                                               | (secret)                   |
 
 ### Placeholders for later phases
 
-| Name | Required | What it does | Example |
-| --- | --- | --- | --- |
-| `POLAR_ACCESS_TOKEN` | Optional | Reserved for Polar invoicing. Not used yet. | blank |
-| `POLAR_WEBHOOK_SECRET` | Optional | Reserved for Polar webhooks. Not used yet. | blank |
-| `TWILIO_ACCOUNT_SID` | Optional | Reserved for SMS and PSTN calls. Not used yet. | blank |
-| `TWILIO_AUTH_TOKEN` | Optional | Reserved for Twilio. Not used yet. | blank |
+| Name                   | Required | What it does                                   | Example |
+| ---------------------- | -------- | ---------------------------------------------- | ------- |
+| `POLAR_ACCESS_TOKEN`   | Optional | Reserved for Polar invoicing. Not used yet.    | blank   |
+| `POLAR_WEBHOOK_SECRET` | Optional | Reserved for Polar webhooks. Not used yet.     | blank   |
+| `TWILIO_ACCOUNT_SID`   | Optional | Reserved for SMS and PSTN calls. Not used yet. | blank   |
+| `TWILIO_AUTH_TOKEN`    | Optional | Reserved for Twilio. Not used yet.             | blank   |
 
 ### Desktop and mobile shells
 
 Read by those apps, not by the API. Desktop values come from the process environment at run time; mobile values are inlined by the Expo bundler at build time (put them in `apps/mobile/.env`).
 
-| Name | Required | What it does | Example |
-| --- | --- | --- | --- |
-| `BOTSS_APP_URL` | Optional | Web app the desktop window loads. Unset: `http://localhost:3000`. | `https://app.example.com` |
-| `BOTSS_APP_EXTRA_ORIGINS` | Optional | Comma-separated extra origins that stay in the desktop window (for example an old domain). Unset: none. | `https://old.example.com` |
-| `EXPO_PUBLIC_APP_URL` | Optional | Web app the mobile WebView loads. Unset: `http://localhost:3000` (simulator only; use your LAN address on a phone). | `https://app.example.com` |
-| `EXPO_PUBLIC_APP_LEGACY_ORIGINS` | Optional | Comma-separated extra origins kept in the mobile WebView. Unset: none. | `https://old.example.com` |
-| `EXPO_PUBLIC_EAS_PROJECT_ID` | Optional | Expo (EAS) project id for native push tokens. Unset: native push off. | `00000000-0000-0000-0000-000000000000` |
+| Name                             | Required | What it does                                                                                                        | Example                                |
+| -------------------------------- | -------- | ------------------------------------------------------------------------------------------------------------------- | -------------------------------------- |
+| `BOTSS_APP_URL`                  | Optional | Web app the desktop window loads. Unset: `http://localhost:3000`.                                                   | `https://app.example.com`              |
+| `BOTSS_APP_EXTRA_ORIGINS`        | Optional | Comma-separated extra origins that stay in the desktop window (for example an old domain). Unset: none.             | `https://old.example.com`              |
+| `EXPO_PUBLIC_APP_URL`            | Optional | Web app the mobile WebView loads. Unset: `http://localhost:3000` (simulator only; use your LAN address on a phone). | `https://app.example.com`              |
+| `EXPO_PUBLIC_APP_LEGACY_ORIGINS` | Optional | Comma-separated extra origins kept in the mobile WebView. Unset: none.                                              | `https://old.example.com`              |
+| `EXPO_PUBLIC_EAS_PROJECT_ID`     | Optional | Expo (EAS) project id for native push tokens. Unset: native push off.                                               | `00000000-0000-0000-0000-000000000000` |
 
 ## 6. Optional services
 
@@ -337,11 +337,11 @@ Local development uses MinIO (console at http://localhost:9101). For S3 or Cloud
 
 The same API build runs in three modes, chosen by the `ROLE` environment variable.
 
-| `ROLE` | What runs |
-| --- | --- |
-| `all` (default, also when unset) | One process does everything: HTTP and Socket.IO, BullMQ workers, IMAP IDLE, crons, boot-time backfills. |
-| `api` | HTTP and Socket.IO only. It enqueues jobs but runs no workers, IMAP watcher or crons. |
-| `worker` | BullMQ workers, IMAP IDLE, crons, backfills. No HTTP API. It serves only a health check on `WORKER_HEALTH_PORT` (default 4100). |
+| `ROLE`                           | What runs                                                                                                                       |
+| -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| `all` (default, also when unset) | One process does everything: HTTP and Socket.IO, BullMQ workers, IMAP IDLE, crons, boot-time backfills.                         |
+| `api`                            | HTTP and Socket.IO only. It enqueues jobs but runs no workers, IMAP watcher or crons.                                           |
+| `worker`                         | BullMQ workers, IMAP IDLE, crons, backfills. No HTTP API. It serves only a health check on `WORKER_HEALTH_PORT` (default 4100). |
 
 `ROLE` and `WORKER_HEALTH_PORT` are read from the real process environment (for example your PM2 or systemd config), never from `.env`, so a shared `.env` cannot flip a process. An invalid `ROLE` stops the boot.
 

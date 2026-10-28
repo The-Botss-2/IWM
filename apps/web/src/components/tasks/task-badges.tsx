@@ -17,7 +17,11 @@ import { Badge } from '@/components/ui/badge';
 
 const STATUS_META: Record<
   TaskStatus,
-  { label: string; icon: ComponentType<{ className?: string }>; tone: Parameters<typeof Badge>[0]['tone'] }
+  {
+    label: string;
+    icon: ComponentType<{ className?: string }>;
+    tone: Parameters<typeof Badge>[0]['tone'];
+  }
 > = {
   BACKLOG: { label: 'Backlog', icon: CircleDashed, tone: 'neutral' },
   TODO: { label: 'To do', icon: Circle, tone: 'neutral' },
@@ -29,7 +33,11 @@ const STATUS_META: Record<
 
 const PRIORITY_META: Record<
   TaskPriority,
-  { label: string; icon: ComponentType<{ className?: string }>; tone: Parameters<typeof Badge>[0]['tone'] }
+  {
+    label: string;
+    icon: ComponentType<{ className?: string }>;
+    tone: Parameters<typeof Badge>[0]['tone'];
+  }
 > = {
   LOW: { label: 'Low', icon: ArrowDown, tone: 'neutral' },
   MEDIUM: { label: 'Medium', icon: ArrowRight, tone: 'info' },

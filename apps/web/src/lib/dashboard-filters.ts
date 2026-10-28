@@ -15,10 +15,23 @@ import {
 import { dayRangeToInstants, normalizeDayRange, type DayRange } from '@/lib/date-range';
 import { DUE_DATE_PRESETS, type DueDatePreset } from '@/lib/task-filters';
 
-export type DashboardGroupBy = 'none' | 'status' | 'assignee' | 'workspace' | 'dueDate' | 'priority';
+export type DashboardGroupBy =
+  | 'none'
+  | 'status'
+  | 'assignee'
+  | 'workspace'
+  | 'dueDate'
+  | 'priority';
 export type DashboardViewMode = 'list' | 'board';
 
-const GROUP_BY: readonly DashboardGroupBy[] = ['none', 'status', 'assignee', 'workspace', 'dueDate', 'priority'];
+const GROUP_BY: readonly DashboardGroupBy[] = [
+  'none',
+  'status',
+  'assignee',
+  'workspace',
+  'dueDate',
+  'priority',
+];
 const VIEW_MODES: readonly DashboardViewMode[] = ['list', 'board'];
 
 /** Assignee multi-select tokens that are not user ids. */
@@ -58,7 +71,9 @@ export const DEFAULT_DASHBOARD_FILTERS: DashboardFilterValues = {
 };
 
 /** The active date range, or null when unset / half-set / malformed. */
-export function activeDayRange(f: Pick<DashboardFilterValues, 'dateFrom' | 'dateTo'>): DayRange | null {
+export function activeDayRange(
+  f: Pick<DashboardFilterValues, 'dateFrom' | 'dateTo'>,
+): DayRange | null {
   return normalizeDayRange(f.dateFrom, f.dateTo);
 }
 
@@ -109,11 +124,20 @@ const ID_RE = /^[A-Za-z0-9_-]{1,64}$/;
 function csv(sp: URLSearchParams, key: string): string[] {
   const raw = sp.get(key);
   if (!raw) return [];
-  return [...new Set(raw.split(',').map((s) => s.trim()).filter(Boolean))];
+  return [
+    ...new Set(
+      raw
+        .split(',')
+        .map((s) => s.trim())
+        .filter(Boolean),
+    ),
+  ];
 }
 
 function pick<T extends string>(allowed: readonly T[], value: string | null): T | undefined {
-  return value !== null && (allowed as readonly string[]).includes(value) ? (value as T) : undefined;
+  return value !== null && (allowed as readonly string[]).includes(value)
+    ? (value as T)
+    : undefined;
 }
 
 /** Whether the URL carries any dashboard filter param. */
@@ -137,7 +161,9 @@ export function parseDashboardUrl(sp: URLSearchParams): DashboardFilterValues {
     workspaceId: ws && ID_RE.test(ws) ? ws : null,
     search: sp.get(P.search) ?? '',
     status: csv(sp, P.status).filter((s): s is TaskStatus => TaskStatus.safeParse(s).success),
-    priority: csv(sp, P.priority).filter((p): p is TaskPriority => TaskPriority.safeParse(p).success),
+    priority: csv(sp, P.priority).filter(
+      (p): p is TaskPriority => TaskPriority.safeParse(p).success,
+    ),
     assigneeIds,
     duePreset: pick(DUE_DATE_PRESETS, sp.get(P.due)) ?? 'all',
     dateField: pick(TaskDateField.options, sp.get(P.dateField)) ?? 'due',
@@ -169,7 +195,9 @@ export function serializeDashboardUrl(
     out.set(
       P.assignee,
       values.assigneeIds
-        .map((id) => (id === ASSIGNED_TO_ME_TOKEN ? 'me' : id === UNASSIGNED_TOKEN ? 'unassigned' : id))
+        .map((id) =>
+          id === ASSIGNED_TO_ME_TOKEN ? 'me' : id === UNASSIGNED_TOKEN ? 'unassigned' : id,
+        )
         .join(','),
     );
   }
@@ -207,7 +235,9 @@ function duePresetQuery(
     case 'no_date':
       return { noDueDate: true };
     case 'overdue': {
-      const open = status.length ? status.filter((s) => OPEN_STATUSES.includes(s)) : [...OPEN_STATUSES];
+      const open = status.length
+        ? status.filter((s) => OPEN_STATUSES.includes(s))
+        : [...OPEN_STATUSES];
       // Every picked status is closed: keep them, so the result is empty
       // rather than silently widening to all open tasks.
       return { dueBefore: new Date(todayStart - 1), status: open.length ? open : status };
@@ -233,7 +263,9 @@ export function dashboardTaskListQuery(
   currentUserId: string,
   now: Date = new Date(),
 ): Partial<ListTasksQuery> {
-  const q: Partial<ListTasksQuery> = f.workspaceId ? { workspaceId: f.workspaceId } : { aggregate: 'org' };
+  const q: Partial<ListTasksQuery> = f.workspaceId
+    ? { workspaceId: f.workspaceId }
+    : { aggregate: 'org' };
   if (f.status.length) q.status = f.status;
   if (f.priority.length) q.priority = f.priority;
 

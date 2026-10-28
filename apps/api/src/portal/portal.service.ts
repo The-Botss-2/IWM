@@ -1,10 +1,6 @@
 import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { hashPassword, verifyPassword } from '@botss/auth';
-import {
-  portalMeSchema,
-  type PortalChangePasswordInput,
-  type PortalMe,
-} from '@botss/shared-types';
+import { portalMeSchema, type PortalChangePasswordInput, type PortalMe } from '@botss/shared-types';
 
 import type { AuthedUser } from '../common/decorators/current-user.decorator';
 import { PrismaService } from '../prisma/prisma.service';

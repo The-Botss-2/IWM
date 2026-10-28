@@ -114,9 +114,7 @@ export const FINANCE_SUBJECTS = [
   'Payroll',
 ] as const satisfies readonly AppSubject[];
 
-const FINANCE_SUBJECTS_NO_PAYROLL: AppSubject[] = FINANCE_SUBJECTS.filter(
-  (s) => s !== 'Payroll',
-);
+const FINANCE_SUBJECTS_NO_PAYROLL: AppSubject[] = FINANCE_SUBJECTS.filter((s) => s !== 'Payroll');
 
 /** A per-member override after validation and project pinning. */
 export interface ScopedProjectAbilityRule {
@@ -178,8 +176,7 @@ export function defineSupportAbility(): AppAbility {
   can('read', 'all');
   cannot('manage', 'Payroll');
   return build({
-    detectSubjectType: (item: { __type?: AppSubject }) =>
-      (item?.__type ?? 'all') as AppSubject,
+    detectSubjectType: (item: { __type?: AppSubject }) => (item?.__type ?? 'all') as AppSubject,
   });
 }
 
@@ -381,7 +378,6 @@ export function defineAbilityFor(ctx: AbilityContext): AppAbility {
   }
 
   return build({
-    detectSubjectType: (item: { __type?: AppSubject }) =>
-      (item?.__type ?? 'all') as AppSubject,
+    detectSubjectType: (item: { __type?: AppSubject }) => (item?.__type ?? 'all') as AppSubject,
   });
 }

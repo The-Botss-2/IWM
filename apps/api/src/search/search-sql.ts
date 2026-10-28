@@ -290,7 +290,11 @@ const tsquery = (q: string) => Prisma.sql`to_tsquery('simple'::regconfig, ${q})`
  * shorter than MIN_LIKE_LENGTH skips the ILIKE branches when a tsquery
  * exists: trigrams can't index it, so it would force a full scan.
  */
-export function matchSql(fts: Prisma.Sql, likeColumns: Prisma.Sql[], m: TextMatch | null): Prisma.Sql {
+export function matchSql(
+  fts: Prisma.Sql,
+  likeColumns: Prisma.Sql[],
+  m: TextMatch | null,
+): Prisma.Sql {
   if (!m) return Prisma.sql`TRUE`;
   const branches: Prisma.Sql[] = [];
   if (m.tsq) branches.push(Prisma.sql`${fts} @@ ${tsquery(m.tsq)}`);
@@ -341,7 +345,11 @@ export function scoreSql(opts: {
 }
 
 /** JS twin of `scoreSql` for the kinds still queried through Prisma (rooms, people, mail). */
-export function scoreInJs(title: string, at: Date | null | undefined, match: TextMatch | null): number {
+export function scoreInJs(
+  title: string,
+  at: Date | null | undefined,
+  match: TextMatch | null,
+): number {
   const ageDays = at ? Math.max(0, (Date.now() - at.getTime()) / 86_400_000) : 365;
   const recency = 0.15 / (1 + ageDays / 30);
   if (!match) return recency;

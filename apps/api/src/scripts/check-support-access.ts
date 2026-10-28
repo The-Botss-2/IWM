@@ -118,7 +118,10 @@ interface GrantRow {
   createdAt: Date;
 }
 
-const ORGS: Record<string, { name: string; isActive: boolean; deletedAt: Date | null; workspaces: string[] }> = {
+const ORGS: Record<
+  string,
+  { name: string; isActive: boolean; deletedAt: Date | null; workspaces: string[] }
+> = {
   [ORG_B]: { name: 'Org B', isActive: true, deletedAt: null, workspaces: [WS_B1, WS_B2] },
   [ORG_C]: { name: 'Org C', isActive: true, deletedAt: null, workspaces: [] },
 };
@@ -140,7 +143,8 @@ function matches(g: GrantRow, where: Where): boolean {
     const org = ORGS[g.organizationId];
     if (!org) return false;
     if (where.organization.deletedAt === null && org.deletedAt !== null) return false;
-    if (where.organization.isActive !== undefined && org.isActive !== where.organization.isActive) return false;
+    if (where.organization.isActive !== undefined && org.isActive !== where.organization.isActive)
+      return false;
   }
   return true;
 }
@@ -185,10 +189,15 @@ function fakePrisma(opts: { auditFails?: boolean } = {}) {
         calls.grantReads++;
         const hit = grants.filter((row) => matches(row, args.where));
         const dir = args.orderBy?.expiresAt;
-        if (dir) hit.sort((a, b) => (a.expiresAt.getTime() - b.expiresAt.getTime()) * (dir === 'asc' ? 1 : -1));
+        if (dir)
+          hit.sort(
+            (a, b) => (a.expiresAt.getTime() - b.expiresAt.getTime()) * (dir === 'asc' ? 1 : -1),
+          );
         return hit.map(shape);
       },
-      create: async (args: { data: Omit<GrantRow, 'id' | 'createdAt' | 'revokedAt' | 'revokedById'> }) => {
+      create: async (args: {
+        data: Omit<GrantRow, 'id' | 'createdAt' | 'revokedAt' | 'revokedById'>;
+      }) => {
         seq++;
         const row: GrantRow = {
           id: `cmgrant${String(seq).padStart(18, '0')}`,
@@ -200,7 +209,10 @@ function fakePrisma(opts: { auditFails?: boolean } = {}) {
         grants.push(row);
         return shape(row);
       },
-      updateMany: async (args: { where: Where; data: { revokedAt: Date; revokedById: string } }) => {
+      updateMany: async (args: {
+        where: Where;
+        data: { revokedAt: Date; revokedById: string };
+      }) => {
         const hit = grants.filter((row) => matches(row, args.where));
         for (const row of hit) Object.assign(row, args.data);
         return { count: hit.length };
@@ -212,10 +224,17 @@ function fakePrisma(opts: { auditFails?: boolean } = {}) {
         audit.push(args.data);
         return { id: `cmaudit${String(audit.length).padStart(18, '0')}` };
       },
-      updateMany: async (args: { where: { id: string; organizationId: string; action: string }; data: { metadata: unknown } }) => {
+      updateMany: async (args: {
+        where: { id: string; organizationId: string; action: string };
+        data: { metadata: unknown };
+      }) => {
         const index = Number(args.where.id.slice('cmaudit'.length)) - 1;
         const row = audit[index];
-        if (!row || row.organizationId !== args.where.organizationId || row.action !== args.where.action) {
+        if (
+          !row ||
+          row.organizationId !== args.where.organizationId ||
+          row.action !== args.where.action
+        ) {
           return { count: 0 };
         }
         row.metadata = args.data.metadata;
@@ -294,7 +313,13 @@ async function runGuard(args: {
   const calls = { context: 0, contextWs: [] as Array<string | undefined> };
   const fakeAuth = {
     getSessionFromRequest: async () => ({
-      user: { id: args.userId, email: `${args.userId}@example.test`, name: args.userId, emailVerified: true, image: null },
+      user: {
+        id: args.userId,
+        email: `${args.userId}@example.test`,
+        name: args.userId,
+        emailVerified: true,
+        image: null,
+      },
       session: { id: args.sessionId ?? SESSION },
     }),
     resolveRequestContext: async (userId: string, ws?: string) => {
@@ -350,18 +375,33 @@ async function runGuard(args: {
     if (args.noStore) run();
     else new RequestContextMiddleware().use({} as Request, {} as Response, run);
   });
-  return { status, code, req: req as RequestExtensions & Record<string, unknown>, calls, snapshotOrg };
+  return {
+    status,
+    code,
+    req: req as RequestExtensions & Record<string, unknown>,
+    calls,
+    snapshotOrg,
+  };
 }
 
 const tokenFor = (grantId: string, opts: { user?: string; session?: string; exp?: number } = {}) =>
   signSupportToken(
-    { g: grantId, u: opts.user ?? SUPER, s: opts.session ?? SESSION, e: opts.exp ?? Date.now() + DAY },
+    {
+      g: grantId,
+      u: opts.user ?? SUPER,
+      s: opts.session ?? SESSION,
+      e: opts.exp ?? Date.now() + DAY,
+    },
     SECRET,
   );
 const supportHeader = (token: string) => ({ [SUPPORT_TOKEN_HEADER]: token });
 
 /** Run `fn` with a request auth snapshot for `userId` (permission helpers read it). */
-function asUser<T>(userId: string, permissions: EffectivePermissions, fn: () => Promise<T>): Promise<T> {
+function asUser<T>(
+  userId: string,
+  permissions: EffectivePermissions,
+  fn: () => Promise<T>,
+): Promise<T> {
   return new Promise<T>((resolve, reject) => {
     new RequestContextMiddleware().use({} as Request, {} as Response, () => {
       setRequestAuth({
@@ -375,7 +415,8 @@ function asUser<T>(userId: string, permissions: EffectivePermissions, fn: () => 
   });
 }
 
-const httpStatus = (err: unknown): number | null => (err instanceof HttpException ? err.getStatus() : null);
+const httpStatus = (err: unknown): number | null =>
+  err instanceof HttpException ? err.getStatus() : null;
 const httpCode = (err: unknown): unknown =>
   err instanceof HttpException ? (err.getResponse() as { code?: unknown }).code : undefined;
 
@@ -384,7 +425,11 @@ async function main(): Promise<void> {
   {
     const db = fakePrisma();
     db.addGrant({ organizationId: ORG_B });
-    const r = await runGuard({ prisma: db.prisma, userId: SUPER, headers: { 'x-workspace-id': WS_ROOT } });
+    const r = await runGuard({
+      prisma: db.prisma,
+      userId: SUPER,
+      headers: { 'x-workspace-id': WS_ROOT },
+    });
     assert.equal(r.status, null, 'normal request allowed');
     assert.equal(r.req.user?.organizationId, ROOT_ORG_ID, 'normal request stays in own org');
     assert.equal(r.req.user?.systemRole, 'SUPER_ADMIN', 'normal request keeps its role');
@@ -394,20 +439,32 @@ async function main(): Promise<void> {
     assert.equal(db.calls.grantReads, 0, 'normal request never reads grants');
     assert.equal(db.audit.length, 0, 'normal request writes no audit row');
 
-    const noService = await runGuard({ prisma: db.prisma, userId: ROOT_EMPLOYEE, withSupportService: false });
+    const noService = await runGuard({
+      prisma: db.prisma,
+      userId: ROOT_EMPLOYEE,
+      withSupportService: false,
+    });
     assert.equal(noService.status, null, 'normal request works without the support service');
   }
 
   // --- no grant / expired / revoked: refused -------------------------------------
   {
     const db = fakePrisma();
-    const none = await runGuard({ prisma: db.prisma, userId: SUPER, headers: supportHeader(tokenFor('cmnogrant0000000000000000')) });
+    const none = await runGuard({
+      prisma: db.prisma,
+      userId: SUPER,
+      headers: supportHeader(tokenFor('cmnogrant0000000000000000')),
+    });
     assert.equal(none.status, 403, 'no grant refused');
     assert.equal(none.code, 'support-session-ended');
 
     const expired = db.addGrant({ organizationId: ORG_B, expiresAt: new Date(Date.now() - 1000) });
     // Even a token that claims a later expiry is refused: the grant is re-read.
-    const r1 = await runGuard({ prisma: db.prisma, userId: SUPER, headers: supportHeader(tokenFor(expired.id)) });
+    const r1 = await runGuard({
+      prisma: db.prisma,
+      userId: SUPER,
+      headers: supportHeader(tokenFor(expired.id)),
+    });
     assert.equal(r1.status, 403, 'expired grant refused');
     assert.equal(r1.code, 'support-session-ended');
     const r2 = await runGuard({
@@ -417,8 +474,16 @@ async function main(): Promise<void> {
     });
     assert.equal(r2.code, 'support-session-ended', 'expired token refused');
 
-    const revoked = db.addGrant({ organizationId: ORG_B, revokedAt: new Date(), revokedById: TENANT_ADMIN });
-    const r3 = await runGuard({ prisma: db.prisma, userId: SUPER, headers: supportHeader(tokenFor(revoked.id)) });
+    const revoked = db.addGrant({
+      organizationId: ORG_B,
+      revokedAt: new Date(),
+      revokedById: TENANT_ADMIN,
+    });
+    const r3 = await runGuard({
+      prisma: db.prisma,
+      userId: SUPER,
+      headers: supportHeader(tokenFor(revoked.id)),
+    });
     assert.equal(r3.status, 403, 'revoked grant refused');
     assert.equal(r3.code, 'support-session-ended');
     assert.equal(db.audit.length, 0, 'refused sessions run nothing and log nothing');
@@ -426,7 +491,11 @@ async function main(): Promise<void> {
     // A suspended organization ends the session too.
     ORGS[ORG_C]!.isActive = false;
     const suspended = db.addGrant({ organizationId: ORG_C });
-    const r4 = await runGuard({ prisma: db.prisma, userId: SUPER, headers: supportHeader(tokenFor(suspended.id)) });
+    const r4 = await runGuard({
+      prisma: db.prisma,
+      userId: SUPER,
+      headers: supportHeader(tokenFor(suspended.id)),
+    });
     assert.equal(r4.code, 'support-session-ended', 'suspended org refused');
     ORGS[ORG_C]!.isActive = true;
   }
@@ -473,7 +542,10 @@ async function main(): Promise<void> {
       'read recorded in the granted org, no query string',
     );
     const perms = read.req.permissions!;
-    assert.ok(!perms.company.includes('org.settings') && !perms.company.includes('users.manage'), 'no admin keys');
+    assert.ok(
+      !perms.company.includes('org.settings') && !perms.company.includes('users.manage'),
+      'no admin keys',
+    );
     assert.ok(!perms.company.includes('payroll.manage'), 'no payroll');
 
     const ability = abilityForRequest(read.req);
@@ -511,18 +583,33 @@ async function main(): Promise<void> {
         `${method} attempt recorded`,
       );
     }
-    const head = await runGuard({ prisma: db.prisma, userId: SUPER, method: 'HEAD', headers: supportHeader(tokenFor(grant.id)) });
+    const head = await runGuard({
+      prisma: db.prisma,
+      userId: SUPER,
+      method: 'HEAD',
+      headers: supportHeader(tokenFor(grant.id)),
+    });
     assert.equal(head.status, null, 'HEAD allowed');
 
     // Revoke through the service: the very next request is refused.
-    const service = new SupportService(db.prisma, { emit: async () => undefined } as unknown as AuditLogService);
+    const service = new SupportService(db.prisma, {
+      emit: async () => undefined,
+    } as unknown as AuditLogService);
     await asUser(TENANT_ADMIN, { company: ['org.settings'], workspace: [] }, async () => {
-      await assert.rejects(service.revokeGrant(TENANT_ADMIN, ORG_C, grant.id), (e) => httpStatus(e) === 404, 'other org cannot revoke');
+      await assert.rejects(
+        service.revokeGrant(TENANT_ADMIN, ORG_C, grant.id),
+        (e) => httpStatus(e) === 404,
+        'other org cannot revoke',
+      );
     });
     await asUser(TENANT_ADMIN, { company: ['org.settings'], workspace: [] }, () =>
       service.revokeGrant(TENANT_ADMIN, ORG_B, grant.id),
     );
-    const after = await runGuard({ prisma: db.prisma, userId: SUPER, headers: supportHeader(tokenFor(grant.id)) });
+    const after = await runGuard({
+      prisma: db.prisma,
+      userId: SUPER,
+      headers: supportHeader(tokenFor(grant.id)),
+    });
     assert.equal(after.code, 'support-session-ended', 'next request after revoke refused');
   }
 
@@ -532,10 +619,16 @@ async function main(): Promise<void> {
     const grant = db.addGrant({ organizationId: ORG_B });
     const good = tokenFor(grant.id);
     const [payload, sig] = good.split('.') as [string, string];
-    const edited = JSON.parse(Buffer.from(payload, 'base64url').toString('utf8')) as Record<string, unknown>;
+    const edited = JSON.parse(Buffer.from(payload, 'base64url').toString('utf8')) as Record<
+      string,
+      unknown
+    >;
     edited['e'] = Date.now() + 365 * DAY;
     const tampered = `${Buffer.from(JSON.stringify(edited)).toString('base64url')}.${sig}`;
-    const forged = signSupportToken({ g: grant.id, u: SUPER, s: SESSION, e: Date.now() + DAY }, 'wrong-secret');
+    const forged = signSupportToken(
+      { g: grant.id, u: SUPER, s: SESSION, e: Date.now() + DAY },
+      'wrong-secret',
+    );
     for (const [name, token] of [
       ['tampered', tampered],
       ['forged', forged],
@@ -546,16 +639,46 @@ async function main(): Promise<void> {
       assert.equal(r.status, 403, `${name} token refused`);
       assert.equal(r.code, 'support-session-invalid', `${name} token is invalid`);
     }
-    const otherSession = await runGuard({ prisma: db.prisma, userId: SUPER, sessionId: 'session-2', headers: supportHeader(good) });
-    assert.equal(otherSession.code, 'support-session-invalid', 'token bound to its sign-in session');
-    const otherSuper = await runGuard({ prisma: db.prisma, userId: SUPER_2, headers: supportHeader(good) });
+    const otherSession = await runGuard({
+      prisma: db.prisma,
+      userId: SUPER,
+      sessionId: 'session-2',
+      headers: supportHeader(good),
+    });
+    assert.equal(
+      otherSession.code,
+      'support-session-invalid',
+      'token bound to its sign-in session',
+    );
+    const otherSuper = await runGuard({
+      prisma: db.prisma,
+      userId: SUPER_2,
+      headers: supportHeader(good),
+    });
     assert.equal(otherSuper.code, 'support-session-invalid', 'token bound to its super admin');
-    const repeated = await runGuard({ prisma: db.prisma, userId: SUPER, headers: { [SUPPORT_TOKEN_HEADER]: [good, good] } });
+    const repeated = await runGuard({
+      prisma: db.prisma,
+      userId: SUPER,
+      headers: { [SUPPORT_TOKEN_HEADER]: [good, good] },
+    });
     assert.equal(repeated.code, 'support-session-invalid', 'repeated header refused');
     // Node joins a header sent twice into one comma separated string.
-    const joined = await runGuard({ prisma: db.prisma, userId: SUPER, headers: supportHeader(`${good}, ${good}`) });
-    assert.equal(joined.code, 'support-session-invalid', 'repeated header joined with a comma refused');
-    const noService = await runGuard({ prisma: db.prisma, userId: SUPER, headers: supportHeader(good), withSupportService: false });
+    const joined = await runGuard({
+      prisma: db.prisma,
+      userId: SUPER,
+      headers: supportHeader(`${good}, ${good}`),
+    });
+    assert.equal(
+      joined.code,
+      'support-session-invalid',
+      'repeated header joined with a comma refused',
+    );
+    const noService = await runGuard({
+      prisma: db.prisma,
+      userId: SUPER,
+      headers: supportHeader(good),
+      withSupportService: false,
+    });
     assert.equal(noService.code, 'support-session-invalid', 'fails closed without the service');
     assert.equal(db.audit.length, 0, 'nothing logged for refused tokens');
   }
@@ -575,23 +698,55 @@ async function main(): Promise<void> {
     }
     assert.equal(db.audit.length, 0, 'non super admins log nothing');
 
-    const service = new SupportService(db.prisma, { emit: async () => undefined } as unknown as AuditLogService);
-    await assert.rejects(service.startSession(TENANT_ADMIN, SESSION, grant.id), (e) => httpCode(e) === 'support-not-allowed');
-    await assert.rejects(service.listActive(ROOT_EMPLOYEE), (e) => httpCode(e) === 'support-not-allowed');
+    const service = new SupportService(db.prisma, {
+      emit: async () => undefined,
+    } as unknown as AuditLogService);
+    await assert.rejects(
+      service.startSession(TENANT_ADMIN, SESSION, grant.id),
+      (e) => httpCode(e) === 'support-not-allowed',
+    );
+    await assert.rejects(
+      service.listActive(ROOT_EMPLOYEE),
+      (e) => httpCode(e) === 'support-not-allowed',
+    );
 
     const session = await service.startSession(SUPER, SESSION, grant.id);
     assert.equal(session.organizationId, ORG_B);
     assert.deepEqual(
-      db.audit.map((a) => ({ org: a.organizationId, actor: a.actorUserId, action: a.action, metadata: a.metadata })),
-      [{ org: ORG_B, actor: SUPER, action: 'support.session_started', metadata: { grantId: grant.id } }],
+      db.audit.map((a) => ({
+        org: a.organizationId,
+        actor: a.actorUserId,
+        action: a.action,
+        metadata: a.metadata,
+      })),
+      [
+        {
+          org: ORG_B,
+          actor: SUPER,
+          action: 'support.session_started',
+          metadata: { grantId: grant.id },
+        },
+      ],
       'session start recorded in the granted org',
     );
-    assert.equal(session.expiresAt.getTime(), grant.expiresAt.getTime(), 'session ends with the grant');
-    const viaStarted = await runGuard({ prisma: db.prisma, userId: SUPER, headers: supportHeader(session.token) });
+    assert.equal(
+      session.expiresAt.getTime(),
+      grant.expiresAt.getTime(),
+      'session ends with the grant',
+    );
+    const viaStarted = await runGuard({
+      prisma: db.prisma,
+      userId: SUPER,
+      headers: supportHeader(session.token),
+    });
     assert.equal(viaStarted.status, null, 'a started session works');
 
     const active = await service.listActive(SUPER);
-    assert.deepEqual(active.items.map((i) => i.grantId), [grant.id], 'active grants listed');
+    assert.deepEqual(
+      active.items.map((i) => i.grantId),
+      [grant.id],
+      'active grants listed',
+    );
     // Two active grants for one org: "Open as support" gets the one ending last.
     const later = db.addGrant({ organizationId: ORG_B, expiresAt: new Date(Date.now() + 3 * DAY) });
     db.addGrant({ organizationId: ORG_B, expiresAt: new Date(Date.now() + 2 * HOUR) });
@@ -619,7 +774,11 @@ async function main(): Promise<void> {
   {
     const db = fakePrisma({ auditFails: true });
     const grant = db.addGrant({ organizationId: ORG_B });
-    const r = await runGuard({ prisma: db.prisma, userId: SUPER, headers: supportHeader(tokenFor(grant.id)) });
+    const r = await runGuard({
+      prisma: db.prisma,
+      userId: SUPER,
+      headers: supportHeader(tokenFor(grant.id)),
+    });
     assert.equal(r.status, 503, 'unlogged request refused');
     assert.equal(r.req.user, undefined, 'unlogged request never runs');
   }
@@ -627,7 +786,11 @@ async function main(): Promise<void> {
   // --- creating grants ----------------------------------------------------------------
   {
     const db = fakePrisma();
-    const emitted: Array<{ action: string; metadata?: Record<string, unknown>; organizationId: string }> = [];
+    const emitted: Array<{
+      action: string;
+      metadata?: Record<string, unknown>;
+      organizationId: string;
+    }> = [];
     const service = new SupportService(db.prisma, {
       emit: async (e: (typeof emitted)[number]) => {
         emitted.push(e);
@@ -647,12 +810,22 @@ async function main(): Promise<void> {
 
     await asUser(TENANT_ADMIN, admin, async () => {
       await assert.rejects(
-        service.createGrant(TENANT_ADMIN, ORG_C, { expiresAt: new Date(now.getTime() + 31 * DAY) }, now),
+        service.createGrant(
+          TENANT_ADMIN,
+          ORG_C,
+          { expiresAt: new Date(now.getTime() + 31 * DAY) },
+          now,
+        ),
         (e) => httpStatus(e) === 400 && httpCode(e) === 'support-grant-too-long',
         'grant over 30 days refused',
       );
       await assert.rejects(
-        service.createGrant(TENANT_ADMIN, ORG_C, { expiresAt: new Date(now.getTime() - 1000) }, now),
+        service.createGrant(
+          TENANT_ADMIN,
+          ORG_C,
+          { expiresAt: new Date(now.getTime() - 1000) },
+          now,
+        ),
         (e) => httpStatus(e) === 400 && httpCode(e) === 'support-grant-in-past',
         'grant in the past refused',
       );
@@ -665,7 +838,12 @@ async function main(): Promise<void> {
         now,
       );
       assert.equal(exact.status, 'ACTIVE', '30 days exactly is allowed');
-      const preset = await service.createGrant(TENANT_ADMIN, ORG_C, { duration: '72h', reason: ' look at invoices ' }, now);
+      const preset = await service.createGrant(
+        TENANT_ADMIN,
+        ORG_C,
+        { duration: '72h', reason: ' look at invoices ' },
+        now,
+      );
       assert.equal(preset.expiresAt.getTime(), now.getTime() + 72 * HOUR, '72h preset');
       assert.equal(preset.readOnly, true, 'always read only');
       assert.equal(preset.reason, 'look at invoices');
@@ -673,17 +851,24 @@ async function main(): Promise<void> {
 
       const created = emitted.filter((e) => e.action === 'support.grant_created');
       assert.equal(created.length, 2, 'grant_created emitted per grant');
-      assert.deepEqual(created[1]!.metadata, {
-        expiresAt: new Date(now.getTime() + 72 * HOUR).toISOString(),
-        readOnly: true,
-      }, 'grant_created metadata: end time and read only flag only');
+      assert.deepEqual(
+        created[1]!.metadata,
+        {
+          expiresAt: new Date(now.getTime() + 72 * HOUR).toISOString(),
+          readOnly: true,
+        },
+        'grant_created metadata: end time and read only flag only',
+      );
       assert.equal(created[1]!.organizationId, ORG_C, 'logged in the granting org');
 
       const listed = await service.listGrants(TENANT_ADMIN, ORG_C, now);
       assert.equal(listed.items.length, 2, 'grants listed');
 
       await service.revokeGrant(TENANT_ADMIN, ORG_C, preset.id, now);
-      assert.ok(emitted.some((e) => e.action === 'support.grant_revoked'), 'grant_revoked emitted');
+      assert.ok(
+        emitted.some((e) => e.action === 'support.grant_revoked'),
+        'grant_revoked emitted',
+      );
       await assert.rejects(
         service.revokeGrant(TENANT_ADMIN, ORG_C, preset.id, now),
         (e) => httpStatus(e) === 409,
@@ -693,18 +878,28 @@ async function main(): Promise<void> {
 
     assert.ok(!createSupportGrantSchema.safeParse({}).success, 'preset or end time required');
     assert.ok(
-      !createSupportGrantSchema.safeParse({ duration: '1h', expiresAt: new Date().toISOString() }).success,
+      !createSupportGrantSchema.safeParse({ duration: '1h', expiresAt: new Date().toISOString() })
+        .success,
       'not both',
     );
-    assert.ok(!createSupportGrantSchema.safeParse({ duration: '7d' }).success, 'unknown preset refused');
+    assert.ok(
+      !createSupportGrantSchema.safeParse({ duration: '7d' }).success,
+      'unknown preset refused',
+    );
   }
 
   // --- platform log -----------------------------------------------------------------
   {
     for (const action of ['support.grant_created', 'support.grant_revoked']) {
-      assert.ok((PLATFORM_AUDIT_ACTIONS as readonly string[]).includes(action), `${action} in platform log`);
+      assert.ok(
+        (PLATFORM_AUDIT_ACTIONS as readonly string[]).includes(action),
+        `${action} in platform log`,
+      );
     }
-    assert.ok(!(PLATFORM_AUDIT_ACTIONS as readonly string[]).includes('support.access'), 'access rows stay in the org');
+    assert.ok(
+      !(PLATFORM_AUDIT_ACTIONS as readonly string[]).includes('support.access'),
+      'access rows stay in the org',
+    );
     const entry: AuditLogEntry = {
       id: 'cmaudit000000000000000001',
       organizationId: ORG_B,
@@ -730,8 +925,12 @@ async function main(): Promise<void> {
   {
     const imports = (Reflect.getMetadata(MODULE_METADATA.IMPORTS, AppModule) ?? []) as unknown[];
     assert.ok(imports.includes(SupportModule), 'AppModule imports SupportModule');
-    const exported = (Reflect.getMetadata(MODULE_METADATA.EXPORTS, SupportModule) ?? []) as unknown[];
-    assert.ok(exported.includes(SupportSessionService), 'SupportModule exports SupportSessionService');
+    const exported = (Reflect.getMetadata(MODULE_METADATA.EXPORTS, SupportModule) ??
+      []) as unknown[];
+    assert.ok(
+      exported.includes(SupportSessionService),
+      'SupportModule exports SupportSessionService',
+    );
   }
 
   // --- the request is marked as support only after its access row ---------------
@@ -739,15 +938,25 @@ async function main(): Promise<void> {
     const db = fakePrisma();
     const grant = db.addGrant({ organizationId: ORG_B });
     let markedDuringInsert: boolean | null = null;
-    const auditLog = db.prisma.client.auditLog as unknown as { create: (args: unknown) => Promise<unknown> };
+    const auditLog = db.prisma.client.auditLog as unknown as {
+      create: (args: unknown) => Promise<unknown>;
+    };
     const create = auditLog.create;
     auditLog.create = async (args: unknown) => {
       markedDuringInsert = isSupportRequest();
       return create(args);
     };
-    const r = await runGuard({ prisma: db.prisma, userId: SUPER, headers: supportHeader(tokenFor(grant.id)) });
+    const r = await runGuard({
+      prisma: db.prisma,
+      userId: SUPER,
+      headers: supportHeader(tokenFor(grant.id)),
+    });
     assert.equal(r.status, null);
-    assert.equal(markedDuringInsert, false, 'the access row is written before the backstop applies');
+    assert.equal(
+      markedDuringInsert,
+      false,
+      'the access row is written before the backstop applies',
+    );
   }
 
   // --- excluded areas: refused after logging ----------------------------------------
@@ -768,29 +977,59 @@ async function main(): Promise<void> {
       '/api/v1/notifications?st=1',
     ]) {
       const before: number = db.audit.length;
-      const r = await runGuard({ prisma: db.prisma, userId: SUPER, url, headers: supportHeader(tokenFor(grant.id)) });
+      const r = await runGuard({
+        prisma: db.prisma,
+        userId: SUPER,
+        url,
+        headers: supportHeader(tokenFor(grant.id)),
+      });
       assert.equal(r.status, 403, `${url} refused`);
       assert.equal(r.code, 'support-excluded', `${url} is excluded`);
       assert.equal(r.req.user, undefined, `${url} never runs`);
-      assert.equal((db.audit[before]?.metadata as { refused?: boolean } | undefined)?.refused, true, `${url} logged as refused`);
+      assert.equal(
+        (db.audit[before]?.metadata as { refused?: boolean } | undefined)?.refused,
+        true,
+        `${url} logged as refused`,
+      );
     }
     for (const prefix of ['/mail', '/chat', '/notifications', '/livekit', '/todos']) {
       assert.ok(SUPPORT_EXCLUDED_PREFIXES.includes(prefix), `${prefix} excluded`);
     }
-    assert.ok(!isSupportExcludedPath('/api/v1/mailboxes', '/api/v1'), 'a longer word is not a prefix match');
+    assert.ok(
+      !isSupportExcludedPath('/api/v1/mailboxes', '/api/v1'),
+      'a longer word is not a prefix match',
+    );
     assert.ok(!isSupportExcludedPath('/api/v1/projects', 'api/v1'), 'projects allowed');
-    assert.ok(isSupportExcludedPath('/api/v1/x', 'api/v1', 'chat/requests'), 'controller path is checked too');
+    assert.ok(
+      isSupportExcludedPath('/api/v1/x', 'api/v1', 'chat/requests'),
+      'controller path is checked too',
+    );
     // Secret path params never reach the log.
-    assert.equal(supportAccessPath('/api/v1/chat/invites/abc123?x=1'), '/api/v1/chat/invites/:code');
-    assert.equal(supportAccessPath('/api/v1/invitations/tok_1', { token: 'tok_1' }), '/api/v1/invitations/:token');
-    assert.equal(supportAccessPath('/api/v1/projects/cmp1', { id: 'cmp1' }), '/api/v1/projects/cmp1', 'ids stay');
+    assert.equal(
+      supportAccessPath('/api/v1/chat/invites/abc123?x=1'),
+      '/api/v1/chat/invites/:code',
+    );
+    assert.equal(
+      supportAccessPath('/api/v1/invitations/tok_1', { token: 'tok_1' }),
+      '/api/v1/invitations/:token',
+    );
+    assert.equal(
+      supportAccessPath('/api/v1/projects/cmp1', { id: 'cmp1' }),
+      '/api/v1/projects/cmp1',
+      'ids stay',
+    );
   }
 
   // --- no request store: a support request fails closed ---------------------------
   {
     const db = fakePrisma();
     const grant = db.addGrant({ organizationId: ORG_B });
-    const r = await runGuard({ prisma: db.prisma, userId: SUPER, headers: supportHeader(tokenFor(grant.id)), noStore: true });
+    const r = await runGuard({
+      prisma: db.prisma,
+      userId: SUPER,
+      headers: supportHeader(tokenFor(grant.id)),
+      noStore: true,
+    });
     assert.equal(r.status, 503, 'refused without a request store');
     assert.equal(r.code, 'support-log-unavailable');
     assert.equal(r.req.user, undefined, 'never runs');
@@ -803,19 +1042,37 @@ async function main(): Promise<void> {
     const db = fakePrisma();
     const grant = db.addGrant({ organizationId: ORG_B });
     const response = Object.assign(new EventEmitter(), { statusCode: 200 });
-    const r = await runGuard({ prisma: db.prisma, userId: SUPER, headers: supportHeader(tokenFor(grant.id)), response });
+    const r = await runGuard({
+      prisma: db.prisma,
+      userId: SUPER,
+      headers: supportHeader(tokenFor(grant.id)),
+      response,
+    });
     assert.equal(r.status, null);
     assert.deepEqual(db.audit[0]?.metadata, { method: 'GET', path: '/api/v1/projects' });
     response.statusCode = 403;
     response.emit('finish');
     await new Promise((resolve) => setImmediate(resolve));
-    assert.deepEqual(db.audit[0]?.metadata, { method: 'GET', path: '/api/v1/projects', refused: true }, 'marked refused');
+    assert.deepEqual(
+      db.audit[0]?.metadata,
+      { method: 'GET', path: '/api/v1/projects', refused: true },
+      'marked refused',
+    );
 
     const ok = Object.assign(new EventEmitter(), { statusCode: 200 });
-    await runGuard({ prisma: db.prisma, userId: SUPER, headers: supportHeader(tokenFor(grant.id)), response: ok });
+    await runGuard({
+      prisma: db.prisma,
+      userId: SUPER,
+      headers: supportHeader(tokenFor(grant.id)),
+      response: ok,
+    });
     ok.emit('finish');
     await new Promise((resolve) => setImmediate(resolve));
-    assert.deepEqual(db.audit[1]?.metadata, { method: 'GET', path: '/api/v1/projects' }, 'a 200 stays unmarked');
+    assert.deepEqual(
+      db.audit[1]?.metadata,
+      { method: 'GET', path: '/api/v1/projects' },
+      'a 200 stays unmarked',
+    );
   }
 
   // --- token in the query string only on marked routes -------------------------------
@@ -850,8 +1107,21 @@ async function main(): Promise<void> {
   // --- write backstop ----------------------------------------------------------------
   {
     await asSupport(async () => {
-      for (const action of ['create', 'createMany', 'update', 'updateMany', 'upsert', 'delete', 'deleteMany', 'executeRaw']) {
-        assert.throws(() => assertSupportWriteAllowed(action), (e) => httpCode(e) === 'support-read-only', `${action} refused`);
+      for (const action of [
+        'create',
+        'createMany',
+        'update',
+        'updateMany',
+        'upsert',
+        'delete',
+        'deleteMany',
+        'executeRaw',
+      ]) {
+        assert.throws(
+          () => assertSupportWriteAllowed(action),
+          (e) => httpCode(e) === 'support-read-only',
+          `${action} refused`,
+        );
       }
       for (const action of ['findMany', 'findFirst', 'count', 'aggregate', 'groupBy', 'queryRaw']) {
         assert.doesNotThrow(() => assertSupportWriteAllowed(action), `${action} allowed`);
@@ -895,7 +1165,11 @@ async function main(): Promise<void> {
       const elsewhere = await loadEffectivePermissions(SUPER, WS_ROOT);
       assert.deepEqual(elsewhere.workspace, [], 'no workspace keys outside the granted org');
       clearRequestAuth();
-      assert.equal(requestAuthFor(SUPER)?.organizationId, ORG_B, 'support snapshot survives clearRequestAuth');
+      assert.equal(
+        requestAuthFor(SUPER)?.organizationId,
+        ORG_B,
+        'support snapshot survives clearRequestAuth',
+      );
     });
   }
 
@@ -919,16 +1193,27 @@ async function main(): Promise<void> {
       await service.list(scope, listExpensesQuerySchema.parse({}));
       assert.deepEqual(seen.at(-1)?.['category'], { not: 'SALARY' }, 'salaries left out');
       const before = seen.length;
-      const salary = await service.list(scope, listExpensesQuerySchema.parse({ category: 'SALARY' }));
+      const salary = await service.list(
+        scope,
+        listExpensesQuerySchema.parse({ category: 'SALARY' }),
+      );
       assert.equal(salary.items.length, 0, 'a salary filter matches nothing');
       assert.equal(seen.length, before, 'without a query');
       await service.list(scope, listExpensesQuerySchema.parse({ category: 'TAX' }));
       assert.equal(seen.at(-1)?.['category'], 'TAX', 'other categories as asked');
-      assert.deepEqual(generalFileVisibility(true).expenseReceipts, { none: { category: 'SALARY' } }, 'no salary receipts');
+      assert.deepEqual(
+        generalFileVisibility(true).expenseReceipts,
+        { none: { category: 'SALARY' } },
+        'no salary receipts',
+      );
     });
     await service.list(scope, listExpensesQuerySchema.parse({}));
     assert.equal(seen.at(-1)?.['category'], undefined, 'normal requests unchanged');
-    assert.equal(generalFileVisibility(true).expenseReceipts, undefined, 'normal file visibility unchanged');
+    assert.equal(
+      generalFileVisibility(true).expenseReceipts,
+      undefined,
+      'normal file visibility unchanged',
+    );
   }
 
   // --- search leaves chat and mail out ---------------------------------------------------
@@ -1020,21 +1305,36 @@ async function main(): Promise<void> {
       files,
     );
     const httpCtx = (req: Record<string, unknown>) =>
-      ({ getType: () => 'http', switchToHttp: () => ({ getRequest: () => req }) }) as unknown as ExecutionContext;
+      ({
+        getType: () => 'http',
+        switchToHttp: () => ({ getRequest: () => req }),
+      }) as unknown as ExecutionContext;
     const supportReq = {
       support: { grantId: 'g' },
       supportToken: 'tok.en',
       workspaceMemberships: [{ workspaceId: WS_B1, role: 'VIEWER' }],
     };
-    const out = (await lastValueFrom(interceptor.intercept(httpCtx(supportReq), { handle: () => of(body) }))) as typeof body;
+    const out = (await lastValueFrom(
+      interceptor.intercept(httpCtx(supportReq), { handle: () => of(body) }),
+    )) as typeof body;
     assert.equal(
       out.items[0]?.url,
       'https://api.example.test/api/v1/files/cmfile000000000000000001/content?st=tok.en',
       'known file links to the content route',
     );
-    assert.equal(out.other, 'https://api.example.test/api/v1/files/unavailable/content', 'unknown file never shows its public URL');
-    assert.deepEqual(lookupWhere, { objectKey: { in: [known] }, workspaceId: { in: [WS_B1] } }, 'granted workspaces only');
-    const normal = await lastValueFrom(interceptor.intercept(httpCtx({}), { handle: () => of(body) }));
+    assert.equal(
+      out.other,
+      'https://api.example.test/api/v1/files/unavailable/content',
+      'unknown file never shows its public URL',
+    );
+    assert.deepEqual(
+      lookupWhere,
+      { objectKey: { in: [known] }, workspaceId: { in: [WS_B1] } },
+      'granted workspaces only',
+    );
+    const normal = await lastValueFrom(
+      interceptor.intercept(httpCtx({}), { handle: () => of(body) }),
+    );
     assert.equal(normal, body, 'normal responses untouched');
   }
 
@@ -1045,7 +1345,11 @@ async function main(): Promise<void> {
     const chatUrl = 'https://files.example.test/botss-files/workspaces/b1/chat.png';
     const rows: Record<string, { id: string; url: string; workspaceId: string }> = {
       [CHAT_FILE]: { id: CHAT_FILE, url: chatUrl, workspaceId: WS_B1 },
-      [PLAIN_FILE]: { id: PLAIN_FILE, url: 'https://files.example.test/botss-files/workspaces/b1/doc.pdf', workspaceId: WS_B1 },
+      [PLAIN_FILE]: {
+        id: PLAIN_FILE,
+        url: 'https://files.example.test/botss-files/workspaces/b1/doc.pdf',
+        workspaceId: WS_B1,
+      },
     };
     const seen = { raw: 0, listWhere: null as unknown, s3: 0 };
     const fake = {
@@ -1069,7 +1373,14 @@ async function main(): Promise<void> {
           findFirst: async (args: { where: { id: string } }) => {
             const row = rows[args.where.id];
             return row
-              ? { ...row, bucket: 'b', objectKey: 'k', mimeType: 'image/png', filename: 'f.png', sizeBytes: 1n }
+              ? {
+                  ...row,
+                  bucket: 'b',
+                  objectKey: 'k',
+                  mimeType: 'image/png',
+                  filename: 'f.png',
+                  sizeBytes: 1n,
+                }
               : null;
           },
         },
@@ -1085,9 +1396,21 @@ async function main(): Promise<void> {
     const q = { page: 1, pageSize: 20, sort: 'createdAt', order: 'desc' } as never;
     await asSupport(async () => {
       await service.list(WS_B1, q, { financeAccess: false });
-      assert.deepEqual((seen.listWhere as { id?: unknown }).id, { notIn: [CHAT_FILE] }, 'chat files left out of the list');
-      await assert.rejects(service.get(WS_B1, CHAT_FILE, { financeAccess: false }), (e) => httpStatus(e) === 404, 'chat file 404');
-      assert.equal((await service.get(WS_B1, PLAIN_FILE, { financeAccess: false })).id, PLAIN_FILE, 'other files open');
+      assert.deepEqual(
+        (seen.listWhere as { id?: unknown }).id,
+        { notIn: [CHAT_FILE] },
+        'chat files left out of the list',
+      );
+      await assert.rejects(
+        service.get(WS_B1, CHAT_FILE, { financeAccess: false }),
+        (e) => httpStatus(e) === 404,
+        'chat file 404',
+      );
+      assert.equal(
+        (await service.get(WS_B1, PLAIN_FILE, { financeAccess: false })).id,
+        PLAIN_FILE,
+        'other files open',
+      );
       await assert.rejects(
         service.openContent([WS_B1], CHAT_FILE, { financeAccess: false }),
         (e) => httpStatus(e) === 404,
@@ -1101,7 +1424,11 @@ async function main(): Promise<void> {
     await service.list(WS_B1, q, { financeAccess: false });
     assert.equal((seen.listWhere as { id?: unknown }).id, undefined, 'normal list unchanged');
     assert.equal(seen.raw, rawBefore, 'no chat lookup for normal requests');
-    assert.equal((await service.get(WS_B1, CHAT_FILE, { financeAccess: false })).id, CHAT_FILE, 'normal get unchanged');
+    assert.equal(
+      (await service.get(WS_B1, CHAT_FILE, { financeAccess: false })).id,
+      CHAT_FILE,
+      'normal get unchanged',
+    );
     await service.openContent([WS_B1], CHAT_FILE, { financeAccess: false });
     assert.equal(seen.s3, 2, 'normal content unchanged');
   }
@@ -1113,7 +1440,11 @@ async function main(): Promise<void> {
       { workspaceId: WS_B2, role: 'VIEWER' },
     ];
     assert.deepEqual(
-      contentWorkspaceIds({ support: { grantId: 'g' } as never, workspaceId: WS_B1, workspaceMemberships: memberships }),
+      contentWorkspaceIds({
+        support: { grantId: 'g' } as never,
+        workspaceId: WS_B1,
+        workspaceMemberships: memberships,
+      }),
       [WS_B1, WS_B2],
       'support reads its granted workspaces',
     );
@@ -1122,7 +1453,11 @@ async function main(): Promise<void> {
       [WS_B1],
       'a normal user only the active workspace',
     );
-    assert.deepEqual(contentWorkspaceIds({ workspaceId: null, workspaceMemberships: memberships }), [], 'no active workspace');
+    assert.deepEqual(
+      contentWorkspaceIds({ workspaceId: null, workspaceMemberships: memberships }),
+      [],
+      'no active workspace',
+    );
 
     assert.equal(inlineContentType('image/png'), 'image/png');
     assert.equal(inlineContentType(' Video/MP4 '), 'video/mp4', 'normalized');
@@ -1147,7 +1482,9 @@ async function main(): Promise<void> {
     const filter = new ProblemDetailsExceptionFilter();
     const sent: Array<{ instance?: string }> = [];
     const logged: string[] = [];
-    (filter as unknown as { logger: { error: (m: string) => void } }).logger = { error: (m) => logged.push(m) };
+    (filter as unknown as { logger: { error: (m: string) => void } }).logger = {
+      error: (m) => logged.push(m),
+    };
     const res = {
       status: () => res,
       type: () => res,
@@ -1159,14 +1496,21 @@ async function main(): Promise<void> {
     const host = {
       switchToHttp: () => ({
         getResponse: () => res,
-        getRequest: () => ({ method: 'GET', originalUrl: '/api/v1/files/cmf/content?st=secret.token#x' }),
+        getRequest: () => ({
+          method: 'GET',
+          originalUrl: '/api/v1/files/cmf/content?st=secret.token#x',
+        }),
       }),
     } as never;
     filter.catch(new HttpException({ title: 'Nope', status: 403 }, 403), host);
     filter.catch(new Error('boom'), host);
     assert.equal(sent.length, 2);
-    for (const b of sent) assert.equal(b.instance, '/api/v1/files/cmf/content', 'instance has no query');
-    assert.ok(logged.length > 0 && logged.every((m) => !m.includes('secret.token')), 'token never logged');
+    for (const b of sent)
+      assert.equal(b.instance, '/api/v1/files/cmf/content', 'instance has no query');
+    assert.ok(
+      logged.length > 0 && logged.every((m) => !m.includes('secret.token')),
+      'token never logged',
+    );
   }
 
   // --- platform log: support events never match on their actor -------------------------

@@ -26,16 +26,15 @@ export default function AppError({
 
   return (
     <div className="flex min-h-[60vh] flex-col items-center justify-center px-6 text-center">
-      <div className="flex h-12 w-12 items-center justify-center rounded-full bg-bg-subtle text-state-error">
+      <div className="bg-bg-subtle text-state-error flex h-12 w-12 items-center justify-center rounded-full">
         <AlertTriangle className="h-6 w-6" aria-hidden />
       </div>
-      <h1 className="mt-4 text-lg font-semibold text-ink">Something went wrong</h1>
-      <p className="mt-1 max-w-md text-sm text-ink-muted">
-        This page hit an unexpected error. You can try again, or head back to
-        your dashboard.
+      <h1 className="text-ink mt-4 text-lg font-semibold">Something went wrong</h1>
+      <p className="text-ink-muted mt-1 max-w-md text-sm">
+        This page hit an unexpected error. You can try again, or head back to your dashboard.
       </p>
       {error.digest ? (
-        <p className="mt-2 text-xs text-ink-disabled">Reference: {error.digest}</p>
+        <p className="text-ink-disabled mt-2 text-xs">Reference: {error.digest}</p>
       ) : null}
       <div className="mt-6 flex items-center gap-2">
         <Button onClick={() => reset()}>Try again</Button>

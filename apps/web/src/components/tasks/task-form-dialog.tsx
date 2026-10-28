@@ -42,8 +42,8 @@ export function TaskFormDialog({ projectId, defaultStatus, onClose }: Props) {
   };
 
   return (
-    <div className="fixed inset-0 z-30 grid place-items-center bg-ink/40 p-4">
-      <div className="card w-full max-w-md p-6 space-y-4">
+    <div className="bg-ink/40 fixed inset-0 z-30 grid place-items-center p-4">
+      <div className="card w-full max-w-md space-y-4 p-6">
         <h2 className="text-base font-semibold">New task</h2>
         <form className="space-y-3" onSubmit={handleSubmit(onSubmit)}>
           <input type="hidden" {...register('projectId')} />
@@ -53,7 +53,9 @@ export function TaskFormDialog({ projectId, defaultStatus, onClose }: Props) {
               <RequiredMark />
             </label>
             <input className="input" {...register('title')} />
-            {errors.title && <p className="text-xs text-state-error mt-1">{errors.title.message}</p>}
+            {errors.title && (
+              <p className="text-state-error mt-1 text-xs">{errors.title.message}</p>
+            )}
           </div>
           <div>
             <label className="label">Description</label>
@@ -64,7 +66,9 @@ export function TaskFormDialog({ projectId, defaultStatus, onClose }: Props) {
               <label className="label">Status</label>
               <select className="input" {...register('status')}>
                 {TaskStatus.options.map((s) => (
-                  <option key={s} value={s}>{s}</option>
+                  <option key={s} value={s}>
+                    {s}
+                  </option>
                 ))}
               </select>
             </div>
@@ -72,7 +76,9 @@ export function TaskFormDialog({ projectId, defaultStatus, onClose }: Props) {
               <label className="label">Priority</label>
               <select className="input" {...register('priority')}>
                 {TaskPriority.options.map((p) => (
-                  <option key={p} value={p}>{p}</option>
+                  <option key={p} value={p}>
+                    {p}
+                  </option>
                 ))}
               </select>
             </div>
@@ -82,22 +88,24 @@ export function TaskFormDialog({ projectId, defaultStatus, onClose }: Props) {
               <label className="label">Start Date</label>
               <input type="date" className="input" {...register('startDate')} />
               {errors.startDate && (
-                <p className="text-xs text-state-error mt-1">{errors.startDate.message}</p>
+                <p className="text-state-error mt-1 text-xs">{errors.startDate.message}</p>
               )}
             </div>
             <div>
               <label className="label">Due Date</label>
               <input type="date" className="input" {...register('dueDate')} />
               {errors.dueDate && (
-                <p className="text-xs text-state-error mt-1">{errors.dueDate.message}</p>
+                <p className="text-state-error mt-1 text-xs">{errors.dueDate.message}</p>
               )}
             </div>
           </div>
-          <p className="text-xs text-ink-muted">
+          <p className="text-ink-muted text-xs">
             Dates are optional and can be set or changed later from the task panel.
           </p>
           <div className="flex justify-end gap-2 pt-2">
-            <button type="button" className="btn-secondary" onClick={onClose}>Cancel</button>
+            <button type="button" className="btn-secondary" onClick={onClose}>
+              Cancel
+            </button>
             <button type="submit" className="btn-primary" disabled={isSubmitting}>
               {isSubmitting ? 'Creating…' : 'Create task'}
             </button>
@@ -110,7 +118,7 @@ export function TaskFormDialog({ projectId, defaultStatus, onClose }: Props) {
 
 function RequiredMark() {
   return (
-    <span className="ml-1 text-state-error" aria-label="required">
+    <span className="text-state-error ml-1" aria-label="required">
       *
     </span>
   );

@@ -14,5 +14,5 @@ export const metadata: Metadata = {
 };
 
 export default function SignLayout({ children }: { children: ReactNode }) {
-  return <div className="min-h-screen bg-bg-subtle">{children}</div>;
+  return <div className="bg-bg-subtle min-h-screen">{children}</div>;
 }

@@ -392,9 +392,7 @@ export class ChatGateway
         `dropCallsForSocket failed socketId=${socket.id} message=${(err as Error)?.message ?? 'unknown'}`,
       );
     }
-    this.logger.debug(
-      `Socket disconnected userId=${auth.userId} socketId=${socket.id}`,
-    );
+    this.logger.debug(`Socket disconnected userId=${auth.userId} socketId=${socket.id}`);
   }
 
   @SubscribeMessage('join_room')
@@ -407,13 +405,11 @@ export class ChatGateway
     await socket.join(chatRoom(input.roomId));
     const { updated } = await this.chat.markDelivered(socket.data.userId, input.roomId);
     if (updated > 0) {
-      this.server
-        .to(chatRoom(input.roomId))
-        .emit('msg_status_update', {
-          roomId: input.roomId,
-          status: 'DELIVERED',
-          byUserId: socket.data.userId,
-        });
+      this.server.to(chatRoom(input.roomId)).emit('msg_status_update', {
+        roomId: input.roomId,
+        status: 'DELIVERED',
+        byUserId: socket.data.userId,
+      });
     }
     return { ok: true, roomId: input.roomId };
   }
@@ -448,11 +444,8 @@ export class ChatGateway
         clientNonce: input.clientNonce ?? null,
       };
     } catch (err) {
-      const detail =
-        err instanceof Error ? err.message : 'Unable to send message';
-      this.logger.warn(
-        `send_msg failed userId=${socket.data.userId} message=${detail}`,
-      );
+      const detail = err instanceof Error ? err.message : 'Unable to send message';
+      this.logger.warn(`send_msg failed userId=${socket.data.userId} message=${detail}`);
       throw new WsException({ title: 'Send failed', status: 500, detail });
     }
   }
@@ -550,20 +543,14 @@ export class ChatGateway
     @MessageBody() raw: unknown,
   ): Promise<{ ok: true; updated: number }> {
     const input: MarkRoomReadInput = parseOrThrow(markRoomReadSchema, raw);
-    const result = await this.chat.markRead(
-      socket.data.userId,
-      input.roomId,
-      input.upToMessageId,
-    );
+    const result = await this.chat.markRead(socket.data.userId, input.roomId, input.upToMessageId);
     if (result.updated > 0) {
-      this.server
-        .to(chatRoom(input.roomId))
-        .emit('msg_status_update', {
-          roomId: input.roomId,
-          status: 'READ',
-          byUserId: socket.data.userId,
-          messageIds: result.messageIds,
-        });
+      this.server.to(chatRoom(input.roomId)).emit('msg_status_update', {
+        roomId: input.roomId,
+        status: 'READ',
+        byUserId: socket.data.userId,
+        messageIds: result.messageIds,
+      });
     }
     return { ok: true, updated: result.updated };
   }
@@ -595,9 +582,7 @@ export class ChatGateway
       return { ok: true, callId: call.id };
     } catch (err) {
       const detail = err instanceof Error ? err.message : 'Unable to start call';
-      this.logger.warn(
-        `call_initiate failed userId=${socket.data.userId} message=${detail}`,
-      );
+      this.logger.warn(`call_initiate failed userId=${socket.data.userId} message=${detail}`);
       throw new WsException({ title: 'Start call failed', status: 500, detail });
     }
   }
@@ -776,14 +761,12 @@ export class ChatGateway
     // ICE fires frequently. assertCallSignal hits the DB at most once per
     // sender per call and authorizes from memory after that.
     await this.authorizeSignal(input.callId, socket.data.userId, input.toUserId);
-    this.server
-      .to(userRoom(input.toUserId))
-      .emit('webrtc_ice_candidate', {
-        callId: input.callId,
-        fromUserId: socket.data.userId,
-        fromSocketId: socket.id,
-        candidate: input.candidate,
-      });
+    this.server.to(userRoom(input.toUserId)).emit('webrtc_ice_candidate', {
+      callId: input.callId,
+      fromUserId: socket.data.userId,
+      fromSocketId: socket.id,
+      candidate: input.candidate,
+    });
     return { ok: true };
   }
 
@@ -805,10 +788,7 @@ export class ChatGateway
 
   private headersFromHandshake(socket: Socket): Headers {
     const headers = new Headers();
-    const raw = socket.handshake.headers as Record<
-      string,
-      string | string[] | undefined
-    >;
+    const raw = socket.handshake.headers as Record<string, string | string[] | undefined>;
     for (const [k, v] of Object.entries(raw)) {
       if (typeof v === 'string') headers.set(k, v);
       else if (Array.isArray(v)) headers.set(k, v.join(', '));

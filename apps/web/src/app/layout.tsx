@@ -48,9 +48,7 @@ export const metadata: Metadata = {
   // the favicon. Listing it here keeps the metadata explicit for browsers
   // that look for the link tag rather than discovering /icon.
   icons: {
-    icon: [
-      { url: '/branding/logo-icon.svg', type: 'image/svg+xml', sizes: 'any' },
-    ],
+    icon: [{ url: '/branding/logo-icon.svg', type: 'image/svg+xml', sizes: 'any' }],
   },
   openGraph: {
     title: 'The Botss - Internal Platform',

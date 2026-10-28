@@ -114,7 +114,7 @@ export function ChatComposer({
   const selected = items.find((i) => i.id === selectedId) ?? items[0] ?? null;
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col bg-ink/95">
+    <div className="bg-ink/95 fixed inset-0 z-50 flex flex-col">
       {/* Top bar */}
       <div className="flex items-center gap-3 px-4 py-3 text-white">
         <Button
@@ -169,11 +169,7 @@ export function ChatComposer({
             // or without a caption - matching the main composer. Shift+Enter
             // inserts a newline. (IME composition Enter is ignored so it
             // doesn't fire mid-typing.)
-            if (
-              e.key === 'Enter' &&
-              !e.shiftKey &&
-              !e.nativeEvent.isComposing
-            ) {
+            if (e.key === 'Enter' && !e.shiftKey && !e.nativeEvent.isComposing) {
               e.preventDefault();
               if (!sending) onSend();
             }
@@ -256,7 +252,7 @@ export function ChatComposer({
           onClick={onSend}
           disabled={sending || items.length === 0}
           aria-label="Send"
-          className="h-12 w-12 min-h-0 min-w-0 rounded-full bg-brand-gradient p-0 shadow-soft"
+          className="bg-brand-gradient shadow-soft h-12 min-h-0 w-12 min-w-0 rounded-full p-0"
         >
           <Send className="h-5 w-5" />
         </Button>

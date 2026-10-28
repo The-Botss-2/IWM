@@ -80,10 +80,7 @@ export class MailMessagesController {
 
   @Get(':id')
   @SkipPermissions()
-  get(
-    @CurrentUser() user: AuthedUser,
-    @Param('id', new ZodValidationPipe(cuid)) id: string,
-  ) {
+  get(@CurrentUser() user: AuthedUser, @Param('id', new ZodValidationPipe(cuid)) id: string) {
     return this.read.getMessage(user.id, id);
   }
 

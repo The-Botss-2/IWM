@@ -35,7 +35,7 @@ export default function FormsView({ projectId }: { projectId: string }) {
   return (
     <section className="space-y-4">
       <div className="flex items-center justify-between">
-        <p className="text-sm text-ink-muted">
+        <p className="text-ink-muted text-sm">
           Public intake forms create tasks in this project. Rate-limited to 10 / hour / IP.
         </p>
         <Button size="sm" onClick={() => setNewOpen(true)}>
@@ -48,18 +48,20 @@ export default function FormsView({ projectId }: { projectId: string }) {
       ) : forms.isError && !forms.data ? (
         <QueryError message="Couldn't load forms." onRetry={() => void forms.refetch()} />
       ) : forms.data && forms.data.length > 0 ? (
-        <ul className="divide-y divide-line rounded-lg border border-line bg-white">
+        <ul className="divide-line border-line divide-y rounded-lg border bg-white">
           {forms.data.map((f) => (
             <li key={f.id} className="flex items-center gap-3 p-4">
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2">
-                  <h4 className="text-sm font-medium text-ink">{f.name}</h4>
-                  {f.isPublic ? <Badge tone="brand">Public</Badge> : <Badge tone="neutral">Private</Badge>}
+                  <h4 className="text-ink text-sm font-medium">{f.name}</h4>
+                  {f.isPublic ? (
+                    <Badge tone="brand">Public</Badge>
+                  ) : (
+                    <Badge tone="neutral">Private</Badge>
+                  )}
                 </div>
-                {f.description ? (
-                  <p className="text-xs text-ink-muted">{f.description}</p>
-                ) : null}
-                <p className="text-xs text-ink-muted">
+                {f.description ? <p className="text-ink-muted text-xs">{f.description}</p> : null}
+                <p className="text-ink-muted text-xs">
                   {f.fields.length} field{f.fields.length === 1 ? '' : 's'} · default{' '}
                   {f.defaultStatus.toLowerCase()}
                 </p>
@@ -100,13 +102,13 @@ export default function FormsView({ projectId }: { projectId: string }) {
                   if (confirm(`Delete form "${f.name}"?`)) remove.mutate(f.id);
                 }}
               >
-                <Trash2 className="h-4 w-4 text-ink-muted" />
+                <Trash2 className="text-ink-muted h-4 w-4" />
               </Button>
             </li>
           ))}
         </ul>
       ) : (
-        <div className="rounded-md border border-dashed border-line p-6 text-center text-sm text-ink-muted">
+        <div className="border-line text-ink-muted rounded-md border border-dashed p-6 text-center text-sm">
           No forms yet. Create one to let people outside the workspace submit tasks.
         </div>
       )}
@@ -152,20 +154,13 @@ function NewFormDialog({
 
   function addField(type: TaskFormField['type']) {
     const id = `field_${fields.length + 1}`;
-    setFields((prev) => [
-      ...prev,
-      { id, label: `New ${type} field`, type, required: false },
-    ]);
+    setFields((prev) => [...prev, { id, label: `New ${type} field`, type, required: false }]);
   }
   function removeField(id: string) {
     setFields((prev) => prev.filter((f) => f.id !== id));
   }
   function patchField(id: string, patch: Partial<TaskFormField>) {
-    setFields((prev) =>
-      prev.map((f) =>
-        f.id === id ? ({ ...f, ...patch } as TaskFormField) : f,
-      ),
-    );
+    setFields((prev) => prev.map((f) => (f.id === id ? ({ ...f, ...patch } as TaskFormField) : f)));
   }
 
   return (
@@ -193,12 +188,12 @@ function NewFormDialog({
             <Label htmlFor="public">Publish a public submission URL</Label>
           </div>
 
-          <div className="space-y-2 rounded-md border border-line p-3">
+          <div className="border-line space-y-2 rounded-md border p-3">
             <div className="flex items-center justify-between">
-              <h4 className="text-xs font-medium uppercase tracking-wide text-ink-muted">Fields</h4>
+              <h4 className="text-ink-muted text-xs font-medium uppercase tracking-wide">Fields</h4>
               <select
                 defaultValue=""
-                className="rounded border border-line px-2 py-1 text-xs"
+                className="border-line rounded border px-2 py-1 text-xs"
                 onChange={(e) => {
                   if (e.target.value) addField(e.target.value as TaskFormField['type']);
                   e.currentTarget.value = '';
@@ -222,7 +217,7 @@ function NewFormDialog({
                     onChange={(e) => patchField(f.id, { label: e.target.value })}
                     className="flex-1"
                   />
-                  <span className="rounded-md bg-bg-subtle px-2 py-1 text-xs text-ink-muted">
+                  <span className="bg-bg-subtle text-ink-muted rounded-md px-2 py-1 text-xs">
                     {f.type}
                   </span>
                   <label className="flex items-center gap-1 text-xs">
@@ -239,7 +234,7 @@ function NewFormDialog({
                     aria-label={`Remove field ${f.label}`}
                     onClick={() => removeField(f.id)}
                   >
-                    <Trash2 className="h-4 w-4 text-ink-muted" />
+                    <Trash2 className="text-ink-muted h-4 w-4" />
                   </Button>
                 </li>
               ))}

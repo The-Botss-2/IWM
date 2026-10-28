@@ -80,9 +80,7 @@ export const createOrganizationFirstOwnerSchema = z.object({
   email: z.string().email().max(255),
   name: z.string().min(1).max(100),
 });
-export type CreateOrganizationFirstOwnerInput = z.infer<
-  typeof createOrganizationFirstOwnerSchema
->;
+export type CreateOrganizationFirstOwnerInput = z.infer<typeof createOrganizationFirstOwnerSchema>;
 
 export const createOrganizationSchema = z.object({
   name: z.string().min(1).max(120),
@@ -113,9 +111,7 @@ export const createOrganizationResponseSchema = organizationSchema.extend({
   /** The 6-digit code that goes with `invitationUrl`. */
   invitationCode: z.string().nullable().optional(),
 });
-export type CreateOrganizationResponse = z.infer<
-  typeof createOrganizationResponseSchema
->;
+export type CreateOrganizationResponse = z.infer<typeof createOrganizationResponseSchema>;
 
 /**
  * Public self-serve organization signup (the "Are you an organization?"
@@ -155,9 +151,7 @@ export const publicOrganizationSignupSchema = z.object({
   /// configured during provisioning; otherwise an admin can add it later.
   mailConfig: publicSignupMailConfigSchema.optional(),
 });
-export type PublicOrganizationSignupInput = z.infer<
-  typeof publicOrganizationSignupSchema
->;
+export type PublicOrganizationSignupInput = z.infer<typeof publicOrganizationSignupSchema>;
 
 export const publicOrganizationSignupResponseSchema = z.object({
   ok: z.literal(true),
@@ -175,9 +169,7 @@ export const inviteOrganizationOwnerSchema = z.object({
   email: z.string().email().max(255),
   name: z.string().min(1).max(100).optional(),
 });
-export type InviteOrganizationOwnerInput = z.infer<
-  typeof inviteOrganizationOwnerSchema
->;
+export type InviteOrganizationOwnerInput = z.infer<typeof inviteOrganizationOwnerSchema>;
 
 export const inviteOrganizationOwnerResponseSchema = z.object({
   organization: organizationSchema,
@@ -186,9 +178,7 @@ export const inviteOrganizationOwnerResponseSchema = z.object({
   invitationCode: z.string().nullable().optional(),
   workspaceId: cuid,
 });
-export type InviteOrganizationOwnerResponse = z.infer<
-  typeof inviteOrganizationOwnerResponseSchema
->;
+export type InviteOrganizationOwnerResponse = z.infer<typeof inviteOrganizationOwnerResponseSchema>;
 
 export const updateOrganizationSchema = z
   .object({

@@ -129,7 +129,9 @@ export const PORTAL_OPEN_INVOICE_STATUSES = ['SENT', 'PARTIALLY_PAID', 'OVERDUE'
  * `percent` = done / total over every task, the same figure the internal
  * project summary shows.
  */
-export function toPortalProgress(counts: ReadonlyArray<{ status: string; count: number }>): PortalProgress {
+export function toPortalProgress(
+  counts: ReadonlyArray<{ status: string; count: number }>,
+): PortalProgress {
   const by = (statuses: string[]) =>
     counts.filter((c) => statuses.includes(c.status)).reduce((n, c) => n + c.count, 0);
   const total = counts.reduce((n, c) => n + c.count, 0);

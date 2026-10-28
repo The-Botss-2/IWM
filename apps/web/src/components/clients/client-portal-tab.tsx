@@ -101,7 +101,13 @@ function displayName(c: ClientContact): string {
  * portal. Everyone may look; workspace owners and admins (`canManage`, a UX
  * hint the API enforces) invite, re-rank and remove people.
  */
-export function ClientPortalTab({ clientId, clientName }: { clientId: string; clientName: string }) {
+export function ClientPortalTab({
+  clientId,
+  clientName,
+}: {
+  clientId: string;
+  clientName: string;
+}) {
   const contacts = useClientPortalContacts(clientId);
   const resend = useResendPortalInvite(clientId);
   const reset = useSendPortalPasswordReset(clientId);
@@ -112,9 +118,10 @@ export function ClientPortalTab({ clientId, clientName }: { clientId: string; cl
   const [linkResult, setLinkResult] = useState<LinkResult | null>(null);
   // The current main contact is captured when the dialog opens, so the copy
   // does not change under the optimistic update while the request runs.
-  const [promote, setPromote] = useState<{ contact: ClientContact; replaces: ClientContact | null } | null>(
-    null,
-  );
+  const [promote, setPromote] = useState<{
+    contact: ClientContact;
+    replaces: ClientContact | null;
+  } | null>(null);
   const [revokeTarget, setRevokeTarget] = useState<ClientContact | null>(null);
 
   const items = contacts.data?.items ?? [];
@@ -155,14 +162,14 @@ export function ClientPortalTab({ clientId, clientName }: { clientId: string; cl
     <>
       <section
         aria-labelledby="client-portal-heading"
-        className="rounded-lg border border-line bg-white p-5"
+        className="border-line rounded-lg border bg-white p-5"
       >
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div className="min-w-0">
-            <h2 id="client-portal-heading" className="text-base font-semibold text-ink">
+            <h2 id="client-portal-heading" className="text-ink text-base font-semibold">
               Portal access
             </h2>
-            <p className="mt-1 max-w-2xl text-sm text-ink-muted">
+            <p className="text-ink-muted mt-1 max-w-2xl text-sm">
               People at {clientName} who can sign in to the client portal. Everything there is read
               only, and people show as pending until they set a password.
             </p>
@@ -175,15 +182,15 @@ export function ClientPortalTab({ clientId, clientName }: { clientId: string; cl
           ) : null}
         </div>
 
-        <div className="mt-4 rounded-md bg-bg-subtle px-4 py-3">
-          <h3 className="text-xs font-semibold uppercase tracking-wide text-ink-muted">
+        <div className="bg-bg-subtle mt-4 rounded-md px-4 py-3">
+          <h3 className="text-ink-muted text-xs font-semibold uppercase tracking-wide">
             What they see
           </h3>
-          <ul className="mt-2 list-disc space-y-1 pl-4 text-sm text-ink marker:text-ink-disabled">
+          <ul className="text-ink marker:text-ink-disabled mt-2 list-disc space-y-1 pl-4 text-sm">
             <li>
               Progress on this client&apos;s projects that are shown in the portal (project
-              Settings, Client portal). Task lists show only tasks marked for the client, unless
-              the project shows all tasks.
+              Settings, Client portal). Task lists show only tasks marked for the client, unless the
+              project shows all tasks.
             </li>
             <li>Documents shared with {clientName} or with them personally.</li>
             <li>Signature requests sent to their email.</li>
@@ -204,7 +211,7 @@ export function ClientPortalTab({ clientId, clientName }: { clientId: string; cl
             />
           ) : items.length > 0 ? (
             <table className="w-full text-sm">
-              <thead className="text-left text-xs font-medium uppercase tracking-wide text-ink-muted">
+              <thead className="text-ink-muted text-left text-xs font-medium uppercase tracking-wide">
                 <tr>
                   <th className="px-3 py-2">Person</th>
                   <th className="px-3 py-2">Role</th>
@@ -234,11 +241,11 @@ export function ClientPortalTab({ clientId, clientName }: { clientId: string; cl
               </tbody>
             </table>
           ) : (
-            <div className="rounded-md border border-dashed border-line p-6 text-center">
-              <p className="text-sm font-medium text-ink">
+            <div className="border-line rounded-md border border-dashed p-6 text-center">
+              <p className="text-ink text-sm font-medium">
                 No one at {clientName} has portal access yet.
               </p>
-              <p className="mt-1 text-sm text-ink-muted">
+              <p className="text-ink-muted mt-1 text-sm">
                 {canManage
                   ? 'Start with the main contact, the person who handles invoices and contracts.'
                   : 'Workspace owners and admins can invite people here.'}
@@ -248,7 +255,7 @@ export function ClientPortalTab({ clientId, clientName }: { clientId: string; cl
         </div>
 
         {!canManage && items.length > 0 ? (
-          <p className="mt-3 text-xs text-ink-muted">
+          <p className="text-ink-muted mt-3 text-xs">
             Only workspace owners and admins can invite or remove people.
           </p>
         ) : null}
@@ -356,14 +363,14 @@ function ContactRow({
   const name = displayName(c);
   const pending = c.status === 'PENDING';
   return (
-    <tr className="border-t border-line">
+    <tr className="border-line border-t">
       <td className="px-3 py-3">
         <div className="flex items-center gap-3">
           {/* No image on purpose: it is client-controlled. Initials only. */}
           <UserAvatar size="md" name={name} />
           <div className="min-w-0">
-            <div className="truncate text-sm font-medium text-ink">{name}</div>
-            <div className="truncate text-xs text-ink-muted">{c.user.email}</div>
+            <div className="text-ink truncate text-sm font-medium">{name}</div>
+            <div className="text-ink-muted truncate text-xs">{c.user.email}</div>
           </div>
         </div>
       </td>
@@ -380,7 +387,7 @@ function ContactRow({
           </Badge>
         )}
       </td>
-      <td className="hidden px-3 py-3 text-xs text-ink-muted sm:table-cell">
+      <td className="text-ink-muted hidden px-3 py-3 text-xs sm:table-cell">
         {c.lastSeenAt ? (
           <span title={absoluteTime(c.lastSeenAt)}>{relativeTime(c.lastSeenAt)}</span>
         ) : (
@@ -397,7 +404,7 @@ function ContactRow({
                 onClick={onResend}
                 disabled={resending}
               >
-                <RefreshCw className="h-4 w-4 text-ink-muted" aria-hidden />
+                <RefreshCw className="text-ink-muted h-4 w-4" aria-hidden />
               </RowAction>
             ) : (
               <RowAction
@@ -406,7 +413,7 @@ function ContactRow({
                 onClick={onReset}
                 disabled={resetting}
               >
-                <KeyRound className="h-4 w-4 text-ink-muted" aria-hidden />
+                <KeyRound className="text-ink-muted h-4 w-4" aria-hidden />
               </RowAction>
             )}
             {c.role === 'MEMBER' ? (
@@ -415,7 +422,7 @@ function ContactRow({
                 label={`Make ${name} the main contact`}
                 onClick={onPromote}
               >
-                <Star className="h-4 w-4 text-ink-muted" aria-hidden />
+                <Star className="text-ink-muted h-4 w-4" aria-hidden />
               </RowAction>
             ) : null}
             <RowAction
@@ -423,7 +430,7 @@ function ContactRow({
               label={`Remove portal access for ${name}`}
               onClick={onRevoke}
             >
-              <UserMinus className="h-4 w-4 text-ink-muted" aria-hidden />
+              <UserMinus className="text-ink-muted h-4 w-4" aria-hidden />
             </RowAction>
           </div>
         </td>
@@ -508,7 +515,7 @@ function InvitePersonDialog({
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="text-lg font-semibold">Invite to the client portal</DialogTitle>
-          <DialogDescription className="text-sm text-ink-muted">
+          <DialogDescription className="text-ink-muted text-sm">
             They get a link to set a password, then see {clientName}&apos;s portal.
           </DialogDescription>
         </DialogHeader>
@@ -560,13 +567,13 @@ function InvitePersonDialog({
                   <SelectItem key={r.value} value={r.value}>
                     <span className="flex flex-col">
                       <span>{ROLE_LABEL[r.value]}</span>
-                      <span className="text-xs text-ink-muted">{r.description}</span>
+                      <span className="text-ink-muted text-xs">{r.description}</span>
                     </span>
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
-            <p id="portal-invite-role-hint" className="text-xs text-ink-muted">
+            <p id="portal-invite-role-hint" className="text-ink-muted text-xs">
               {roleHint}
             </p>
           </div>
@@ -574,7 +581,7 @@ function InvitePersonDialog({
             <p
               id="portal-invite-error"
               role="alert"
-              className="rounded-md border border-red-100 bg-tint-error px-3 py-2 text-xs text-state-error"
+              className="bg-tint-error text-state-error rounded-md border border-red-100 px-3 py-2 text-xs"
             >
               {error}
             </p>
@@ -611,7 +618,10 @@ function PortalLinkDialog({ result, onClose }: { result: LinkResult; onClose: ()
       setCopied(true);
       window.setTimeout(() => setCopied(false), 1500);
     } catch {
-      toastErrorMessage("Couldn't copy the link", { description: "Your browser blocked clipboard access. Allow it in site settings, or copy it by hand." });
+      toastErrorMessage("Couldn't copy the link", {
+        description:
+          'Your browser blocked clipboard access. Allow it in site settings, or copy it by hand.',
+      });
     }
   }
 
@@ -627,7 +637,7 @@ function PortalLinkDialog({ result, onClose }: { result: LinkResult; onClose: ()
           <DialogTitle className="text-lg font-semibold">
             {response.emailed ? copy.sent : copy.ready}
           </DialogTitle>
-          <DialogDescription className="text-sm text-ink-muted">
+          <DialogDescription className="text-ink-muted text-sm">
             {response.emailed
               ? `We emailed ${response.contact.user.email}. If it does not arrive, copy the link and send it to ${who} yourself.`
               : `For ${who} (${response.contact.user.email}).`}
@@ -636,12 +646,11 @@ function PortalLinkDialog({ result, onClose }: { result: LinkResult; onClose: ()
         {response.emailed ? null : (
           <div
             role="status"
-            className="flex items-start gap-2 rounded-md border border-brand-orange/30 bg-tint-warning px-3 py-2 text-sm text-ink"
+            className="border-brand-orange/30 bg-tint-warning text-ink flex items-start gap-2 rounded-md border px-3 py-2 text-sm"
           >
-            <MailWarning className="mt-0.5 h-4 w-4 shrink-0 text-brand-orange" aria-hidden />
+            <MailWarning className="text-brand-orange mt-0.5 h-4 w-4 shrink-0" aria-hidden />
             <p>
-              Email is not set up, so nothing was sent. Copy the link and send it to {who}{' '}
-              yourself.
+              Email is not set up, so nothing was sent. Copy the link and send it to {who} yourself.
             </p>
           </div>
         )}
@@ -664,7 +673,7 @@ function PortalLinkDialog({ result, onClose }: { result: LinkResult; onClose: ()
               {copied ? 'Copied' : 'Copy link'}
             </Button>
           </div>
-          <p className="text-xs text-ink-muted">
+          <p className="text-ink-muted text-xs">
             {copy.note}
             {response.linkExpiresAt ? ` It expires ${absoluteTime(response.linkExpiresAt)}.` : null}
           </p>

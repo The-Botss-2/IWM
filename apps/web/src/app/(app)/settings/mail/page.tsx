@@ -14,11 +14,7 @@ import {
   Trash2,
 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
-import type {
-  MailAccount,
-  MailAccountStatus,
-  MailSignature,
-} from '@botss/shared-types';
+import type { MailAccount, MailAccountStatus, MailSignature } from '@botss/shared-types';
 
 import { AddMailAccountDialog } from '@/components/mail/add-mail-account-dialog';
 import { MailEditor } from '@/components/mail/mail-editor';
@@ -75,11 +71,11 @@ export default function MailSettingsPage() {
     <div className="space-y-6">
       <header className="flex items-start justify-between gap-3">
         <div>
-          <h2 className="text-lg font-semibold text-ink">Mail settings</h2>
-          <p className="mt-1 text-sm text-ink-muted">
-            Connect your IMAP and SMTP credentials so you can read mail inside The
-            Botss, manage the signatures appended to your outgoing mail, and let
-            workspace invitations and password resets send from your own mailbox.
+          <h2 className="text-ink text-lg font-semibold">Mail settings</h2>
+          <p className="text-ink-muted mt-1 text-sm">
+            Connect your IMAP and SMTP credentials so you can read mail inside The Botss, manage the
+            signatures appended to your outgoing mail, and let workspace invitations and password
+            resets send from your own mailbox.
           </p>
         </div>
         <div className="flex flex-wrap gap-2">
@@ -103,23 +99,17 @@ export default function MailSettingsPage() {
       </header>
 
       {accounts.isLoading ? (
-        <div className="rounded-md border border-line bg-bg-surface p-6 text-center">
+        <div className="border-line bg-bg-surface rounded-md border p-6 text-center">
           <Loader size="sm" label="Loading accounts" />
         </div>
       ) : accounts.isError && !accounts.data ? (
-        <QueryError
-          message="Couldn't load mailboxes."
-          onRetry={() => void accounts.refetch()}
-        />
+        <QueryError message="Couldn't load mailboxes." onRetry={() => void accounts.refetch()} />
       ) : items.length === 0 ? (
-        <div className="rounded-md border border-dashed border-line-strong bg-bg-surface p-8 text-center">
-          <Mail className="mx-auto h-8 w-8 text-ink-disabled" aria-hidden />
-          <h2 className="mt-3 text-base font-medium text-ink">
-            No mailboxes connected yet
-          </h2>
-          <p className="mt-1 text-sm text-ink-muted">
-            Add your first mailbox to send and receive email from inside the
-            platform.
+        <div className="border-line-strong bg-bg-surface rounded-md border border-dashed p-8 text-center">
+          <Mail className="text-ink-disabled mx-auto h-8 w-8" aria-hidden />
+          <h2 className="text-ink mt-3 text-base font-medium">No mailboxes connected yet</h2>
+          <p className="text-ink-muted mt-1 text-sm">
+            Add your first mailbox to send and receive email from inside the platform.
           </p>
           <Button className="mt-4" onClick={() => setAddOpen(true)}>
             <Plus className="h-4 w-4" />
@@ -136,13 +126,12 @@ export default function MailSettingsPage() {
         </ul>
       )}
 
-      <section className="rounded-md border border-line bg-bg-subtle px-4 py-3 text-xs text-ink-muted">
-        <p className="font-medium text-ink">A note about security</p>
+      <section className="border-line bg-bg-subtle text-ink-muted rounded-md border px-4 py-3 text-xs">
+        <p className="text-ink font-medium">A note about security</p>
         <p className="mt-1">
-          Your mailbox password is encrypted with AES-256-GCM before storage
-          and is never returned in API responses. Anyone with workspace admin
-          access can still send mail from a default mailbox, so use a service
-          account rather than a personal mailbox where possible.
+          Your mailbox password is encrypted with AES-256-GCM before storage and is never returned
+          in API responses. Anyone with workspace admin access can still send mail from a default
+          mailbox, so use a service account rather than a personal mailbox where possible.
         </p>
       </section>
 
@@ -163,14 +152,14 @@ function AccountCard({ account }: { account: MailAccount }) {
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
-    <article className="rounded-md border border-line bg-bg-surface p-4">
+    <article className="border-line bg-bg-surface rounded-md border p-4">
       <div className="flex items-start gap-3">
-        <div className="grid h-9 w-9 shrink-0 place-items-center rounded-md bg-brand-50 text-brand-700">
+        <div className="bg-brand-50 text-brand-700 grid h-9 w-9 shrink-0 place-items-center rounded-md">
           <Mail className="h-4 w-4" />
         </div>
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
-            <span className="truncate text-sm font-semibold text-ink">
+            <span className="text-ink truncate text-sm font-semibold">
               {account.displayName || account.email}
             </span>
             {account.isDefault ? (
@@ -181,21 +170,20 @@ function AccountCard({ account }: { account: MailAccount }) {
             <StatusBadge status={account.status} />
           </div>
           {account.displayName ? (
-            <div className="truncate text-xs text-ink-muted">{account.email}</div>
+            <div className="text-ink-muted truncate text-xs">{account.email}</div>
           ) : null}
-          <div className="mt-1 truncate text-[11px] text-ink-disabled">
+          <div className="text-ink-disabled mt-1 truncate text-[11px]">
             IMAP {account.imapHost}:{account.imapPort}
-            {account.imapSecure ? ' (TLS)' : ''} · SMTP {account.smtpHost}:
-            {account.smtpPort}
+            {account.imapSecure ? ' (TLS)' : ''} · SMTP {account.smtpHost}:{account.smtpPort}
             {account.smtpSecure ? ' (TLS)' : ''}
           </div>
           {account.lastError ? (
-            <p className="mt-2 rounded border border-red-100 bg-tint-error px-2 py-1.5 text-xs text-state-error">
+            <p className="bg-tint-error text-state-error mt-2 rounded border border-red-100 px-2 py-1.5 text-xs">
               {account.lastError}
             </p>
           ) : null}
           {account.lastSyncedAt ? (
-            <div className="mt-1 text-[11px] text-ink-disabled">
+            <div className="text-ink-disabled mt-1 text-[11px]">
               Last verified {relativeTime(account.lastSyncedAt)}
             </div>
           ) : null}
@@ -207,12 +195,12 @@ function AccountCard({ account }: { account: MailAccount }) {
             aria-label="Account actions"
             onClick={() => setMenuOpen((o) => !o)}
             onBlur={() => setTimeout(() => setMenuOpen(false), 120)}
-            className="rounded p-1.5 text-ink-disabled hover:bg-bg-subtle hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:shadow-focus"
+            className="text-ink-disabled hover:bg-bg-subtle hover:text-ink focus-visible:shadow-focus rounded p-1.5 focus-visible:outline-none focus-visible:ring-2"
           >
             <MoreHorizontal className="h-4 w-4" />
           </button>
           {menuOpen ? (
-            <div className="absolute right-0 z-10 mt-1 w-max min-w-[12rem] rounded-md border border-line bg-bg-surface py-1 shadow-md">
+            <div className="border-line bg-bg-surface absolute right-0 z-10 mt-1 w-max min-w-[12rem] rounded-md border py-1 shadow-md">
               <MenuItem
                 onClick={() => {
                   setMenuOpen(false);
@@ -248,16 +236,12 @@ function AccountCard({ account }: { account: MailAccount }) {
                   </>
                 )}
               </MenuItem>
-              <div className="my-1 border-t border-line" />
+              <div className="border-line my-1 border-t" />
               <MenuItem
                 tone="danger"
                 onClick={() => {
                   setMenuOpen(false);
-                  if (
-                    window.confirm(
-                      `Disconnect ${account.email}? You can re-add it later.`,
-                    )
-                  ) {
+                  if (window.confirm(`Disconnect ${account.email}? You can re-add it later.`)) {
                     remove.mutate(account.id);
                   }
                 }}
@@ -290,9 +274,7 @@ function SignatureManager({ account }: { account: MailAccount }) {
   const updateAccount = useUpdateMailAccount();
 
   const signatures = account.signatures;
-  const [selectedId, setSelectedId] = useState<string | null>(
-    signatures[0]?.id ?? null,
-  );
+  const [selectedId, setSelectedId] = useState<string | null>(signatures[0]?.id ?? null);
   const htmlRef = useRef<string>('');
 
   // Keep a valid selection as signatures are added or removed. After a create
@@ -363,10 +345,7 @@ function SignatureManager({ account }: { account: MailAccount }) {
     );
   };
 
-  const setDefault = (
-    field: 'newSignatureId' | 'replySignatureId',
-    value: string,
-  ) => {
+  const setDefault = (field: 'newSignatureId' | 'replySignatureId', value: string) => {
     updateAccount.mutate({
       id: account.id,
       input: { [field]: value || null },
@@ -374,17 +353,17 @@ function SignatureManager({ account }: { account: MailAccount }) {
   };
 
   return (
-    <section className="mt-3 border-t border-line pt-3">
+    <section className="border-line mt-3 border-t pt-3">
       <div className="flex items-center justify-between gap-2">
-        <h3 className="text-sm font-semibold text-ink">Signature</h3>
-        <p className="text-[11px] text-ink-disabled">
+        <h3 className="text-ink text-sm font-semibold">Signature</h3>
+        <p className="text-ink-disabled text-[11px]">
           Appended to outgoing mail from this account.
         </p>
       </div>
 
       {signatures.length === 0 ? (
-        <div className="mt-3 rounded-md border border-dashed border-line-strong bg-bg-subtle p-5 text-center">
-          <p className="text-sm text-ink-muted">No signatures yet.</p>
+        <div className="border-line-strong bg-bg-subtle mt-3 rounded-md border border-dashed p-5 text-center">
+          <p className="text-ink-muted text-sm">No signatures yet.</p>
           <Button
             type="button"
             className="mt-3"
@@ -399,19 +378,19 @@ function SignatureManager({ account }: { account: MailAccount }) {
         <div className="mt-3 grid gap-3 md:grid-cols-[200px_minmax(0,1fr)]">
           {/* Signature list */}
           <div className="space-y-1">
-            <ul className="rounded-md border border-line bg-bg-surface" role="list">
+            <ul className="border-line bg-bg-surface rounded-md border" role="list">
               {signatures.map((s) => (
                 <li
                   key={s.id}
                   className={cn(
-                    'flex items-center gap-1 border-b border-line px-2 py-1.5 last:border-b-0',
+                    'border-line flex items-center gap-1 border-b px-2 py-1.5 last:border-b-0',
                     s.id === selectedId ? 'bg-bg-subtle' : '',
                   )}
                 >
                   <button
                     type="button"
                     onClick={() => setSelectedId(s.id)}
-                    className="min-w-0 flex-1 truncate text-left text-sm text-ink focus-visible:outline-none"
+                    className="text-ink min-w-0 flex-1 truncate text-left text-sm focus-visible:outline-none"
                   >
                     {s.name}
                   </button>
@@ -419,7 +398,7 @@ function SignatureManager({ account }: { account: MailAccount }) {
                     type="button"
                     aria-label={`Rename ${s.name}`}
                     onClick={() => void rename(s)}
-                    className="rounded p-1 text-ink-disabled hover:bg-bg-subtle hover:text-ink"
+                    className="text-ink-disabled hover:bg-bg-subtle hover:text-ink rounded p-1"
                   >
                     <PenLine className="h-3.5 w-3.5" />
                   </button>
@@ -427,7 +406,7 @@ function SignatureManager({ account }: { account: MailAccount }) {
                     type="button"
                     aria-label={`Delete ${s.name}`}
                     onClick={() => del(s)}
-                    className="rounded p-1 text-ink-disabled hover:bg-tint-error hover:text-state-error"
+                    className="text-ink-disabled hover:bg-tint-error hover:text-state-error rounded p-1"
                   >
                     <Trash2 className="h-3.5 w-3.5" />
                   </button>
@@ -460,12 +439,7 @@ function SignatureManager({ account }: { account: MailAccount }) {
                   placeholder="Regards, …"
                 />
                 <div className="flex justify-end">
-                  <Button
-                    type="button"
-                    size="sm"
-                    onClick={saveHtml}
-                    disabled={updateSig.isPending}
-                  >
+                  <Button type="button" size="sm" onClick={saveHtml} disabled={updateSig.isPending}>
                     {updateSig.isPending ? 'Saving…' : 'Save signature'}
                   </Button>
                 </div>
@@ -477,16 +451,16 @@ function SignatureManager({ account }: { account: MailAccount }) {
 
       {signatures.length > 0 ? (
         <div className="mt-4 space-y-3">
-          <p className="text-xs font-semibold uppercase tracking-wide text-ink-muted">
+          <p className="text-ink-muted text-xs font-semibold uppercase tracking-wide">
             Signature defaults
           </p>
           <div className="grid gap-3 sm:grid-cols-2">
-            <label className="block text-xs text-ink-muted">
+            <label className="text-ink-muted block text-xs">
               For new emails use
               <select
                 value={account.newSignatureId ?? ''}
                 onChange={(e) => setDefault('newSignatureId', e.target.value)}
-                className="mt-1 block w-full rounded-md border border-line bg-bg-surface px-2 py-1.5 text-sm text-ink focus-visible:outline-none focus-visible:shadow-focus"
+                className="border-line bg-bg-surface text-ink focus-visible:shadow-focus mt-1 block w-full rounded-md border px-2 py-1.5 text-sm focus-visible:outline-none"
               >
                 <option value="">No signature</option>
                 {signatures.map((s) => (
@@ -496,12 +470,12 @@ function SignatureManager({ account }: { account: MailAccount }) {
                 ))}
               </select>
             </label>
-            <label className="block text-xs text-ink-muted">
+            <label className="text-ink-muted block text-xs">
               On reply/forward use
               <select
                 value={account.replySignatureId ?? ''}
                 onChange={(e) => setDefault('replySignatureId', e.target.value)}
-                className="mt-1 block w-full rounded-md border border-line bg-bg-surface px-2 py-1.5 text-sm text-ink focus-visible:outline-none focus-visible:shadow-focus"
+                className="border-line bg-bg-surface text-ink focus-visible:shadow-focus mt-1 block w-full rounded-md border px-2 py-1.5 text-sm focus-visible:outline-none"
               >
                 <option value="">No signature</option>
                 {signatures.map((s) => (
@@ -512,7 +486,7 @@ function SignatureManager({ account }: { account: MailAccount }) {
               </select>
             </label>
           </div>
-          <label className="flex items-start gap-2 text-xs text-ink-muted">
+          <label className="text-ink-muted flex items-start gap-2 text-xs">
             <input
               type="checkbox"
               checked={account.signatureBeforeQuote}
@@ -593,9 +567,7 @@ function MenuItem({
       disabled={disabled}
       className={cn(
         'flex w-full items-center gap-2 px-3 py-1.5 text-left text-xs',
-        tone === 'danger'
-          ? 'text-state-error hover:bg-tint-error'
-          : 'text-ink hover:bg-bg-subtle',
+        tone === 'danger' ? 'text-state-error hover:bg-tint-error' : 'text-ink hover:bg-bg-subtle',
         'disabled:cursor-not-allowed disabled:opacity-50',
       )}
     >

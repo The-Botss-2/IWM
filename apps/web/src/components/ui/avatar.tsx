@@ -13,7 +13,7 @@ const Avatar = forwardRef<
     <AvatarPrimitive.Root
       ref={ref}
       className={cn(
-        'relative inline-flex h-9 w-9 shrink-0 overflow-hidden rounded-full bg-bg-subtle',
+        'bg-bg-subtle relative inline-flex h-9 w-9 shrink-0 overflow-hidden rounded-full',
         className,
       )}
       {...rest}
@@ -42,7 +42,7 @@ const AvatarFallback = forwardRef<
     <AvatarPrimitive.Fallback
       ref={ref}
       className={cn(
-        'flex h-full w-full items-center justify-center bg-fallback-avatar text-white text-xs font-semibold uppercase',
+        'bg-fallback-avatar flex h-full w-full items-center justify-center text-xs font-semibold uppercase text-white',
         className,
       )}
       {...rest}
@@ -79,7 +79,7 @@ export function UserAvatar({
       {online ? (
         <span
           aria-hidden
-          className="absolute bottom-0 right-0 h-2 w-2 rounded-full bg-brand-teal ring-2 ring-white"
+          className="bg-brand-teal absolute bottom-0 right-0 h-2 w-2 rounded-full ring-2 ring-white"
         />
       ) : null}
     </span>

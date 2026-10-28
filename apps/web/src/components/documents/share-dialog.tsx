@@ -41,11 +41,7 @@ import {
   useSetDocumentClientShare,
   useUpdateDocumentAccess,
 } from '@/hooks/use-document-access';
-import {
-  useShareDocument,
-  useUnshareDocument,
-  useUpdateDocument,
-} from '@/hooks/use-documents';
+import { useShareDocument, useUnshareDocument, useUpdateDocument } from '@/hooks/use-documents';
 import { toastErrorMessage } from '@/lib/toast';
 
 interface Props {
@@ -81,7 +77,10 @@ export function ShareDialog({ doc, open, onOpenChange }: Props) {
       setCopied(true);
       window.setTimeout(() => setCopied(false), 1500);
     } catch {
-      toastErrorMessage("Couldn't copy the link", { description: "Your browser blocked clipboard access. Allow it in site settings, or copy it by hand." });
+      toastErrorMessage("Couldn't copy the link", {
+        description:
+          'Your browser blocked clipboard access. Allow it in site settings, or copy it by hand.',
+      });
     }
   };
 
@@ -90,12 +89,12 @@ export function ShareDialog({ doc, open, onOpenChange }: Props) {
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-lg font-semibold">
-            <Globe className="h-4 w-4 text-brand-600" aria-hidden />
+            <Globe className="text-brand-600 h-4 w-4" aria-hidden />
             Share document
           </DialogTitle>
-          <DialogDescription className="text-sm text-ink-muted">
-            Share with teammates, with people at your clients through their portal, or with a
-            public link.
+          <DialogDescription className="text-ink-muted text-sm">
+            Share with teammates, with people at your clients through their portal, or with a public
+            link.
           </DialogDescription>
         </DialogHeader>
 
@@ -104,8 +103,8 @@ export function ShareDialog({ doc, open, onOpenChange }: Props) {
 
           <ClientPortalSection docId={doc.id} />
 
-          <div className="border-t border-line pt-4">
-            <h3 className="mb-3 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-ink-muted">
+          <div className="border-line border-t pt-4">
+            <h3 className="text-ink-muted mb-3 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide">
               <Globe className="h-3.5 w-3.5" aria-hidden /> Public link
             </h3>
             <div className="space-y-3">
@@ -154,8 +153,8 @@ export function ShareDialog({ doc, open, onOpenChange }: Props) {
 
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <div>
-                      <p className="text-sm font-medium text-ink">Link expires</p>
-                      <p className="text-xs text-ink-muted">
+                      <p className="text-ink text-sm font-medium">Link expires</p>
+                      <p className="text-ink-muted text-xs">
                         {doc.publicExpiresAt
                           ? `Stops working ${new Date(doc.publicExpiresAt).toLocaleString()}.`
                           : 'The link works until you turn sharing off.'}
@@ -170,7 +169,9 @@ export function ShareDialog({ doc, open, onOpenChange }: Props) {
                           id: doc.id,
                           input: {
                             publicExpiresAt:
-                              days === null ? null : new Date(Date.now() + days * 24 * 60 * 60 * 1000),
+                              days === null
+                                ? null
+                                : new Date(Date.now() + days * 24 * 60 * 60 * 1000),
                           },
                         });
                       }}
@@ -205,7 +206,7 @@ export function ShareDialog({ doc, open, onOpenChange }: Props) {
                     href={publicUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1 text-sm font-medium text-brand-700 hover:text-brand-800"
+                    className="text-brand-700 hover:text-brand-800 inline-flex items-center gap-1 text-sm font-medium"
                   >
                     Open public page
                     <ExternalLink className="h-3.5 w-3.5" aria-hidden />
@@ -237,7 +238,7 @@ function InternalAccessSection({ docId }: { docId: string }) {
 
   return (
     <section>
-      <h3 className="mb-3 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-ink-muted">
+      <h3 className="text-ink-muted mb-3 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide">
         <Users className="h-3.5 w-3.5" aria-hidden /> People with access
       </h3>
 
@@ -288,19 +289,19 @@ function InternalAccessSection({ docId }: { docId: string }) {
 
       <ul className="space-y-1" role="list">
         {list.data?.owner ? (
-          <li className="flex items-center gap-3 rounded-md border border-line bg-bg-subtle px-3 py-2">
+          <li className="border-line bg-bg-subtle flex items-center gap-3 rounded-md border px-3 py-2">
             <UserAvatar
               size="sm"
               name={list.data.owner.name || list.data.owner.email}
               image={list.data.owner.image}
             />
             <div className="min-w-0 flex-1">
-              <div className="truncate text-sm font-medium text-ink">
+              <div className="text-ink truncate text-sm font-medium">
                 {list.data.owner.name || list.data.owner.email}
               </div>
-              <div className="truncate text-xs text-ink-muted">{list.data.owner.email}</div>
+              <div className="text-ink-muted truncate text-xs">{list.data.owner.email}</div>
             </div>
-            <span className="text-xs font-medium text-ink-muted">Owner</span>
+            <span className="text-ink-muted text-xs font-medium">Owner</span>
           </li>
         ) : null}
         {list.isLoading ? (
@@ -308,7 +309,7 @@ function InternalAccessSection({ docId }: { docId: string }) {
             <Loader size="sm" label="Loading access" />
           </li>
         ) : list.data && list.data.items.length === 0 ? (
-          <li className="rounded-md border border-dashed border-line bg-white px-3 py-2 text-xs text-ink-muted">
+          <li className="border-line text-ink-muted rounded-md border border-dashed bg-white px-3 py-2 text-xs">
             No one else has access yet. Add a teammate above.
           </li>
         ) : (
@@ -341,7 +342,7 @@ function AccessRow({
   // avatar is client-controlled, so it is never loaded in a staff browser.
   const isClient = grant.user.accountType === 'CLIENT';
   return (
-    <li className="flex items-center gap-3 rounded-md border border-line bg-white px-3 py-2">
+    <li className="border-line flex items-center gap-3 rounded-md border bg-white px-3 py-2">
       <UserAvatar
         size="sm"
         name={grant.user.name || grant.user.email}
@@ -349,7 +350,7 @@ function AccessRow({
       />
       <div className="min-w-0 flex-1">
         <div className="flex min-w-0 items-center gap-1.5">
-          <span className="truncate text-sm font-medium text-ink">
+          <span className="text-ink truncate text-sm font-medium">
             {grant.user.name || grant.user.email}
           </span>
           {isClient ? (
@@ -358,10 +359,10 @@ function AccessRow({
             </Badge>
           ) : null}
         </div>
-        <div className="truncate text-xs text-ink-muted">{grant.user.email}</div>
+        <div className="text-ink-muted truncate text-xs">{grant.user.email}</div>
       </div>
       {isClient ? (
-        <span className="w-24 shrink-0 px-3.5 text-sm text-ink-muted">Read</span>
+        <span className="text-ink-muted w-24 shrink-0 px-3.5 text-sm">Read</span>
       ) : (
         <Select
           value={grant.permission}
@@ -384,7 +385,7 @@ function AccessRow({
             onRemove();
           }
         }}
-        className="rounded p-1.5 text-ink-disabled hover:bg-tint-error hover:text-state-error focus-visible:outline-none focus-visible:ring-2 focus-visible:shadow-focus"
+        className="text-ink-disabled hover:bg-tint-error hover:text-state-error focus-visible:shadow-focus rounded p-1.5 focus-visible:outline-none focus-visible:ring-2"
       >
         <Trash2 className="h-3.5 w-3.5" />
       </button>
@@ -409,11 +410,11 @@ function ClientPortalSection({ docId }: { docId: string }) {
   const personPendingId = personAccess.isPending ? personAccess.variables?.userId : undefined;
 
   return (
-    <section className="border-t border-line pt-4">
-      <h3 className="mb-1 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-ink-muted">
+    <section className="border-line border-t pt-4">
+      <h3 className="text-ink-muted mb-1 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide">
         <Building2 className="h-3.5 w-3.5" aria-hidden /> Client portal
       </h3>
-      <p className="mb-3 text-xs text-ink-muted">
+      <p className="text-ink-muted mb-3 text-xs">
         People at a client read shared documents in their portal. They can never edit them.
       </p>
 
@@ -438,13 +439,13 @@ function ClientPortalSection({ docId }: { docId: string }) {
           {sharing.otherShares.map((share) => (
             <div
               key={share.id}
-              className="flex items-center gap-3 rounded-md border border-line bg-white px-3 py-2"
+              className="border-line flex items-center gap-3 rounded-md border bg-white px-3 py-2"
             >
               <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-medium text-ink">
+                <p className="text-ink truncate text-sm font-medium">
                   Everyone at {share.client.name}
                 </p>
-                <p className="truncate text-xs text-ink-muted">
+                <p className="text-ink-muted truncate text-xs">
                   {share.grantedBy
                     ? `Shared with the company by ${share.grantedBy.name}`
                     : 'Shared with the company'}
@@ -463,11 +464,11 @@ function ClientPortalSection({ docId }: { docId: string }) {
             </div>
           ))}
           {sharing.forbidden ? (
-            <p className="text-xs text-ink-muted">
+            <p className="text-ink-muted text-xs">
               Only the document owner or a workspace admin can share with clients.
             </p>
           ) : sharing.clients.length === 0 && sharing.otherShares.length === 0 ? (
-            <p className="rounded-md border border-dashed border-line bg-white px-3 py-2 text-xs text-ink-muted">
+            <p className="border-line text-ink-muted rounded-md border border-dashed bg-white px-3 py-2 text-xs">
               Clients show up here once someone at the client has portal access, or when this
               document belongs to a client&apos;s project.
             </p>
@@ -493,7 +494,7 @@ function ClientShareCard({
 }) {
   const companyId = `client-share-${client.id}`;
   return (
-    <div className="rounded-md border border-line bg-white">
+    <div className="border-line rounded-md border bg-white">
       <div className="flex items-start gap-3 p-3">
         <Checkbox
           id={companyId}
@@ -507,7 +508,7 @@ function ClientShareCard({
           <Label htmlFor={companyId} className="cursor-pointer leading-snug">
             Share with everyone at {client.name}
           </Label>
-          <p id={`${companyId}-help`} className="mt-1 text-xs text-ink-muted">
+          <p id={`${companyId}-help`} className="text-ink-muted mt-1 text-xs">
             {client.people.length === 0
               ? `No one at ${client.name} has portal access yet. People who get it later see this too.`
               : 'Includes people who get portal access later.'}
@@ -515,7 +516,7 @@ function ClientShareCard({
         </div>
       </div>
       {client.people.length > 0 ? (
-        <ul className="border-t border-line px-3 py-1.5" aria-label={`People at ${client.name}`}>
+        <ul className="border-line border-t px-3 py-1.5" aria-label={`People at ${client.name}`}>
           {client.people.map((person) => {
             const personId = `client-person-${client.id}-${person.userId}`;
             return (
@@ -527,10 +528,10 @@ function ClientShareCard({
                   onCheckedChange={(v) => onPersonChange(person.userId, v === true)}
                 />
                 <label htmlFor={personId} className="min-w-0 flex-1 cursor-pointer">
-                  <span className="block truncate text-sm text-ink">
+                  <span className="text-ink block truncate text-sm">
                     {person.name || person.email}
                   </span>
-                  <span className="block truncate text-xs text-ink-muted">{person.email}</span>
+                  <span className="text-ink-muted block truncate text-xs">{person.email}</span>
                 </label>
               </li>
             );
@@ -538,7 +539,7 @@ function ClientShareCard({
         </ul>
       ) : null}
       {client.companyShared && client.people.length > 0 ? (
-        <p className="border-t border-line px-3 py-2 text-xs text-ink-muted">
+        <p className="border-line text-ink-muted border-t px-3 py-2 text-xs">
           Everyone here can already read it through the company share. A person you tick keeps
           access if you stop sharing with the company.
         </p>
@@ -561,17 +562,17 @@ function ToggleRow({
   onChange: (next: boolean) => void;
 }) {
   return (
-    <label className="flex items-start justify-between gap-3 rounded-md border border-line bg-white p-3">
+    <label className="border-line flex items-start justify-between gap-3 rounded-md border bg-white p-3">
       <span className="space-y-0.5">
-        <span className="block text-sm font-medium text-ink">{label}</span>
-        <span className="block text-xs text-ink-muted">{description}</span>
+        <span className="text-ink block text-sm font-medium">{label}</span>
+        <span className="text-ink-muted block text-xs">{description}</span>
       </span>
       <input
         type="checkbox"
         checked={checked}
         disabled={pending}
         onChange={(e) => onChange(e.target.checked)}
-        className="mt-1 h-4 w-4 cursor-pointer accent-brand-600 disabled:cursor-not-allowed disabled:opacity-50"
+        className="accent-brand-600 mt-1 h-4 w-4 cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
       />
     </label>
   );

@@ -33,25 +33,24 @@ export default function AdminWorkspacesPage() {
     const q = search.trim().toLowerCase();
     if (!q) return all;
     return all.filter(
-      (ws) =>
-        ws.name.toLowerCase().includes(q) || ws.slug.toLowerCase().includes(q),
+      (ws) => ws.name.toLowerCase().includes(q) || ws.slug.toLowerCase().includes(q),
     );
   }, [list.data, search]);
 
   return (
     <div className="space-y-6">
       <header>
-        <h2 className="text-lg font-semibold text-ink">Workspaces</h2>
-        <p className="mt-0.5 text-sm text-ink-muted">
-          Every workspace inside your organization. Members and per-workspace
-          settings live on each workspace page.
+        <h2 className="text-ink text-lg font-semibold">Workspaces</h2>
+        <p className="text-ink-muted mt-0.5 text-sm">
+          Every workspace inside your organization. Members and per-workspace settings live on each
+          workspace page.
         </p>
       </header>
 
       <div className="relative max-w-sm">
         <Search
           aria-hidden
-          className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-muted"
+          className="text-ink-muted pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2"
         />
         <input
           type="search"
@@ -63,7 +62,7 @@ export default function AdminWorkspacesPage() {
         />
       </div>
 
-      <section className="rounded-lg border border-line bg-white">
+      <section className="border-line rounded-lg border bg-white">
         <div className="overflow-x-auto">
           {list.isLoading ? (
             <div className="flex justify-center px-4 py-8">
@@ -71,18 +70,15 @@ export default function AdminWorkspacesPage() {
             </div>
           ) : list.isError && !list.data ? (
             <div className="p-4">
-              <QueryError
-                message="Couldn't load workspaces."
-                onRetry={() => void list.refetch()}
-              />
+              <QueryError message="Couldn't load workspaces." onRetry={() => void list.refetch()} />
             </div>
           ) : filtered.length === 0 ? (
-            <p className="px-4 py-8 text-center text-xs text-ink-muted">
+            <p className="text-ink-muted px-4 py-8 text-center text-xs">
               {search.trim() ? 'No workspaces match your search.' : 'No workspaces yet.'}
             </p>
           ) : (
             <table className="w-full text-sm">
-              <thead className="text-left text-[11px] font-medium uppercase tracking-wide text-ink-muted">
+              <thead className="text-ink-muted text-left text-[11px] font-medium uppercase tracking-wide">
                 <tr>
                   <th className="px-4 py-2">Name</th>
                   <th className="px-4 py-2">Slug</th>
@@ -95,25 +91,19 @@ export default function AdminWorkspacesPage() {
               </thead>
               <tbody>
                 {filtered.map((ws) => (
-                  <tr key={ws.id} className="border-t border-line">
+                  <tr key={ws.id} className="border-line border-t">
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-2">
-                        <Briefcase className="h-4 w-4 text-ink-muted" />
-                        <span className="font-medium text-ink">{ws.name}</span>
+                        <Briefcase className="text-ink-muted h-4 w-4" />
+                        <span className="text-ink font-medium">{ws.name}</span>
                       </div>
                     </td>
-                    <td className="px-4 py-3 font-mono text-xs text-ink-muted">
-                      {ws.slug}
+                    <td className="text-ink-muted px-4 py-3 font-mono text-xs">{ws.slug}</td>
+                    <td className="text-ink-muted px-4 py-3 text-xs">
+                      <span title={absoluteTime(ws.createdAt)}>{relativeTime(ws.createdAt)}</span>
                     </td>
-                    <td className="px-4 py-3 text-xs text-ink-muted">
-                      <span title={absoluteTime(ws.createdAt)}>
-                        {relativeTime(ws.createdAt)}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 text-xs text-ink-muted">
-                      <span title={absoluteTime(ws.updatedAt)}>
-                        {relativeTime(ws.updatedAt)}
-                      </span>
+                    <td className="text-ink-muted px-4 py-3 text-xs">
+                      <span title={absoluteTime(ws.updatedAt)}>{relativeTime(ws.updatedAt)}</span>
                     </td>
                     <td className="px-4 py-3 text-right">
                       <Button

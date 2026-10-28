@@ -7,10 +7,7 @@ import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { useSessionContext } from '@/components/auth/session-gate';
 import { useCall } from '@/components/chat/call-context';
 import { IncomingCallModal } from '@/components/chat/incoming-call-modal';
-import {
-  pushInAppNotification,
-  type InAppNotification,
-} from '@/lib/in-app-notifications';
+import { pushInAppNotification, type InAppNotification } from '@/lib/in-app-notifications';
 import { useChatRooms } from '@/hooks/use-chat';
 import { useChatNotifyingEffects } from '@/hooks/use-chat-notifications';
 import { useGlobalChatSocket, usePresence } from '@/hooks/use-chat-socket';
@@ -186,16 +183,12 @@ export function GlobalRealtime() {
   );
   const incomingCallerName = useMemo(() => {
     if (!call.incoming || !incomingRoom) return 'Unknown';
-    const caller = incomingRoom.participants.find(
-      (p) => p.userId === call.incoming!.callerId,
-    );
+    const caller = incomingRoom.participants.find((p) => p.userId === call.incoming!.callerId);
     return caller?.user.name ?? caller?.user.email ?? 'Unknown';
   }, [call.incoming, incomingRoom]);
   const incomingCallerImage = useMemo(() => {
     if (!call.incoming || !incomingRoom) return null;
-    const caller = incomingRoom.participants.find(
-      (p) => p.userId === call.incoming!.callerId,
-    );
+    const caller = incomingRoom.participants.find((p) => p.userId === call.incoming!.callerId);
     return caller?.user.image ?? null;
   }, [call.incoming, incomingRoom]);
 
@@ -210,12 +203,9 @@ export function GlobalRealtime() {
         />
       ) : null}
 
-      {call.phase === 'outgoing' ||
-      call.phase === 'connecting' ||
-      call.phase === 'connected' ? (
+      {call.phase === 'outgoing' || call.phase === 'connecting' || call.phase === 'connected' ? (
         <ActiveCallSurface rooms={rooms} userId={userId} presenceSet={presenceSet} />
       ) : null}
     </>
   );
 }
-

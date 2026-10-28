@@ -54,9 +54,7 @@ export const useDashboardFilters = create<DashboardFilterState>((set) => ({
   setStatus: (status) => set({ status }),
   toggleStatus: (s) =>
     set((state) => ({
-      status: state.status.includes(s)
-        ? state.status.filter((x) => x !== s)
-        : [...state.status, s],
+      status: state.status.includes(s) ? state.status.filter((x) => x !== s) : [...state.status, s],
     })),
   setPriority: (priority) => set({ priority }),
   togglePriority: (p) =>
@@ -75,8 +73,7 @@ export const useDashboardFilters = create<DashboardFilterState>((set) => ({
   setDuePreset: (duePreset) => set({ duePreset }),
   setSearch: (search) => set({ search }),
   setDateField: (dateField) => set({ dateField }),
-  setDateRange: (range) =>
-    set({ dateFrom: range?.from ?? null, dateTo: range?.to ?? null }),
+  setDateRange: (range) => set({ dateFrom: range?.from ?? null, dateTo: range?.to ?? null }),
   setGroupBy: (groupBy) => set({ groupBy }),
   setViewMode: (viewMode) => set({ viewMode }),
   replaceAll: (values) => set(values),
@@ -147,7 +144,8 @@ type FilterSubset = Pick<
 
 export function hasActiveDashboardFilters(filters: FilterSubset): boolean {
   return (
-    activeDayRange({ dateFrom: filters.dateFrom ?? null, dateTo: filters.dateTo ?? null }) !== null ||
+    activeDayRange({ dateFrom: filters.dateFrom ?? null, dateTo: filters.dateTo ?? null }) !==
+      null ||
     filters.workspaceId !== null ||
     filters.status.length > 0 ||
     filters.priority.length > 0 ||
@@ -159,7 +157,8 @@ export function hasActiveDashboardFilters(filters: FilterSubset): boolean {
 
 export function activeDashboardFilterCount(filters: FilterSubset): number {
   let count = 0;
-  if (activeDayRange({ dateFrom: filters.dateFrom ?? null, dateTo: filters.dateTo ?? null })) count++;
+  if (activeDayRange({ dateFrom: filters.dateFrom ?? null, dateTo: filters.dateTo ?? null }))
+    count++;
   if (filters.workspaceId !== null) count++;
   if (filters.status.length > 0) count += filters.status.length;
   if (filters.priority.length > 0) count += filters.priority.length;
@@ -191,7 +190,10 @@ export function matchesTaskOverviewFilters(
   currentUserId?: string,
 ): boolean {
   // 0. Date range on the chosen date (same rule as the API)
-  const range = activeDayRange({ dateFrom: filters.dateFrom ?? null, dateTo: filters.dateTo ?? null });
+  const range = activeDayRange({
+    dateFrom: filters.dateFrom ?? null,
+    dateTo: filters.dateTo ?? null,
+  });
   if (range && !matchesDayRange(t, filters.dateField ?? 'due', range)) return false;
 
   // 1. Workspace filter

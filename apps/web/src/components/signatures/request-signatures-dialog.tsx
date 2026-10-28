@@ -49,7 +49,11 @@ export function RequestSignaturesDialog({
 }) {
   if (!open) return null;
   return (
-    <RequestSignaturesFlow documentId={documentId} documentTitle={documentTitle} onOpenChange={onOpenChange} />
+    <RequestSignaturesFlow
+      documentId={documentId}
+      documentTitle={documentTitle}
+      onOpenChange={onOpenChange}
+    />
   );
 }
 
@@ -82,7 +86,7 @@ function RequestSignaturesFlow({
           <DialogTitle className="text-lg font-semibold">
             {f.step === 'sent' ? 'Signature request sent' : 'Request signatures'}
           </DialogTitle>
-          <DialogDescription className="text-sm text-ink-muted">
+          <DialogDescription className="text-ink-muted text-sm">
             {f.step === 'sent'
               ? 'Each signer gets their own link. No account is needed to sign.'
               : 'Signers get an email link and sign in the browser without an account.'}
@@ -99,15 +103,17 @@ function RequestSignaturesFlow({
                     i < stepIndex
                       ? 'bg-brand-gradient text-white'
                       : i === stepIndex
-                        ? 'bg-brand-50 text-brand-700 ring-1 ring-brand-purple'
+                        ? 'bg-brand-50 text-brand-700 ring-brand-purple ring-1'
                         : 'bg-bg-subtle text-ink-muted',
                   )}
                   aria-current={i === stepIndex ? 'step' : undefined}
                 >
                   {i < stepIndex ? <Check className="h-3 w-3" /> : i + 1}
                 </span>
-                <span className={i === stepIndex ? 'font-semibold text-ink' : 'text-ink-muted'}>{s.label}</span>
-                {i < STEPS.length - 1 ? <span className="h-px w-6 bg-line" aria-hidden /> : null}
+                <span className={i === stepIndex ? 'text-ink font-semibold' : 'text-ink-muted'}>
+                  {s.label}
+                </span>
+                {i < STEPS.length - 1 ? <span className="bg-line h-px w-6" aria-hidden /> : null}
               </li>
             ))}
           </ol>
@@ -119,7 +125,7 @@ function RequestSignaturesFlow({
         {f.step === 'sent' && f.result ? <SentStep result={f.result} /> : null}
 
         {f.error ? (
-          <p role="alert" className="rounded-md bg-tint-error px-3 py-2 text-sm text-state-error">
+          <p role="alert" className="bg-tint-error text-state-error rounded-md px-3 py-2 text-sm">
             {f.error}
           </p>
         ) : null}
@@ -167,34 +173,46 @@ function SignersStep({ f }: { f: Flow }) {
   return (
     <div className="space-y-5">
       <fieldset className="space-y-2">
-        <legend className="mb-1 text-sm font-medium text-ink">What should they sign?</legend>
+        <legend className="text-ink mb-1 text-sm font-medium">What should they sign?</legend>
         <div className="grid gap-2 sm:grid-cols-2">
           {(
             [
-              { key: 'document', icon: FileText, title: 'This document', hint: 'Turned into a PDF as it is now' },
-              { key: 'upload', icon: Upload, title: 'Upload a PDF', hint: 'For contracts made elsewhere' },
+              {
+                key: 'document',
+                icon: FileText,
+                title: 'This document',
+                hint: 'Turned into a PDF as it is now',
+              },
+              {
+                key: 'upload',
+                icon: Upload,
+                title: 'Upload a PDF',
+                hint: 'For contracts made elsewhere',
+              },
             ] as const
           ).map((o) => (
             <label
               key={o.key}
               className={cn(
                 'flex cursor-pointer items-start gap-2.5 rounded-lg border p-3 transition-colors',
-                f.source === o.key ? 'border-brand-purple bg-brand-50' : 'border-line hover:bg-bg-subtle',
+                f.source === o.key
+                  ? 'border-brand-purple bg-brand-50'
+                  : 'border-line hover:bg-bg-subtle',
               )}
             >
               <input
                 type="radio"
                 name="signature-source"
-                className="mt-1 accent-brand-purple"
+                className="accent-brand-purple mt-1"
                 checked={f.source === o.key}
                 onChange={() => f.setSource(o.key)}
               />
               <span>
-                <span className="flex items-center gap-1.5 text-sm font-medium text-ink">
+                <span className="text-ink flex items-center gap-1.5 text-sm font-medium">
                   <o.icon className="h-4 w-4" aria-hidden />
                   {o.title}
                 </span>
-                <span className="block text-xs text-ink-muted">{o.hint}</span>
+                <span className="text-ink-muted block text-xs">{o.hint}</span>
               </span>
             </label>
           ))}
@@ -208,17 +226,22 @@ function SignersStep({ f }: { f: Flow }) {
           />
         ) : null}
         {f.source === 'upload' && f.pdfFile ? (
-          <p className="truncate text-xs text-ink-muted">Selected: {f.pdfFile.name}</p>
+          <p className="text-ink-muted truncate text-xs">Selected: {f.pdfFile.name}</p>
         ) : null}
       </fieldset>
 
       <div className="space-y-1.5">
         <Label htmlFor="signature-title">Title</Label>
-        <Input id="signature-title" value={f.title} maxLength={200} onChange={(e) => f.setTitle(e.target.value)} />
+        <Input
+          id="signature-title"
+          value={f.title}
+          maxLength={200}
+          onChange={(e) => f.setTitle(e.target.value)}
+        />
       </div>
 
       <fieldset className="space-y-2">
-        <legend className="mb-1 text-sm font-medium text-ink">Signers</legend>
+        <legend className="text-ink mb-1 text-sm font-medium">Signers</legend>
         {f.signers.map((s, i) => (
           <div key={s.key} className="flex items-center gap-2">
             <span
@@ -247,7 +270,7 @@ function SignersStep({ f }: { f: Flow }) {
               onClick={() => f.removeSigner(s.key)}
               disabled={f.signers.length <= 1}
               aria-label={`Remove signer ${i + 1}`}
-              className="grid h-9 w-9 shrink-0 place-items-center rounded-md text-ink-muted hover:bg-tint-error hover:text-state-error disabled:opacity-30"
+              className="text-ink-muted hover:bg-tint-error hover:text-state-error grid h-9 w-9 shrink-0 place-items-center rounded-md disabled:opacity-30"
             >
               <Trash2 className="h-4 w-4" />
             </button>
@@ -268,7 +291,9 @@ function FieldsStep({ f, pdf }: { f: Flow; pdf: ReturnType<typeof usePdfDocument
     <div className="grid gap-4 md:grid-cols-[220px_1fr]">
       <aside className="space-y-4">
         <div className="space-y-1.5">
-          <p className="text-xs font-semibold uppercase tracking-wide text-ink-muted">Placing for</p>
+          <p className="text-ink-muted text-xs font-semibold uppercase tracking-wide">
+            Placing for
+          </p>
           <div className="space-y-1" role="radiogroup" aria-label="Signer">
             {signers.map((s, i) => (
               <button
@@ -283,14 +308,17 @@ function FieldsStep({ f, pdf }: { f: Flow; pdf: ReturnType<typeof usePdfDocument
                 )}
                 style={f.activeSigner === i ? { borderColor: signerColor(i) } : undefined}
               >
-                <span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ backgroundColor: signerColor(i) }} />
+                <span
+                  className="h-2.5 w-2.5 shrink-0 rounded-full"
+                  style={{ backgroundColor: signerColor(i) }}
+                />
                 <span className="truncate">{s.name || s.email}</span>
               </button>
             ))}
           </div>
         </div>
         <div className="space-y-1.5">
-          <p className="text-xs font-semibold uppercase tracking-wide text-ink-muted">Field</p>
+          <p className="text-ink-muted text-xs font-semibold uppercase tracking-wide">Field</p>
           <div className="flex gap-1.5" role="radiogroup" aria-label="Field type">
             {(['SIGNATURE', 'DATE'] as const).map((k) => (
               <button
@@ -301,27 +329,35 @@ function FieldsStep({ f, pdf }: { f: Flow; pdf: ReturnType<typeof usePdfDocument
                 onClick={() => f.setKind(k)}
                 className={cn(
                   'inline-flex flex-1 items-center justify-center gap-1 rounded-md border px-2 py-1.5 text-xs font-medium',
-                  f.kind === k ? 'border-brand-purple bg-brand-50 text-brand-700' : 'border-line text-ink-muted',
+                  f.kind === k
+                    ? 'border-brand-purple bg-brand-50 text-brand-700'
+                    : 'border-line text-ink-muted',
                 )}
               >
-                {k === 'SIGNATURE' ? <PenLine className="h-3.5 w-3.5" /> : <CalendarDays className="h-3.5 w-3.5" />}
+                {k === 'SIGNATURE' ? (
+                  <PenLine className="h-3.5 w-3.5" />
+                ) : (
+                  <CalendarDays className="h-3.5 w-3.5" />
+                )}
                 {k === 'SIGNATURE' ? 'Signature' : 'Date'}
               </button>
             ))}
           </div>
         </div>
-        <p className="text-xs text-ink-muted">
-          Click the page to add a field for the selected signer. Drag to move, pull the corner to resize.
+        <p className="text-ink-muted text-xs">
+          Click the page to add a field for the selected signer. Drag to move, pull the corner to
+          resize.
         </p>
         {f.signersWithoutField.length > 0 ? (
-          <p className="rounded-md bg-tint-warning px-2.5 py-2 text-xs text-brand-orange">
+          <p className="bg-tint-warning text-brand-orange rounded-md px-2.5 py-2 text-xs">
             {f.signersWithoutField.map((s) => s.name || s.email).join(', ')}{' '}
-            {f.signersWithoutField.length === 1 ? 'has' : 'have'} no signature box and will place their own.
+            {f.signersWithoutField.length === 1 ? 'has' : 'have'} no signature box and will place
+            their own.
           </p>
         ) : null}
       </aside>
 
-      <div className="max-h-[65vh] overflow-y-auto rounded-lg bg-bg-subtle p-3">
+      <div className="bg-bg-subtle max-h-[65vh] overflow-y-auto rounded-lg p-3">
         {pdf.status === 'ready' ? (
           <PdfPages
             doc={pdf.doc}
@@ -348,7 +384,7 @@ function FieldsStep({ f, pdf }: { f: Flow; pdf: ReturnType<typeof usePdfDocument
             }
           />
         ) : pdf.status === 'error' ? (
-          <p role="alert" className="p-4 text-sm text-state-error">
+          <p role="alert" className="text-state-error p-4 text-sm">
             {pdf.message}
           </p>
         ) : (
@@ -363,11 +399,12 @@ function SendStep({ f }: { f: Flow }) {
   const signers = f.draft?.signers ?? [];
   return (
     <div className="space-y-4">
-      <div className="rounded-lg border border-line p-3 text-sm">
-        <p className="font-medium text-ink">{f.title || 'Untitled'}</p>
-        <p className="mt-0.5 text-ink-muted">
+      <div className="border-line rounded-lg border p-3 text-sm">
+        <p className="text-ink font-medium">{f.title || 'Untitled'}</p>
+        <p className="text-ink-muted mt-0.5">
           {f.draft?.pageCount} page{f.draft?.pageCount === 1 ? '' : 's'}, {f.fields.length} field
-          {f.fields.length === 1 ? '' : 's'}, {signers.length} signer{signers.length === 1 ? '' : 's'}
+          {f.fields.length === 1 ? '' : 's'}, {signers.length} signer
+          {signers.length === 1 ? '' : 's'}
         </p>
       </div>
       <div className="space-y-1.5">
@@ -427,23 +464,32 @@ function SentStep({ result }: { result: NonNullable<Flow['result']> }) {
       </p>
       <ul className="space-y-2">
         {result.links.map((l) => (
-          <li key={l.signerId} className="flex items-center gap-2 rounded-md border border-line p-2">
-            <span className="min-w-0 flex-1 truncate text-sm text-ink">{l.email}</span>
-            {l.code ? <span className="font-mono text-xs text-ink-muted">Code {l.code}</span> : null}
+          <li
+            key={l.signerId}
+            className="border-line flex items-center gap-2 rounded-md border p-2"
+          >
+            <span className="text-ink min-w-0 flex-1 truncate text-sm">{l.email}</span>
+            {l.code ? (
+              <span className="text-ink-muted font-mono text-xs">Code {l.code}</span>
+            ) : null}
             <Button
               variant="secondary"
               size="sm"
               onClick={() => void copy(l.signerId, l.code ? `${l.url}\nCode: ${l.code}` : l.url)}
             >
-              {copied === l.signerId ? <Check className="mr-1 h-3.5 w-3.5" /> : <Copy className="mr-1 h-3.5 w-3.5" />}
+              {copied === l.signerId ? (
+                <Check className="mr-1 h-3.5 w-3.5" />
+              ) : (
+                <Copy className="mr-1 h-3.5 w-3.5" />
+              )}
               {copied === l.signerId ? 'Copied' : 'Copy link'}
             </Button>
           </li>
         ))}
       </ul>
-      <p className="text-xs text-ink-muted">
-        Each link signs as that person only and opens with its 6-digit code (copied with the link). Both
-        are shown once here and are not stored, so resend from the document if one is lost.
+      <p className="text-ink-muted text-xs">
+        Each link signs as that person only and opens with its 6-digit code (copied with the link).
+        Both are shown once here and are not stored, so resend from the document if one is lost.
       </p>
     </div>
   );

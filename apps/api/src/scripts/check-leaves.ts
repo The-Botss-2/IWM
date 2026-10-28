@@ -81,10 +81,15 @@ type DateFilter = { gte?: Date; lte?: Date; lt?: Date };
 const clone = <T>(v: T): T => (v === null ? v : { ...v });
 const day = (ymd: string): Date => new Date(`${ymd}T00:00:00.000Z`);
 const inRange = (d: Date, f?: DateFilter): boolean =>
-  !f ||
-  ((!f.gte || d >= f.gte) && (!f.lte || d <= f.lte) && (!f.lt || d < f.lt));
+  !f || ((!f.gte || d >= f.gte) && (!f.lte || d <= f.lte) && (!f.lt || d < f.lt));
 
-function leave(id: string, userId: string, from: string, to: string, status: LeaveRow['status']): LeaveRow {
+function leave(
+  id: string,
+  userId: string,
+  from: string,
+  to: string,
+  status: LeaveRow['status'],
+): LeaveRow {
   return {
     id,
     userId,
@@ -134,7 +139,9 @@ function fakePrisma(init: {
       (typeof w.userId === 'string' ? r.userId === w.userId : w.userId.in.includes(r.userId))) &&
     (w.status === undefined || r.status === w.status) &&
     (!('notes' in w) ||
-      (w.notes === null ? r.notes === null : (r.notes ?? '').startsWith(w.notes?.startsWith ?? ''))) &&
+      (w.notes === null
+        ? r.notes === null
+        : (r.notes ?? '').startsWith(w.notes?.startsWith ?? ''))) &&
     (w.date instanceof Date ? r.date.getTime() === w.date.getTime() : inRange(r.date, w.date));
 
   const client = {
@@ -208,12 +215,17 @@ function fakePrisma(init: {
         }
         return { count };
       },
-      createMany: async (args: { data: Omit<AttendanceRow, 'id' | 'notes'>[]; skipDuplicates: boolean }) => {
+      createMany: async (args: {
+        data: Omit<AttendanceRow, 'id' | 'notes'>[];
+        skipDuplicates: boolean;
+      }) => {
         writes.push('attendance.createMany');
         event('attendance.createMany');
         let count = 0;
         for (const r of args.data) {
-          const dup = attendance.some((a) => a.userId === r.userId && a.date.getTime() === r.date.getTime());
+          const dup = attendance.some(
+            (a) => a.userId === r.userId && a.date.getTime() === r.date.getTime(),
+          );
           if (dup) continue;
           attendance.push({ ...r, id: `gen-${r.userId}-${r.date.toISOString()}`, notes: null });
           count++;
@@ -245,7 +257,11 @@ function fakePrisma(init: {
       },
     },
     $executeRaw: async (sql: { strings: string[]; values: unknown[] }) => {
-      assert.match(sql.strings.join('?'), /pg_advisory_xact_lock\(hashtext\(\?\)\)/, 'advisory lock SQL');
+      assert.match(
+        sql.strings.join('?'),
+        /pg_advisory_xact_lock\(hashtext\(\?\)\)/,
+        'advisory lock SQL',
+      );
       writes.push('lock');
       event(`lock:${String(sql.values[0])}`);
       return 1;
@@ -273,7 +289,11 @@ function fakeNotifications() {
 }
 
 /** Run `fn` as `userId`, the way AuthGuard leaves a request. */
-function as<T>(userId: string, permissions: EffectivePermissions, fn: () => Promise<T>): Promise<T> {
+function as<T>(
+  userId: string,
+  permissions: EffectivePermissions,
+  fn: () => Promise<T>,
+): Promise<T> {
   return new Promise<T>((resolve, reject) => {
     new RequestContextMiddleware().use({} as Request, {} as Response, () => {
       setRequestAuth({
@@ -360,7 +380,12 @@ async function main(): Promise<void> {
   // --- attendance after an approved leave is rejected / deleted -------------
   // 2026-10-09 is a Friday; the leave runs Fri 9 .. Wed 14.
   for (const action of ['reject', 'delete'] as const) {
-    const att = (id: string, userId: string, ymd: string, notes: string | null = null): AttendanceRow => ({
+    const att = (
+      id: string,
+      userId: string,
+      ymd: string,
+      notes: string | null = null,
+    ): AttendanceRow => ({
       id,
       userId,
       date: day(ymd),
@@ -396,14 +421,30 @@ async function main(): Promise<void> {
     const label = `after ${action}`;
     assert.equal(writes[0], 'lock', `${label}: the attendance/leave lock is taken first`);
     assert.equal(byId.get('a-fri')?.status, 'ABSENT', `${label}: weekday without time is ABSENT`);
-    assert.match(byId.get('a-fri')?.notes ?? '', /^Was LEAVE until the leave request was/, `${label}: note explains it`);
-    assert.equal(byId.has('a-sat'), false, `${label}: idle weekend row removed (the cron writes none)`);
+    assert.match(
+      byId.get('a-fri')?.notes ?? '',
+      /^Was LEAVE until the leave request was/,
+      `${label}: note explains it`,
+    );
+    assert.equal(
+      byId.has('a-sat'),
+      false,
+      `${label}: idle weekend row removed (the cron writes none)`,
+    );
     assert.equal(byId.get('a-sun')?.status, 'PRESENT', `${label}: day with logged time is PRESENT`);
     assert.equal(byId.get('a-mon')?.status, 'LEAVE', `${label}: HR override with a note untouched`);
     assert.equal(byId.get('a-mon')?.notes, 'Doctor note on file', `${label}: override note kept`);
-    assert.equal(byId.get('a-tue')?.status, 'LEAVE', `${label}: day under another approved leave stays LEAVE`);
+    assert.equal(
+      byId.get('a-tue')?.status,
+      'LEAVE',
+      `${label}: day under another approved leave stays LEAVE`,
+    );
     assert.equal(byId.get('a-wed')?.status, 'HOLIDAY', `${label}: holiday wins`);
-    assert.equal(byId.get('a-after')?.status, 'LEAVE', `${label}: rows outside the range untouched`);
+    assert.equal(
+      byId.get('a-after')?.status,
+      'LEAVE',
+      `${label}: rows outside the range untouched`,
+    );
     assert.equal(byId.get('a-other-user')?.status, 'LEAVE', `${label}: other people untouched`);
   }
 
@@ -411,7 +452,9 @@ async function main(): Promise<void> {
   {
     const { prisma, writes } = fakePrisma({
       leaves: [leave(LEAVE_ID, EMP_A, '2026-10-09', '2026-10-09', 'PENDING')],
-      attendance: [{ id: 'a', userId: EMP_A, date: day('2026-10-09'), status: 'LEAVE', notes: null }],
+      attendance: [
+        { id: 'a', userId: EMP_A, date: day('2026-10-09'), status: 'LEAVE', notes: null },
+      ],
     });
     const leaves = new LeavesService(prisma, fakeNotifications().service);
     await as(HR_A, HR_PERMS, () => leaves.updateStatus(HR_A, LEAVE_ID, { status: 'REJECTED' }));
@@ -421,13 +464,23 @@ async function main(): Promise<void> {
   // An employee's cancel races HR's approval: the first read still says
   // PENDING, the locked re-read says APPROVED. The cancel must be refused.
   {
-    const { prisma, leaves: rows, writes } = fakePrisma({
+    const {
+      prisma,
+      leaves: rows,
+      writes,
+    } = fakePrisma({
       leaves: [leave(LEAVE_ID, EMP_A, '2026-10-09', '2026-10-09', 'PENDING')],
-      attendance: [{ id: 'a', userId: EMP_A, date: day('2026-10-09'), status: 'LEAVE', notes: null }],
+      attendance: [
+        { id: 'a', userId: EMP_A, date: day('2026-10-09'), status: 'LEAVE', notes: null },
+      ],
     });
-    const leaveModel = (prisma as unknown as {
-      client: { leave: { findUnique: (args: { where: { id: string } }) => Promise<LeaveRow | null> } };
-    }).client.leave;
+    const leaveModel = (
+      prisma as unknown as {
+        client: {
+          leave: { findUnique: (args: { where: { id: string } }) => Promise<LeaveRow | null> };
+        };
+      }
+    ).client.leave;
     const read = leaveModel.findUnique;
     let reads = 0;
     leaveModel.findUnique = async (args) => {
@@ -457,7 +510,9 @@ async function main(): Promise<void> {
     const HOLIDAY_ID = 'cmholiday0000000000000000';
     const { prisma, attendance, events } = fakePrisma({
       leaves: [leave(LEAVE_ID, EMP_A, '2026-10-09', '2026-10-09', 'APPROVED')],
-      attendance: [{ id: 'h', userId: EMP_A, date: day('2026-10-09'), status: 'HOLIDAY', notes: null }],
+      attendance: [
+        { id: 'h', userId: EMP_A, date: day('2026-10-09'), status: 'HOLIDAY', notes: null },
+      ],
       // Unmark keeps the holiday definition.
       holidays: [{ id: HOLIDAY_ID, organizationId: ORG_A, date: day('2026-10-09') }],
     });
@@ -508,12 +563,22 @@ async function main(): Promise<void> {
       ],
       attendance: [
         { id: 'sys', userId: EMP_A, date: day('2026-10-09'), status: 'HOLIDAY', notes: revertNote },
-        { id: 'hr', userId: OTHER_A, date: day('2026-10-09'), status: 'HOLIDAY', notes: 'Approved by phone' },
+        {
+          id: 'hr',
+          userId: OTHER_A,
+          date: day('2026-10-09'),
+          status: 'HOLIDAY',
+          notes: 'Approved by phone',
+        },
       ],
       holidays: [{ id: HOLIDAY_ID, organizationId: ORG_A, date: day('2026-10-09') }],
     });
     const leaves = new LeavesService(prisma, fakeNotifications().service);
-    const holidays = new HolidaysService(prisma, { assertAdminOrHR: async () => undefined } as never, leaves);
+    const holidays = new HolidaysService(
+      prisma,
+      { assertAdminOrHR: async () => undefined } as never,
+      leaves,
+    );
     await as(HR_A, HR_PERMS, () => holidays.unmark(HR_A, HOLIDAY_ID));
     const byId = () => new Map(attendance.map((r) => [r.id, r]));
     assert.deepEqual(
@@ -529,7 +594,10 @@ async function main(): Promise<void> {
     await as(HR_A, HR_PERMS, () => leaves.updateStatus(HR_A, LEAVE_ID, { status: 'REJECTED' }));
     // The holiday still stands, so the reverted row is HOLIDAY again, with a fresh revert note.
     assert.equal(byId().get('sys')?.status, 'HOLIDAY', 'rejecting L2 reverts the recomputed row');
-    assert.ok(byId().get('sys')?.notes?.startsWith(LEAVE_REVERT_NOTE_PREFIX), 'revert note written');
+    assert.ok(
+      byId().get('sys')?.notes?.startsWith(LEAVE_REVERT_NOTE_PREFIX),
+      'revert note written',
+    );
   }
 
   // --- the cron and a reject/delete are serialized by one advisory lock -----

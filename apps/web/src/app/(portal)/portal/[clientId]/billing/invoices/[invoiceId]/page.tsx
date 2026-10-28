@@ -117,12 +117,16 @@ export default function PortalInvoicePage({
 
       <article aria-label={`Invoice ${inv.number}`} className="card overflow-hidden">
         {context ? (
-          <p className="border-b border-line px-4 py-3 text-sm text-ink-muted sm:px-6">{context}</p>
+          <p className="border-line text-ink-muted border-b px-4 py-3 text-sm sm:px-6">{context}</p>
         ) : null}
 
-        <LineItems invoice={inv} showTaxRate={breakdown.showTaxRate} discounted={breakdown.discountedLineIds} />
+        <LineItems
+          invoice={inv}
+          showTaxRate={breakdown.showTaxRate}
+          discounted={breakdown.discountedLineIds}
+        />
 
-        <div className="flex flex-col gap-6 border-t border-line px-4 py-5 sm:px-6 lg:flex-row lg:items-start lg:justify-between">
+        <div className="border-line flex flex-col gap-6 border-t px-4 py-5 sm:px-6 lg:flex-row lg:items-start lg:justify-between">
           <div className="min-w-0 space-y-4 lg:max-w-md">
             {inv.notes ? <TextBlock title="Notes" text={inv.notes} /> : null}
             {inv.terms ? <TextBlock title="Terms" text={inv.terms} /> : null}
@@ -133,7 +137,9 @@ export default function PortalInvoicePage({
                 key={row.key}
                 className={cn(
                   'flex items-baseline justify-between gap-4',
-                  row.strong ? 'border-t border-line pt-2 font-semibold text-ink' : 'text-ink-muted',
+                  row.strong
+                    ? 'border-line text-ink border-t pt-2 font-semibold'
+                    : 'text-ink-muted',
                   row.key === 'balance' && 'text-base',
                 )}
               >
@@ -145,7 +151,7 @@ export default function PortalInvoicePage({
         </div>
 
         {inv.footer ? (
-          <p className="whitespace-pre-wrap border-t border-line px-4 py-4 text-xs text-ink-muted sm:px-6">
+          <p className="border-line text-ink-muted whitespace-pre-wrap border-t px-4 py-4 text-xs sm:px-6">
             {inv.footer}
           </p>
         ) : null}
@@ -168,7 +174,7 @@ function LineItems({
     <div className="overflow-x-auto">
       <table className="w-full min-w-[560px] text-sm">
         <thead>
-          <tr className="border-b border-line text-left text-xs text-ink-muted">
+          <tr className="border-line text-ink-muted border-b text-left text-xs">
             <th scope="col" className={cn(TH, 'w-12')}>
               #
             </th>
@@ -194,32 +200,35 @@ function LineItems({
         <tbody>
           {invoice.lineItems.length === 0 ? (
             <tr>
-              <td colSpan={showTaxRate ? 6 : 5} className={cn(TD, 'text-center text-ink-muted')}>
+              <td colSpan={showTaxRate ? 6 : 5} className={cn(TD, 'text-ink-muted text-center')}>
                 No line items.
               </td>
             </tr>
           ) : (
             invoice.lineItems.map((line, i) => (
-              <tr key={line.id} className="border-b border-line align-top last:border-0">
-                <td className={cn(TD, 'tabular-nums text-ink-muted')}>{i + 1}</td>
+              <tr key={line.id} className="border-line border-b align-top last:border-0">
+                <td className={cn(TD, 'text-ink-muted tabular-nums')}>{i + 1}</td>
                 <td className={cn(TD, 'text-ink')}>
                   <span className="whitespace-pre-wrap">{line.description}</span>
                   {discounted.has(line.id) ? (
-                    <span className="text-ink-muted"> ({formatPercent(line.discountRate)} off)</span>
+                    <span className="text-ink-muted">
+                      {' '}
+                      ({formatPercent(line.discountRate)} off)
+                    </span>
                   ) : null}
                 </td>
-                <td className={cn(TD, 'whitespace-nowrap text-right text-ink')}>
+                <td className={cn(TD, 'text-ink whitespace-nowrap text-right')}>
                   {formatQuantity(line.quantity)}
                 </td>
-                <td className={cn(TD, 'whitespace-nowrap text-right text-ink')}>
+                <td className={cn(TD, 'text-ink whitespace-nowrap text-right')}>
                   {formatCurrency(line.unitPrice, invoice.currency)}
                 </td>
                 {showTaxRate ? (
-                  <td className={cn(TD, 'whitespace-nowrap text-right text-ink-muted')}>
+                  <td className={cn(TD, 'text-ink-muted whitespace-nowrap text-right')}>
                     {formatPercent(line.taxRate)}
                   </td>
                 ) : null}
-                <td className={cn(TD, 'whitespace-nowrap text-right font-medium text-ink')}>
+                <td className={cn(TD, 'text-ink whitespace-nowrap text-right font-medium')}>
                   {formatCurrency(line.amount, invoice.currency)}
                 </td>
               </tr>
@@ -234,8 +243,8 @@ function LineItems({
 function TextBlock({ title, text }: { title: string; text: string }) {
   return (
     <div>
-      <h2 className="text-sm font-medium text-ink">{title}</h2>
-      <p className="mt-1 whitespace-pre-wrap text-sm text-ink-muted">{text}</p>
+      <h2 className="text-ink text-sm font-medium">{title}</h2>
+      <p className="text-ink-muted mt-1 whitespace-pre-wrap text-sm">{text}</p>
     </div>
   );
 }

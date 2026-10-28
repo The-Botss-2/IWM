@@ -1,6 +1,13 @@
 'use client';
 
-import { ChevronRight, FileSignature, FileText, FolderKanban, Wallet, type LucideIcon } from 'lucide-react';
+import {
+  ChevronRight,
+  FileSignature,
+  FileText,
+  FolderKanban,
+  Wallet,
+  type LucideIcon,
+} from 'lucide-react';
 import Link from 'next/link';
 import { use, type ReactNode } from 'react';
 import type { PortalClientSummary, PortalOverview } from '@botss/shared-types';
@@ -49,7 +56,13 @@ export default function PortalOverviewPage({ params }: { params: Promise<{ clien
   );
 }
 
-function OverviewBody({ client, overview }: { client: PortalClientSummary; overview: PortalOverview }) {
+function OverviewBody({
+  client,
+  overview,
+}: {
+  client: PortalClientSummary;
+  overview: PortalOverview;
+}) {
   const { projects, pendingSignatures, sharedDocuments, outstanding } = overview;
   const shown = projects.slice(0, OVERVIEW_PROJECTS);
 
@@ -66,16 +79,16 @@ function OverviewBody({ client, overview }: { client: PortalClientSummary; overv
             >
               {pendingSignatures > 0 ? (
                 <>
-                  <p className="text-2xl font-bold tabular-nums text-ink">{pendingSignatures}</p>
-                  <p className="text-sm text-ink-muted">
+                  <p className="text-ink text-2xl font-bold tabular-nums">{pendingSignatures}</p>
+                  <p className="text-ink-muted text-sm">
                     {plural(pendingSignatures, 'document', 'documents')} waiting for your signature
                   </p>
-                  <p className="pt-1 text-sm font-medium text-brand-700">Review and sign</p>
+                  <p className="text-brand-700 pt-1 text-sm font-medium">Review and sign</p>
                 </>
               ) : (
                 <>
-                  <p className="text-base font-medium text-ink">Nothing to sign right now</p>
-                  <p className="text-sm text-ink-muted">
+                  <p className="text-ink text-base font-medium">Nothing to sign right now</p>
+                  <p className="text-ink-muted text-sm">
                     Documents that need your signature will show up here.
                   </p>
                 </>
@@ -86,15 +99,15 @@ function OverviewBody({ client, overview }: { client: PortalClientSummary; overv
             <GlanceCard href={portalHref(client.id, 'documents')} icon={FileText} label="Documents">
               {sharedDocuments > 0 ? (
                 <>
-                  <p className="text-2xl font-bold tabular-nums text-ink">{sharedDocuments}</p>
-                  <p className="text-sm text-ink-muted">
+                  <p className="text-ink text-2xl font-bold tabular-nums">{sharedDocuments}</p>
+                  <p className="text-ink-muted text-sm">
                     {plural(sharedDocuments, 'document', 'documents')} shared with you
                   </p>
                 </>
               ) : (
                 <>
-                  <p className="text-base font-medium text-ink">No documents yet</p>
-                  <p className="text-sm text-ink-muted">
+                  <p className="text-ink text-base font-medium">No documents yet</p>
+                  <p className="text-ink-muted text-sm">
                     Documents {client.agency.name} shares with you will show up here.
                   </p>
                 </>
@@ -106,8 +119,8 @@ function OverviewBody({ client, overview }: { client: PortalClientSummary; overv
               <GlanceCard href={portalHref(client.id, 'billing')} icon={Wallet} label="Outstanding">
                 {outstanding.length === 0 ? (
                   <>
-                    <p className="text-base font-medium text-ink">Nothing outstanding</p>
-                    <p className="text-sm text-ink-muted">You are all paid up.</p>
+                    <p className="text-ink text-base font-medium">Nothing outstanding</p>
+                    <p className="text-ink-muted text-sm">You are all paid up.</p>
                   </>
                 ) : (
                   // One line per currency: amounts in different currencies
@@ -115,10 +128,10 @@ function OverviewBody({ client, overview }: { client: PortalClientSummary; overv
                   <ul className="space-y-2">
                     {outstanding.map((row) => (
                       <li key={row.currency}>
-                        <p className="text-xl font-bold tabular-nums text-ink">
+                        <p className="text-ink text-xl font-bold tabular-nums">
                           {formatCurrency(row.amount, row.currency)}
                         </p>
-                        <p className="text-sm text-ink-muted">
+                        <p className="text-ink-muted text-sm">
                           {row.invoiceCount} open {plural(row.invoiceCount, 'invoice', 'invoices')}
                         </p>
                       </li>
@@ -133,13 +146,13 @@ function OverviewBody({ client, overview }: { client: PortalClientSummary; overv
 
       <section aria-labelledby="overview-projects" className="space-y-4">
         <div className="flex items-center justify-between gap-3">
-          <h2 id="overview-projects" className="text-lg font-semibold text-ink">
+          <h2 id="overview-projects" className="text-ink text-lg font-semibold">
             Projects
           </h2>
           {projects.length > shown.length ? (
             <Link
               href={portalHref(client.id, 'projects')}
-              className="rounded-md text-sm font-medium text-brand-700 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-purple/50"
+              className="text-brand-700 focus-visible:ring-brand-purple/50 rounded-md text-sm font-medium hover:underline focus-visible:outline-none focus-visible:ring-2"
             >
               View all {projects.length}
             </Link>
@@ -183,15 +196,15 @@ function GlanceCard({
     <Link
       href={href}
       className={cn(
-        'card flex h-full flex-col gap-3 p-5 transition-shadow duration-200 hover:shadow-soft-lg',
-        'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-purple/50',
-        attention && 'bg-brand-50 ring-1 ring-inset ring-brand-purple/20',
+        'card hover:shadow-soft-lg flex h-full flex-col gap-3 p-5 transition-shadow duration-200',
+        'focus-visible:ring-brand-purple/50 focus-visible:outline-none focus-visible:ring-2',
+        attention && 'bg-brand-50 ring-brand-purple/20 ring-1 ring-inset',
       )}
     >
-      <span className="flex items-center gap-2 text-sm font-medium text-ink-muted">
+      <span className="text-ink-muted flex items-center gap-2 text-sm font-medium">
         <Icon className={cn('h-4 w-4', attention && 'text-brand-purple')} aria-hidden />
         {label}
-        <ChevronRight className="ml-auto h-4 w-4 text-ink-disabled" aria-hidden />
+        <ChevronRight className="text-ink-disabled ml-auto h-4 w-4" aria-hidden />
       </span>
       <div className="space-y-1">{children}</div>
     </Link>

@@ -17,10 +17,7 @@ import { useCurrentWorkspace } from '@/hooks/use-workspace';
 import { relativeTime } from '@/lib/time';
 import { cn } from '@/lib/utils';
 
-const STATUS_META: Record<
-  ProjectStatus,
-  { label: string; pill: string; dot: string }
-> = {
+const STATUS_META: Record<ProjectStatus, { label: string; pill: string; dot: string }> = {
   DRAFT: {
     label: 'Draft',
     pill: 'bg-bg-subtle text-ink-muted',
@@ -70,13 +67,13 @@ export default function ProjectsPage() {
     <div className="mx-auto max-w-7xl space-y-6 px-4 py-8 sm:px-6 lg:px-8">
       <header className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <p className="text-xs font-medium text-ink-muted">
-            <span className="hover:underline cursor-pointer">Dashboard</span>
+          <p className="text-ink-muted text-xs font-medium">
+            <span className="cursor-pointer hover:underline">Dashboard</span>
             <span className="mx-1">›</span>
             <span className="underline">Projects</span>
           </p>
-          <h1 className="mt-2 text-2xl font-semibold text-ink">Projects</h1>
-          <p className="text-sm text-ink-muted">
+          <h1 className="text-ink mt-2 text-2xl font-semibold">Projects</h1>
+          <p className="text-ink-muted text-sm">
             {workspace.data?.name
               ? `All projects in ${workspace.data.name}.`
               : 'All projects in this workspace.'}
@@ -95,7 +92,7 @@ export default function ProjectsPage() {
         <div className="relative w-full max-w-sm">
           <Search
             aria-hidden
-            className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-muted"
+            className="text-ink-muted pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2"
           />
           <input
             type="search"
@@ -132,8 +129,8 @@ export default function ProjectsPage() {
                 className={cn(
                   'inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium transition-colors',
                   active
-                    ? 'border border-brand-purple/30 bg-brand-50 text-brand-700 font-semibold'
-                    : 'border border-line hover:bg-bg-subtle text-ink-muted',
+                    ? 'border-brand-purple/30 bg-brand-50 text-brand-700 border font-semibold'
+                    : 'border-line hover:bg-bg-subtle text-ink-muted border',
                 )}
               >
                 <span className={cn('h-1.5 w-1.5 rounded-full', meta.dot)} />
@@ -151,13 +148,10 @@ export default function ProjectsPage() {
           ))}
         </div>
       ) : projects.isError && !projects.data ? (
-        <QueryError
-          message="Couldn't load projects."
-          onRetry={() => void projects.refetch()}
-        />
+        <QueryError message="Couldn't load projects." onRetry={() => void projects.refetch()} />
       ) : items.length === 0 ? (
         searching || statusFilter !== 'ALL' ? (
-          <div className="rounded-xl bg-white p-10 text-center text-sm text-ink-muted shadow-soft">
+          <div className="text-ink-muted shadow-soft rounded-xl bg-white p-10 text-center text-sm">
             No projects match your filter.
             <div className="mt-3">
               <Button
@@ -196,33 +190,31 @@ function ProjectCard({ project: p }: { project: ProjectWithCreator }) {
     <Link
       href={`/projects/${p.id}`}
       className={cn(
-        'group relative flex flex-col gap-4 rounded-xl bg-white p-6 shadow-soft transition-all duration-200',
-        'hover:-translate-y-0.5 hover:shadow-soft-lg',
-        'focus-visible:outline-none focus-visible:shadow-focus',
+        'shadow-soft group relative flex flex-col gap-4 rounded-xl bg-white p-6 transition-all duration-200',
+        'hover:shadow-soft-lg hover:-translate-y-0.5',
+        'focus-visible:shadow-focus focus-visible:outline-none',
       )}
     >
       {/* Header row: project color block + key + status pill */}
       <div className="flex items-start justify-between gap-3">
-        <div className="flex items-center gap-3 min-w-0">
+        <div className="flex min-w-0 items-center gap-3">
           <div
-            className="grid h-11 w-11 shrink-0 place-items-center rounded-lg text-base font-semibold text-white shadow-soft"
+            className="shadow-soft grid h-11 w-11 shrink-0 place-items-center rounded-lg text-base font-semibold text-white"
             style={{ background: color }}
             aria-hidden
           >
             {initial}
           </div>
           <div className="min-w-0">
-            <div className="font-mono text-[10px] uppercase tracking-wide text-ink-muted">
+            <div className="text-ink-muted font-mono text-[10px] uppercase tracking-wide">
               {p.key}
             </div>
-            <div className="truncate text-base font-semibold text-ink">
-              {p.name}
-            </div>
+            <div className="text-ink truncate text-base font-semibold">{p.name}</div>
           </div>
         </div>
         <span
           className={cn(
-            'whitespace-nowrap inline-flex shrink-0 items-center gap-1 rounded-full px-2.5 py-0.5 text-[11px] font-medium',
+            'inline-flex shrink-0 items-center gap-1 whitespace-nowrap rounded-full px-2.5 py-0.5 text-[11px] font-medium',
             status.pill,
           )}
         >
@@ -232,29 +224,23 @@ function ProjectCard({ project: p }: { project: ProjectWithCreator }) {
       </div>
 
       {/* Description (3 lines max) */}
-      <p className="min-h-[3em] text-sm text-ink-muted line-clamp-3">
-        {p.description ?? (
-          <span className="italic text-ink-disabled">No description yet.</span>
-        )}
+      <p className="text-ink-muted line-clamp-3 min-h-[3em] text-sm">
+        {p.description ?? <span className="text-ink-disabled italic">No description yet.</span>}
       </p>
 
       {/* Footer row: creator + last activity + arrow */}
-      <div className="mt-auto flex items-center justify-between gap-2 border-t border-line pt-3 text-xs">
+      <div className="border-line mt-auto flex items-center justify-between gap-2 border-t pt-3 text-xs">
         <div className="flex min-w-0 items-center gap-1.5">
           <UserAvatar
             size="xs"
             name={p.createdBy.name || p.createdBy.email}
             image={p.createdBy.image}
           />
-          <span className="truncate text-ink-muted">
-            {p.createdBy.name || p.createdBy.email}
-          </span>
+          <span className="text-ink-muted truncate">{p.createdBy.name || p.createdBy.email}</span>
         </div>
-        <span className="shrink-0 text-ink-muted">
-          {relativeTime(new Date(p.updatedAt))}
-        </span>
+        <span className="text-ink-muted shrink-0">{relativeTime(new Date(p.updatedAt))}</span>
         <ArrowRight
-          className="h-4 w-4 shrink-0 text-ink-disabled transition-all group-hover:translate-x-0.5 group-hover:text-brand-purple"
+          className="text-ink-disabled group-hover:text-brand-purple h-4 w-4 shrink-0 transition-all group-hover:translate-x-0.5"
           aria-hidden
         />
       </div>
@@ -264,12 +250,12 @@ function ProjectCard({ project: p }: { project: ProjectWithCreator }) {
 
 function EmptyState({ onCreate }: { onCreate: () => void }) {
   return (
-    <div className="rounded-xl bg-white p-12 text-center shadow-soft">
-      <div className="mx-auto mb-4 grid h-14 w-14 place-items-center rounded-full bg-brand-gradient-soft">
-        <FolderKanban className="h-6 w-6 text-brand-purple" aria-hidden />
+    <div className="shadow-soft rounded-xl bg-white p-12 text-center">
+      <div className="bg-brand-gradient-soft mx-auto mb-4 grid h-14 w-14 place-items-center rounded-full">
+        <FolderKanban className="text-brand-purple h-6 w-6" aria-hidden />
       </div>
-      <h2 className="text-base font-semibold text-ink">No projects yet</h2>
-      <p className="mt-1 text-sm text-ink-muted">
+      <h2 className="text-ink text-base font-semibold">No projects yet</h2>
+      <p className="text-ink-muted mt-1 text-sm">
         Create your first project to start tracking tasks, sprints, and time.
       </p>
       <Can I="create" a="Project">

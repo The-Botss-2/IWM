@@ -32,9 +32,7 @@ export function mergeUserPreferences(
   return out;
 }
 
-function toResponse(
-  row: { data: unknown; updatedAt: Date } | null,
-): UserPreferencesResponse {
+function toResponse(row: { data: unknown; updatedAt: Date } | null): UserPreferencesResponse {
   return {
     version: USER_PREFERENCES_VERSION,
     preferences: parseStoredUserPreferences(row?.data),
@@ -68,10 +66,7 @@ export class UserPreferencesService {
    * devices patching different keys at the same moment both land instead of
    * the later write silently dropping the earlier one's key.
    */
-  async update(
-    userId: string,
-    patch: UserPreferences,
-  ): Promise<UserPreferencesResponse> {
+  async update(userId: string, patch: UserPreferences): Promise<UserPreferencesResponse> {
     for (let attempt = 0; attempt < MAX_WRITE_ATTEMPTS; attempt++) {
       const row = await this.prisma.client.userPreferences.findUnique({
         where: { userId },

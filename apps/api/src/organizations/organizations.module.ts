@@ -12,11 +12,7 @@ import { OrganizationsService } from './organizations.service';
 
 @Module({
   imports: [PrismaModule, forwardRef(() => AdminModule)],
-  controllers: [
-    OrganizationsController,
-    OrgSignupController,
-    OrgMailConfigController,
-  ],
+  controllers: [OrganizationsController, OrgSignupController, OrgMailConfigController],
   providers: [
     OrganizationsService,
     OrganizationAutoRouteService,

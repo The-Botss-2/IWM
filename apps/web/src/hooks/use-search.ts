@@ -103,7 +103,8 @@ export function useSearchCounts(filters: SearchFilters, enabled: boolean) {
   const params = toParams(filters);
   return useQuery({
     queryKey: ['search', 'counts', params],
-    queryFn: () => getApi().search.query({ ...params, kind: 'chat_message', limit: 1, counts: true }),
+    queryFn: () =>
+      getApi().search.query({ ...params, kind: 'chat_message', limit: 1, counts: true }),
     enabled: enabled && canSearch(filters),
     staleTime: 30_000,
     select: (data) => data.counts ?? {},
@@ -174,7 +175,9 @@ export function useResolvedSearch(parsed: ParsedSearch, userId: string, sort: Se
     if (!parsed.from) return null;
     const needle = parsed.from.toLowerCase();
     return (
-      peopleOptions.find((p) => p.label.toLowerCase() === needle || p.description?.toLowerCase() === needle) ??
+      peopleOptions.find(
+        (p) => p.label.toLowerCase() === needle || p.description?.toLowerCase() === needle,
+      ) ??
       peopleOptions.find((p) => p.label.toLowerCase().includes(needle)) ??
       null
     );
@@ -185,7 +188,8 @@ export function useResolvedSearch(parsed: ParsedSearch, userId: string, sort: Se
       // The direct message whose other participant matches the name or email.
       const needle = parsed.inDm.toLowerCase();
       const dms = joinedRooms.filter((r) => r.type === 'DM');
-      const peerOf = (r: (typeof dms)[number]) => r.participants.find((p) => p.userId !== userId)?.user;
+      const peerOf = (r: (typeof dms)[number]) =>
+        r.participants.find((p) => p.userId !== userId)?.user;
       const match =
         dms.find((r) => {
           const peer = peerOf(r);
@@ -209,7 +213,8 @@ export function useResolvedSearch(parsed: ParsedSearch, userId: string, sort: Se
     const joined = new Set(joinedRooms.map((r) => r.id));
     return (
       (rooms.data?.items ?? []).find(
-        (r) => !joined.has(r.id) && roomTitle(r, userId).replace(/^#\s*/, '').toLowerCase() === needle,
+        (r) =>
+          !joined.has(r.id) && roomTitle(r, userId).replace(/^#\s*/, '').toLowerCase() === needle,
       ) ?? null
     );
   }, [parsed.in, inRoom, joinedRooms, rooms.data, userId]);
@@ -224,7 +229,9 @@ export function useResolvedSearch(parsed: ParsedSearch, userId: string, sort: Se
     sort,
   };
   const unresolved =
-    (parsed.from && !fromUser && members.data ? `No one named "${parsed.from}" in this workspace.` : null) ??
+    (parsed.from && !fromUser && members.data
+      ? `No one named "${parsed.from}" in this workspace.`
+      : null) ??
     (parsed.in && !inRoom && unjoinedRoom ? `Join #${parsed.in} to search it.` : null) ??
     (parsed.in && !inRoom && rooms.data ? `No chat named "${parsed.in}".` : null) ??
     (parsed.inDm && !inRoom && rooms.data ? `No direct message with "${parsed.inDm}".` : null);

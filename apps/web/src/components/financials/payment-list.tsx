@@ -56,7 +56,7 @@ export function PaymentList({
 
   if (items.length === 0) {
     return (
-      <div className="rounded-md border border-dashed border-line bg-bg-surface p-8 text-center text-sm text-ink-muted">
+      <div className="border-line bg-bg-surface text-ink-muted rounded-md border border-dashed p-8 text-center text-sm">
         No payments recorded yet.
       </div>
     );
@@ -67,7 +67,7 @@ export function PaymentList({
       <div className="hidden overflow-x-auto md:block">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-line text-left text-xs uppercase tracking-wide text-ink-muted">
+            <tr className="border-line text-ink-muted border-b text-left text-xs uppercase tracking-wide">
               <th className="px-3 py-2 font-medium">Date</th>
               {showContract ? <th className="px-3 py-2 font-medium">Contract</th> : null}
               <th className="px-3 py-2 font-medium">Source</th>
@@ -82,22 +82,22 @@ export function PaymentList({
             {items.map((p) => (
               <tr
                 key={p.id}
-                className={`border-b border-line last:border-0 hover:bg-bg-subtle ${
+                className={`border-line hover:bg-bg-subtle border-b last:border-0 ${
                   p.voidedAt ? 'opacity-50' : ''
                 }`}
               >
-                <td className="px-3 py-2 whitespace-nowrap">
+                <td className="whitespace-nowrap px-3 py-2">
                   {new Date(p.paidAt).toLocaleDateString()}
                 </td>
                 {showContract ? (
-                  <td className="px-3 py-2 text-ink-muted">
+                  <td className="text-ink-muted px-3 py-2">
                     {p.contract?.title ?? '-'}
                     {p.milestone ? (
                       <span className="block text-xs">{p.milestone.title}</span>
                     ) : null}
                   </td>
                 ) : null}
-                <td className="px-3 py-2 text-ink-muted">
+                <td className="text-ink-muted px-3 py-2">
                   {p.paymentSource?.name ?? 'Unattributed'}
                 </td>
                 <td className="px-3 py-2">
@@ -107,19 +107,16 @@ export function PaymentList({
                   {formatCurrency(p.amount, p.currency)}
                   {/* Only worth showing when the money landed as something
                       other than what the contract was billed in. */}
-                  {p.receivedCurrency !== p.currency ||
-                  p.receivedAmount !== p.amount ? (
-                    <span className="block text-xs text-ink-muted">
+                  {p.receivedCurrency !== p.currency || p.receivedAmount !== p.amount ? (
+                    <span className="text-ink-muted block text-xs">
                       got {formatCurrency(p.receivedAmount, p.receivedCurrency)}
                     </span>
                   ) : null}
                 </td>
-                <td className="px-3 py-2 text-right tabular-nums text-ink-muted">
-                  {Number(p.feeAmount) > 0
-                    ? formatCurrency(p.feeAmount, p.receivedCurrency)
-                    : '-'}
+                <td className="text-ink-muted px-3 py-2 text-right tabular-nums">
+                  {Number(p.feeAmount) > 0 ? formatCurrency(p.feeAmount, p.receivedCurrency) : '-'}
                 </td>
-                <td className="px-3 py-2 text-right tabular-nums font-medium">
+                <td className="px-3 py-2 text-right font-medium tabular-nums">
                   {baseCurrency ? formatCurrency(p.baseAmount, baseCurrency) : p.baseAmount}
                 </td>
                 <td className="px-3 py-2 text-right">
@@ -146,7 +143,7 @@ export function PaymentList({
         {items.map((p) => (
           <li
             key={p.id}
-            className={`rounded-md border border-line bg-bg-surface p-3 ${
+            className={`border-line bg-bg-surface rounded-md border p-3 ${
               p.voidedAt ? 'opacity-50' : ''
             }`}
           >
@@ -154,18 +151,18 @@ export function PaymentList({
               <span className="font-medium tabular-nums">
                 {formatCurrency(p.amount, p.currency)}
               </span>
-              <span className="text-xs text-ink-muted">
+              <span className="text-ink-muted text-xs">
                 {new Date(p.paidAt).toLocaleDateString()}
               </span>
             </div>
-            <p className="mt-0.5 text-xs text-ink-muted">
+            <p className="text-ink-muted mt-0.5 text-xs">
               {p.paymentSource?.name ?? 'Unattributed'}
               {p.contract ? ` · ${p.contract.title}` : ''}
             </p>
             <div className="mt-2 flex items-center gap-2">
               <RegionBadge region={p.region} />
               {p.voidedAt ? <Badge tone="neutral">Voided</Badge> : null}
-              <span className="ml-auto text-xs tabular-nums text-ink-muted">
+              <span className="text-ink-muted ml-auto text-xs tabular-nums">
                 {baseCurrency ? formatCurrency(p.baseAmount, baseCurrency) : p.baseAmount}
               </span>
             </div>
@@ -228,8 +225,7 @@ function VoidDialog({
         <DialogHeader>
           <DialogTitle>Void this payment</DialogTitle>
           <DialogDescription>
-            The row stays on the record and the contract total is recalculated.
-            Nothing is deleted.
+            The row stays on the record and the contract total is recalculated. Nothing is deleted.
           </DialogDescription>
         </DialogHeader>
         <div>
@@ -247,10 +243,7 @@ function VoidDialog({
           <Button variant="secondary" onClick={onClose}>
             Cancel
           </Button>
-          <Button
-            onClick={submit}
-            disabled={voidPayment.isPending || !reason.trim()}
-          >
+          <Button onClick={submit} disabled={voidPayment.isPending || !reason.trim()}>
             {voidPayment.isPending ? 'Voiding…' : 'Void payment'}
           </Button>
         </DialogFooter>

@@ -33,9 +33,7 @@ export default function ClientsPage() {
     ...(debouncedSearch.trim() ? { search: debouncedSearch.trim() } : {}),
   });
   const remove = useDeleteClient();
-  const emptyLabel = debouncedSearch.trim()
-    ? 'No clients match your search.'
-    : 'No clients yet.';
+  const emptyLabel = debouncedSearch.trim() ? 'No clients match your search.' : 'No clients yet.';
 
   if (!access.allowed) {
     return (
@@ -49,13 +47,13 @@ export default function ClientsPage() {
     <div className="mx-auto max-w-7xl space-y-6 px-4 py-8 sm:px-6 lg:px-8">
       <header className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <p className="text-xs font-medium text-ink-muted">
-            <span className="hover:underline cursor-pointer">Dashboard</span>
+          <p className="text-ink-muted text-xs font-medium">
+            <span className="cursor-pointer hover:underline">Dashboard</span>
             <span className="mx-1">›</span>
             <span className="underline">Clients</span>
           </p>
-          <h1 className="mt-2 text-2xl font-semibold text-ink">Clients</h1>
-          <p className="text-sm text-ink-muted">Customers and prospects.</p>
+          <h1 className="text-ink mt-2 text-2xl font-semibold">Clients</h1>
+          <p className="text-ink-muted text-sm">Customers and prospects.</p>
         </div>
         <Can I="create" a="Client">
           <Button onClick={() => setDialog(true)}>
@@ -68,7 +66,7 @@ export default function ClientsPage() {
       <div className="relative max-w-sm">
         <Search
           aria-hidden
-          className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-muted"
+          className="text-ink-muted pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2"
         />
         <input
           type="search"
@@ -83,26 +81,23 @@ export default function ClientsPage() {
       {/* Mobile: stacked card list (below md). Renders from the same data array. */}
       <div className="space-y-3 md:hidden">
         {clients.isLoading ? (
-          <div className="rounded-xl bg-white p-6 text-center shadow-soft">
+          <div className="shadow-soft rounded-xl bg-white p-6 text-center">
             <Loader size="sm" label="Loading" />
           </div>
         ) : clients.isError && !clients.data ? (
-          <QueryError
-            message="Couldn't load clients."
-            onRetry={() => void clients.refetch()}
-          />
+          <QueryError message="Couldn't load clients." onRetry={() => void clients.refetch()} />
         ) : clients.data?.items.length ? (
           clients.data.items.map((c) => (
             <div
               key={c.id}
               onClick={() => router.push(`/clients/${c.id}`)}
-              className="cursor-pointer rounded-xl bg-white p-4 shadow-soft transition-colors hover:bg-bg-subtle focus-within:bg-bg-subtle"
+              className="shadow-soft hover:bg-bg-subtle focus-within:bg-bg-subtle cursor-pointer rounded-xl bg-white p-4 transition-colors"
             >
               <div className="flex items-start justify-between gap-3">
                 <Link
                   href={`/clients/${c.id}`}
                   onClick={(e) => e.stopPropagation()}
-                  className="text-base font-medium text-ink hover:text-brand-purple focus-visible:outline-none focus-visible:text-brand-purple"
+                  className="text-ink hover:text-brand-purple focus-visible:text-brand-purple text-base font-medium focus-visible:outline-none"
                 >
                   {c.name}
                 </Link>
@@ -111,7 +106,7 @@ export default function ClientsPage() {
 
               <dl className="mt-3 space-y-1.5 text-sm">
                 <div className="flex items-center justify-between gap-3">
-                  <dt className="text-xs font-medium uppercase tracking-wide text-ink-muted">
+                  <dt className="text-ink-muted text-xs font-medium uppercase tracking-wide">
                     Email
                   </dt>
                   <dd className="min-w-0 truncate text-right">
@@ -119,7 +114,7 @@ export default function ClientsPage() {
                       <a
                         href={`mailto:${c.email}`}
                         onClick={(e) => e.stopPropagation()}
-                        className="text-brand-gradient hover:underline underline-offset-2"
+                        className="text-brand-gradient underline-offset-2 hover:underline"
                       >
                         {c.email}
                       </a>
@@ -129,7 +124,7 @@ export default function ClientsPage() {
                   </dd>
                 </div>
                 <div className="flex items-center justify-between gap-3">
-                  <dt className="text-xs font-medium uppercase tracking-wide text-ink-muted">
+                  <dt className="text-ink-muted text-xs font-medium uppercase tracking-wide">
                     Industry
                   </dt>
                   <dd className="text-ink">
@@ -137,7 +132,7 @@ export default function ClientsPage() {
                   </dd>
                 </div>
                 <div className="flex items-center justify-between gap-3">
-                  <dt className="text-xs font-medium uppercase tracking-wide text-ink-muted">
+                  <dt className="text-ink-muted text-xs font-medium uppercase tracking-wide">
                     Owner
                   </dt>
                   <dd className="text-ink">
@@ -145,7 +140,7 @@ export default function ClientsPage() {
                   </dd>
                 </div>
                 <div className="flex items-center justify-between gap-3">
-                  <dt className="text-xs font-medium uppercase tracking-wide text-ink-muted">
+                  <dt className="text-ink-muted text-xs font-medium uppercase tracking-wide">
                     Assignee
                   </dt>
                   <dd className="text-ink">
@@ -155,13 +150,13 @@ export default function ClientsPage() {
               </dl>
 
               <div
-                className="mt-3 flex items-center justify-end gap-2 border-t border-line pt-3"
+                className="border-line mt-3 flex items-center justify-end gap-2 border-t pt-3"
                 onClick={(e) => e.stopPropagation()}
               >
                 <Link
                   href={`/clients/${c.id}`}
                   aria-label={`Edit ${c.name}`}
-                  className="grid h-8 w-8 place-items-center rounded-full text-ink-muted transition-all hover:bg-bg-subtle hover:text-ink focus-visible:outline-none focus-visible:shadow-focus"
+                  className="text-ink-muted hover:bg-bg-subtle hover:text-ink focus-visible:shadow-focus grid h-8 w-8 place-items-center rounded-full transition-all focus-visible:outline-none"
                 >
                   <Pencil className="h-3.5 w-3.5" aria-hidden />
                 </Link>
@@ -169,8 +164,10 @@ export default function ClientsPage() {
                   <button
                     type="button"
                     aria-label={`Delete ${c.name}`}
-                    onClick={() => remove.mutate(c.id, { onSuccess: () => toast.success('Client deleted.') })}
-                    className="grid h-8 w-8 place-items-center rounded-full text-ink-muted transition-all hover:bg-tint-error hover:text-state-error focus-visible:outline-none focus-visible:shadow-focus"
+                    onClick={() =>
+                      remove.mutate(c.id, { onSuccess: () => toast.success('Client deleted.') })
+                    }
+                    className="text-ink-muted hover:bg-tint-error hover:text-state-error focus-visible:shadow-focus grid h-8 w-8 place-items-center rounded-full transition-all focus-visible:outline-none"
                   >
                     <Trash2 className="h-3.5 w-3.5" aria-hidden />
                   </button>
@@ -179,14 +176,14 @@ export default function ClientsPage() {
             </div>
           ))
         ) : (
-          <div className="rounded-xl bg-white p-6 text-center text-sm text-ink-muted shadow-soft">
+          <div className="text-ink-muted shadow-soft rounded-xl bg-white p-6 text-center text-sm">
             {emptyLabel}
           </div>
         )}
       </div>
 
       {/* Desktop: unchanged table (md and up). */}
-      <div className="hidden md:block rounded-xl bg-white p-4 sm:p-6 shadow-soft overflow-x-auto">
+      <div className="shadow-soft hidden overflow-x-auto rounded-xl bg-white p-4 sm:p-6 md:block">
         <table className="w-full min-w-[640px] text-sm">
           <thead>
             <tr>
@@ -222,13 +219,13 @@ export default function ClientsPage() {
                 <tr
                   key={c.id}
                   onClick={() => router.push(`/clients/${c.id}`)}
-                  className="cursor-pointer border-t border-line transition-colors hover:bg-bg-subtle focus-within:bg-bg-subtle"
+                  className="border-line hover:bg-bg-subtle focus-within:bg-bg-subtle cursor-pointer border-t transition-colors"
                 >
                   <Td className="font-medium">
                     <Link
                       href={`/clients/${c.id}`}
                       onClick={(e) => e.stopPropagation()}
-                      className="text-ink hover:text-brand-purple focus-visible:outline-none focus-visible:text-brand-purple"
+                      className="text-ink hover:text-brand-purple focus-visible:text-brand-purple focus-visible:outline-none"
                     >
                       {c.name}
                     </Link>
@@ -238,7 +235,7 @@ export default function ClientsPage() {
                       <a
                         href={`mailto:${c.email}`}
                         onClick={(e) => e.stopPropagation()}
-                        className="text-brand-gradient hover:underline underline-offset-2"
+                        className="text-brand-gradient underline-offset-2 hover:underline"
                       >
                         {c.email}
                       </a>
@@ -251,9 +248,7 @@ export default function ClientsPage() {
                     <ClientStatusBadge status={c.status} />
                   </Td>
                   <Td>{c.owner?.name ?? <span className="text-ink-muted">-</span>}</Td>
-                  <Td>
-                    {c.assignee?.name ?? <span className="text-ink-muted">Unassigned</span>}
-                  </Td>
+                  <Td>{c.assignee?.name ?? <span className="text-ink-muted">Unassigned</span>}</Td>
                   <Td>
                     <div
                       className="flex items-center justify-end gap-2"
@@ -262,7 +257,7 @@ export default function ClientsPage() {
                       <Link
                         href={`/clients/${c.id}`}
                         aria-label={`Edit ${c.name}`}
-                        className="grid h-8 w-8 place-items-center rounded-full text-ink-muted transition-all hover:bg-bg-subtle hover:text-ink focus-visible:outline-none focus-visible:shadow-focus"
+                        className="text-ink-muted hover:bg-bg-subtle hover:text-ink focus-visible:shadow-focus grid h-8 w-8 place-items-center rounded-full transition-all focus-visible:outline-none"
                       >
                         <Pencil className="h-3.5 w-3.5" aria-hidden />
                       </Link>
@@ -270,8 +265,12 @@ export default function ClientsPage() {
                         <button
                           type="button"
                           aria-label={`Delete ${c.name}`}
-                          onClick={() => remove.mutate(c.id, { onSuccess: () => toast.success('Client deleted.') })}
-                          className="grid h-8 w-8 place-items-center rounded-full text-ink-muted transition-all hover:bg-tint-error hover:text-state-error focus-visible:outline-none focus-visible:shadow-focus"
+                          onClick={() =>
+                            remove.mutate(c.id, {
+                              onSuccess: () => toast.success('Client deleted.'),
+                            })
+                          }
+                          className="text-ink-muted hover:bg-tint-error hover:text-state-error focus-visible:shadow-focus grid h-8 w-8 place-items-center rounded-full transition-all focus-visible:outline-none"
                         >
                           <Trash2 className="h-3.5 w-3.5" aria-hidden />
                         </button>
@@ -282,7 +281,7 @@ export default function ClientsPage() {
               ))
             ) : (
               <tr>
-                <td colSpan={7} className="px-4 py-10 text-center text-ink-muted">
+                <td colSpan={7} className="text-ink-muted px-4 py-10 text-center">
                   {emptyLabel}
                 </td>
               </tr>
@@ -297,10 +296,10 @@ export default function ClientsPage() {
 }
 
 const Th = ({ children }: { children: React.ReactNode }) => (
-  <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wide text-ink-muted">
+  <th className="text-ink-muted px-4 py-3 text-left text-xs font-medium uppercase tracking-wide">
     {children}
   </th>
 );
 const Td = ({ children, className = '' }: { children: React.ReactNode; className?: string }) => (
-  <td className={`px-4 py-3 text-ink ${className}`}>{children}</td>
+  <td className={`text-ink px-4 py-3 ${className}`}>{children}</td>
 );

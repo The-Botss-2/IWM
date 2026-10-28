@@ -71,7 +71,9 @@ function toEntries(flat: string[]): Array<{ member: string; score: number }> {
 function withTimeout<T>(p: Promise<T>, ms: number): Promise<T> {
   return Promise.race([
     p,
-    new Promise<T>((_, reject) => setTimeout(() => reject(new Error('redis timed out')), ms).unref()),
+    new Promise<T>((_, reject) =>
+      setTimeout(() => reject(new Error('redis timed out')), ms).unref(),
+    ),
   ]);
 }
 

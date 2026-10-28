@@ -1,4 +1,15 @@
-import { Body, Controller, Delete, Get, Header, Param, Patch, Post, Put, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Header,
+  Param,
+  Patch,
+  Post,
+  Put,
+  Query,
+} from '@nestjs/common';
 import { z } from 'zod';
 import {
   createInvoiceSchema,
@@ -21,10 +32,7 @@ import {
 } from '@botss/shared-types';
 
 import { RequireAbility } from '../common/decorators/required-ability.decorator';
-import {
-  RequestUserScope,
-  type UserScope,
-} from '../common/decorators/user-scope.decorator';
+import { RequestUserScope, type UserScope } from '../common/decorators/user-scope.decorator';
 import { ZodValidationPipe } from '../common/pipes/zod-validation.pipe';
 import { InvoicesService } from './invoices.service';
 
@@ -112,10 +120,7 @@ export class InvoicesController {
 
   @Get(':id')
   @RequireAbility('read', 'Invoice')
-  get(
-    @RequestUserScope() scope: UserScope,
-    @Param('id', new ZodValidationPipe(cuid)) id: string,
-  ) {
+  get(@RequestUserScope() scope: UserScope, @Param('id', new ZodValidationPipe(cuid)) id: string) {
     return this.invoices.get(scope, id);
   }
 
@@ -171,10 +176,7 @@ export class InvoicesController {
 
   @Post(':id/pdf')
   @RequireAbility('read', 'Invoice')
-  pdf(
-    @RequestUserScope() scope: UserScope,
-    @Param('id', new ZodValidationPipe(cuid)) id: string,
-  ) {
+  pdf(@RequestUserScope() scope: UserScope, @Param('id', new ZodValidationPipe(cuid)) id: string) {
     return this.invoices.generatePdfUrl(scope, id);
   }
 }

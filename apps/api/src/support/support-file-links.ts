@@ -28,7 +28,10 @@ function isPlainObject(value: unknown): value is Record<string, unknown> {
 }
 
 /** Every object key linked anywhere in `value` (plain objects, arrays, strings). */
-export function collectFileLinkKeys(value: unknown, pattern: RegExp): { found: boolean; keys: Set<string> } {
+export function collectFileLinkKeys(
+  value: unknown,
+  pattern: RegExp,
+): { found: boolean; keys: Set<string> } {
   const keys = new Set<string>();
   let found = false;
   const visit = (v: unknown, depth: number): void => {
@@ -59,7 +62,11 @@ export function collectFileLinkKeys(value: unknown, pattern: RegExp): { found: b
  * null when the link has no valid object key). Never mutates `value`, which
  * may be shared with a cache. Class instances (Date, Buffer...) are kept.
  */
-export function rewriteFileLinks<T>(value: T, pattern: RegExp, replace: (key: string | null) => string): T {
+export function rewriteFileLinks<T>(
+  value: T,
+  pattern: RegExp,
+  replace: (key: string | null) => string,
+): T {
   const visit = (v: unknown, depth: number): unknown => {
     if (depth > 64) return v;
     if (typeof v === 'string') {

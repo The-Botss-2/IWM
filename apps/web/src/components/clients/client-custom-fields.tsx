@@ -28,15 +28,11 @@ export function ClientCustomFields({ clientId }: { clientId: string }) {
     );
   } else if (cf.isError) {
     body = (
-      <QueryError
-        className="mt-4"
-        message="Couldn't load custom fields."
-        onRetry={cf.refetch}
-      />
+      <QueryError className="mt-4" message="Couldn't load custom fields." onRetry={cf.refetch} />
     );
   } else if (cf.fields.length === 0) {
     body = (
-      <p className="mt-2 text-sm text-ink-muted">
+      <p className="text-ink-muted mt-2 text-sm">
         No custom fields for clients yet.{' '}
         <Can I="update" a="Workspace">
           <Link href="/settings/workspace/custom-fields" className="underline">
@@ -64,14 +60,16 @@ export function ClientCustomFields({ clientId }: { clientId: string }) {
   return (
     <section
       aria-labelledby="client-custom-fields-heading"
-      className="rounded-lg border border-line bg-white p-5"
+      className="border-line rounded-lg border bg-white p-5"
     >
-      <h2 id="client-custom-fields-heading" className="text-base font-semibold text-ink">
+      <h2 id="client-custom-fields-heading" className="text-ink text-base font-semibold">
         Custom fields
       </h2>
       {!cf.isLoading && cf.fields.length > 0 ? (
-        <p className="mt-1 text-sm text-ink-muted">
-          {cf.readOnly ? 'You can view these fields but not change them.' : 'Changes save automatically.'}
+        <p className="text-ink-muted mt-1 text-sm">
+          {cf.readOnly
+            ? 'You can view these fields but not change them.'
+            : 'Changes save automatically.'}
         </p>
       ) : null}
       {body}

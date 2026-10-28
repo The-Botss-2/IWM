@@ -26,9 +26,7 @@ const ROOT_ORG_ID = 'org_root_thebotss';
 
 function assertSafeEnvironment(): void {
   if (process.env.NODE_ENV === 'production' || process.env.ALLOW_SEED !== 'true') {
-    console.error(
-      '[seed] Refusing to run. Set NODE_ENV=development and ALLOW_SEED=true to seed.',
-    );
+    console.error('[seed] Refusing to run. Set NODE_ENV=development and ALLOW_SEED=true to seed.');
     process.exit(1);
   }
 }

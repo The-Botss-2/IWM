@@ -62,12 +62,7 @@ export function LeadFunnelWidget() {
   const totalLeads = q.data?.items?.length ?? 0;
 
   return (
-    <WidgetShell
-      id="widget-ws-lead-funnel"
-      title="Lead pipeline"
-      icon={Layers}
-      linkHref="/leads"
-    >
+    <WidgetShell id="widget-ws-lead-funnel" title="Lead pipeline" icon={Layers} linkHref="/leads">
       {q.isLoading ? (
         <div className="space-y-2">
           {Array.from({ length: 6 }).map((_, i) => (
@@ -75,23 +70,29 @@ export function LeadFunnelWidget() {
           ))}
         </div>
       ) : q.isError && !q.data ? (
-        <QueryError compact message="Couldn't load the lead pipeline." onRetry={() => void q.refetch()} />
+        <QueryError
+          compact
+          message="Couldn't load the lead pipeline."
+          onRetry={() => void q.refetch()}
+        />
       ) : totalLeads === 0 ? (
         <WidgetEmpty icon={Layers} message="No leads in the pipeline yet." />
       ) : (
         <>
           <div className="mb-3 flex items-end gap-2">
-            <div className="text-2xl font-bold text-ink">{totalOpen}</div>
-            <div className="mb-1 text-xs text-ink-muted">open leads</div>
+            <div className="text-ink text-2xl font-bold">{totalOpen}</div>
+            <div className="text-ink-muted mb-1 text-xs">open leads</div>
           </div>
           <ul className="space-y-1.5" role="list">
             {STAGES.map((s) => {
               const v = counts.get(s.id) ?? 0;
               const pct = maxOpen === 0 ? 0 : (v / maxOpen) * 100;
-              return <FunnelRow key={s.id} label={s.label} value={v} pct={pct} terminal={s.terminal} />;
+              return (
+                <FunnelRow key={s.id} label={s.label} value={v} pct={pct} terminal={s.terminal} />
+              );
             })}
           </ul>
-          <div className="mt-3 text-[11px] text-ink-muted">
+          <div className="text-ink-muted mt-3 text-[11px]">
             Conversion:{' '}
             <Link
               href="/leads?view=pipeline"
@@ -121,18 +122,19 @@ function FunnelRow({
   pct: number;
   terminal?: 'win' | 'loss';
 }) {
-  const barBg = terminal === 'win'
-    ? 'bg-brand-teal'
-    : terminal === 'loss'
-      ? 'bg-state-error/60'
-      : 'bg-brand-gradient';
+  const barBg =
+    terminal === 'win'
+      ? 'bg-brand-teal'
+      : terminal === 'loss'
+        ? 'bg-state-error/60'
+        : 'bg-brand-gradient';
   return (
     <li className="space-y-1">
       <div className="flex items-center justify-between gap-2 text-xs">
         <span className="text-ink">{label}</span>
-        <span className="font-medium text-ink tabular-nums">{value}</span>
+        <span className="text-ink font-medium tabular-nums">{value}</span>
       </div>
-      <div className="relative h-2 rounded-full bg-bg-subtle" aria-hidden>
+      <div className="bg-bg-subtle relative h-2 rounded-full" aria-hidden>
         {value > 0 ? (
           <span
             className={`absolute inset-y-0 left-0 rounded-full ${barBg}`}

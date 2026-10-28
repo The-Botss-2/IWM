@@ -17,13 +17,13 @@ export const SelectTrigger = forwardRef<
     <SelectPrimitive.Trigger
       ref={ref}
       className={cn(
-        'flex h-10 w-full items-center justify-between gap-2 whitespace-nowrap rounded-md border border-line bg-white px-3.5 py-2.5 text-left text-sm text-ink',
+        'border-line text-ink flex h-10 w-full items-center justify-between gap-2 whitespace-nowrap rounded-md border bg-white px-3.5 py-2.5 text-left text-sm',
         // Label never wraps: icons keep their size and the value span
         // ellipsizes if a caller pins the trigger narrower than its text.
-        '[&_svg]:shrink-0 [&>span]:min-w-0 [&>span]:truncate',
+        '[&>span]:min-w-0 [&>span]:truncate [&_svg]:shrink-0',
         'transition-all duration-200',
-        'focus-visible:outline-none focus-visible:border-brand-purple focus-visible:shadow-focus',
-        'disabled:cursor-not-allowed disabled:bg-bg-subtle disabled:text-ink-disabled',
+        'focus-visible:border-brand-purple focus-visible:shadow-focus focus-visible:outline-none',
+        'disabled:bg-bg-subtle disabled:text-ink-disabled disabled:cursor-not-allowed',
         'data-[placeholder]:text-ink-disabled',
         className,
       )}
@@ -31,7 +31,7 @@ export const SelectTrigger = forwardRef<
     >
       {children}
       <SelectPrimitive.Icon asChild>
-        <ChevronDown className="h-4 w-4 shrink-0 text-ink-muted" />
+        <ChevronDown className="text-ink-muted h-4 w-4 shrink-0" />
       </SelectPrimitive.Icon>
     </SelectPrimitive.Trigger>
   );
@@ -47,7 +47,7 @@ export const SelectContent = forwardRef<
         ref={ref}
         position={position}
         className={cn(
-          'relative z-50 max-h-72 min-w-[8rem] max-w-[calc(100vw-1rem)] overflow-hidden rounded-lg border border-line bg-white shadow-popover',
+          'border-line shadow-popover relative z-50 max-h-72 min-w-[8rem] max-w-[calc(100vw-1rem)] overflow-hidden rounded-lg border bg-white',
           'data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95',
           'data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95',
           position === 'popper' && 'data-[side=bottom]:translate-y-1',
@@ -78,7 +78,7 @@ export const SelectItem = forwardRef<
     <SelectPrimitive.Item
       ref={ref}
       className={cn(
-        'relative flex w-full cursor-pointer select-none items-center gap-2 whitespace-nowrap rounded-md px-3 py-2 text-sm text-ink outline-none transition-colors',
+        'text-ink relative flex w-full cursor-pointer select-none items-center gap-2 whitespace-nowrap rounded-md px-3 py-2 text-sm outline-none transition-colors',
         'data-[highlighted]:bg-bg-subtle data-[highlighted]:text-ink',
         'data-[disabled]:pointer-events-none data-[disabled]:opacity-50',
         className,
@@ -87,7 +87,7 @@ export const SelectItem = forwardRef<
     >
       <span className="flex h-4 w-4 shrink-0 items-center justify-center">
         <SelectPrimitive.ItemIndicator>
-          <Check className="h-3.5 w-3.5 text-brand-purple" />
+          <Check className="text-brand-purple h-3.5 w-3.5" />
         </SelectPrimitive.ItemIndicator>
       </span>
       <span className="min-w-0 truncate">

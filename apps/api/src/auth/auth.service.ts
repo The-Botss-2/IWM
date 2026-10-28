@@ -88,9 +88,7 @@ export class AuthService {
    * Kept as a separate call so AuthGuard can resolve them with a single
    * round-trip per request alongside the session lookup.
    */
-  async getUserOrgContext(
-    userId: string,
-  ): Promise<{
+  async getUserOrgContext(userId: string): Promise<{
     // Sourced from the shared Zod enum rather than re-typed by hand. The
     // literal union that used to live here had to be widened by hand for HR
     // (2026-05), SUPER_ADMIN (2026-06) and FINANCE (2026-08), and silently

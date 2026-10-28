@@ -26,10 +26,7 @@ import {
 
 import { Public } from '../common/decorators/public.decorator';
 import { RequireAbility } from '../common/decorators/required-ability.decorator';
-import {
-  CurrentSalesActor,
-  type SalesActor,
-} from '../common/decorators/sales-actor.decorator';
+import { CurrentSalesActor, type SalesActor } from '../common/decorators/sales-actor.decorator';
 import { ZodValidationPipe } from '../common/pipes/zod-validation.pipe';
 import { LeadsService } from './leads.service';
 

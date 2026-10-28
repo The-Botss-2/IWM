@@ -93,7 +93,7 @@ export const FolderList = memo(function FolderList({
         className={cn(
           // min-h-0 lets overflow-y-auto win against the intrinsic content
           // size of the folder list when many folders are present.
-          'flex-1 min-h-0 overflow-y-auto pb-3',
+          'min-h-0 flex-1 overflow-y-auto pb-3',
           collapsed ? 'px-1.5' : 'px-2',
         )}
         aria-label="Folders"
@@ -116,13 +116,9 @@ export const FolderList = memo(function FolderList({
                   title={collapsed ? label : undefined}
                   className={cn(
                     'flex w-full items-center rounded-lg text-left transition-colors',
-                    'focus-visible:outline-none focus-visible:shadow-focus',
-                    collapsed
-                      ? 'relative justify-center py-2.5'
-                      : 'gap-2 px-3 py-2 text-sm',
-                    active
-                      ? 'bg-bg-subtle text-ink font-medium'
-                      : 'text-ink hover:bg-bg-subtle',
+                    'focus-visible:shadow-focus focus-visible:outline-none',
+                    collapsed ? 'relative justify-center py-2.5' : 'gap-2 px-3 py-2 text-sm',
+                    active ? 'bg-bg-subtle text-ink font-medium' : 'text-ink hover:bg-bg-subtle',
                   )}
                 >
                   <Icon className="h-4 w-4 shrink-0" aria-hidden />
@@ -131,7 +127,7 @@ export const FolderList = memo(function FolderList({
                     collapsed ? (
                       <span
                         aria-hidden
-                        className="absolute right-1 top-1 inline-flex h-3.5 min-w-[14px] items-center justify-center rounded-full bg-brand-gradient px-1 text-[9px] font-semibold text-white"
+                        className="bg-brand-gradient absolute right-1 top-1 inline-flex h-3.5 min-w-[14px] items-center justify-center rounded-full px-1 text-[9px] font-semibold text-white"
                       >
                         {f.unreadCount > 9 ? '9+' : f.unreadCount}
                       </span>
@@ -139,9 +135,7 @@ export const FolderList = memo(function FolderList({
                       <span
                         className={cn(
                           'ml-auto inline-flex h-5 min-w-[20px] items-center justify-center rounded-full px-1.5 text-[10px] font-semibold',
-                          active
-                            ? 'bg-brand-gradient text-white'
-                            : 'bg-bg-subtle text-ink',
+                          active ? 'bg-brand-gradient text-white' : 'bg-bg-subtle text-ink',
                         )}
                       >
                         {f.unreadCount > 99 ? '99+' : f.unreadCount}

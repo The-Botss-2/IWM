@@ -21,7 +21,10 @@
  */
 
 export class TemplateError extends Error {
-  constructor(message: string, readonly line: number) {
+  constructor(
+    message: string,
+    readonly line: number,
+  ) {
     super(`${message} (line ${line})`);
     this.name = 'TemplateError';
   }
@@ -122,7 +125,10 @@ function tokenizeArgs(input: string, line: number): string[] {
 }
 
 function parseAtom(token: string, line: number): Expr {
-  if ((token.startsWith('"') && token.endsWith('"')) || (token.startsWith("'") && token.endsWith("'"))) {
+  if (
+    (token.startsWith('"') && token.endsWith('"')) ||
+    (token.startsWith("'") && token.endsWith("'"))
+  ) {
     return { kind: 'literal', value: token.slice(1, -1) };
   }
   if (token.startsWith('(') && token.endsWith(')')) {
@@ -227,7 +233,12 @@ function truthy(value: unknown): boolean {
   return Boolean(value) && value !== '0';
 }
 
-function evaluate(expr: Expr, frames: Frame[], helpers: Record<string, HelperFn>, line: number): unknown {
+function evaluate(
+  expr: Expr,
+  frames: Frame[],
+  helpers: Record<string, HelperFn>,
+  line: number,
+): unknown {
   if (expr.kind === 'literal') return expr.value;
   if (expr.kind === 'call') {
     const fn = helpers[expr.helper];
@@ -254,7 +265,12 @@ function evaluate(expr: Expr, frames: Frame[], helpers: Record<string, HelperFn>
   return value;
 }
 
-function renderNodes(nodes: Node[], frames: Frame[], helpers: Record<string, HelperFn>, out: string[]): void {
+function renderNodes(
+  nodes: Node[],
+  frames: Frame[],
+  helpers: Record<string, HelperFn>,
+  out: string[],
+): void {
   for (const node of nodes) {
     if (node.kind === 'text') {
       out.push(node.value);
@@ -316,7 +332,10 @@ export interface CompiledTemplate {
   render(context: unknown): string;
 }
 
-export function compileTemplate(source: string, helpers: Record<string, HelperFn>): CompiledTemplate {
+export function compileTemplate(
+  source: string,
+  helpers: Record<string, HelperFn>,
+): CompiledTemplate {
   const ast = parseTemplate(source);
   return {
     render(context: unknown): string {

@@ -15,13 +15,7 @@ export type RoomType = z.infer<typeof RoomType>;
 export const MessageStatus = z.enum(['SENT', 'DELIVERED', 'READ']);
 export type MessageStatus = z.infer<typeof MessageStatus>;
 
-export const CallStatus = z.enum([
-  'RINGING',
-  'ONGOING',
-  'COMPLETED',
-  'MISSED',
-  'REJECTED',
-]);
+export const CallStatus = z.enum(['RINGING', 'ONGOING', 'COMPLETED', 'MISSED', 'REJECTED']);
 export type CallStatus = z.infer<typeof CallStatus>;
 
 export const ChatRoomParticipantRole = z.enum(['ADMIN', 'MEMBER']);
@@ -303,17 +297,18 @@ export const updateRoomSchema = z
      *  false = open to the whole organization. Admin-only, channels only. */
     isPrivate: z.boolean().optional(),
   })
-  .refine(
-    (v) =>
-      v.name !== undefined ||
-      v.description !== undefined ||
-      v.isPrivate !== undefined,
-    { message: 'Provide at least one field to update' },
-  );
+  .refine((v) => v.name !== undefined || v.description !== undefined || v.isPrivate !== undefined, {
+    message: 'Provide at least one field to update',
+  });
 export type UpdateRoomInput = z.infer<typeof updateRoomSchema>;
 
 export const createInviteSchema = z.object({
-  expiresInHours: z.number().int().min(1).max(24 * 365).optional(),
+  expiresInHours: z
+    .number()
+    .int()
+    .min(1)
+    .max(24 * 365)
+    .optional(),
   maxUses: z.number().int().min(1).max(1000).optional(),
 });
 export type CreateInviteInput = z.infer<typeof createInviteSchema>;

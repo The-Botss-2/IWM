@@ -31,11 +31,7 @@ export class CustomFieldsResource {
     id: string,
     input: UpdateCustomFieldDefinitionInput,
   ): Promise<CustomFieldDefinition> {
-    return this.http.patch(
-      `/custom-field-definitions/${id}`,
-      customFieldDefinitionSchema,
-      input,
-    );
+    return this.http.patch(`/custom-field-definitions/${id}`, customFieldDefinitionSchema, input);
   }
   deleteDefinition(id: string) {
     return this.http.delete(`/custom-field-definitions/${id}`, okSchema);

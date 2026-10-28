@@ -75,11 +75,11 @@ export function LeadList({ leads, isLoading, hasFilters, onSelect }: Props) {
 
   if (sorted.length === 0) {
     return (
-      <div className="rounded-lg border border-dashed border-line bg-white p-10 text-center">
-        <p className="text-sm font-medium text-ink">
+      <div className="border-line rounded-lg border border-dashed bg-white p-10 text-center">
+        <p className="text-ink text-sm font-medium">
           {hasFilters ? 'No leads match these filters.' : 'No leads yet.'}
         </p>
-        <p className="mt-1 text-sm text-ink-muted">
+        <p className="text-ink-muted mt-1 text-sm">
           {hasFilters
             ? 'Try removing a filter or clearing the search.'
             : 'Capture your first opportunity with the New lead button.'}
@@ -106,25 +106,27 @@ function Table({
 
   if (isSmall) {
     return (
-      <ul className="divide-y divide-line rounded-lg border border-line bg-white">
+      <ul className="divide-line border-line divide-y rounded-lg border bg-white">
         {leads.map((l) => (
           <li key={l.id}>
             <button
               type="button"
               onClick={() => onSelect(l.id)}
-              className="flex w-full flex-col gap-2 p-3 text-left hover:bg-bg-subtle focus-visible:outline-none focus-visible:bg-bg-subtle"
+              className="hover:bg-bg-subtle focus-visible:bg-bg-subtle flex w-full flex-col gap-2 p-3 text-left focus-visible:outline-none"
             >
               <div className="flex items-start justify-between gap-2">
-                <span className="text-sm font-medium text-ink truncate">{l.name}</span>
+                <span className="text-ink truncate text-sm font-medium">{l.name}</span>
                 <StageBadge stage={l.stage} />
               </div>
               {l.company ? (
-                <span className="text-xs text-ink-muted truncate">{l.company}</span>
+                <span className="text-ink-muted truncate text-xs">{l.company}</span>
               ) : null}
               <div className="flex items-center justify-between gap-2">
                 <SourceBadge source={l.source} />
-                <span className="text-xs font-medium text-ink">
-                  {l.estimatedValue ? formatCurrency(l.estimatedValue, l.currency, { compact: true }) : '-'}
+                <span className="text-ink text-xs font-medium">
+                  {l.estimatedValue
+                    ? formatCurrency(l.estimatedValue, l.currency, { compact: true })
+                    : '-'}
                 </span>
               </div>
             </button>
@@ -135,9 +137,9 @@ function Table({
   }
 
   return (
-    <div className="overflow-x-auto rounded-lg border border-line bg-white">
+    <div className="border-line overflow-x-auto rounded-lg border bg-white">
       <table className="w-full text-sm">
-        <thead className="sticky top-0 z-10 bg-bg-subtle text-left text-xs font-medium uppercase tracking-wide text-ink-muted">
+        <thead className="bg-bg-subtle text-ink-muted sticky top-0 z-10 text-left text-xs font-medium uppercase tracking-wide">
           <tr>
             <SortHeader label="Name" sortKey="name" sort={sort} onClick={onSortClick} />
             <SortHeader label="Company" sortKey="company" sort={sort} onClick={onSortClick} />
@@ -182,11 +184,16 @@ function VirtualTbody({
       <tr>
         <td colSpan={8} className="p-0">
           <div ref={parentRef} className="max-h-[640px] overflow-auto">
-            <div style={{ height: virtualizer.getTotalSize(), position: 'relative' }} role="rowgroup">
+            <div
+              style={{ height: virtualizer.getTotalSize(), position: 'relative' }}
+              role="rowgroup"
+            >
               {virtualizer.getVirtualItems().map((vi) => {
                 const l = leads[vi.index];
                 if (!l) return null;
-                return <VirtualRow key={l.id} lead={l} top={vi.start} onSelect={() => onSelect(l.id)} />;
+                return (
+                  <VirtualRow key={l.id} lead={l} top={vi.start} onSelect={() => onSelect(l.id)} />
+                );
               })}
             </div>
           </div>
@@ -217,13 +224,10 @@ function SortHeader({
       <button
         type="button"
         onClick={() => onClick(sortKey)}
-        className="flex items-center gap-1 text-xs uppercase tracking-wide text-ink-muted hover:text-ink focus-visible:outline-none focus-visible:text-ink"
+        className="text-ink-muted hover:text-ink focus-visible:text-ink flex items-center gap-1 text-xs uppercase tracking-wide focus-visible:outline-none"
       >
         {label}
-        <Icon
-          className={cn('h-3 w-3', active ? 'text-ink' : 'text-ink-disabled')}
-          aria-hidden
-        />
+        <Icon className={cn('h-3 w-3', active ? 'text-ink' : 'text-ink-disabled')} aria-hidden />
       </button>
     </th>
   );
@@ -231,25 +235,27 @@ function SortHeader({
 
 function Row({ lead, onSelect }: { lead: LeadWithOwner; onSelect: () => void }) {
   return (
-    <tr className="border-t border-line hover:bg-bg-subtle">
+    <tr className="border-line hover:bg-bg-subtle border-t">
       <td className="px-3 py-2 align-middle">
         <button
           type="button"
           onClick={onSelect}
-          className="text-left text-sm font-medium text-ink hover:text-brand-700 focus-visible:outline-none focus-visible:text-brand-700"
+          className="text-ink hover:text-brand-700 focus-visible:text-brand-700 text-left text-sm font-medium focus-visible:outline-none"
         >
           {lead.name}
         </button>
       </td>
-      <td className="px-3 py-2 align-middle text-sm text-ink">{lead.company ?? '-'}</td>
+      <td className="text-ink px-3 py-2 align-middle text-sm">{lead.company ?? '-'}</td>
       <td className="px-3 py-2 align-middle">
         <StageBadge stage={lead.stage} />
       </td>
       <td className="px-3 py-2 align-middle">
         <SourceBadge source={lead.source} />
       </td>
-      <td className="px-3 py-2 align-middle text-sm text-ink">
-        {lead.estimatedValue ? formatCurrency(lead.estimatedValue, lead.currency, { compact: true }) : '-'}
+      <td className="text-ink px-3 py-2 align-middle text-sm">
+        {lead.estimatedValue
+          ? formatCurrency(lead.estimatedValue, lead.currency, { compact: true })
+          : '-'}
       </td>
       <td className="px-3 py-2 align-middle">
         <PersonCell user={lead.owner} emptyLabel="Unknown" />
@@ -257,7 +263,7 @@ function Row({ lead, onSelect }: { lead: LeadWithOwner; onSelect: () => void }) 
       <td className="px-3 py-2 align-middle">
         <PersonCell user={lead.assignee} emptyLabel="Unassigned" />
       </td>
-      <td className="px-3 py-2 align-middle text-xs text-ink-muted">
+      <td className="text-ink-muted px-3 py-2 align-middle text-xs">
         <Tooltip content={lead.updatedAt.toString()}>
           <span>{relativeTime(lead.updatedAt)}</span>
         </Tooltip>
@@ -278,7 +284,7 @@ function VirtualRow({
   return (
     <div
       role="row"
-      className="absolute left-0 right-0 grid items-center gap-2 border-t border-line px-3 hover:bg-bg-subtle"
+      className="border-line hover:bg-bg-subtle absolute left-0 right-0 grid items-center gap-2 border-t px-3"
       style={{
         transform: `translateY(${top}px)`,
         // Mirrors the <thead> column order: name, company, stage, source,
@@ -291,36 +297,32 @@ function VirtualRow({
       <button
         type="button"
         onClick={onSelect}
-        className="truncate text-left text-sm font-medium text-ink hover:text-brand-700 focus-visible:outline-none focus-visible:text-brand-700"
+        className="text-ink hover:text-brand-700 focus-visible:text-brand-700 truncate text-left text-sm font-medium focus-visible:outline-none"
       >
         {lead.name}
       </button>
-      <span className="truncate text-sm text-ink">{lead.company ?? '-'}</span>
+      <span className="text-ink truncate text-sm">{lead.company ?? '-'}</span>
       <StageBadge stage={lead.stage} />
       <SourceBadge source={lead.source} />
-      <span className="text-sm text-ink truncate">
-        {lead.estimatedValue ? formatCurrency(lead.estimatedValue, lead.currency, { compact: true }) : '-'}
+      <span className="text-ink truncate text-sm">
+        {lead.estimatedValue
+          ? formatCurrency(lead.estimatedValue, lead.currency, { compact: true })
+          : '-'}
       </span>
       <PersonCell user={lead.owner} emptyLabel="Unknown" />
       <PersonCell user={lead.assignee} emptyLabel="Unassigned" />
-      <span className="truncate text-xs text-ink-muted">{relativeTime(lead.updatedAt)}</span>
+      <span className="text-ink-muted truncate text-xs">{relativeTime(lead.updatedAt)}</span>
     </div>
   );
 }
 
 /** Avatar + name for either of the two people on a lead (owner or assignee). */
-function PersonCell({
-  user,
-  emptyLabel,
-}: {
-  user: LeadWithOwner['owner'];
-  emptyLabel: string;
-}) {
-  if (!user) return <span className="text-xs text-ink-disabled">{emptyLabel}</span>;
+function PersonCell({ user, emptyLabel }: { user: LeadWithOwner['owner']; emptyLabel: string }) {
+  if (!user) return <span className="text-ink-disabled text-xs">{emptyLabel}</span>;
   return (
-    <div className="flex items-center gap-2 min-w-0">
+    <div className="flex min-w-0 items-center gap-2">
       <UserAvatar size="sm" name={user.name || user.email} image={user.image} />
-      <span className="truncate text-sm text-ink">{user.name || user.email}</span>
+      <span className="text-ink truncate text-sm">{user.name || user.email}</span>
     </div>
   );
 }

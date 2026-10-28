@@ -21,7 +21,6 @@ import type {
   RoomBumpedPayload,
 } from '@/lib/chat-socket-events';
 
-
 export function useRoomRealtime(roomId: string | null, selfUserId: string) {
   const qc = useQueryClient();
   useEffect(() => {

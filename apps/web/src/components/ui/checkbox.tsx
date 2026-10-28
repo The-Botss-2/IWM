@@ -14,9 +14,9 @@ export const Checkbox = forwardRef<
     <CheckboxPrimitive.Root
       ref={ref}
       className={cn(
-        'peer h-4 w-4 shrink-0 rounded border border-line-strong bg-white transition-all',
-        'focus-visible:outline-none focus-visible:shadow-focus focus-visible:border-brand-purple',
-        'data-[state=checked]:bg-brand-gradient data-[state=checked]:text-white data-[state=checked]:border-transparent',
+        'border-line-strong peer h-4 w-4 shrink-0 rounded border bg-white transition-all',
+        'focus-visible:shadow-focus focus-visible:border-brand-purple focus-visible:outline-none',
+        'data-[state=checked]:bg-brand-gradient data-[state=checked]:border-transparent data-[state=checked]:text-white',
         'disabled:cursor-not-allowed disabled:opacity-50',
         className,
       )}

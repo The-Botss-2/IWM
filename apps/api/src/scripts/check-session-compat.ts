@@ -448,7 +448,11 @@ async function main(): Promise<void> {
     calls.length = 0;
     const ok = await signIn('staff@example.test', 'correct horse battery staple');
     check('correct password signs in', ok.status === 200, `status ${ok.status}`);
-    check('successful sign-in does not call onSignInFailed', calls.length === 0, JSON.stringify(calls));
+    check(
+      'successful sign-in does not call onSignInFailed',
+      calls.length === 0,
+      JSON.stringify(calls),
+    );
   }
 
   if (failures > 0) {

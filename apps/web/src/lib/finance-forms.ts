@@ -18,7 +18,10 @@ import {
  */
 
 /** Two decimal strings (or typed text) holding the same amount. */
-function sameAmount(a: string | number | null | undefined, b: string | number | null | undefined): boolean {
+function sameAmount(
+  a: string | number | null | undefined,
+  b: string | number | null | undefined,
+): boolean {
   const x = Number(a ?? 0);
   const y = Number(b ?? 0);
   return Number.isFinite(x) && Number.isFinite(y) ? x === y : String(a) === String(b);

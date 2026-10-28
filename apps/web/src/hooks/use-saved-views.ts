@@ -1,11 +1,7 @@
 'use client';
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import type {
-  CreateSavedViewInput,
-  SavedView,
-  UpdateSavedViewInput,
-} from '@botss/shared-types';
+import type { CreateSavedViewInput, SavedView, UpdateSavedViewInput } from '@botss/shared-types';
 
 import { getApi } from '@/lib/api';
 
@@ -29,8 +25,7 @@ export function useSavedViews(projectId: string) {
 export function useCreateSavedView(projectId: string) {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (input: CreateSavedViewInput) =>
-      getApi().savedViews.create(projectId, input),
+    mutationFn: (input: CreateSavedViewInput) => getApi().savedViews.create(projectId, input),
     onSuccess: (view: SavedView) => {
       qc.setQueryData<SavedView[] | undefined>(savedViewsKey(projectId), (prev) =>
         prev ? [...prev, view] : [view],

@@ -63,12 +63,24 @@ async function main(): Promise<void> {
   // -------------------------------------------------------------------------
   // 1a. The pure boundary rule
   // -------------------------------------------------------------------------
-  check('boundary: client on internal route denied', portalBoundary('CLIENT', undefined) === 'deny-client');
-  check('boundary: client on portal route allowed', portalBoundary('CLIENT', 'client-only') === 'client');
+  check(
+    'boundary: client on internal route denied',
+    portalBoundary('CLIENT', undefined) === 'deny-client',
+  );
+  check(
+    'boundary: client on portal route allowed',
+    portalBoundary('CLIENT', 'client-only') === 'client',
+  );
   check('boundary: client on shared route allowed', portalBoundary('CLIENT', 'both') === 'client');
-  check('boundary: staff on internal route resolves', portalBoundary('STAFF', undefined) === 'staff');
+  check(
+    'boundary: staff on internal route resolves',
+    portalBoundary('STAFF', undefined) === 'staff',
+  );
   check('boundary: staff on shared route resolves', portalBoundary('STAFF', 'both') === 'staff');
-  check('boundary: staff on client-only route denied', portalBoundary('STAFF', 'client-only') === 'deny-staff');
+  check(
+    'boundary: staff on client-only route denied',
+    portalBoundary('STAFF', 'client-only') === 'deny-staff',
+  );
 
   // -------------------------------------------------------------------------
   // 1b. The real AuthGuard, with a fake AuthService
@@ -155,9 +167,16 @@ async function main(): Promise<void> {
 
   {
     const r = await run('CLIENT', InternalController);
-    check('guard: client refused on an internal route', r.status === 403 && r.code === 'portal-only', JSON.stringify(r));
+    check(
+      'guard: client refused on an internal route',
+      r.status === 403 && r.code === 'portal-only',
+      JSON.stringify(r),
+    );
     // One context resolution (it carries the accountType), never a bootstrap.
-    check('guard: client never bootstraps a workspace', r.calls.bootstrap === 0 && r.calls.context === 1);
+    check(
+      'guard: client never bootstraps a workspace',
+      r.calls.bootstrap === 0 && r.calls.context === 1,
+    );
   }
   {
     const r = await run('CLIENT', PortalOnlyController);
@@ -175,7 +194,10 @@ async function main(): Promise<void> {
       JSON.stringify(r.req['permissions']) === JSON.stringify({ company: [], workspace: [] }),
       JSON.stringify(r.req['permissions']),
     );
-    check('guard: client context skips the bootstrap', r.calls.bootstrap === 0 && r.calls.context === 1);
+    check(
+      'guard: client context skips the bootstrap',
+      r.calls.bootstrap === 0 && r.calls.context === 1,
+    );
     check(
       'guard: accountType lands on req.user',
       (r.req['user'] as { accountType?: string })?.accountType === 'CLIENT',
@@ -183,16 +205,27 @@ async function main(): Promise<void> {
   }
   {
     const r = await run('CLIENT', SharedController);
-    check('guard: client allowed on /auth/me-style shared route', r.status === null, JSON.stringify(r));
+    check(
+      'guard: client allowed on /auth/me-style shared route',
+      r.status === null,
+      JSON.stringify(r),
+    );
   }
   {
     const r = await run('STAFF', PortalOnlyController);
-    check('guard: staff refused on a client-only route', r.status === 403 && r.code === 'client-portal-only');
+    check(
+      'guard: staff refused on a client-only route',
+      r.status === 403 && r.code === 'client-portal-only',
+    );
   }
   {
     const r = await run('STAFF', InternalController);
     // Zero memberships in the fake: the staff path still bootstraps as before.
-    check('guard: staff path unchanged (context + bootstrap)', r.status === null && r.calls.context === 2 && r.calls.bootstrap === 1, JSON.stringify(r.calls));
+    check(
+      'guard: staff path unchanged (context + bootstrap)',
+      r.status === null && r.calls.context === 2 && r.calls.bootstrap === 1,
+      JSON.stringify(r.calls),
+    );
   }
 
   // -------------------------------------------------------------------------
@@ -224,7 +257,8 @@ async function main(): Promise<void> {
     ['GET', '/api/v1/auth/me'],
   ];
   for (const [m, p] of open) check(`auth route open: ${m} ${p}`, isAllowedBetterAuthRoute(m, p));
-  for (const [m, p] of closed) check(`auth route closed: ${m} ${p}`, !isAllowedBetterAuthRoute(m, p));
+  for (const [m, p] of closed)
+    check(`auth route closed: ${m} ${p}`, !isAllowedBetterAuthRoute(m, p));
 
   // -------------------------------------------------------------------------
   // 3. Portal link identifiers
@@ -233,17 +267,39 @@ async function main(): Promise<void> {
   const rst = portalTokenIdentifier('portal-reset', 'cclient1', 'cuser1');
   const parsedInv = parsePortalTokenIdentifier(inv);
   const parsedRst = parsePortalTokenIdentifier(rst);
-  check('token: invite round-trips', parsedInv?.kind === 'portal-invite' && parsedInv.clientId === 'cclient1' && parsedInv.userId === 'cuser1');
-  check('token: reset round-trips', parsedRst?.kind === 'portal-reset' && parsedRst.clientId === 'cclient1');
-  check('token: workspace invite is not a portal link', parsePortalTokenIdentifier('workspace-invite:w1:u1') === null);
-  check('token: malformed rejected', parsePortalTokenIdentifier('client-portal-invite:onlyone') === null);
-  check('token: extra segment rejected', parsePortalTokenIdentifier('client-portal-invite:c:u:x') === null);
+  check(
+    'token: invite round-trips',
+    parsedInv?.kind === 'portal-invite' &&
+      parsedInv.clientId === 'cclient1' &&
+      parsedInv.userId === 'cuser1',
+  );
+  check(
+    'token: reset round-trips',
+    parsedRst?.kind === 'portal-reset' && parsedRst.clientId === 'cclient1',
+  );
+  check(
+    'token: workspace invite is not a portal link',
+    parsePortalTokenIdentifier('workspace-invite:w1:u1') === null,
+  );
+  check(
+    'token: malformed rejected',
+    parsePortalTokenIdentifier('client-portal-invite:onlyone') === null,
+  );
+  check(
+    'token: extra segment rejected',
+    parsePortalTokenIdentifier('client-portal-invite:c:u:x') === null,
+  );
   const inviteFilter = portalTokensForUser('portal-invite', 'cuser1');
   check(
     'token: per-user filter matches this person only, one kind',
-    inviteFilter.identifier.startsWith === 'client-portal-invite:' && inviteFilter.identifier.endsWith === ':cuser1',
+    inviteFilter.identifier.startsWith === 'client-portal-invite:' &&
+      inviteFilter.identifier.endsWith === ':cuser1',
   );
-  check('token: revoke covers both kinds', portalTokenIdentifiers('c', 'u').length === 2 && portalTokenIdentifiers('c', 'u').includes(portalTokenIdentifier('portal-reset', 'c', 'u')));
+  check(
+    'token: revoke covers both kinds',
+    portalTokenIdentifiers('c', 'u').length === 2 &&
+      portalTokenIdentifiers('c', 'u').includes(portalTokenIdentifier('portal-reset', 'c', 'u')),
+  );
 
   // -------------------------------------------------------------------------
   // 4. Where-builders
@@ -257,31 +313,91 @@ async function main(): Promise<void> {
     organizationId: 'o1',
   };
   const pw = portalProjectWhere(contact);
-  check('where: project pinned to client + workspace', pw.clientId === 'c1' && pw.workspaceId === 'w1');
+  check(
+    'where: project pinned to client + workspace',
+    pw.clientId === 'c1' && pw.workspaceId === 'w1',
+  );
   check('where: project must be switched on', pw.portalVisible === true && pw.deletedAt === null);
-  check('where: drafts and archived projects hidden', !pw.status.in.includes('DRAFT' as never) && !pw.status.in.includes('ARCHIVED' as never) && pw.status.in.includes('ACTIVE'));
+  check(
+    'where: drafts and archived projects hidden',
+    !pw.status.in.includes('DRAFT' as never) &&
+      !pw.status.in.includes('ARCHIVED' as never) &&
+      pw.status.in.includes('ACTIVE'),
+  );
   check('where: marked tasks only by default', portalTaskWhere('p1', false).portalVisible === true);
-  check('where: all tasks mode drops the mark filter', !('portalVisible' in portalTaskWhere('p1', true)));
-  check('where: cancelled tasks never listed', portalTaskWhere('p1', true).status.not === 'CANCELLED');
+  check(
+    'where: all tasks mode drops the mark filter',
+    !('portalVisible' in portalTaskWhere('p1', true)),
+  );
+  check(
+    'where: cancelled tasks never listed',
+    portalTaskWhere('p1', true).status.not === 'CANCELLED',
+  );
   const iw = portalInvoiceWhere(contact);
-  check('where: invoices pinned and drafts hidden', iw.clientId === 'c1' && iw.workspaceId === 'w1' && iw.status.not === 'DRAFT');
+  check(
+    'where: invoices pinned and drafts hidden',
+    iw.clientId === 'c1' && iw.workspaceId === 'w1' && iw.status.not === 'DRAFT',
+  );
   const cw = portalContractWhere(contact);
-  check('where: contracts pinned and drafts hidden', cw.workspaceId === 'w1' && cw.status.not === 'DRAFT');
+  check(
+    'where: contracts pinned and drafts hidden',
+    cw.workspaceId === 'w1' && cw.status.not === 'DRAFT',
+  );
   check(
     'where: client-less contract only through the client project',
-    JSON.stringify(cw.OR[1]) === JSON.stringify({ clientId: null, project: { clientId: 'c1', workspaceId: 'w1', deletedAt: null, portalVisible: true } }),
+    JSON.stringify(cw.OR[1]) ===
+      JSON.stringify({
+        clientId: null,
+        project: { clientId: 'c1', workspaceId: 'w1', deletedAt: null, portalVisible: true },
+      }),
   );
   const dw = portalDocumentWhere(contact, 'u1');
-  check('where: documents pinned to client workspace', dw.workspaceId === 'w1' && dw.deletedAt === null);
-  check('where: documents shared with company or person', JSON.stringify(dw.OR) === JSON.stringify([{ clientShares: { some: { clientId: 'c1' } } }, { access: { some: { userId: 'u1' } } }]));
+  check(
+    'where: documents pinned to client workspace',
+    dw.workspaceId === 'w1' && dw.deletedAt === null,
+  );
+  check(
+    'where: documents shared with company or person',
+    JSON.stringify(dw.OR) ===
+      JSON.stringify([
+        { clientShares: { some: { clientId: 'c1' } } },
+        { access: { some: { userId: 'u1' } } },
+      ]),
+  );
   const lw = livePortalContactWhere('u1');
-  check('where: contact must be a CLIENT account', lw.user.accountType === 'CLIENT' && lw.user.deletedAt === null);
-  check('where: contact org and workspace must be live', lw.client.workspace.isActive === true && lw.client.workspace.organization.isActive === true && lw.client.workspace.deletedAt === null && lw.client.deletedAt === null);
+  check(
+    'where: contact must be a CLIENT account',
+    lw.user.accountType === 'CLIENT' && lw.user.deletedAt === null,
+  );
+  check(
+    'where: contact org and workspace must be live',
+    lw.client.workspace.isActive === true &&
+      lw.client.workspace.organization.isActive === true &&
+      lw.client.workspace.deletedAt === null &&
+      lw.client.deletedAt === null,
+  );
 
   // -------------------------------------------------------------------------
   // 5. Allowlist schemas strip internal fields
   // -------------------------------------------------------------------------
-  const leakKeys = ['fxRate', 'fxRateToBase', 'baseAmount', 'baseTotalValue', 'feeAmount', 'receivedAmount', 'reference', 'notesInternal', 'expenses', 'assigneeId', 'assignee', 'description', 'estimateHours', 'createdById', 'paymentSourceId', 'voidReason'];
+  const leakKeys = [
+    'fxRate',
+    'fxRateToBase',
+    'baseAmount',
+    'baseTotalValue',
+    'feeAmount',
+    'receivedAmount',
+    'reference',
+    'notesInternal',
+    'expenses',
+    'assigneeId',
+    'assignee',
+    'description',
+    'estimateHours',
+    'createdById',
+    'paymentSourceId',
+    'voidReason',
+  ];
   const withLeaks = <T extends object>(o: T) => ({
     ...o,
     ...Object.fromEntries(leakKeys.map((k) => [k, 'SECRET'])),
@@ -316,9 +432,20 @@ async function main(): Promise<void> {
     }),
   );
   const contractJson = JSON.stringify(contract);
-  check('allowlist: contract drops internal fields', !contractJson.includes('SECRET') && !('notes' in contract), contractJson);
+  check(
+    'allowlist: contract drops internal fields',
+    !contractJson.includes('SECRET') && !('notes' in contract),
+    contractJson,
+  );
   const payment = portalPaymentSchema.parse(
-    withLeaks({ id: 'cjld2cjxh0000qzrmn831i7rl', amount: '100.00', currency: 'USD', paidAt: new Date(), invoiceNumber: null, contractTitle: null }),
+    withLeaks({
+      id: 'cjld2cjxh0000qzrmn831i7rl',
+      amount: '100.00',
+      currency: 'USD',
+      paidAt: new Date(),
+      invoiceNumber: null,
+      contractTitle: null,
+    }),
   );
   check('allowlist: payment drops fee/fx/reference', !JSON.stringify(payment).includes('SECRET'));
   const invoice = portalInvoiceDetailSchema.parse(
@@ -343,18 +470,44 @@ async function main(): Promise<void> {
       lineItems: [],
     }),
   );
-  check('allowlist: invoice keeps what the PDF prints only', !JSON.stringify(invoice).includes('SECRET') && invoice.notes === 'Thanks for your business');
+  check(
+    'allowlist: invoice keeps what the PDF prints only',
+    !JSON.stringify(invoice).includes('SECRET') && invoice.notes === 'Thanks for your business',
+  );
   const task = portalTaskSchema.parse(
-    withLeaks({ id: 'cjld2cjxh0000qzrmn831i7rj', title: 'Homepage', status: 'IN_PROGRESS', startDate: null, dueDate: null, completedAt: null }),
+    withLeaks({
+      id: 'cjld2cjxh0000qzrmn831i7rj',
+      title: 'Homepage',
+      status: 'IN_PROGRESS',
+      startDate: null,
+      dueDate: null,
+      completedAt: null,
+    }),
   );
-  check('allowlist: task drops assignee/description/hours', !JSON.stringify(task).includes('SECRET'));
+  check(
+    'allowlist: task drops assignee/description/hours',
+    !JSON.stringify(task).includes('SECRET'),
+  );
   const milestone = portalMilestoneSchema.parse(
-    withLeaks({ id: 'cjld2cjxh0000qzrmn831i7ri', title: 'M1', status: 'PENDING', dueDate: null, deliveredAt: null, amount: null, currency: null, paymentStatus: null }),
+    withLeaks({
+      id: 'cjld2cjxh0000qzrmn831i7ri',
+      title: 'M1',
+      status: 'PENDING',
+      dueDate: null,
+      deliveredAt: null,
+      amount: null,
+      currency: null,
+      paymentStatus: null,
+    }),
   );
-  check('allowlist: milestone drops internal fields', !JSON.stringify(milestone).includes('SECRET'));
+  check(
+    'allowlist: milestone drops internal fields',
+    !JSON.stringify(milestone).includes('SECRET'),
+  );
   check(
     'allowlist: project detail has no description or members',
-    !('description' in portalProjectDetailSchema.shape) && !('members' in portalProjectDetailSchema.shape),
+    !('description' in portalProjectDetailSchema.shape) &&
+      !('members' in portalProjectDetailSchema.shape),
   );
 
   // -------------------------------------------------------------------------
@@ -368,9 +521,18 @@ async function main(): Promise<void> {
     { status: 'DONE', count: 2 },
     { status: 'CANCELLED', count: 1 },
   ]);
-  check('progress: buckets add up to total', p.notStarted + p.inProgress + p.inReview + p.done + p.cancelled === p.total && p.total === 10);
-  check('progress: same formula as the internal summary (done / all)', p.percent === Math.round((2 / 10) * 100));
-  check('progress: empty project is 0%', toPortalProgress([]).percent === 0 && toPortalProgress([]).total === 0);
+  check(
+    'progress: buckets add up to total',
+    p.notStarted + p.inProgress + p.inReview + p.done + p.cancelled === p.total && p.total === 10,
+  );
+  check(
+    'progress: same formula as the internal summary (done / all)',
+    p.percent === Math.round((2 / 10) * 100),
+  );
+  check(
+    'progress: empty project is 0%',
+    toPortalProgress([]).percent === 0 && toPortalProgress([]).total === 0,
+  );
 
   // -------------------------------------------------------------------------
   // 7. Portal emails
@@ -387,7 +549,10 @@ async function main(): Promise<void> {
     });
     const all = `${mail.subject}\n${mail.html}\n${mail.text}`;
     check(`email ${variant}: no em-dash`, !all.includes(String.fromCharCode(0x2014)));
-    check(`email ${variant}: names escaped in html`, !mail.html.includes('<b>Ann</b>') && !mail.html.includes('Acme <Ltd>'));
+    check(
+      `email ${variant}: names escaped in html`,
+      !mail.html.includes('<b>Ann</b>') && !mail.html.includes('Acme <Ltd>'),
+    );
     check(`email ${variant}: url attribute escaped`, !mail.html.includes('x="y"'));
     check(`email ${variant}: subject is one line`, !/[\r\n]/.test(mail.subject));
   }
@@ -395,13 +560,34 @@ async function main(): Promise<void> {
   // -------------------------------------------------------------------------
   // 8. Staff flows refuse client accounts; one portal account, one workspace
   // -------------------------------------------------------------------------
-  check('reuse: brand-new account (no contacts, no password) allowed', portalAccountReusable({ elsewhere: 0, here: 0, hasPassword: false }));
-  check('reuse: account already in this workspace allowed', portalAccountReusable({ elsewhere: 0, here: 2, hasPassword: true }));
-  check('reuse: revoked-here account without password allowed', portalAccountReusable({ elsewhere: 0, here: 1, hasPassword: false }));
-  check('reuse: account in another workspace refused (takeover)', !portalAccountReusable({ elsewhere: 1, here: 0, hasPassword: true }));
-  check('reuse: account in another workspace refused even without password', !portalAccountReusable({ elsewhere: 1, here: 0, hasPassword: false }));
-  check('reuse: account in both workspaces refused', !portalAccountReusable({ elsewhere: 1, here: 1, hasPassword: true }));
-  check('reuse: password set elsewhere with no history here refused (pre-hijack)', !portalAccountReusable({ elsewhere: 0, here: 0, hasPassword: true }));
+  check(
+    'reuse: brand-new account (no contacts, no password) allowed',
+    portalAccountReusable({ elsewhere: 0, here: 0, hasPassword: false }),
+  );
+  check(
+    'reuse: account already in this workspace allowed',
+    portalAccountReusable({ elsewhere: 0, here: 2, hasPassword: true }),
+  );
+  check(
+    'reuse: revoked-here account without password allowed',
+    portalAccountReusable({ elsewhere: 0, here: 1, hasPassword: false }),
+  );
+  check(
+    'reuse: account in another workspace refused (takeover)',
+    !portalAccountReusable({ elsewhere: 1, here: 0, hasPassword: true }),
+  );
+  check(
+    'reuse: account in another workspace refused even without password',
+    !portalAccountReusable({ elsewhere: 1, here: 0, hasPassword: false }),
+  );
+  check(
+    'reuse: account in both workspaces refused',
+    !portalAccountReusable({ elsewhere: 1, here: 1, hasPassword: true }),
+  );
+  check(
+    'reuse: password set elsewhere with no history here refused (pre-hijack)',
+    !portalAccountReusable({ elsewhere: 0, here: 0, hasPassword: true }),
+  );
 
   let refused = false;
   try {

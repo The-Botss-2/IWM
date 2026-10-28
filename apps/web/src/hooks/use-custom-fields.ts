@@ -26,8 +26,7 @@ import { useWorkspaceMembers } from './use-workspace-members';
 const customFieldDefinitionsKey = (q?: Partial<ListCustomFieldDefinitionsQuery>) =>
   ['custom-field-definitions', q ?? {}] as const;
 
-const customFieldValuesKey = (entityId: string) =>
-  ['custom-field-values', entityId] as const;
+const customFieldValuesKey = (entityId: string) => ['custom-field-values', entityId] as const;
 
 /** Every TASK-field value on one project's tasks (List view columns). */
 const projectTaskValuesKey = (projectId: string) =>
@@ -135,7 +134,10 @@ export function useCustomFieldValues(entityId: string | null | undefined) {
 }
 
 /** Every TASK-field value on a project's tasks, in one read (List view). */
-export function useProjectTaskCustomFieldValues(projectId: string | null | undefined, enabled = true) {
+export function useProjectTaskCustomFieldValues(
+  projectId: string | null | undefined,
+  enabled = true,
+) {
   return useQuery({
     queryKey: projectTaskValuesKey(projectId ?? ''),
     queryFn: () => getApi().customFields.listProjectTaskValues(projectId as string),
@@ -184,26 +186,31 @@ function restoreValueCaches(qc: QueryClient, snapshots: ValueCaches | undefined)
 export function useSetCustomFieldValue(projectId?: string) {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (input: SetCustomFieldValueInput) =>
-      getApi().customFields.setValue(input),
+    mutationFn: (input: SetCustomFieldValueInput) => getApi().customFields.setValue(input),
     onMutate: async (input) => {
       await qc.cancelQueries({ queryKey: customFieldValuesKey(input.entityId) });
       if (projectId) await qc.cancelQueries({ queryKey: projectTaskValuesKey(projectId) });
       const now = new Date();
-      const snapshots = patchValueCaches(qc, input.entityId, projectId, (list) => {
-        const prev = list.find(
-          (v) => v.definitionId === input.definitionId && v.entityId === input.entityId,
-        );
-        const optimistic: CustomFieldValue = {
-          id: prev?.id ?? `temp-${input.definitionId}-${input.entityId}`,
-          definitionId: input.definitionId,
-          entityId: input.entityId,
-          value: input.value,
-          createdAt: prev?.createdAt ?? now,
-          updatedAt: now,
-        };
-        return prev ? list.map((v) => (v === prev ? optimistic : v)) : [...list, optimistic];
-      }, true);
+      const snapshots = patchValueCaches(
+        qc,
+        input.entityId,
+        projectId,
+        (list) => {
+          const prev = list.find(
+            (v) => v.definitionId === input.definitionId && v.entityId === input.entityId,
+          );
+          const optimistic: CustomFieldValue = {
+            id: prev?.id ?? `temp-${input.definitionId}-${input.entityId}`,
+            definitionId: input.definitionId,
+            entityId: input.entityId,
+            value: input.value,
+            createdAt: prev?.createdAt ?? now,
+            updatedAt: now,
+          };
+          return prev ? list.map((v) => (v === prev ? optimistic : v)) : [...list, optimistic];
+        },
+        true,
+      );
       return { snapshots };
     },
     onSuccess: (saved) => {

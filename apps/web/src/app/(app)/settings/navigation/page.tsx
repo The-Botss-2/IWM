@@ -15,11 +15,7 @@ import {
   type NavDestination,
   type NavGroup,
 } from '@/lib/nav-registry';
-import {
-  NAV_LAYOUTS,
-  setAppAppearance,
-  useAppAppearance,
-} from '@/lib/app-prefs';
+import { NAV_LAYOUTS, setAppAppearance, useAppAppearance } from '@/lib/app-prefs';
 import { cn } from '@/lib/utils';
 
 const GROUP_ORDER: NavGroup[] = ['primary', 'workspace', 'money', 'admin'];
@@ -61,18 +57,15 @@ export default function NavigationSettingsPage() {
     return out;
   }, [destinations]);
 
-  const hiddenCount = destinations.filter(
-    (d) => !d.alwaysOn && !prefs.isVisible(d.id),
-  ).length;
+  const hiddenCount = destinations.filter((d) => !d.alwaysOn && !prefs.isVisible(d.id)).length;
 
   return (
     <div className="mx-auto max-w-3xl space-y-8 p-4 sm:p-6">
       <header>
         <h1 className="text-xl font-semibold">Navigation</h1>
-        <p className="mt-1 text-sm text-ink-muted">
-          Choose your layout and which sections appear in it. These are your
-          settings - they do not change what anyone else sees, and they never
-          grant or remove access.
+        <p className="text-ink-muted mt-1 text-sm">
+          Choose your layout and which sections appear in it. These are your settings - they do not
+          change what anyone else sees, and they never grant or remove access.
         </p>
       </header>
 
@@ -91,7 +84,7 @@ export default function NavigationSettingsPage() {
                 className={cn(
                   'rounded-lg border p-3 text-left transition-colors',
                   active
-                    ? 'border-transparent bg-brand-gradient text-white'
+                    ? 'bg-brand-gradient border-transparent text-white'
                     : 'border-line bg-bg-surface hover:bg-bg-subtle',
                 )}
               >
@@ -115,9 +108,8 @@ export default function NavigationSettingsPage() {
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div>
             <h2 className="text-sm font-semibold">Sections</h2>
-            <p className="text-xs text-ink-muted">
-              Applies to both layouts. Hidden sections stay reachable by URL,
-              search and shortcut.
+            <p className="text-ink-muted text-xs">
+              Applies to both layouts. Hidden sections stay reachable by URL, search and shortcut.
             </p>
           </div>
           {hiddenCount > 0 ? (
@@ -132,31 +124,30 @@ export default function NavigationSettingsPage() {
           if (!items || items.length === 0) return null;
           return (
             <div key={group} className="space-y-1.5">
-              <h3 className="px-1 pt-2 text-[11px] font-bold uppercase tracking-wide text-ink-muted">
+              <h3 className="text-ink-muted px-1 pt-2 text-[11px] font-bold uppercase tracking-wide">
                 {NAV_GROUP_LABEL[group]}
               </h3>
-              <ul className="divide-y divide-line overflow-hidden rounded-lg border border-line bg-bg-surface" role="list">
+              <ul
+                className="divide-line border-line bg-bg-surface divide-y overflow-hidden rounded-lg border"
+                role="list"
+              >
                 {items.map((d) => {
                   const Icon = d.icon;
                   const visible = prefs.isVisible(d.id);
                   return (
                     <li key={d.id} className="flex items-center gap-3 px-3 py-2.5">
-                      <Icon className="h-4 w-4 shrink-0 text-ink-muted" aria-hidden />
+                      <Icon className="text-ink-muted h-4 w-4 shrink-0" aria-hidden />
                       <div className="min-w-0 flex-1">
                         <div className="flex flex-wrap items-center gap-2">
                           <span className="text-sm font-medium">{d.label}</span>
-                          {d.alwaysOn ? (
-                            <Badge tone="outline">Always on</Badge>
-                          ) : null}
+                          {d.alwaysOn ? <Badge tone="outline">Always on</Badge> : null}
                           {d.shortcut ? (
-                            <kbd className="rounded bg-bg-subtle px-1.5 py-0.5 font-mono text-[10px] text-ink-muted">
+                            <kbd className="bg-bg-subtle text-ink-muted rounded px-1.5 py-0.5 font-mono text-[10px]">
                               {d.shortcut}
                             </kbd>
                           ) : null}
                         </div>
-                        <p className="truncate text-xs text-ink-muted">
-                          {d.description}
-                        </p>
+                        <p className="text-ink-muted truncate text-xs">{d.description}</p>
                       </div>
                       <Checkbox
                         checked={visible}
@@ -177,14 +168,17 @@ export default function NavigationSettingsPage() {
       <section className="space-y-3">
         <div>
           <h2 className="text-sm font-semibold">Keyboard shortcuts</h2>
-          <p className="text-xs text-ink-muted">
-            Press the keys in sequence, not together. They do not fire while
-            you are typing in a field.
+          <p className="text-ink-muted text-xs">
+            Press the keys in sequence, not together. They do not fire while you are typing in a
+            field.
           </p>
         </div>
-        <ul className="divide-y divide-line overflow-hidden rounded-lg border border-line bg-bg-surface" role="list">
+        <ul
+          className="divide-line border-line bg-bg-surface divide-y overflow-hidden rounded-lg border"
+          role="list"
+        >
           <li className="flex items-center gap-3 px-3 py-2.5">
-            <kbd className="rounded bg-bg-subtle px-1.5 py-0.5 font-mono text-[10px] text-ink-muted">
+            <kbd className="bg-bg-subtle text-ink-muted rounded px-1.5 py-0.5 font-mono text-[10px]">
               ⌘K
             </kbd>
             <span className="text-sm">Search or jump to anything</span>
@@ -193,7 +187,7 @@ export default function NavigationSettingsPage() {
             .filter((d) => d.shortcut)
             .map((d) => (
               <li key={d.id} className="flex items-center gap-3 px-3 py-2.5">
-                <kbd className="rounded bg-bg-subtle px-1.5 py-0.5 font-mono text-[10px] text-ink-muted">
+                <kbd className="bg-bg-subtle text-ink-muted rounded px-1.5 py-0.5 font-mono text-[10px]">
                   {d.shortcut}
                 </kbd>
                 <span className="text-sm">Go to {d.label}</span>

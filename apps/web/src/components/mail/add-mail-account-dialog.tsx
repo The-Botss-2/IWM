@@ -106,13 +106,12 @@ export function AddMailAccountDialog({ open, onOpenChange }: Props) {
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-lg font-semibold">
-            <Mail className="h-4 w-4 text-brand-600" aria-hidden />
+            <Mail className="text-brand-600 h-4 w-4" aria-hidden />
             Connect a mailbox
           </DialogTitle>
-          <DialogDescription className="text-sm text-ink-muted">
-            We will verify the credentials in the background. Once active, the
-            mailbox can also be used to send password-reset and invitation
-            email for your workspace.
+          <DialogDescription className="text-ink-muted text-sm">
+            We will verify the credentials in the background. Once active, the mailbox can also be
+            used to send password-reset and invitation email for your workspace.
           </DialogDescription>
         </DialogHeader>
 
@@ -148,8 +147,8 @@ export function AddMailAccountDialog({ open, onOpenChange }: Props) {
             />
           </Field>
 
-          <div className="rounded-md border border-line bg-bg-subtle/60 p-3">
-            <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-ink-muted">
+          <div className="border-line bg-bg-subtle/60 rounded-md border p-3">
+            <p className="text-ink-muted mb-2 text-xs font-semibold uppercase tracking-wide">
               IMAP server (receiving mail)
             </p>
             <div className="grid grid-cols-1 gap-2 sm:grid-cols-[1fr_100px]">
@@ -168,16 +167,13 @@ export function AddMailAccountDialog({ open, onOpenChange }: Props) {
                 }
               />
             </div>
-            <label className="mt-2 flex items-center gap-2 text-xs text-ink-muted">
-              <Checkbox
-                checked={imapSecure}
-                onCheckedChange={(v) => setImapSecure(v === true)}
-              />
+            <label className="text-ink-muted mt-2 flex items-center gap-2 text-xs">
+              <Checkbox checked={imapSecure} onCheckedChange={(v) => setImapSecure(v === true)} />
               Use SSL/TLS (recommended for port 993)
             </label>
           </div>
 
-          <label className="flex items-center gap-2 text-sm text-ink">
+          <label className="text-ink flex items-center gap-2 text-sm">
             <Checkbox
               checked={useSameForSmtp}
               onCheckedChange={(v) => setUseSameForSmtp(v === true)}
@@ -186,8 +182,8 @@ export function AddMailAccountDialog({ open, onOpenChange }: Props) {
           </label>
 
           {!useSameForSmtp ? (
-            <div className="rounded-md border border-line bg-bg-subtle/60 p-3">
-              <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-ink-muted">
+            <div className="border-line bg-bg-subtle/60 rounded-md border p-3">
+              <p className="text-ink-muted mb-2 text-xs font-semibold uppercase tracking-wide">
                 SMTP server (sending mail)
               </p>
               <div className="grid grid-cols-1 gap-2 sm:grid-cols-[1fr_100px]">
@@ -206,29 +202,24 @@ export function AddMailAccountDialog({ open, onOpenChange }: Props) {
                   }
                 />
               </div>
-              <label className="mt-2 flex items-center gap-2 text-xs text-ink-muted">
-                <Checkbox
-                  checked={smtpSecure}
-                  onCheckedChange={(v) => setSmtpSecure(v === true)}
-                />
+              <label className="text-ink-muted mt-2 flex items-center gap-2 text-xs">
+                <Checkbox checked={smtpSecure} onCheckedChange={(v) => setSmtpSecure(v === true)} />
                 Use SSL/TLS (recommended for port 465)
               </label>
             </div>
           ) : null}
 
-          <label className="flex items-start gap-2 rounded-md border border-line bg-white p-3 text-sm">
+          <label className="border-line flex items-start gap-2 rounded-md border bg-white p-3 text-sm">
             <Checkbox
               checked={isDefault}
               onCheckedChange={(v) => setIsDefault(v === true)}
               className="mt-0.5"
             />
             <span>
-              <span className="block font-medium text-ink">
-                Use for transactional email
-              </span>
-              <span className="block text-xs text-ink-muted">
-                Send password reset and workspace invitation email from this
-                mailbox. Recommended for one mailbox per workspace.
+              <span className="text-ink block font-medium">Use for transactional email</span>
+              <span className="text-ink-muted block text-xs">
+                Send password reset and workspace invitation email from this mailbox. Recommended
+                for one mailbox per workspace.
               </span>
             </span>
           </label>
@@ -274,7 +265,7 @@ function Field({
       <Label htmlFor={htmlFor}>
         {label}
         {required ? (
-          <span className="ml-1 text-state-error" aria-label="required">
+          <span className="text-state-error ml-1" aria-label="required">
             *
           </span>
         ) : null}

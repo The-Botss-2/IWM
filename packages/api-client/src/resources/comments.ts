@@ -16,11 +16,7 @@ export class CommentsResource {
   constructor(private readonly http: HttpClient) {}
 
   list(taskId: string, query?: Partial<ListCommentsQuery>) {
-    return this.http.get(
-      `/tasks/${taskId}/comments`,
-      commentListResponseSchema,
-      query,
-    );
+    return this.http.get(`/tasks/${taskId}/comments`, commentListResponseSchema, query);
   }
   create(taskId: string, input: CreateCommentInput): Promise<Comment> {
     return this.http.post(`/tasks/${taskId}/comments`, commentSchema, input);

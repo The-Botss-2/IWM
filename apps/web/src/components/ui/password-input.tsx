@@ -33,10 +33,14 @@ export const PasswordInput = forwardRef<HTMLInputElement, PasswordInputProps>(
           className={cn(
             'absolute inset-y-0 right-0 flex w-10 items-center justify-center',
             'text-ink-muted hover:text-ink focus-visible:text-ink',
-            'focus-visible:outline-none focus-visible:shadow-focus rounded-r-md',
+            'focus-visible:shadow-focus rounded-r-md focus-visible:outline-none',
           )}
         >
-          {revealed ? <EyeOff className="h-4 w-4" aria-hidden /> : <Eye className="h-4 w-4" aria-hidden />}
+          {revealed ? (
+            <EyeOff className="h-4 w-4" aria-hidden />
+          ) : (
+            <Eye className="h-4 w-4" aria-hidden />
+          )}
         </button>
       </div>
     );

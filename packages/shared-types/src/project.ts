@@ -28,13 +28,19 @@ export const projectSchema = z.object({
     .string()
     .min(2)
     .max(10)
-    .regex(/^[A-Z][A-Z0-9]*$/, 'Project key must be uppercase letters/digits, starting with a letter'),
+    .regex(
+      /^[A-Z][A-Z0-9]*$/,
+      'Project key must be uppercase letters/digits, starting with a letter',
+    ),
   description: z.string().nullable(),
   status: ProjectStatus,
   visibility: ProjectVisibility,
   startDate: z.coerce.date().nullable(),
   dueDate: z.coerce.date().nullable(),
-  color: z.string().regex(/^#[0-9a-fA-F]{6}$/, 'Color must be a hex string').nullable(),
+  color: z
+    .string()
+    .regex(/^#[0-9a-fA-F]{6}$/, 'Color must be a hex string')
+    .nullable(),
   workflowSettings: projectWorkflowSettingsSchema,
   /** Client portal: whether the linked client's people see this project
    *  (absent reads as true). Read-only here; changed through
@@ -86,18 +92,19 @@ const optionalKey = z.preprocess(
     .optional(),
 );
 
-export const createProjectSchema = projectSchema
-  .pick({ name: true })
-  .extend({
-    key: optionalKey,
-    clientId: cuid.optional(),
-    description: z.string().optional(),
-    status: ProjectStatus.optional(),
-    visibility: ProjectVisibility.optional(),
-    startDate: optionalDate,
-    dueDate: optionalDate,
-    color: z.string().regex(/^#[0-9a-fA-F]{6}$/).optional(),
-  });
+export const createProjectSchema = projectSchema.pick({ name: true }).extend({
+  key: optionalKey,
+  clientId: cuid.optional(),
+  description: z.string().optional(),
+  status: ProjectStatus.optional(),
+  visibility: ProjectVisibility.optional(),
+  startDate: optionalDate,
+  dueDate: optionalDate,
+  color: z
+    .string()
+    .regex(/^#[0-9a-fA-F]{6}$/)
+    .optional(),
+});
 export type CreateProjectInput = z.infer<typeof createProjectSchema>;
 
 export const updateProjectSchema = createProjectSchema.partial().extend({

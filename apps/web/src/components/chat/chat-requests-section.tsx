@@ -44,10 +44,14 @@ function ChatRequestsSectionInner() {
   if (items.length === 0) return null;
 
   return (
-    <section ref={ref} aria-labelledby="chat-section-requests" className="border-b border-line pb-2">
+    <section
+      ref={ref}
+      aria-labelledby="chat-section-requests"
+      className="border-line border-b pb-2"
+    >
       <h3
         id="chat-section-requests"
-        className="px-4 pt-4 pb-1 text-[10px] font-semibold uppercase tracking-wide text-ink-muted"
+        className="text-ink-muted px-4 pb-1 pt-4 text-[10px] font-semibold uppercase tracking-wide"
       >
         Chat requests
       </h3>
@@ -85,22 +89,20 @@ function RequestRow({
         <UserAvatar size="md" name={who} image={request.requester.image ?? null} />
         <div className="min-w-0 flex-1">
           <div className="flex items-baseline justify-between gap-2">
-            <span className="truncate text-sm font-medium text-ink">{who}</span>
+            <span className="text-ink truncate text-sm font-medium">{who}</span>
             <span
-              className="shrink-0 text-[10px] text-ink-disabled"
+              className="text-ink-disabled shrink-0 text-[10px]"
               title={absoluteTime(request.sentAt)}
             >
               {relativeTime(request.sentAt)}
             </span>
           </div>
-          <div className="truncate text-xs text-ink-muted">
+          <div className="text-ink-muted truncate text-xs">
             {request.requester.organizationName
               ? `${request.requester.organizationName} · ${request.requester.email}`
               : request.requester.email}
           </div>
-          <p className="mt-1 whitespace-pre-wrap break-words text-xs text-ink">
-            {request.message}
-          </p>
+          <p className="text-ink mt-1 whitespace-pre-wrap break-words text-xs">{request.message}</p>
           <div className="mt-2 flex flex-wrap gap-1.5">
             <Button size="sm" onClick={onAccept} disabled={busy}>
               Accept

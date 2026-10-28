@@ -59,7 +59,7 @@ export function useBulkTasks() {
                 next.assignee =
                   op.assigneeId == null
                     ? null
-                    : findCachedUser(qc, op.assigneeId) ?? next.assignee;
+                    : (findCachedUser(qc, op.assigneeId) ?? next.assignee);
               }
               return next;
             }),

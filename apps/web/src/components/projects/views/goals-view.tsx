@@ -82,9 +82,9 @@ export default function GoalsView({ projectId }: { projectId: string }) {
 
   return (
     <div className="grid gap-4 lg:grid-cols-[1fr,1.5fr]">
-      <section className="rounded-lg border border-line bg-white p-4">
+      <section className="border-line rounded-lg border bg-white p-4">
         <div className="flex items-center justify-between">
-          <h3 className="text-sm font-semibold text-ink">Goals</h3>
+          <h3 className="text-ink text-sm font-semibold">Goals</h3>
           {canEdit ? (
             <Button size="sm" onClick={() => setNewOpen(true)}>
               <Plus className="h-4 w-4" /> New goal
@@ -112,13 +112,13 @@ export default function GoalsView({ projectId }: { projectId: string }) {
                   onClick={() => setSelectedId(g.id)}
                 >
                   <div className="flex items-center gap-2">
-                    <Target className="h-4 w-4 text-ink-disabled" aria-hidden />
+                    <Target className="text-ink-disabled h-4 w-4" aria-hidden />
                     <span className="flex-1 truncate font-medium">{g.title}</span>
                     <Badge tone={STATUS_TONE[g.status]}>{statusText(g.status)}</Badge>
                   </div>
-                  <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-bg-subtle">
+                  <div className="bg-bg-subtle mt-1 h-1.5 w-full overflow-hidden rounded-full">
                     <div
-                      className="h-full bg-tint-info0"
+                      className="bg-tint-info0 h-full"
                       style={{ width: `${Math.round(g.progress * 100)}%` }}
                     />
                   </div>
@@ -127,13 +127,13 @@ export default function GoalsView({ projectId }: { projectId: string }) {
             ))}
           </ul>
         ) : (
-          <div className="mt-3 rounded-md border border-dashed border-line p-6 text-center text-sm text-ink-muted">
+          <div className="border-line text-ink-muted mt-3 rounded-md border border-dashed p-6 text-center text-sm">
             No goals yet.
           </div>
         )}
       </section>
 
-      <section className="rounded-lg border border-line bg-white p-4">
+      <section className="border-line rounded-lg border bg-white p-4">
         {selected ? (
           <GoalDetail
             key={selected.id}
@@ -161,7 +161,7 @@ export default function GoalsView({ projectId }: { projectId: string }) {
             }}
           />
         ) : (
-          <p className="text-sm text-ink-muted">Select a goal to see its key results.</p>
+          <p className="text-ink-muted text-sm">Select a goal to see its key results.</p>
         )}
       </section>
 
@@ -255,45 +255,40 @@ function GoalDetail({
     <div className="space-y-4">
       <header className="flex items-start justify-between gap-3">
         <div>
-          <h3 className="text-base font-semibold text-ink">{goal.title}</h3>
+          <h3 className="text-ink text-base font-semibold">{goal.title}</h3>
           {goal.description ? (
-            <p className="mt-1 text-sm text-ink-muted">{goal.description}</p>
+            <p className="text-ink-muted mt-1 text-sm">{goal.description}</p>
           ) : null}
-          <p className="mt-1 text-xs text-ink-muted">
+          <p className="text-ink-muted mt-1 text-xs">
             Owner: {goal.owner.name || goal.owner.email} · {statusText(goal.status)}
           </p>
         </div>
         {canEdit ? (
           <div className="flex items-center gap-1">
             <Button variant="ghost" size="icon" aria-label="Edit goal" onClick={onEdit}>
-              <Pencil className="h-4 w-4 text-ink-muted" />
+              <Pencil className="text-ink-muted h-4 w-4" />
             </Button>
             <Button variant="ghost" size="icon" aria-label="Delete goal" onClick={onRemove}>
-              <Trash2 className="h-4 w-4 text-ink-muted" />
+              <Trash2 className="text-ink-muted h-4 w-4" />
             </Button>
           </div>
         ) : null}
       </header>
 
       <div>
-        <h4 className="text-xs font-medium uppercase tracking-wide text-ink-muted">
-          Key results
-        </h4>
+        <h4 className="text-ink-muted text-xs font-medium uppercase tracking-wide">Key results</h4>
         {goal.keyResults.length === 0 ? (
-          <p className="mt-2 text-sm text-ink-muted">No key results yet.</p>
+          <p className="text-ink-muted mt-2 text-sm">No key results yet.</p>
         ) : null}
         <ul className="mt-2 space-y-2">
           {goal.keyResults.map((k) => {
-            const pct = Math.min(
-              1,
-              Number(k.currentValue) / Math.max(1, Number(k.targetValue)),
-            );
+            const pct = Math.min(1, Number(k.currentValue) / Math.max(1, Number(k.targetValue)));
             return (
-              <li key={k.id} className="rounded-md border border-line p-3">
+              <li key={k.id} className="border-line rounded-md border p-3">
                 <div className="flex items-center justify-between gap-3">
                   <span className="text-sm">{k.title}</span>
                   <div className="flex items-center gap-1">
-                    <span className="font-mono text-xs text-ink-muted">
+                    <span className="text-ink-muted font-mono text-xs">
                       {k.currentValue} / {k.targetValue} {k.unit ?? ''}
                     </span>
                     {canEdit ? (
@@ -304,16 +299,13 @@ function GoalDetail({
                         aria-label={`Delete key result ${k.title}`}
                         onClick={() => setConfirmKr(k)}
                       >
-                        <Trash2 className="h-3.5 w-3.5 text-ink-muted" />
+                        <Trash2 className="text-ink-muted h-3.5 w-3.5" />
                       </Button>
                     ) : null}
                   </div>
                 </div>
-                <div className="mt-1 h-1.5 w-full overflow-hidden rounded-full bg-bg-subtle">
-                  <div
-                    className="h-full bg-tint-info0"
-                    style={{ width: `${pct * 100}%` }}
-                  />
+                <div className="bg-bg-subtle mt-1 h-1.5 w-full overflow-hidden rounded-full">
+                  <div className="bg-tint-info0 h-full" style={{ width: `${pct * 100}%` }} />
                 </div>
                 {canEdit ? (
                   <div className="mt-2 flex items-center gap-2">
@@ -373,7 +365,7 @@ function GoalDetail({
       </div>
 
       <div>
-        <h4 className="text-xs font-medium uppercase tracking-wide text-ink-muted">Updates</h4>
+        <h4 className="text-ink-muted text-xs font-medium uppercase tracking-wide">Updates</h4>
         {canEdit ? (
           <div className="mt-2 flex items-end gap-2">
             <Input
@@ -407,20 +399,20 @@ function GoalDetail({
             onRetry={() => void updates.refetch()}
           />
         ) : updates.data && updates.data.length > 0 ? (
-          <ol className="mt-3 space-y-3 border-l border-line pl-4">
+          <ol className="border-line mt-3 space-y-3 border-l pl-4">
             {[...updates.data]
               .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
               .map((u) => (
                 <li key={u.id} className="text-sm">
-                  <p className="text-xs text-ink-muted">
+                  <p className="text-ink-muted text-xs">
                     {authorName(u.authorId)} · {relativeTime(u.createdAt)}
                   </p>
-                  <p className="mt-0.5 whitespace-pre-wrap text-ink">{u.body}</p>
+                  <p className="text-ink mt-0.5 whitespace-pre-wrap">{u.body}</p>
                 </li>
               ))}
           </ol>
         ) : (
-          <p className="mt-3 text-sm text-ink-muted">No updates yet.</p>
+          <p className="text-ink-muted mt-3 text-sm">No updates yet.</p>
         )}
       </div>
 
@@ -494,7 +486,12 @@ function GoalDialog({
         <div className="space-y-3">
           <div className="space-y-1.5">
             <Label htmlFor="goal-title">Title</Label>
-            <Input id="goal-title" value={title} onChange={(e) => setTitle(e.target.value)} autoFocus />
+            <Input
+              id="goal-title"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              autoFocus
+            />
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="goal-description">Description (optional)</Label>
@@ -508,7 +505,7 @@ function GoalDialog({
             <Label htmlFor="goal-owner">Owner</Label>
             <select
               id="goal-owner"
-              className="w-full rounded-md border border-line px-3 py-2 text-sm"
+              className="border-line w-full rounded-md border px-3 py-2 text-sm"
               value={ownerId}
               onChange={(e) => setOwnerId(e.target.value)}
             >
@@ -575,13 +572,7 @@ function GoalDialog({
               })
             }
           >
-            {existing
-              ? pending
-                ? 'Saving…'
-                : 'Save goal'
-              : pending
-                ? 'Creating…'
-                : 'Create goal'}
+            {existing ? (pending ? 'Saving…' : 'Save goal') : pending ? 'Creating…' : 'Create goal'}
           </Button>
         </DialogFooter>
       </DialogContent>

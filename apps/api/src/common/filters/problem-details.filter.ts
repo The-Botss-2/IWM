@@ -41,10 +41,7 @@ export class ProblemDetailsExceptionFilter implements ExceptionFilter {
     const path = pathWithoutQuery(req.originalUrl ?? req.url);
     const body = scrubProblemBody(this.toProblemBody(exception, path));
 
-    res
-      .status(body.status)
-      .type('application/problem+json')
-      .json(body);
+    res.status(body.status).type('application/problem+json').json(body);
 
     if (body.status >= 500) {
       const stack = exception instanceof Error ? exception.stack : String(exception);
@@ -183,7 +180,10 @@ function describeTarget(meta: unknown): string | null {
     const parts = t.split(/[,\s]+/).filter(Boolean);
     fields =
       parts.length === 1 && /_(key|pkey|idx|unique)$/i.test(t)
-        ? t.replace(/_(key|pkey|idx|unique)$/i, '').split('_').slice(1)
+        ? t
+            .replace(/_(key|pkey|idx|unique)$/i, '')
+            .split('_')
+            .slice(1)
         : parts;
   }
   const words = fields
@@ -211,10 +211,7 @@ function scrubProblemBody(body: ProblemBody): ProblemBody {
     ...(body.errors
       ? {
           errors: Object.fromEntries(
-            Object.entries(body.errors).map(([field, msgs]) => [
-              field,
-              msgs.map(scrubSecrets),
-            ]),
+            Object.entries(body.errors).map(([field, msgs]) => [field, msgs.map(scrubSecrets)]),
           ),
         }
       : {}),
@@ -224,17 +221,11 @@ function scrubProblemBody(body: ProblemBody): ProblemBody {
 function scrubSecrets(input: string): string {
   if (!input) return input;
   let out = input;
-  out = out.replace(
-    /eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+/g,
-    '<token>',
-  );
+  out = out.replace(/eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+/g, '<token>');
   out = out.replace(/Bearer\s+[A-Za-z0-9._\-+/=]+/gi, 'Bearer <token>');
   out = out.replace(/\bAPI[A-Za-z0-9]{14,}\b/g, '<key>');
   out = out.replace(/\b(?:AKIA|ASIA)[A-Z0-9]{16,}\b/g, '<key>');
-  out = out.replace(
-    /(https?:\/\/)[^:@/\s]+:[^@\s]+@/gi,
-    '$1<redacted>@',
-  );
+  out = out.replace(/(https?:\/\/)[^:@/\s]+:[^@\s]+@/gi, '$1<redacted>@');
   out = out.replace(
     /\b(password|passwd|pwd|secret|api[_-]?key|access[_-]?key|api[_-]?secret|token)\s*[:=]\s*([^\s,;]+)/gi,
     '$1=<redacted>',

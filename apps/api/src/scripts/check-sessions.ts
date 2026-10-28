@@ -115,23 +115,48 @@ async function rejects(p: Promise<unknown>, type: new (...a: never[]) => Error):
 async function main(): Promise<void> {
   // ---- user-agent parser ----
   const ua = (s: string) => parseUserAgent(s);
-  const win = ua('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120.0 Safari/537.36');
-  check('ua windows chrome', win.os === 'Windows' && win.browser === 'Chrome' && win.device === 'Windows PC');
-  const edge = ua('Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 Chrome/120.0 Safari/537.36 Edg/120.0');
+  const win = ua(
+    'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120.0 Safari/537.36',
+  );
+  check(
+    'ua windows chrome',
+    win.os === 'Windows' && win.browser === 'Chrome' && win.device === 'Windows PC',
+  );
+  const edge = ua(
+    'Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 Chrome/120.0 Safari/537.36 Edg/120.0',
+  );
   check('ua edge not chrome', edge.browser === 'Edge');
-  const iphone = ua('Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 Version/17.0 Mobile/15E148 Safari/604.1');
-  check('ua iphone safari', iphone.os === 'iOS' && iphone.device === 'iPhone' && iphone.browser === 'Safari');
-  const android = ua('Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 Chrome/120.0 Mobile Safari/537.36');
+  const iphone = ua(
+    'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 Version/17.0 Mobile/15E148 Safari/604.1',
+  );
+  check(
+    'ua iphone safari',
+    iphone.os === 'iOS' && iphone.device === 'iPhone' && iphone.browser === 'Safari',
+  );
+  const android = ua(
+    'Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 Chrome/120.0 Mobile Safari/537.36',
+  );
   check('ua android phone', android.os === 'Android' && android.device === 'Android phone');
   const mac = ua('Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) Gecko/20100101 Firefox/121.0');
   check('ua mac firefox', mac.os === 'macOS' && mac.browser === 'Firefox' && mac.device === 'Mac');
-  const electron = ua('Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 Chrome/120.0 Electron/30.0 Safari/537.36');
+  const electron = ua(
+    'Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 Chrome/120.0 Electron/30.0 Safari/537.36',
+  );
   check('ua electron desktop app', electron.browser === 'Desktop app');
-  const webview = ua('Mozilla/5.0 (Linux; Android 14; Pixel 8; wv) AppleWebKit/537.36 Version/4.0 Chrome/120.0 Mobile Safari/537.36');
-  check('ua android webview is App', webview.browser === 'App' && webview.os === 'Android', webview.browser);
+  const webview = ua(
+    'Mozilla/5.0 (Linux; Android 14; Pixel 8; wv) AppleWebKit/537.36 Version/4.0 Chrome/120.0 Mobile Safari/537.36',
+  );
+  check(
+    'ua android webview is App',
+    webview.browser === 'App' && webview.os === 'Android',
+    webview.browser,
+  );
   const linux = ua('Mozilla/5.0 (X11; Linux x86_64; rv:121.0) Gecko/20100101 Firefox/121.0');
   check('ua linux', linux.os === 'Linux');
-  check('ua empty', parseUserAgent('').browser === 'Unknown' && parseUserAgent(null).os === 'Unknown');
+  check(
+    'ua empty',
+    parseUserAgent('').browser === 'Unknown' && parseUserAgent(null).os === 'Unknown',
+  );
 
   // ---- list returns only mine ----
   {
@@ -155,11 +180,23 @@ async function main(): Promise<void> {
 
   // ---- delete another user's session -> 404, nothing deleted ----
   {
-    const { prisma, sessions } = makePrisma([session('s_me', 'me'), session('s_other', 'other')], []);
+    const { prisma, sessions } = makePrisma(
+      [session('s_me', 'me'), session('s_other', 'other')],
+      [],
+    );
     const svc = new SessionsService(prisma);
-    check('delete foreign session 404', await rejects(svc.revokeMine('me', 's_other'), NotFoundException));
-    check('foreign session kept', sessions.some((s) => s.id === 's_other'));
-    check('delete missing session 404', await rejects(svc.revokeMine('me', 's_nope'), NotFoundException));
+    check(
+      'delete foreign session 404',
+      await rejects(svc.revokeMine('me', 's_other'), NotFoundException),
+    );
+    check(
+      'foreign session kept',
+      sessions.some((s) => s.id === 's_other'),
+    );
+    check(
+      'delete missing session 404',
+      await rejects(svc.revokeMine('me', 's_nope'), NotFoundException),
+    );
     const n = await svc.revokeMine('me', 's_me');
     check('delete own session', n.join() === 's_me' && !sessions.some((s) => s.id === 's_me'));
   }
@@ -172,15 +209,27 @@ async function main(): Promise<void> {
     );
     const svc = new SessionsService(prisma);
     const n = await svc.revokeOthers('me', 'b');
-    const left = sessions.map((s) => s.id).sort().join(',');
+    const left = sessions
+      .map((s) => s.id)
+      .sort()
+      .join(',');
     check('revoke others returns deleted ids', n.slice().sort().join() === 'a,c', n.join());
     check(
       'revoke others without current session refused',
       await rejects(svc.revokeOthers('me', undefined), UnauthorizedException),
     );
-    check('refused revoke deleted nothing', sessions.map((x) => x.id).sort().join() === 'b,x');
+    check(
+      'refused revoke deleted nothing',
+      sessions
+        .map((x) => x.id)
+        .sort()
+        .join() === 'b,x',
+    );
     check('revoke others keeps current + other users', left === 'b,x', left);
-    check('revoke others scoped to caller', deleteCalls.every((w) => w.userId === 'me'));
+    check(
+      'revoke others scoped to caller',
+      deleteCalls.every((w) => w.userId === 'me'),
+    );
   }
 
   // ---- admin sign out everywhere ----
@@ -202,7 +251,9 @@ async function main(): Promise<void> {
       users,
     );
     const audits: { action: string; organizationId: string; target?: string | null }[] = [];
-    const audit = { emit: async (a: (typeof audits)[number]) => void audits.push(a) } as unknown as AuditLogService;
+    const audit = {
+      emit: async (a: (typeof audits)[number]) => void audits.push(a),
+    } as unknown as AuditLogService;
     const revokedUsers: string[][] = [];
     const realtime = {
       publishSessionsRevoked: (ids: string[]) => void revokedUsers.push(ids),
@@ -223,13 +274,19 @@ async function main(): Promise<void> {
       'admin revoke other org refused',
       await rejects(svc.revokeUserSessions('admin', 'otherorg'), ForbiddenException),
     );
-    check('other org sessions kept', sessions.some((s) => s.id === 'o1'));
+    check(
+      'other org sessions kept',
+      sessions.some((s) => s.id === 'o1'),
+    );
     check('no delete issued for refused call', deleteCalls.length === 0);
     check(
       'super admin also refused cross-org',
       await rejects(svc.revokeUserSessions('root', 'sameorg'), ForbiddenException),
     );
-    check('same-org sessions kept after cross-org refusal', sessions.filter((s) => s.userId === 'sameorg').length === 2);
+    check(
+      'same-org sessions kept after cross-org refusal',
+      sessions.filter((s) => s.userId === 'sameorg').length === 2,
+    );
     check(
       'admin cannot sign out a higher tier',
       await rejects(svc.revokeUserSessions('admin', 'boss'), ForbiddenException),
@@ -244,7 +301,13 @@ async function main(): Promise<void> {
     );
     const n = await svc.revokeUserSessions('admin', 'sameorg');
     check('same-org revoke count', n === 2, String(n));
-    check('same-org sessions gone, others intact', sessions.map((s) => s.id).sort().join(',') === 'b1,o1');
+    check(
+      'same-org sessions gone, others intact',
+      sessions
+        .map((s) => s.id)
+        .sort()
+        .join(',') === 'b1,o1',
+    );
     check(
       'audited as user.sessions_revoked',
       audits.length === 1 &&
@@ -253,7 +316,10 @@ async function main(): Promise<void> {
         audits[0]?.target === 'user:sameorg',
       JSON.stringify(audits),
     );
-    check('sockets revoked for target only', revokedUsers.length === 1 && revokedUsers[0]?.join() === 'sameorg');
+    check(
+      'sockets revoked for target only',
+      revokedUsers.length === 1 && revokedUsers[0]?.join() === 'sameorg',
+    );
   }
 
   if (failures > 0) {

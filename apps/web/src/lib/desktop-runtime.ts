@@ -50,7 +50,10 @@ function openNotificationUrl(url: string): void {
     return;
   }
   if (target.origin !== window.location.origin) return;
-  const event = new CustomEvent('botss:navigate', { detail: { url: target.href }, cancelable: true });
+  const event = new CustomEvent('botss:navigate', {
+    detail: { url: target.href },
+    cancelable: true,
+  });
   if (window.dispatchEvent(event)) window.location.href = target.href;
 }
 

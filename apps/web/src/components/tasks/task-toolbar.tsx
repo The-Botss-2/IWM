@@ -35,23 +35,11 @@ import {
   statusLabel,
 } from '@/components/tasks/task-badges';
 import { useDebouncedCallback } from '@/hooks/use-debounced';
-import type {
-  BoardDensity,
-  BoardGroupBy,
-  ListColumn,
-  ListGroupBy,
-} from '@/hooks/use-board-prefs';
+import type { BoardDensity, BoardGroupBy, ListColumn, ListGroupBy } from '@/hooks/use-board-prefs';
 import { ALL_LIST_COLUMNS, customFieldColumn } from '@/hooks/use-board-prefs';
 import { useCustomFieldDefinitions } from '@/hooks/use-custom-fields';
-import {
-  SavedViewsMenu,
-  type ViewSnapshot,
-} from '@/components/projects/views/saved-views-menu';
-import {
-  hasActiveFilters,
-  type DueDatePreset,
-  type TaskFilters,
-} from '@/hooks/use-task-filters';
+import { SavedViewsMenu, type ViewSnapshot } from '@/components/projects/views/saved-views-menu';
+import { hasActiveFilters, type DueDatePreset, type TaskFilters } from '@/hooks/use-task-filters';
 import { cn } from '@/lib/utils';
 
 interface BaseProps {
@@ -96,7 +84,7 @@ export function TaskToolbar(props: TaskToolbarProps) {
       <div className="flex flex-wrap items-center gap-2">
         <div className="relative flex-1 sm:max-w-xs">
           <Search
-            className="absolute left-2 top-1/2 -translate-y-1/2 h-4 w-4 text-ink-disabled"
+            className="text-ink-disabled absolute left-2 top-1/2 h-4 w-4 -translate-y-1/2"
             aria-hidden
           />
           <Input
@@ -112,11 +100,7 @@ export function TaskToolbar(props: TaskToolbarProps) {
           />
         </div>
 
-        <FilterChipsButton
-          projectId={projectId}
-          filters={filters}
-          onChange={onChangeFilters}
-        />
+        <FilterChipsButton projectId={projectId} filters={filters} onChange={onChangeFilters} />
 
         {hasActiveFilters(filters) ? (
           <Button size="sm" variant="ghost" onClick={onClearFilters} aria-label="Clear filters">
@@ -331,7 +315,7 @@ function ColumnPickerPopover({
         </Button>
       </PopoverTrigger>
       <PopoverContent align="end" className="w-72">
-        <p className="px-2 pt-1 pb-2 text-[10px] font-semibold uppercase tracking-wide text-ink-muted">
+        <p className="text-ink-muted px-2 pb-2 pt-1 text-[10px] font-semibold uppercase tracking-wide">
           Visible columns
         </p>
         <ul role="listbox" aria-label="Visible columns" className="space-y-0.5">
@@ -346,15 +330,12 @@ function ColumnPickerPopover({
               onDrop={() => col.visible && handleDrop(col.id)}
               className={cn(
                 'flex items-center gap-2 rounded px-2 py-1.5 text-sm',
-                col.visible ? 'hover:bg-bg-subtle' : 'opacity-60 hover:bg-bg-subtle',
+                col.visible ? 'hover:bg-bg-subtle' : 'hover:bg-bg-subtle opacity-60',
                 dragId === col.id && 'opacity-50',
               )}
             >
-              <span
-                aria-hidden
-                className={cn('cursor-grab', !col.visible && 'invisible')}
-              >
-                <GripVertical className="h-3.5 w-3.5 text-ink-disabled" />
+              <span aria-hidden className={cn('cursor-grab', !col.visible && 'invisible')}>
+                <GripVertical className="text-ink-disabled h-3.5 w-3.5" />
               </span>
               <Checkbox
                 checked={col.visible}
@@ -362,7 +343,7 @@ function ColumnPickerPopover({
                 aria-label={col.visible ? `Hide ${col.label}` : `Show ${col.label}`}
               />
               <span className="flex-1">{col.label}</span>
-              {col.visible ? <Check className="h-3 w-3 text-brand-600" aria-hidden /> : null}
+              {col.visible ? <Check className="text-brand-600 h-3 w-3" aria-hidden /> : null}
             </li>
           ))}
         </ul>
@@ -422,7 +403,7 @@ function FilterChipsButton({
           <FilterIcon className="h-3.5 w-3.5" />
           Filter
           {activeCount > 0 ? (
-            <span className="rounded-full bg-brand-100 px-1.5 text-[10px] font-semibold text-brand-700">
+            <span className="bg-brand-100 text-brand-700 rounded-full px-1.5 text-[10px] font-semibold">
               {activeCount}
             </span>
           ) : null}
@@ -450,8 +431,8 @@ function FilterChipsButton({
                       'whitespace-nowrap rounded-full border px-2 py-0.5 text-xs transition-colors',
                       active
                         ? d.id === 'overdue'
-                          ? 'border-state-error bg-state-error/10 font-medium text-state-error'
-                          : 'border-brand-purple bg-brand-50 font-medium text-brand-700'
+                          ? 'border-state-error bg-state-error/10 text-state-error font-medium'
+                          : 'border-brand-purple bg-brand-50 text-brand-700 font-medium'
                         : 'border-line text-ink-muted hover:bg-bg-subtle',
                     )}
                   >
@@ -536,7 +517,7 @@ function FilterChipsButton({
                   className={cn(
                     'rounded px-1.5 py-0.5 transition-colors',
                     filters.assigneeIds.length === 0
-                      ? 'bg-brand-50 font-semibold text-brand-700'
+                      ? 'bg-brand-50 text-brand-700 font-semibold'
                       : 'text-ink-muted hover:text-ink',
                   )}
                 >
@@ -548,7 +529,7 @@ function FilterChipsButton({
                   className={cn(
                     'rounded px-1.5 py-0.5 transition-colors',
                     filters.assigneeIds.includes('__unassigned__')
-                      ? 'bg-brand-50 font-semibold text-brand-700'
+                      ? 'bg-brand-50 text-brand-700 font-semibold'
                       : 'text-ink-muted hover:text-ink',
                   )}
                 >
@@ -583,22 +564,13 @@ function FilterChipsButton({
                   <label
                     key={m.userId}
                     className={cn(
-                      'flex cursor-pointer items-center gap-2 rounded px-2 py-1 text-xs hover:bg-bg-subtle',
+                      'hover:bg-bg-subtle flex cursor-pointer items-center gap-2 rounded px-2 py-1 text-xs',
                       checked && 'bg-brand-50/50',
                     )}
                   >
-                    <Checkbox
-                      checked={checked}
-                      onCheckedChange={() => toggleAssignee(m.userId)}
-                    />
-                    <UserAvatar
-                      size="xs"
-                      name={m.user.name || m.user.email}
-                      image={m.user.image}
-                    />
-                    <span className="truncate text-ink">
-                      {m.user.name || m.user.email}
-                    </span>
+                    <Checkbox checked={checked} onCheckedChange={() => toggleAssignee(m.userId)} />
+                    <UserAvatar size="xs" name={m.user.name || m.user.email} image={m.user.image} />
+                    <span className="text-ink truncate">{m.user.name || m.user.email}</span>
                   </label>
                 );
               })}
@@ -613,7 +585,7 @@ function FilterChipsButton({
 function FilterSection({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="space-y-1.5">
-      <div className="text-[10px] font-semibold uppercase tracking-wide text-ink-muted">
+      <div className="text-ink-muted text-[10px] font-semibold uppercase tracking-wide">
         {label}
       </div>
       {children}

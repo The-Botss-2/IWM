@@ -43,9 +43,7 @@ function loadKey(): Buffer {
     throw new Error('Encryption key must be valid hex or base64.');
   }
   if (buf.length !== KEY_BYTES) {
-    throw new Error(
-      `Encryption key must decode to exactly ${KEY_BYTES} bytes; got ${buf.length}.`,
-    );
+    throw new Error(`Encryption key must decode to exactly ${KEY_BYTES} bytes; got ${buf.length}.`);
   }
   cachedKey = buf;
   return buf;
@@ -58,10 +56,7 @@ export function encrypt(plaintext: string): string {
   const key = loadKey();
   const iv = randomBytes(IV_BYTES);
   const cipher = createCipheriv(ALGO, key, iv) as CipherGCM;
-  const cipherBuf = Buffer.concat([
-    cipher.update(plaintext, 'utf8'),
-    cipher.final(),
-  ]);
+  const cipherBuf = Buffer.concat([cipher.update(plaintext, 'utf8'), cipher.final()]);
   const tag = cipher.getAuthTag();
   return `${iv.toString('hex')}:${cipherBuf.toString('hex')}:${tag.toString('hex')}`;
 }
@@ -87,4 +82,3 @@ export function decrypt(token: string): string {
   const plain = Buffer.concat([decipher.update(cipherBuf), decipher.final()]);
   return plain.toString('utf8');
 }
-

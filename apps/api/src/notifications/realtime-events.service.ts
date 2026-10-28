@@ -39,7 +39,8 @@ const nullableString = (v: unknown): v is string | null => v === null || typeof 
 export const NOTIFICATION_TOPIC: BusTopic<RealtimeNotificationEvent> = {
   name: 'notifications',
   decode(raw) {
-    if (!isRecord(raw) || typeof raw.userId !== 'string' || !isRecord(raw.notification)) return null;
+    if (!isRecord(raw) || typeof raw.userId !== 'string' || !isRecord(raw.notification))
+      return null;
     const n = raw.notification;
     if (
       typeof n.id !== 'string' ||

@@ -55,12 +55,17 @@ interface Row {
   pdfFileId: string | null;
 }
 
-type Where = { id: string; status?: InvoiceStatus | { in: InvoiceStatus[] }; amountPaid?: { lte: number } };
+type Where = {
+  id: string;
+  status?: InvoiceStatus | { in: InvoiceStatus[] };
+  amountPaid?: { lte: number };
+};
 
 function matches(row: Row, where: Where): boolean {
   if (where.id !== row.id) return false;
   if (typeof where.status === 'string' && where.status !== row.status) return false;
-  if (where.status && typeof where.status === 'object' && !where.status.in.includes(row.status)) return false;
+  if (where.status && typeof where.status === 'object' && !where.status.in.includes(row.status))
+    return false;
   if (where.amountPaid && !row.amountPaid.lte(where.amountPaid.lte)) return false;
   return true;
 }
@@ -111,7 +116,11 @@ function setup(
   );
   // Rendering and the response shape are covered elsewhere; these checks are
   // about the status column.
-  svc.ensurePdf = async () => ({ fileId: 'f1', url: 'https://x/f1', filename: 'INV-2026-0001.pdf' });
+  svc.ensurePdf = async () => ({
+    fileId: 'f1',
+    url: 'https://x/f1',
+    filename: 'INV-2026-0001.pdf',
+  });
   svc.get = async () => ({ ...row }) as unknown as InvoiceWithItems;
   return { svc, row };
 }
@@ -194,7 +203,10 @@ async function main(): Promise<void> {
     'schema rejects PAID (paid states follow payments)',
     !setInvoiceStatusSchema.safeParse({ status: 'PAID' }).success,
   );
-  check('schema accepts CANCELLED', setInvoiceStatusSchema.safeParse({ status: 'CANCELLED' }).success);
+  check(
+    'schema accepts CANCELLED',
+    setInvoiceStatusSchema.safeParse({ status: 'CANCELLED' }).success,
+  );
 
   if (failures > 0) {
     console.error(`invoice-status: ${failures} check(s) failed`);

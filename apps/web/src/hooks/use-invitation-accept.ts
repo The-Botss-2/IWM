@@ -28,7 +28,10 @@ function invalidCopy(err: unknown): { title: string; message: string } {
   if (status === 423) {
     return {
       title: 'Invitation locked',
-      message: describeError(err, 'Too many wrong codes were entered. Ask whoever invited you to send it again.'),
+      message: describeError(
+        err,
+        'Too many wrong codes were entered. Ask whoever invited you to send it again.',
+      ),
     };
   }
   return {
@@ -49,7 +52,9 @@ function invalidCopy(err: unknown): { title: string; message: string } {
  * `code` (the old format) is treated as missing.
  */
 export function useInvitationAccept(token: string | null) {
-  const [state, setState] = useState<InvitationState>(token ? { kind: 'loading' } : { kind: 'missing' });
+  const [state, setState] = useState<InvitationState>(
+    token ? { kind: 'loading' } : { kind: 'missing' },
+  );
   // The verified code, re-sent with accept. Memory only.
   const codeRef = useRef<string | undefined>(undefined);
 
@@ -110,7 +115,10 @@ export function useInvitationAccept(token: string | null) {
         // just set. This avoids the API ever holding a Better Auth handle.
         const res = await authClient.signIn.email({ email: info.email, password });
         if (res.error) {
-          return describeError(res.error, "Password set, but we couldn't sign you in. Sign in manually.");
+          return describeError(
+            res.error,
+            "Password set, but we couldn't sign you in. Sign in manually.",
+          );
         }
         setState({ kind: 'success', destination: accepted.destination });
         return null;

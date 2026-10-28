@@ -110,7 +110,7 @@ export function ConvertLeadDialog({ lead, open, onOpenChange, onConverted }: Pro
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle className="text-lg font-semibold">Convert lead to client</DialogTitle>
-          <DialogDescription className="text-sm text-ink-muted">
+          <DialogDescription className="text-ink-muted text-sm">
             Promote {lead.name} into a client record. Pick one of the options below.
           </DialogDescription>
         </DialogHeader>
@@ -132,7 +132,7 @@ export function ConvertLeadDialog({ lead, open, onOpenChange, onConverted }: Pro
                 autoFocus
               />
             </Field>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <Field label="Email" htmlFor="convert-email">
                 <Input
                   id="convert-email"
@@ -178,7 +178,7 @@ export function ConvertLeadDialog({ lead, open, onOpenChange, onConverted }: Pro
                 placeholder="Pick a client"
               />
             </Field>
-            <p className="text-xs text-ink-muted">
+            <p className="text-ink-muted text-xs">
               The lead will be marked as Won and linked to the chosen client.
             </p>
           </div>
@@ -189,7 +189,11 @@ export function ConvertLeadDialog({ lead, open, onOpenChange, onConverted }: Pro
             Cancel
           </Button>
           <Button onClick={onSubmit} disabled={pending}>
-            {pending ? 'Converting…' : mode === 'new' ? 'Create client & convert' : 'Link & convert'}
+            {pending
+              ? 'Converting…'
+              : mode === 'new'
+                ? 'Create client & convert'
+                : 'Link & convert'}
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -212,7 +216,11 @@ function Field({
     <div className="space-y-1.5">
       <Label htmlFor={htmlFor}>
         {label}
-        {required ? <span className="ml-1 text-state-error" aria-hidden>*</span> : null}
+        {required ? (
+          <span className="text-state-error ml-1" aria-hidden>
+            *
+          </span>
+        ) : null}
       </Label>
       {children}
     </div>

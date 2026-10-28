@@ -79,10 +79,7 @@ export class LeadsService {
   }
 
   /** Reject an assignee that isn't in the same org as the lead's workspace. */
-  private async assertAssigneeInOrg(
-    workspaceId: string,
-    assigneeId: string,
-  ): Promise<void> {
+  private async assertAssigneeInOrg(workspaceId: string, assigneeId: string): Promise<void> {
     const [ws, assignee] = await Promise.all([
       this.prisma.client.workspace.findUnique({
         where: { id: workspaceId },

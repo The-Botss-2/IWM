@@ -21,9 +21,7 @@ export const REQUIRE_WORKSPACE_ROLE_KEY = 'require_workspace_role';
  * resolver here.
  */
 /** @public Decorator paired with WorkspaceRoleGuard; no route uses it yet. */
-export const RequireWorkspaceRole = (
-  ...roles: WorkspaceRole[]
-): MethodDecorator & ClassDecorator =>
+export const RequireWorkspaceRole = (...roles: WorkspaceRole[]): MethodDecorator & ClassDecorator =>
   SetMetadata(REQUIRE_WORKSPACE_ROLE_KEY, roles);
 
 @Injectable()
@@ -34,22 +32,19 @@ export class WorkspaceRoleGuard implements CanActivate {
   ) {}
 
   async canActivate(ctx: ExecutionContext): Promise<boolean> {
-    const required = this.reflector.getAllAndOverride<WorkspaceRole[]>(
-      REQUIRE_WORKSPACE_ROLE_KEY,
-      [ctx.getHandler(), ctx.getClass()],
-    );
+    const required = this.reflector.getAllAndOverride<WorkspaceRole[]>(REQUIRE_WORKSPACE_ROLE_KEY, [
+      ctx.getHandler(),
+      ctx.getClass(),
+    ]);
     if (!required || required.length === 0) return true;
 
-    const req = ctx
-      .switchToHttp()
-      .getRequest<{
-        user?: { id?: string };
-        headers: Record<string, string>;
-        workspaceMemberships?: Array<{ workspaceId: string; role: string }>;
-      }>();
+    const req = ctx.switchToHttp().getRequest<{
+      user?: { id?: string };
+      headers: Record<string, string>;
+      workspaceMemberships?: Array<{ workspaceId: string; role: string }>;
+    }>();
     const userId = req.user?.id;
-    const workspaceId =
-      (req.headers['x-workspace-id'] as string | undefined) ?? null;
+    const workspaceId = (req.headers['x-workspace-id'] as string | undefined) ?? null;
     if (!userId || !workspaceId) {
       throw new ForbiddenException({
         title: 'Missing workspace context',

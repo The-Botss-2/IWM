@@ -138,10 +138,7 @@ export class AttendanceExportService {
       if (rows.length === 0) break;
       exported += rows.length;
       for (const r of rows) {
-        const netHours =
-          typeof r.durationMin === 'number'
-            ? (r.durationMin / 60).toFixed(2)
-            : '';
+        const netHours = typeof r.durationMin === 'number' ? (r.durationMin / 60).toFixed(2) : '';
         res.write(
           [
             isoDate(r.startTime),

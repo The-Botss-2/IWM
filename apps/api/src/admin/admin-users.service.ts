@@ -179,8 +179,7 @@ export class AdminUsersService {
       throw new ForbiddenException({
         title: 'Super admin only',
         status: 403,
-        detail:
-          'This action requires SUPER_ADMIN privileges (Botss platform operator).',
+        detail: 'This action requires SUPER_ADMIN privileges (Botss platform operator).',
       });
     }
   }
@@ -244,10 +243,7 @@ export class AdminUsersService {
     // HR may create users but ONLY non-admin accounts. Without this an HR
     // user could mint an ADMIN (or SUPER_ADMIN) and self-escalate. ADMIN tier
     // keeps the full grant range, still bounded by the SUPER_ADMIN checks below.
-    if (
-      !isAdminTier &&
-      (input.systemRole === 'ADMIN' || input.systemRole === 'SUPER_ADMIN')
-    ) {
+    if (!isAdminTier && (input.systemRole === 'ADMIN' || input.systemRole === 'SUPER_ADMIN')) {
       throw new ForbiddenException({
         title: 'HR cannot grant admin roles',
         status: 403,
@@ -480,11 +476,7 @@ export class AdminUsersService {
     }
   }
 
-  async update(
-    actingUserId: string,
-    targetUserId: string,
-    input: AdminUpdateUserInput,
-  ) {
+  async update(actingUserId: string, targetUserId: string, input: AdminUpdateUserInput) {
     await this.assertAdmin(actingUserId);
     const target = await this.prisma.client.user.findUnique({
       where: { id: targetUserId },
@@ -560,8 +552,7 @@ export class AdminUsersService {
     // user keeps acting with their cached cookie until natural expiry - a
     // demoted admin would retain admin-equivalent capability for up to the
     // session TTL.
-    const roleChanging =
-      input.systemRole !== undefined && input.systemRole !== target.systemRole;
+    const roleChanging = input.systemRole !== undefined && input.systemRole !== target.systemRole;
 
     await this.prisma.client.$transaction(async (tx) => {
       if (Object.keys(data).length > 0) {
@@ -830,9 +821,7 @@ export class AdminUsersService {
       await tx.user.delete({ where: { id: targetUserId } });
     });
     this.realtime?.publishSessionsRevoked([targetUserId]);
-    this.logger.log(
-      `Admin ${actingUserId} HARD-deleted user ${targetUserId} (${target.email})`,
-    );
+    this.logger.log(`Admin ${actingUserId} HARD-deleted user ${targetUserId} (${target.email})`);
     // The row is gone, so the name travels in metadata for the log to show.
     void this.auditLog.emit({
       organizationId: actor.organizationId,
@@ -1040,9 +1029,7 @@ export class AdminUsersService {
       }
     }
 
-    this.logger.log(
-      `Admin ${actingUserId} imported webmail user ${created.id} email=${email}`,
-    );
+    this.logger.log(`Admin ${actingUserId} imported webmail user ${created.id} email=${email}`);
     void this.auditLog.emit({
       organizationId: importOrgId,
       actorUserId: actingUserId,

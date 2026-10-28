@@ -1,15 +1,9 @@
-import {
-  BadRequestException,
-  Logger,
-  type PipeTransform,
-} from '@nestjs/common';
+import { BadRequestException, Logger, type PipeTransform } from '@nestjs/common';
 import type { ZodError, ZodTypeAny, z } from 'zod';
 
 import { humanizeField } from '../humanize-field';
 
-export class ZodValidationPipe<S extends ZodTypeAny>
-  implements PipeTransform<unknown, z.infer<S>>
-{
+export class ZodValidationPipe<S extends ZodTypeAny> implements PipeTransform<unknown, z.infer<S>> {
   private static readonly logger = new Logger('ZodValidationPipe');
 
   constructor(private readonly schema: S) {}
@@ -22,9 +16,7 @@ export class ZodValidationPipe<S extends ZodTypeAny>
       // raw payload is intentionally NOT logged because it can contain
       // secrets (passwords, tokens, mail bodies) - only the field paths
       // and the reasons are emitted.
-      ZodValidationPipe.logger.warn(
-        `Validation failed: ${JSON.stringify(fieldErrors)}`,
-      );
+      ZodValidationPipe.logger.warn(`Validation failed: ${JSON.stringify(fieldErrors)}`);
       // Build a short human-readable detail. RFC 7807 keeps the structured
       // map under `errors`, but the toast on the client renders `detail`
       // first; including a one-liner there means the user sees the cause

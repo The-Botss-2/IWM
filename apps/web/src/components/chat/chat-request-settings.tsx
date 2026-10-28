@@ -30,33 +30,35 @@ export function SentChatRequestsSection() {
   const items = data?.items ?? [];
 
   return (
-    <section className="rounded-lg border border-line bg-bg-surface p-5">
-      <div className="mb-1 flex items-center gap-2 text-sm font-semibold text-ink">
-        <Send className="h-4 w-4 text-ink-muted" aria-hidden /> Sent requests
+    <section className="border-line bg-bg-surface rounded-lg border p-5">
+      <div className="text-ink mb-1 flex items-center gap-2 text-sm font-semibold">
+        <Send className="text-ink-muted h-4 w-4" aria-hidden /> Sent requests
       </div>
-      <p className="mb-3 text-xs text-ink-muted">
-        Chat requests you sent to people at other companies. A request stays
-        open for 30 days.
+      <p className="text-ink-muted mb-3 text-xs">
+        Chat requests you sent to people at other companies. A request stays open for 30 days.
       </p>
       {isLoading ? (
         <div className="flex justify-center py-4">
           <Loader size="sm" label="Loading" />
         </div>
       ) : items.length === 0 ? (
-        <p className="py-2 text-xs text-ink-muted">You haven&apos;t sent any chat requests.</p>
+        <p className="text-ink-muted py-2 text-xs">You haven&apos;t sent any chat requests.</p>
       ) : (
-        <ul role="list" className="divide-y divide-line">
+        <ul role="list" className="divide-line divide-y">
           {items.map((r) => {
             const state = STATE_LABEL[r.state];
             return (
               <li key={r.id} className="flex items-start gap-3 py-2.5">
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2">
-                    <span className="truncate text-sm font-medium text-ink">{r.email}</span>
+                    <span className="text-ink truncate text-sm font-medium">{r.email}</span>
                     <Badge tone={state.tone}>{state.label}</Badge>
                   </div>
-                  <p className="mt-0.5 truncate text-xs text-ink-muted">{r.message}</p>
-                  <p className="mt-0.5 text-[11px] text-ink-disabled" title={absoluteTime(r.sentAt)}>
+                  <p className="text-ink-muted mt-0.5 truncate text-xs">{r.message}</p>
+                  <p
+                    className="text-ink-disabled mt-0.5 text-[11px]"
+                    title={absoluteTime(r.sentAt)}
+                  >
                     {relativeTime(r.sentAt)}
                   </p>
                 </div>
@@ -90,30 +92,30 @@ export function BlockedChatRequestersSection() {
   const items = data?.items ?? [];
 
   return (
-    <section className="rounded-lg border border-line bg-bg-surface p-5">
-      <div className="mb-1 flex items-center gap-2 text-sm font-semibold text-ink">
-        <Ban className="h-4 w-4 text-ink-muted" aria-hidden /> Blocked from chat requests
+    <section className="border-line bg-bg-surface rounded-lg border p-5">
+      <div className="text-ink mb-1 flex items-center gap-2 text-sm font-semibold">
+        <Ban className="text-ink-muted h-4 w-4" aria-hidden /> Blocked from chat requests
       </div>
-      <p className="mb-3 text-xs text-ink-muted">
-        People here can&apos;t send you chat requests or message you in a chat
-        between your companies. They aren&apos;t told.
+      <p className="text-ink-muted mb-3 text-xs">
+        People here can&apos;t send you chat requests or message you in a chat between your
+        companies. They aren&apos;t told.
       </p>
       {isLoading ? (
         <div className="flex justify-center py-4">
           <Loader size="sm" label="Loading" />
         </div>
       ) : items.length === 0 ? (
-        <p className="py-2 text-xs text-ink-muted">You haven&apos;t blocked anyone.</p>
+        <p className="text-ink-muted py-2 text-xs">You haven&apos;t blocked anyone.</p>
       ) : (
-        <ul role="list" className="divide-y divide-line">
+        <ul role="list" className="divide-line divide-y">
           {items.map((b) => {
             const who = b.user.name || b.user.email;
             return (
               <li key={b.user.id} className="flex items-center gap-3 py-2.5">
                 <UserAvatar size="sm" name={who} image={b.user.image ?? null} />
                 <div className="min-w-0 flex-1">
-                  <div className="truncate text-sm font-medium text-ink">{who}</div>
-                  <div className="truncate text-xs text-ink-muted">{b.user.email}</div>
+                  <div className="text-ink truncate text-sm font-medium">{who}</div>
+                  <div className="text-ink-muted truncate text-xs">{b.user.email}</div>
                 </div>
                 <Button
                   size="sm"

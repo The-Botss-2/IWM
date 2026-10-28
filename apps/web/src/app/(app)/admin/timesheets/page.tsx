@@ -102,8 +102,7 @@ export default function AdminTimesheetsPage() {
     if (!q) return all;
     return all.filter(
       (r) =>
-        (r.user.name ?? '').toLowerCase().includes(q) ||
-        r.user.email.toLowerCase().includes(q),
+        (r.user.name ?? '').toLowerCase().includes(q) || r.user.email.toLowerCase().includes(q),
     );
   }, [attendance.data, memberSearch]);
 
@@ -115,17 +114,16 @@ export default function AdminTimesheetsPage() {
     <div className="space-y-6">
       <header className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h2 className="text-lg font-semibold text-ink">Timesheets</h2>
-          <p className="mt-0.5 text-sm text-ink-muted">
-            Daily attendance grid + every tracked entry across the
-            organization. System admin only.
+          <h2 className="text-ink text-lg font-semibold">Timesheets</h2>
+          <p className="text-ink-muted mt-0.5 text-sm">
+            Daily attendance grid + every tracked entry across the organization. System admin only.
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <div
             role="tablist"
             aria-label="Range"
-            className="inline-flex rounded-md border border-line bg-white p-0.5"
+            className="border-line inline-flex rounded-md border bg-white p-0.5"
           >
             <RangeButton active={range === 'day'} onClick={() => setRange('day')}>
               Day
@@ -147,9 +145,7 @@ export default function AdminTimesheetsPage() {
               size="sm"
               variant="secondary"
               onClick={() =>
-                setAnchor(
-                  range === 'day' ? startOfDay(new Date()) : startOfWeek(new Date()),
-                )
+                setAnchor(range === 'day' ? startOfDay(new Date()) : startOfWeek(new Date()))
               }
             >
               {range === 'day' ? 'Today' : 'This week'}
@@ -163,20 +159,18 @@ export default function AdminTimesheetsPage() {
               <ChevronRight className="h-4 w-4" />
             </Button>
           </div>
-          <span className="text-sm font-medium text-ink">
-            {fmtRange(from, endInclusive)}
-          </span>
+          <span className="text-ink text-sm font-medium">{fmtRange(from, endInclusive)}</span>
         </div>
       </header>
 
-      <section className="rounded-lg border border-line bg-white">
-        <header className="flex flex-wrap items-center justify-between gap-2 border-b border-line px-4 py-3">
-          <h3 className="text-sm font-semibold text-ink">Attendance grid</h3>
+      <section className="border-line rounded-lg border bg-white">
+        <header className="border-line flex flex-wrap items-center justify-between gap-2 border-b px-4 py-3">
+          <h3 className="text-ink text-sm font-semibold">Attendance grid</h3>
           <div className="flex items-center gap-3">
             <div className="relative">
               <Search
                 aria-hidden
-                className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-muted"
+                className="text-ink-muted pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2"
               />
               <input
                 type="search"
@@ -187,7 +181,7 @@ export default function AdminTimesheetsPage() {
                 className="input h-8 w-48 pl-8 text-sm"
               />
             </div>
-            <span className="hidden text-xs text-ink-muted sm:inline">
+            <span className="text-ink-muted hidden text-xs sm:inline">
               Click a cell to see the entries logged that day.
             </span>
           </div>
@@ -205,14 +199,14 @@ export default function AdminTimesheetsPage() {
               />
             </div>
           ) : rows.length === 0 ? (
-            <p className="px-4 py-8 text-center text-xs text-ink-muted">
+            <p className="text-ink-muted px-4 py-8 text-center text-xs">
               {memberSearch.trim()
                 ? 'No members match your search.'
                 : 'No tracked time in this window.'}
             </p>
           ) : (
             <table className="w-full text-sm">
-              <thead className="text-left text-[11px] font-medium uppercase tracking-wide text-ink-muted">
+              <thead className="text-ink-muted text-left text-[11px] font-medium uppercase tracking-wide">
                 <tr>
                   <th className="px-4 py-2">Member</th>
                   {dateRange.map((d) => (
@@ -225,7 +219,7 @@ export default function AdminTimesheetsPage() {
               </thead>
               <tbody>
                 {rows.map((row) => (
-                  <tr key={row.user.id} className="border-t border-line">
+                  <tr key={row.user.id} className="border-line border-t">
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-2">
                         <UserAvatar
@@ -234,12 +228,10 @@ export default function AdminTimesheetsPage() {
                           image={row.user.image}
                         />
                         <div className="min-w-0">
-                          <div className="truncate text-sm font-medium text-ink">
+                          <div className="text-ink truncate text-sm font-medium">
                             {row.user.name || row.user.email}
                           </div>
-                          <div className="truncate text-xs text-ink-muted">
-                            {row.user.email}
-                          </div>
+                          <div className="text-ink-muted truncate text-xs">{row.user.email}</div>
                         </div>
                       </div>
                     </td>
@@ -259,10 +251,10 @@ export default function AdminTimesheetsPage() {
                             disabled={!active}
                             className={cn(
                               'w-full rounded-md px-2 py-1 text-xs transition-colors',
-                              'focus-visible:outline-none focus-visible:ring-2 focus-visible:shadow-focus',
+                              'focus-visible:shadow-focus focus-visible:outline-none focus-visible:ring-2',
                               active
-                                ? 'cursor-pointer font-medium text-ink hover:bg-brand-50 hover:text-brand-700'
-                                : 'cursor-default text-line-strong',
+                                ? 'text-ink hover:bg-brand-50 hover:text-brand-700 cursor-pointer font-medium'
+                                : 'text-line-strong cursor-default',
                             )}
                             aria-label={
                               active
@@ -275,7 +267,7 @@ export default function AdminTimesheetsPage() {
                         </td>
                       );
                     })}
-                    <td className="px-4 py-3 text-right text-sm font-semibold text-ink">
+                    <td className="text-ink px-4 py-3 text-right text-sm font-semibold">
                       {fmtMinutes(row.totalMinutes)}
                     </td>
                   </tr>
@@ -315,9 +307,7 @@ function RangeButton({
       onClick={onClick}
       className={cn(
         'rounded px-3 py-1.5 text-sm transition-colors',
-        active
-          ? 'bg-brand-50 text-brand-700'
-          : 'text-ink-muted hover:bg-bg-subtle',
+        active ? 'bg-brand-50 text-brand-700' : 'text-ink-muted hover:bg-bg-subtle',
       )}
     >
       {children}
@@ -347,8 +337,7 @@ function DayDetailDialog({
 
   const entries = useQuery({
     queryKey: ['admin', 'timesheets', 'day-detail', userId, date],
-    queryFn: () =>
-      getApi().timesheets.adminList({ userId, from, to }),
+    queryFn: () => getApi().timesheets.adminList({ userId, from, to }),
     staleTime: 30_000,
   });
 
@@ -365,21 +354,19 @@ function DayDetailDialog({
     <div
       role="dialog"
       aria-label={`${userName} entries on ${headingDate}`}
-      className="fixed inset-0 z-40 flex justify-end bg-ink/40"
+      className="bg-ink/40 fixed inset-0 z-40 flex justify-end"
       onClick={onClose}
     >
       <aside
-        className="h-full w-[min(480px,95vw)] overflow-y-auto border-l border-line bg-white shadow-lg"
+        className="border-line h-full w-[min(480px,95vw)] overflow-y-auto border-l bg-white shadow-lg"
         onClick={(e) => e.stopPropagation()}
       >
-        <header className="flex items-start justify-between gap-3 border-b border-line px-4 py-3">
+        <header className="border-line flex items-start justify-between gap-3 border-b px-4 py-3">
           <div className="min-w-0">
-            <h2 className="truncate text-base font-semibold text-ink">
-              {userName}
-            </h2>
-            <p className="mt-0.5 text-xs text-ink-muted">{headingDate}</p>
-            <p className="mt-1 text-xs text-ink-muted">
-              Total tracked: <span className="font-semibold text-ink">{fmtMinutes(totalMin)}</span>
+            <h2 className="text-ink truncate text-base font-semibold">{userName}</h2>
+            <p className="text-ink-muted mt-0.5 text-xs">{headingDate}</p>
+            <p className="text-ink-muted mt-1 text-xs">
+              Total tracked: <span className="text-ink font-semibold">{fmtMinutes(totalMin)}</span>
             </p>
           </div>
           <Button
@@ -387,12 +374,12 @@ function DayDetailDialog({
             size="icon"
             aria-label="Close"
             onClick={onClose}
-            className="h-7 w-7 text-ink-muted"
+            className="text-ink-muted h-7 w-7"
           >
             <X className="h-4 w-4" />
           </Button>
         </header>
-        <div className="divide-y divide-line">
+        <div className="divide-line divide-y">
           {entries.isLoading ? (
             <div className="flex justify-center px-4 py-8">
               <Loader size="sm" label="Loading" />
@@ -405,9 +392,7 @@ function DayDetailDialog({
               />
             </div>
           ) : items.length === 0 ? (
-            <p className="px-4 py-8 text-center text-xs text-ink-muted">
-              No entries on this day.
-            </p>
+            <p className="text-ink-muted px-4 py-8 text-center text-xs">No entries on this day.</p>
           ) : (
             items.map((e) => <EntryRow key={e.id} entry={e} />)
           )}
@@ -432,29 +417,27 @@ function EntryRow({ entry }: { entry: TimeEntryWithMeta }) {
                 aria-hidden
               />
             ) : null}
-            <span className="truncate text-sm font-medium text-ink">
+            <span className="text-ink truncate text-sm font-medium">
               {projectName ?? 'No project'}
             </span>
             {!entry.billable ? (
-              <span className="ml-1 rounded bg-bg-subtle px-1 text-[10px] text-ink-muted">
+              <span className="bg-bg-subtle text-ink-muted ml-1 rounded px-1 text-[10px]">
                 non-billable
               </span>
             ) : null}
           </div>
-          {taskTitle ? (
-            <div className="mt-0.5 text-xs text-ink">{taskTitle}</div>
-          ) : null}
+          {taskTitle ? <div className="text-ink mt-0.5 text-xs">{taskTitle}</div> : null}
           {entry.description ? (
-            <p className="mt-1 whitespace-pre-wrap break-words text-xs text-ink-muted">
+            <p className="text-ink-muted mt-1 whitespace-pre-wrap break-words text-xs">
               {entry.description}
             </p>
           ) : null}
-          <div className="mt-1 text-[11px] text-ink-muted">
+          <div className="text-ink-muted mt-1 text-[11px]">
             {absoluteTime(entry.startTime)}
             {entry.endTime ? ` → ${absoluteTime(entry.endTime)}` : ' · running'}
           </div>
         </div>
-        <span className="shrink-0 text-sm font-semibold text-ink">
+        <span className="text-ink shrink-0 text-sm font-semibold">
           {entry.durationMin != null ? fmtMinutes(entry.durationMin) : '…'}
         </span>
       </div>

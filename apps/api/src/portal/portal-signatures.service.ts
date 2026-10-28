@@ -73,7 +73,11 @@ export class PortalSignaturesService {
     return portalOkSchema.parse({ ok: true });
   }
 
-  private async ref(user: AuthedUser, clientId: string, signerId: string): Promise<PortalSignerRef> {
+  private async ref(
+    user: AuthedUser,
+    clientId: string,
+    signerId: string,
+  ): Promise<PortalSignerRef> {
     const contact = await this.scope.require(user.id, clientId);
     return { signerId, email: user.email, workspaceId: contact.workspaceId, userId: user.id };
   }

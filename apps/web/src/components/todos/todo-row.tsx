@@ -71,12 +71,12 @@ export function TodoRow({
   }
 
   return (
-    <div className="group flex items-center gap-2 rounded-md border border-line bg-bg-surface px-2 py-2 shadow-sm hover:border-line-strong">
+    <div className="border-line bg-bg-surface hover:border-line-strong group flex items-center gap-2 rounded-md border px-2 py-2 shadow-sm">
       {dragHandleProps ? (
         <button
           type="button"
           aria-label="Drag to reorder"
-          className="cursor-grab text-line-strong hover:text-ink-muted"
+          className="text-line-strong hover:text-ink-muted cursor-grab"
           {...dragHandleProps}
         >
           <GripVertical className="h-4 w-4" />
@@ -125,18 +125,15 @@ export function TodoRow({
             {todo.title}
           </button>
         )}
-        <div className="mt-0.5 flex flex-wrap items-center gap-1.5 text-[11px] text-ink-muted">
+        <div className="text-ink-muted mt-0.5 flex flex-wrap items-center gap-1.5 text-[11px]">
           {todo.dueDate ? (
-            <span
-              className="inline-flex items-center gap-1"
-              title={absoluteTime(todo.dueDate)}
-            >
+            <span className="inline-flex items-center gap-1" title={absoluteTime(todo.dueDate)}>
               <CalendarDays className="h-3 w-3" aria-hidden />
               {relativeTime(todo.dueDate)}
             </span>
           ) : null}
           {!hideContextBadges && todo.workspace ? (
-            <span className="rounded bg-bg-subtle px-1.5 py-0.5 text-[10px] font-medium text-ink-muted">
+            <span className="bg-bg-subtle text-ink-muted rounded px-1.5 py-0.5 text-[10px] font-medium">
               {todo.workspace.name}
             </span>
           ) : null}
@@ -144,9 +141,7 @@ export function TodoRow({
             <span
               className="rounded px-1.5 py-0.5 text-[10px] font-medium"
               style={{
-                backgroundColor: todo.project.color
-                  ? `${todo.project.color}22`
-                  : '#e2e8f0',
+                backgroundColor: todo.project.color ? `${todo.project.color}22` : '#e2e8f0',
                 color: todo.project.color ?? '#475569',
               }}
             >
@@ -154,7 +149,7 @@ export function TodoRow({
             </span>
           ) : null}
           {todo.creator && todo.assignee && todo.creator.id !== todo.assignee.id ? (
-            <span className="inline-flex items-center gap-1 rounded bg-brand-orange/15 px-1.5 py-0.5 text-[10px] font-medium text-brand-orange">
+            <span className="bg-brand-orange/15 text-brand-orange inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-[10px] font-medium">
               Assigned by {todo.creator.name?.split(' ')[0] ?? todo.creator.email}
             </span>
           ) : null}
@@ -162,7 +157,7 @@ export function TodoRow({
           todo.assignee &&
           todo.creator &&
           todo.creator.id !== todo.assignee.id ? (
-            <span className="inline-flex items-center gap-1 rounded bg-bg-subtle px-1.5 py-0.5 text-[10px] font-medium text-ink">
+            <span className="bg-bg-subtle text-ink inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-[10px] font-medium">
               For {todo.assignee.name?.split(' ')[0] ?? todo.assignee.email}
             </span>
           ) : null}
@@ -189,7 +184,7 @@ export function TodoRow({
         size="icon"
         aria-label="Share to chat"
         onClick={onShare}
-        className="h-7 w-7 text-ink-disabled opacity-0 transition group-hover:opacity-100 hover:text-brand-teal"
+        className="text-ink-disabled hover:text-brand-teal h-7 w-7 opacity-0 transition group-hover:opacity-100"
       >
         <Send className="h-4 w-4" />
       </Button>
@@ -198,7 +193,7 @@ export function TodoRow({
         size="icon"
         aria-label="Delete todo"
         onClick={onDelete}
-        className="h-7 w-7 text-ink-disabled opacity-0 transition group-hover:opacity-100 hover:text-state-error"
+        className="text-ink-disabled hover:text-state-error h-7 w-7 opacity-0 transition group-hover:opacity-100"
       >
         <Trash2 className="h-4 w-4" />
       </Button>

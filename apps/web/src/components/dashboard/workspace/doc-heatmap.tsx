@@ -82,20 +82,24 @@ export function DocActivityHeatmapWidget() {
       {q.isLoading ? (
         <Skeleton className="h-32 w-full" />
       ) : q.isError && !q.data ? (
-        <QueryError compact message="Couldn't load document activity." onRetry={() => void q.refetch()} />
+        <QueryError
+          compact
+          message="Couldn't load document activity."
+          onRetry={() => void q.refetch()}
+        />
       ) : totalCount === 0 ? (
         <WidgetEmpty icon={FileClock} message="No document edits in the last 12 weeks." />
       ) : (
         <>
           <div className="mb-2 flex items-baseline justify-between">
             <div>
-              <div className="text-2xl font-bold text-ink">{totalCount}</div>
-              <div className="text-[11px] text-ink-muted">edits in 12 weeks</div>
+              <div className="text-ink text-2xl font-bold">{totalCount}</div>
+              <div className="text-ink-muted text-[11px]">edits in 12 weeks</div>
             </div>
             <Legend />
           </div>
           <div className="flex gap-1.5 overflow-x-auto pb-1">
-            <div className="flex flex-col justify-between py-1 text-[9px] text-ink-muted">
+            <div className="text-ink-muted flex flex-col justify-between py-1 text-[9px]">
               {DAY_LABELS.map((l) => (
                 <span key={l}>{l}</span>
               ))}
@@ -107,10 +111,7 @@ export function DocActivityHeatmapWidget() {
                     <span
                       key={d.key}
                       title={`${d.date.toDateString()}: ${d.count} ${d.count === 1 ? 'edit' : 'edits'}`}
-                      className={cn(
-                        'h-3 w-3 rounded-[2px]',
-                        intensityClass(d.count, maxCount),
-                      )}
+                      className={cn('h-3 w-3 rounded-[2px]', intensityClass(d.count, maxCount))}
                     />
                   ))}
                 </div>
@@ -135,13 +136,13 @@ function intensityClass(count: number, max: number): string {
 
 function Legend() {
   return (
-    <div className="flex items-center gap-1 text-[10px] text-ink-muted">
+    <div className="text-ink-muted flex items-center gap-1 text-[10px]">
       <span>less</span>
-      <span className="h-2.5 w-2.5 rounded-[2px] bg-bg-subtle" aria-hidden />
-      <span className="h-2.5 w-2.5 rounded-[2px] bg-brand-purple/25" aria-hidden />
-      <span className="h-2.5 w-2.5 rounded-[2px] bg-brand-purple/55" aria-hidden />
-      <span className="h-2.5 w-2.5 rounded-[2px] bg-brand-magenta/75" aria-hidden />
-      <span className="h-2.5 w-2.5 rounded-[2px] bg-brand-magenta" aria-hidden />
+      <span className="bg-bg-subtle h-2.5 w-2.5 rounded-[2px]" aria-hidden />
+      <span className="bg-brand-purple/25 h-2.5 w-2.5 rounded-[2px]" aria-hidden />
+      <span className="bg-brand-purple/55 h-2.5 w-2.5 rounded-[2px]" aria-hidden />
+      <span className="bg-brand-magenta/75 h-2.5 w-2.5 rounded-[2px]" aria-hidden />
+      <span className="bg-brand-magenta h-2.5 w-2.5 rounded-[2px]" aria-hidden />
       <span>more</span>
     </div>
   );

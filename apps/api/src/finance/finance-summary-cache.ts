@@ -113,7 +113,12 @@ export function storeFinanceSummary(
   if (!client) return;
   const entry: CachedEntry = { epoch, data };
   client
-    .set(financeSummaryKey(workspaceId, q), JSON.stringify(entry), 'EX', FINANCE_SUMMARY_TTL_SECONDS)
+    .set(
+      financeSummaryKey(workspaceId, q),
+      JSON.stringify(entry),
+      'EX',
+      FINANCE_SUMMARY_TTL_SECONDS,
+    )
     .catch(() => undefined);
 }
 

@@ -10,13 +10,13 @@ import { Logo } from '@/components/branding/logo';
  */
 export default function PublicReaderLayout({ children }: { children: ReactNode }) {
   return (
-    <div className="min-h-screen bg-bg-subtle">
-      <header className="border-b border-line bg-bg-surface">
+    <div className="bg-bg-subtle min-h-screen">
+      <header className="border-line bg-bg-surface border-b">
         <div className="mx-auto flex max-w-3xl items-center justify-center px-4 py-4 sm:px-6">
           <Link
             href="/"
             aria-label="The Botss home"
-            className="rounded focus-visible:outline-none focus-visible:ring-2 focus-visible:shadow-focus"
+            className="focus-visible:shadow-focus rounded focus-visible:outline-none focus-visible:ring-2"
           >
             <Logo variant="full" size="sm" />
           </Link>

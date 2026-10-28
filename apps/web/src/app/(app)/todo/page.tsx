@@ -74,10 +74,7 @@ export default function TodoPage() {
   const remove = useDeleteTodo();
 
   const openItems = useMemo(
-    () =>
-      [...(openQuery.data?.items ?? [])].sort(
-        (a, b) => a.sortOrder - b.sortOrder,
-      ),
+    () => [...(openQuery.data?.items ?? [])].sort((a, b) => a.sortOrder - b.sortOrder),
     [openQuery.data],
   );
   const doneItems = useMemo(
@@ -109,13 +106,13 @@ export default function TodoPage() {
   return (
     <div className="mx-auto h-[var(--app-content-h,calc(100vh-4rem))] w-full max-w-3xl overflow-y-auto px-4 py-6 sm:px-6">
       <header className="mb-6">
-        <h1 className="text-2xl font-semibold text-ink">Todos</h1>
-        <p className="mt-0.5 text-sm text-ink-muted">
+        <h1 className="text-ink text-2xl font-semibold">Todos</h1>
+        <p className="text-ink-muted mt-0.5 text-sm">
           Your personal task list. Press Enter to save a new item.
         </p>
       </header>
 
-      <div className="mb-4 inline-flex rounded-md border border-line bg-bg-surface p-0.5 text-sm">
+      <div className="border-line bg-bg-surface mb-4 inline-flex rounded-md border p-0.5 text-sm">
         {(['today', 'upcoming', 'all'] as const).map((t) => (
           <button
             key={t}
@@ -125,9 +122,7 @@ export default function TodoPage() {
             aria-pressed={tab === t}
             className={cn(
               'rounded px-3 py-1.5 capitalize transition-colors',
-              tab === t
-                ? 'bg-brand-50 text-brand-700'
-                : 'text-ink-muted hover:text-ink',
+              tab === t ? 'bg-brand-50 text-brand-700' : 'text-ink-muted hover:text-ink',
             )}
           >
             {t}
@@ -147,10 +142,7 @@ export default function TodoPage() {
       />
 
       <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={onDragEnd}>
-        <SortableContext
-          items={openItems.map((t) => t.id)}
-          strategy={verticalListSortingStrategy}
-        >
+        <SortableContext items={openItems.map((t) => t.id)} strategy={verticalListSortingStrategy}>
           {openQuery.isLoading ? (
             <EmptyHint>
               <Loader size="sm" label="Loading" />
@@ -168,15 +160,9 @@ export default function TodoPage() {
                 <SortableTodoRow
                   key={t.id}
                   todo={t}
-                  onToggle={(done) =>
-                    update.mutate({ id: t.id, input: { done } })
-                  }
-                  onRename={(title) =>
-                    update.mutate({ id: t.id, input: { title } })
-                  }
-                  onPriority={(priority) =>
-                    update.mutate({ id: t.id, input: { priority } })
-                  }
+                  onToggle={(done) => update.mutate({ id: t.id, input: { done } })}
+                  onRename={(title) => update.mutate({ id: t.id, input: { title } })}
+                  onPriority={(priority) => update.mutate({ id: t.id, input: { priority } })}
                   onDelete={() => remove.mutate(t.id)}
                   onShare={() => setShareTarget({ id: t.id, title: t.title })}
                 />
@@ -193,7 +179,7 @@ export default function TodoPage() {
             id="todo-completed-toggle"
             onClick={() => setCompletedOpen((v) => !v)}
             aria-expanded={completedOpen}
-            className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-ink-muted hover:text-ink"
+            className="text-ink-muted hover:text-ink inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide"
           >
             {completedOpen ? (
               <ChevronDown className="h-3.5 w-3.5" />
@@ -208,15 +194,9 @@ export default function TodoPage() {
                 <TodoRow
                   key={t.id}
                   todo={t}
-                  onToggle={(done) =>
-                    update.mutate({ id: t.id, input: { done } })
-                  }
-                  onRename={(title) =>
-                    update.mutate({ id: t.id, input: { title } })
-                  }
-                  onPriority={(priority) =>
-                    update.mutate({ id: t.id, input: { priority } })
-                  }
+                  onToggle={(done) => update.mutate({ id: t.id, input: { done } })}
+                  onRename={(title) => update.mutate({ id: t.id, input: { title } })}
+                  onPriority={(priority) => update.mutate({ id: t.id, input: { priority } })}
                   onDelete={() => remove.mutate(t.id)}
                   onShare={() => setShareTarget({ id: t.id, title: t.title })}
                 />
@@ -284,9 +264,9 @@ function TodoComposer({
   }
 
   return (
-    <div className="mb-3 rounded-md border border-line bg-bg-surface p-2 shadow-sm">
+    <div className="border-line bg-bg-surface mb-3 rounded-md border p-2 shadow-sm">
       <div className="flex items-center gap-2">
-        <Plus className="ml-1 h-4 w-4 text-ink-disabled" aria-hidden />
+        <Plus className="text-ink-disabled ml-1 h-4 w-4" aria-hidden />
         <Input
           id="todo-new-title"
           aria-label="New todo"
@@ -308,9 +288,7 @@ function TodoComposer({
           onClick={() => setOpen((v) => !v)}
           className={cn(
             'rounded px-2 py-1 text-xs transition-colors',
-            open
-              ? 'bg-brand-50 text-brand-700'
-              : 'text-ink-muted hover:bg-bg-subtle',
+            open ? 'bg-brand-50 text-brand-700' : 'text-ink-muted hover:bg-bg-subtle',
           )}
         >
           {open ? 'Hide' : 'Options'}
@@ -326,7 +304,7 @@ function TodoComposer({
               setProjectId('');
               setAssigneeId('');
             }}
-            className="h-9 rounded-md border border-line bg-bg-surface px-2 text-sm"
+            className="border-line bg-bg-surface h-9 rounded-md border px-2 text-sm"
           >
             <option value="">Current workspace</option>
             {(workspaces.data?.items ?? []).map((w) => (
@@ -340,7 +318,7 @@ function TodoComposer({
             value={projectId}
             disabled={!workspaceId}
             onChange={(e) => setProjectId(e.target.value)}
-            className="h-9 rounded-md border border-line bg-bg-surface px-2 text-sm disabled:opacity-50"
+            className="border-line bg-bg-surface h-9 rounded-md border px-2 text-sm disabled:opacity-50"
           >
             <option value="">No project</option>
             {projectsForWorkspace.map((p) => (
@@ -354,7 +332,7 @@ function TodoComposer({
             value={assigneeId}
             disabled={!workspaceId}
             onChange={(e) => setAssigneeId(e.target.value)}
-            className="h-9 rounded-md border border-line bg-bg-surface px-2 text-sm disabled:opacity-50"
+            className="border-line bg-bg-surface h-9 rounded-md border px-2 text-sm disabled:opacity-50"
           >
             <option value="">Me (default)</option>
             {(members.data ?? [])
@@ -365,7 +343,7 @@ function TodoComposer({
                 </option>
               ))}
           </select>
-          <div className="sm:col-span-3 flex justify-end">
+          <div className="flex justify-end sm:col-span-3">
             <Button size="sm" onClick={submit} disabled={pending || !defaultValue.trim()}>
               {pending ? 'Adding…' : 'Add todo'}
             </Button>
@@ -384,8 +362,9 @@ function SortableTodoRow(props: {
   onDelete: () => void;
   onShare: () => void;
 }) {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
-    useSortable({ id: props.todo.id });
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: props.todo.id,
+  });
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
@@ -393,17 +372,14 @@ function SortableTodoRow(props: {
   };
   return (
     <li ref={setNodeRef} style={style}>
-      <TodoRow
-        {...props}
-        dragHandleProps={{ ...attributes, ...listeners }}
-      />
+      <TodoRow {...props} dragHandleProps={{ ...attributes, ...listeners }} />
     </li>
   );
 }
 
 function EmptyHint({ children }: { children: ReactNode }) {
   return (
-    <div className="rounded-md border border-dashed border-line p-8 text-center text-sm text-ink-muted">
+    <div className="border-line text-ink-muted rounded-md border border-dashed p-8 text-center text-sm">
       {children}
     </div>
   );

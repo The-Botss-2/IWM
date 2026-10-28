@@ -1,11 +1,4 @@
-import {
-  Body,
-  Controller,
-  ForbiddenException,
-  Get,
-  Post,
-  Req,
-} from '@nestjs/common';
+import { Body, Controller, ForbiddenException, Get, Post, Req } from '@nestjs/common';
 import type { Request } from 'express';
 import { z } from 'zod';
 
@@ -63,9 +56,7 @@ export class EmailController {
    */
   @Get('health')
   @SkipPermissions()
-  async health(
-    @Req() req: Request & RequestExtensions,
-  ) {
+  async health(@Req() req: Request & RequestExtensions) {
     const user = requireUser(req);
     const memberships = req.workspaceMemberships ?? [];
     const isAdmin =

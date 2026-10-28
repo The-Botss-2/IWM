@@ -40,17 +40,17 @@ export function ChatRequestDialog({ open, onOpenChange }: Props) {
         <DialogHeader>
           <DialogTitle>Send a chat request</DialogTitle>
           <DialogDescription>
-            Reach someone at another company by their work email. If they
-            accept, a direct chat opens for both of you.
+            Reach someone at another company by their work email. If they accept, a direct chat
+            opens for both of you.
           </DialogDescription>
         </DialogHeader>
 
         {form.notice ? (
-          <div className="flex items-start gap-3 rounded-md border border-line bg-bg-subtle px-3 py-3">
-            <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-brand-teal" aria-hidden />
+          <div className="border-line bg-bg-subtle flex items-start gap-3 rounded-md border px-3 py-3">
+            <CheckCircle2 className="text-brand-teal mt-0.5 h-4 w-4 shrink-0" aria-hidden />
             <div className="min-w-0 text-sm">
-              <p className="font-medium text-ink">{form.notice}</p>
-              <p className="mt-0.5 text-xs text-ink-muted">
+              <p className="text-ink font-medium">{form.notice}</p>
+              <p className="text-ink-muted mt-0.5 text-xs">
                 You can see and cancel sent requests in Settings, Communication.
               </p>
             </div>
@@ -80,7 +80,7 @@ export function ChatRequestDialog({ open, onOpenChange }: Props) {
                 <Label htmlFor="chat-request-message">Message</Label>
                 <span
                   className={
-                    form.tooLong ? 'text-[11px] text-state-error' : 'text-[11px] text-ink-muted'
+                    form.tooLong ? 'text-state-error text-[11px]' : 'text-ink-muted text-[11px]'
                   }
                 >
                   {form.message.length}/{CHAT_REQUEST_MESSAGE_MAX}

@@ -38,10 +38,19 @@ const optionalEmail = z
   .nullable()
   .optional();
 const optionalCnic = z
-  .union([z.literal(''), z.string().trim().regex(/^\d{5}-?\d{7}-?\d$/, 'CNIC must have 13 digits.')])
+  .union([
+    z.literal(''),
+    z
+      .string()
+      .trim()
+      .regex(/^\d{5}-?\d{7}-?\d$/, 'CNIC must have 13 digits.'),
+  ])
   .nullable()
   .optional();
-const optionalDate = z.union([z.literal(''), payrollDate]).nullable().optional();
+const optionalDate = z
+  .union([z.literal(''), payrollDate])
+  .nullable()
+  .optional();
 
 /** A staff member as offered in the "Add people" picker. */
 export const payrollStaffSchema = z.object({

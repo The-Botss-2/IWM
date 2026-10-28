@@ -19,7 +19,10 @@ export default function PortalSignPage() {
         </Link>
       </Button>
       {/* Keyed so another request never inherits this one's adopted signature. */}
-      <SigningView key={`${clientId}:${signerId}`} source={{ kind: 'portal', clientId, signerId }} />
+      <SigningView
+        key={`${clientId}:${signerId}`}
+        source={{ kind: 'portal', clientId, signerId }}
+      />
     </div>
   );
 }

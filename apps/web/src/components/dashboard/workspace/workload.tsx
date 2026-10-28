@@ -35,7 +35,7 @@ export function WorkloadWidget() {
       ) : q.isError && !q.data ? (
         <QueryError compact message="Couldn't load workload." onRetry={() => void q.refetch()} />
       ) : rows.length === 0 ? (
-        <div className="grid h-32 place-items-center text-xs text-ink-muted">
+        <div className="text-ink-muted grid h-32 place-items-center text-xs">
           No open work assigned.
         </div>
       ) : (
@@ -51,27 +51,24 @@ export function WorkloadWidget() {
                       {r.userId ? (
                         <UserAvatar size="xs" name={r.name} image={r.image} />
                       ) : (
-                        <span className="grid h-5 w-5 place-items-center rounded-full bg-bg-subtle text-[10px] text-ink-muted">
+                        <span className="bg-bg-subtle text-ink-muted grid h-5 w-5 place-items-center rounded-full text-[10px]">
                           -
                         </span>
                       )}
-                      <span className="truncate text-ink">{r.name}</span>
+                      <span className="text-ink truncate">{r.name}</span>
                     </span>
-                    <span className="shrink-0 font-medium text-ink">
+                    <span className="text-ink shrink-0 font-medium">
                       {r.open}
                       {r.overdue > 0 ? (
-                        <span className="ml-1 text-[10px] font-normal text-state-error">
+                        <span className="text-state-error ml-1 text-[10px] font-normal">
                           ({r.overdue} late)
                         </span>
                       ) : null}
                     </span>
                   </div>
-                  <div
-                    className="relative h-2 rounded-full bg-bg-subtle"
-                    aria-hidden
-                  >
+                  <div className="bg-bg-subtle relative h-2 rounded-full" aria-hidden>
                     <span
-                      className="absolute inset-y-0 left-0 rounded-full bg-brand-gradient"
+                      className="bg-brand-gradient absolute inset-y-0 left-0 rounded-full"
                       style={{ width: `${widthPct}%` }}
                     />
                     {r.overdue > 0 ? (
@@ -89,7 +86,7 @@ export function WorkloadWidget() {
               );
             })}
           </ul>
-          <p className="mt-3 text-[11px] text-ink-muted">
+          <p className="text-ink-muted mt-3 text-[11px]">
             {openTotal} open {openTotal === 1 ? 'task' : 'tasks'} (done and cancelled not counted).
             {groupCount > rows.length ? ` Top ${rows.length} of ${groupCount} shown.` : null}
           </p>

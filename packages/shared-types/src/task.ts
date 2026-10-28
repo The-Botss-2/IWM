@@ -34,16 +34,22 @@ export type Task = z.infer<typeof taskSchema>;
 export const taskWithPeopleSchema = taskSchema.extend({
   createdBy: userSummarySchema,
   assignee: userSummarySchema.nullable(),
-  sprintTasks: z.array(z.object({
-    sprint: z.object({ id: cuid, name: z.string() })
-  })).optional(),
-  project: z.object({
-    id: cuid,
-    name: z.string(),
-    key: z.string().optional(),
-    color: z.string().nullable().optional(),
-    workspace: z.object({ id: cuid, name: z.string() }).optional(),
-  }).optional(),
+  sprintTasks: z
+    .array(
+      z.object({
+        sprint: z.object({ id: cuid, name: z.string() }),
+      }),
+    )
+    .optional(),
+  project: z
+    .object({
+      id: cuid,
+      name: z.string(),
+      key: z.string().optional(),
+      color: z.string().nullable().optional(),
+      workspace: z.object({ id: cuid, name: z.string() }).optional(),
+    })
+    .optional(),
 });
 export type TaskWithPeople = z.infer<typeof taskWithPeopleSchema>;
 
@@ -101,55 +107,57 @@ export type ReorderTaskInput = z.infer<typeof reorderTaskSchema>;
 export const TaskDateField = z.enum(['due', 'created', 'completed']);
 export type TaskDateField = z.infer<typeof TaskDateField>;
 
-export const listTasksQuerySchema = paginationQuerySchema.extend({
-  projectId: cuid.optional(),
-  /// Phase 4 org-layer: optional explicit workspace filter. When present
-  /// AND the caller is a member of the workspace's organization, the
-  /// list narrows to that workspace. Omit to use the legacy current-
-  /// workspace (header) scope, or pair with `aggregate='org'` to widen
-  /// the view to every workspace in the caller's organization.
-  workspaceId: cuid.optional(),
-  /// Phase 4 org-layer: when set to 'org', the list is aggregated
-  /// across all workspaces the caller's organization owns. Without it
-  /// the legacy header-scoped behavior is preserved exactly.
-  aggregate: z.enum(['org']).optional(),
-  status: z.union([TaskStatus, z.array(TaskStatus)]).optional(),
-  priority: z.union([TaskPriority, z.array(TaskPriority)]).optional(),
-  assigneeId: z.union([cuid, z.array(cuid)]).optional(),
-  assigneeIds: z.union([cuid, z.array(cuid)]).optional(),
-  assignedToMe: z
-    .union([z.literal('true'), z.literal('false')])
-    .transform((v) => v === 'true')
-    .optional(),
-  /// Also match tasks with no assignee. OR'd with `assigneeId(s)` when both
-  /// are given ("Alice, Bob or unassigned"); alone it lists unassigned tasks
-  /// only. `assignedToMe` still overrides every assignee filter.
-  unassigned: z
-    .union([z.literal('true'), z.literal('false')])
-    .transform((v) => v === 'true')
-    .optional(),
-  dueBefore: z.coerce.date().optional(),
-  dueAfter: z.coerce.date().optional(),
-  /// Only tasks without a due date. Combined with `dueBefore`/`dueAfter` it
-  /// matches nothing, as you would expect.
-  noDueDate: z
-    .union([z.literal('true'), z.literal('false')])
-    .transform((v) => v === 'true')
-    .optional(),
-  /// Generic date range: `from`/`to` are inclusive UTC instants applied to the
-  /// column `dateField` names (default `due`). `completed` falls back to
-  /// `updatedAt` for DONE tasks completed before `completedAt` was tracked.
-  /// Independent of (and ANDed with) `dueBefore`/`dueAfter`.
-  dateField: TaskDateField.optional(),
-  from: z.coerce.date().optional(),
-  to: z.coerce.date().optional(),
-  search: z.string().optional(),
-  sort: z.enum(['position', 'createdAt', 'updatedAt', 'dueDate', 'priority']).default('position'),
-  order: sortOrderSchema,
-}).refine((q) => !q.from || !q.to || q.from.getTime() <= q.to.getTime(), {
-  message: '`from` must not be after `to`.',
-  path: ['from'],
-});
+export const listTasksQuerySchema = paginationQuerySchema
+  .extend({
+    projectId: cuid.optional(),
+    /// Phase 4 org-layer: optional explicit workspace filter. When present
+    /// AND the caller is a member of the workspace's organization, the
+    /// list narrows to that workspace. Omit to use the legacy current-
+    /// workspace (header) scope, or pair with `aggregate='org'` to widen
+    /// the view to every workspace in the caller's organization.
+    workspaceId: cuid.optional(),
+    /// Phase 4 org-layer: when set to 'org', the list is aggregated
+    /// across all workspaces the caller's organization owns. Without it
+    /// the legacy header-scoped behavior is preserved exactly.
+    aggregate: z.enum(['org']).optional(),
+    status: z.union([TaskStatus, z.array(TaskStatus)]).optional(),
+    priority: z.union([TaskPriority, z.array(TaskPriority)]).optional(),
+    assigneeId: z.union([cuid, z.array(cuid)]).optional(),
+    assigneeIds: z.union([cuid, z.array(cuid)]).optional(),
+    assignedToMe: z
+      .union([z.literal('true'), z.literal('false')])
+      .transform((v) => v === 'true')
+      .optional(),
+    /// Also match tasks with no assignee. OR'd with `assigneeId(s)` when both
+    /// are given ("Alice, Bob or unassigned"); alone it lists unassigned tasks
+    /// only. `assignedToMe` still overrides every assignee filter.
+    unassigned: z
+      .union([z.literal('true'), z.literal('false')])
+      .transform((v) => v === 'true')
+      .optional(),
+    dueBefore: z.coerce.date().optional(),
+    dueAfter: z.coerce.date().optional(),
+    /// Only tasks without a due date. Combined with `dueBefore`/`dueAfter` it
+    /// matches nothing, as you would expect.
+    noDueDate: z
+      .union([z.literal('true'), z.literal('false')])
+      .transform((v) => v === 'true')
+      .optional(),
+    /// Generic date range: `from`/`to` are inclusive UTC instants applied to the
+    /// column `dateField` names (default `due`). `completed` falls back to
+    /// `updatedAt` for DONE tasks completed before `completedAt` was tracked.
+    /// Independent of (and ANDed with) `dueBefore`/`dueAfter`.
+    dateField: TaskDateField.optional(),
+    from: z.coerce.date().optional(),
+    to: z.coerce.date().optional(),
+    search: z.string().optional(),
+    sort: z.enum(['position', 'createdAt', 'updatedAt', 'dueDate', 'priority']).default('position'),
+    order: sortOrderSchema,
+  })
+  .refine((q) => !q.from || !q.to || q.from.getTime() <= q.to.getTime(), {
+    message: '`from` must not be after `to`.',
+    path: ['from'],
+  });
 export type ListTasksQuery = z.infer<typeof listTasksQuerySchema>;
 
 /**

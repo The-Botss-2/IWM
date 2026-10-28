@@ -1,8 +1,4 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import type {
   AwaitingPaymentItem,
   CreateMilestoneInput,
@@ -134,9 +130,7 @@ export class MilestonesService {
         where: {
           id: { in: input.taskIds },
           project: { workspaceId: existing.contract.workspaceId },
-          ...(existing.contract.projectId
-            ? { projectId: existing.contract.projectId }
-            : {}),
+          ...(existing.contract.projectId ? { projectId: existing.contract.projectId } : {}),
         },
       });
       if (count !== input.taskIds.length) {
@@ -205,7 +199,12 @@ export class MilestonesService {
     // The ids must be exactly the contract's full milestone set: a subset
     // would land on positions 0..n-1 that rows left out still hold and
     // collide with @@unique([contractId, position]).
-    if (!isSameIdSet(all.map((m) => m.id), input.ids)) {
+    if (
+      !isSameIdSet(
+        all.map((m) => m.id),
+        input.ids,
+      )
+    ) {
       throw new BadRequestException({
         title: 'Invalid reorder',
         status: 400,

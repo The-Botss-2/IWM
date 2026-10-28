@@ -137,7 +137,11 @@ function patchLeaveRow(
 }
 
 /** Put one leave back where it was in each list, leaving every other row alone. */
-function rollbackLeaveRow(qc: QueryClient, id: string, rollback: LeaveRowRollback | undefined): void {
+function rollbackLeaveRow(
+  qc: QueryClient,
+  id: string,
+  rollback: LeaveRowRollback | undefined,
+): void {
   for (const { key, row, index } of rollback ?? []) {
     qc.setQueryData<LeaveListResponse>(key, (data) => {
       if (!data) return data;

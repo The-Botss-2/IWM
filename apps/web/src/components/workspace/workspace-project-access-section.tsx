@@ -46,20 +46,14 @@ const VISIBILITY_OPTIONS: {
   { value: 'PRIVATE', label: 'Members only' },
 ];
 
-export function WorkspaceProjectAccessSection({
-  workspace,
-}: {
-  workspace: Workspace;
-}) {
+export function WorkspaceProjectAccessSection({ workspace }: { workspace: Workspace }) {
   const session = useSessionContext();
   const canManage = useMemo(() => {
     const data = session.data as SessionContext | undefined;
     if (!data) return false;
     const systemRole = data.user?.systemRole;
     if (systemRole === 'ADMIN' || systemRole === 'SUPER_ADMIN') return true;
-    const membership = data.workspaceMemberships.find(
-      (m) => m.workspaceId === workspace.id,
-    );
+    const membership = data.workspaceMemberships.find((m) => m.workspaceId === workspace.id);
     return membership?.role === 'OWNER' || membership?.role === 'ADMIN';
   }, [session.data, workspace.id]);
 
@@ -73,9 +67,7 @@ export function WorkspaceProjectAccessSection({
     const all = projects.data?.items ?? [];
     const q = filter.trim().toLowerCase();
     if (!q) return all;
-    return all.filter(
-      (p) => p.name.toLowerCase().includes(q) || p.key.toLowerCase().includes(q),
-    );
+    return all.filter((p) => p.name.toLowerCase().includes(q) || p.key.toLowerCase().includes(q));
   }, [projects.data, filter]);
 
   // Members see nothing here - the whole section is an admin control, and
@@ -85,27 +77,23 @@ export function WorkspaceProjectAccessSection({
   return (
     <section
       aria-labelledby="project-access-heading"
-      className="rounded-lg border border-line bg-white p-5"
+      className="border-line rounded-lg border bg-white p-5"
     >
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h2
-            id="project-access-heading"
-            className="text-base font-semibold text-ink"
-          >
+          <h2 id="project-access-heading" className="text-ink text-base font-semibold">
             Project access
           </h2>
-          <p className="mt-1 max-w-2xl text-sm text-ink-muted">
+          <p className="text-ink-muted mt-1 max-w-2xl text-sm">
             Choose who can see each project. Setting one to{' '}
-            <span className="font-medium text-ink">Members only</span> hides it
-            from everyone except the people added to it, along with its tasks,
-            sprints, goals, calendar entries and search results. You and other
-            workspace admins always see everything.
+            <span className="text-ink font-medium">Members only</span> hides it from everyone except
+            the people added to it, along with its tasks, sprints, goals, calendar entries and
+            search results. You and other workspace admins always see everything.
           </p>
         </div>
         {(projects.data?.items.length ?? 0) > 8 ? (
           <div className="relative">
-            <Search className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-muted" />
+            <Search className="text-ink-muted pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2" />
             <Input
               value={filter}
               onChange={(e) => setFilter(e.target.value)}
@@ -125,15 +113,15 @@ export function WorkspaceProjectAccessSection({
             <Skeleton className="h-14" />
           </div>
         ) : projects.isError ? (
-          <p className="text-sm text-state-error">Couldn&apos;t load projects.</p>
+          <p className="text-state-error text-sm">Couldn&apos;t load projects.</p>
         ) : items.length === 0 ? (
-          <p className="text-sm text-ink-muted">
+          <p className="text-ink-muted text-sm">
             {filter.trim()
               ? 'No projects match that filter.'
               : 'This workspace has no projects yet.'}
           </p>
         ) : (
-          <ul className="divide-y divide-line rounded-lg border border-line">
+          <ul className="divide-line border-line divide-y rounded-lg border">
             {items.map((project) => (
               <ProjectAccessRow key={project.id} project={project} />
             ))}
@@ -157,7 +145,7 @@ function ProjectAccessRow({ project }: { project: ProjectWithCreator }) {
         <div className="flex items-center gap-2">
           <Link
             href={`/projects/${project.id}`}
-            className="truncate font-medium text-ink hover:underline"
+            className="text-ink truncate font-medium hover:underline"
           >
             {project.name}
           </Link>
@@ -165,13 +153,13 @@ function ProjectAccessRow({ project }: { project: ProjectWithCreator }) {
             {project.key}
           </Badge>
           {isPrivate ? (
-            <span className="inline-flex items-center gap-1 text-xs text-ink-muted">
+            <span className="text-ink-muted inline-flex items-center gap-1 text-xs">
               <Lock className="h-3 w-3" aria-hidden />
               Hidden
             </span>
           ) : null}
         </div>
-        <p className="mt-0.5 flex flex-wrap items-center gap-1 text-xs text-ink-muted">
+        <p className="text-ink-muted mt-0.5 flex flex-wrap items-center gap-1 text-xs">
           <Users className="h-3 w-3" aria-hidden />
           {isPrivate
             ? `${memberCount} ${memberCount === 1 ? 'person' : 'people'} can see this`
@@ -179,7 +167,7 @@ function ProjectAccessRow({ project }: { project: ProjectWithCreator }) {
           {isPrivate ? (
             <Link
               href={`/projects/${project.id}?view=settings`}
-              className="underline hover:text-ink"
+              className="hover:text-ink underline"
             >
               Manage members
             </Link>
@@ -192,10 +180,7 @@ function ProjectAccessRow({ project }: { project: ProjectWithCreator }) {
         disabled={update.isPending}
         onValueChange={(v) => update.mutate({ visibility: v as ProjectVisibility })}
       >
-        <SelectTrigger
-          className="w-56"
-          aria-label={`Visibility for ${project.name}`}
-        >
+        <SelectTrigger className="w-56" aria-label={`Visibility for ${project.name}`}>
           <SelectValue />
         </SelectTrigger>
         <SelectContent>

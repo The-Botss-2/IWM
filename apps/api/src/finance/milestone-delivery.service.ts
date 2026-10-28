@@ -104,16 +104,11 @@ export class MilestoneDeliveryService {
         await this.markDelivered(milestone.id, recipientCache);
       }
     } catch (err) {
-      this.log.warn(
-        `Milestone delivery sync failed for task ${taskId}: ${(err as Error).message}`,
-      );
+      this.log.warn(`Milestone delivery sync failed for task ${taskId}: ${(err as Error).message}`);
     }
   }
 
-  private async markDelivered(
-    milestoneId: string,
-    recipientCache: RecipientCache,
-  ): Promise<void> {
+  private async markDelivered(milestoneId: string, recipientCache: RecipientCache): Promise<void> {
     const updated = await this.prisma.client.contractMilestone.update({
       where: { id: milestoneId },
       data: { status: 'DELIVERED', deliveredAt: new Date() },
@@ -125,23 +120,17 @@ export class MilestoneDeliveryService {
     });
     await bumpFinanceSummary(this.redis, updated.contract.workspaceId);
 
-    const recipients = await this.financeRecipients(
-      updated.contract.workspaceId,
-      recipientCache,
-    );
+    const recipients = await this.financeRecipients(updated.contract.workspaceId, recipientCache);
     if (!recipients) return;
 
-    await this.notifications.emitMany(
-      recipients,
-      {
-        type: 'MILESTONE_DELIVERED',
-        title: 'Milestone delivered',
-        body: `${updated.title} - ${updated.contract.title} is ready to invoice`,
-        entityType: 'contract',
-        entityId: updated.contract.id,
-        url: `/financials/${updated.contract.id}?tab=milestones`,
-      },
-    );
+    await this.notifications.emitMany(recipients, {
+      type: 'MILESTONE_DELIVERED',
+      title: 'Milestone delivered',
+      body: `${updated.title} - ${updated.contract.title} is ready to invoice`,
+      entityType: 'contract',
+      entityId: updated.contract.id,
+      url: `/financials/${updated.contract.id}?tab=milestones`,
+    });
   }
 
   /**

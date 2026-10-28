@@ -109,11 +109,11 @@ export function NewRunDialog({
         </div>
 
         {clash ? (
-          <p className="text-sm text-ink-muted" role="status">
+          <p className="text-ink-muted text-sm" role="status">
             {payrollPeriod(year, month)} already has a payroll run.{' '}
             <button
               type="button"
-              className="font-medium text-ink underline underline-offset-2"
+              className="text-ink font-medium underline underline-offset-2"
               onClick={() => {
                 onOpenChange(false);
                 onOpenExisting(clash.id);
@@ -128,7 +128,10 @@ export function NewRunDialog({
           <Button variant="secondary" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
-          <Button onClick={() => void submit()} disabled={!!clash || activePeople === 0 || create.isPending}>
+          <Button
+            onClick={() => void submit()}
+            disabled={!!clash || activePeople === 0 || create.isPending}
+          >
             {create.isPending ? 'Creating…' : `Create ${payrollPeriod(year, month)}`}
           </Button>
         </DialogFooter>

@@ -26,8 +26,7 @@ const api = {
   getAutoStart: (): Promise<boolean> => ipcRenderer.invoke('botss:getAutoStart'),
   setAutoStart: (enabled: boolean): Promise<boolean> =>
     ipcRenderer.invoke('botss:setAutoStart', enabled),
-  getPowerState: (): Promise<PowerState> =>
-    ipcRenderer.invoke('botss:getPowerState'),
+  getPowerState: (): Promise<PowerState> => ipcRenderer.invoke('botss:getPowerState'),
   onPowerStateChange: (cb: (state: PowerState) => void): (() => void) => {
     const listener = (_e: unknown, state: PowerState): void => cb(state);
     ipcRenderer.on('botss:powerState', listener);

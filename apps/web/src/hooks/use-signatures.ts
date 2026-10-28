@@ -32,8 +32,7 @@ export function useSignatureRequests(documentId: string | null) {
     enabled: Boolean(documentId) && canRead,
     retry: 1,
     // Signers act outside the app; poll gently while something is open.
-    refetchInterval: (q) =>
-      q.state.data?.items.some((r) => r.status === 'SENT') ? 30_000 : false,
+    refetchInterval: (q) => (q.state.data?.items.some((r) => r.status === 'SENT') ? 30_000 : false),
   });
 }
 
@@ -160,7 +159,8 @@ export function usePdfDocument(key: string | null, load: () => Promise<{ blob: B
         opened = doc;
         setState({ status: 'ready', doc, bytes });
       } catch (err) {
-        if (!cancelled) setState({ status: 'error', message: describeError(err, "Couldn't open the PDF.") });
+        if (!cancelled)
+          setState({ status: 'error', message: describeError(err, "Couldn't open the PDF.") });
       }
     })();
     return () => {

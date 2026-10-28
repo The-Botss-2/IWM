@@ -84,9 +84,12 @@ const scope: UserScope = {
   seesEveryProject: false,
 } as unknown as UserScope;
 
-const noRedis = { client: { multi: () => ({ incr: () => null, expire: () => null, exec: async () => [] }) } } as unknown as RedisService;
+const noRedis = {
+  client: { multi: () => ({ incr: () => null, expire: () => null, exec: async () => [] }) },
+} as unknown as RedisService;
 
-const isStatus = (status: number) => (e: unknown) => e instanceof HttpException && e.getStatus() === status;
+const isStatus = (status: number) => (e: unknown) =>
+  e instanceof HttpException && e.getStatus() === status;
 
 async function main() {
   // --- G5 milestone reorder ----------------------------------------------------
@@ -122,8 +125,18 @@ async function main() {
     assert.equal(writes.length, 0, 'G5: refused reorders write nothing');
 
     await milestones.reorder(scope, CONTRACT, { ids: [M3, M1, M2] });
-    const finalPositions = writes.slice(3).map((w) => [(w['where'] as Row)['id'], (w['data'] as Row)['position']]);
-    assert.deepEqual(finalPositions, [[M3, 0], [M1, 1], [M2, 2]], 'G5: full-set reorder lands 0..n-1');
+    const finalPositions = writes
+      .slice(3)
+      .map((w) => [(w['where'] as Row)['id'], (w['data'] as Row)['position']]);
+    assert.deepEqual(
+      finalPositions,
+      [
+        [M3, 0],
+        [M1, 1],
+        [M2, 2],
+      ],
+      'G5: full-set reorder lands 0..n-1',
+    );
     console.log('  ok  G5 milestone reorder requires the full set');
   }
 
@@ -161,7 +174,11 @@ async function main() {
           findMany: async (args: { include: Row }) => {
             include = args.include;
             return [
-              { ...base, id: 'cmexppayroll0000000000001', payrollItem: { id: 'cmpayitem00000000000001' } },
+              {
+                ...base,
+                id: 'cmexppayroll0000000000001',
+                payrollItem: { id: 'cmpayitem00000000000001' },
+              },
               { ...base, id: 'cmexpmanual00000000000002', payrollItem: null },
             ];
           },
@@ -170,9 +187,18 @@ async function main() {
       },
     } as unknown as PrismaService;
     const expenses = new ExpensesService(prisma, noRedis);
-    const list = await expenses.list(scope, { page: 1, pageSize: 50, sort: 'incurredAt', order: 'desc' } as never);
+    const list = await expenses.list(scope, {
+      page: 1,
+      pageSize: 50,
+      sort: 'incurredAt',
+      order: 'desc',
+    } as never);
     assert.ok(include['payrollItem'], 'G6: list includes the payroll back-relation');
-    assert.deepEqual(list.items.map((e) => e.fromPayroll), [true, false], 'G6: fromPayroll mirrors the payroll item');
+    assert.deepEqual(
+      list.items.map((e) => e.fromPayroll),
+      [true, false],
+      'G6: fromPayroll mirrors the payroll item',
+    );
     for (const item of list.items) expenseWithRefsSchema.parse(item);
     console.log('  ok  G6 payroll expenses are flagged');
   }
@@ -185,33 +211,73 @@ async function main() {
     const TASK_A = 'cmtaska000000000000000tka';
     const TASK_B = 'cmtaskb000000000000000tkb';
     const tasks: Row[] = [
-      { id: TASK_A, projectId: PROJECT_A, status: 'TODO', createdById: OTHER_USER, assigneeId: null },
+      {
+        id: TASK_A,
+        projectId: PROJECT_A,
+        status: 'TODO',
+        createdById: OTHER_USER,
+        assigneeId: null,
+      },
       // A task the caller cannot see (another project, no membership).
-      { id: TASK_B, projectId: PROJECT_B, status: 'TODO', createdById: OTHER_USER, assigneeId: null },
+      {
+        id: TASK_B,
+        projectId: PROJECT_B,
+        status: 'TODO',
+        createdById: OTHER_USER,
+        assigneeId: null,
+      },
     ];
     const visibleProjects = new Set([PROJECT_A]);
     const values: Row[] = [
-      { id: VALUE_A, definitionId: DEF_A, entityId: TASK_A, definition: { scope: 'TASK', projectId: PROJECT_A } },
-      { id: VALUE_B, definitionId: DEF_A, entityId: TASK_B, definition: { scope: 'TASK', projectId: null } },
+      {
+        id: VALUE_A,
+        definitionId: DEF_A,
+        entityId: TASK_A,
+        definition: { scope: 'TASK', projectId: PROJECT_A },
+      },
+      {
+        id: VALUE_B,
+        definitionId: DEF_A,
+        entityId: TASK_B,
+        definition: { scope: 'TASK', projectId: null },
+      },
     ];
     const writes: string[] = [];
     const prisma = {
       client: {
         customFieldDefinition: {
-          findFirst: async () => ({ id: DEF_A, workspaceId: WS, scope: 'TASK', projectId: PROJECT_A, type: 'TEXT', options: null }),
+          findFirst: async () => ({
+            id: DEF_A,
+            workspaceId: WS,
+            scope: 'TASK',
+            projectId: PROJECT_A,
+            type: 'TEXT',
+            options: null,
+          }),
         },
         task: {
           findFirst: async (args: { where: Row }) => {
-            assert.equal((args.where['project'] as Row)['workspaceId'], WS, 'G7: task lookup pinned to the workspace');
+            assert.equal(
+              (args.where['project'] as Row)['workspaceId'],
+              WS,
+              'G7: task lookup pinned to the workspace',
+            );
             const t = tasks.find((x) => x.id === args.where['id']);
             return t && visibleProjects.has(t['projectId'] as string) ? t : null;
           },
         },
         customFieldValue: {
-          findFirst: async (args: { where: Row }) => values.find((v) => v.id === args.where['id']) ?? null,
+          findFirst: async (args: { where: Row }) =>
+            values.find((v) => v.id === args.where['id']) ?? null,
           upsert: async (args: { create: Row }) => {
             writes.push('upsert');
-            return { id: VALUE_A, ...args.create, value: 'x', createdAt: new Date(), updatedAt: new Date() };
+            return {
+              id: VALUE_A,
+              ...args.create,
+              value: 'x',
+              createdAt: new Date(),
+              updatedAt: new Date(),
+            };
           },
           delete: async () => {
             writes.push('delete');
@@ -221,20 +287,27 @@ async function main() {
       },
     } as unknown as PrismaService;
     const fields = new CustomFieldsService(prisma);
-    const permissions = presetPermissions({ systemRole: 'EMPLOYEE', workspaceMemberships: [{ role: 'VIEWER' }] });
+    const permissions = presetPermissions({
+      systemRole: 'EMPLOYEE',
+      workspaceMemberships: [{ role: 'VIEWER' }],
+    });
     const viewer = defineAbilityFor({
       userId: USER,
       systemRole: 'EMPLOYEE',
       permissions,
       workspaceMemberships: [{ workspaceId: WS, role: 'VIEWER' }],
-      projectMemberships: [{ projectId: PROJECT_A, workspaceId: WS, role: 'VIEWER', abilities: null }],
+      projectMemberships: [
+        { projectId: PROJECT_A, workspaceId: WS, role: 'VIEWER', abilities: null },
+      ],
     });
     const contributor = defineAbilityFor({
       userId: USER,
       systemRole: 'EMPLOYEE',
       permissions,
       workspaceMemberships: [{ workspaceId: WS, role: 'VIEWER' }],
-      projectMemberships: [{ projectId: PROJECT_A, workspaceId: WS, role: 'CONTRIBUTOR', abilities: null }],
+      projectMemberships: [
+        { projectId: PROJECT_A, workspaceId: WS, role: 'CONTRIBUTOR', abilities: null },
+      ],
     });
     assert.ok(!viewer.can('update', 'Task'), 'G7: fixture viewer has no task update');
 
@@ -267,7 +340,11 @@ async function main() {
     visibleProjects.delete(PROJECT_B);
     assert.deepEqual(writes, [], 'G7: refused value writes touch nothing');
 
-    await fields.setValue(scope, contributor, { definitionId: DEF_A, entityId: TASK_A, value: 'x' });
+    await fields.setValue(scope, contributor, {
+      definitionId: DEF_A,
+      entityId: TASK_A,
+      value: 'x',
+    });
     await fields.clearValue(scope, contributor, VALUE_A);
     assert.deepEqual(writes, ['upsert', 'delete'], 'G7: a contributor sets and clears');
 
@@ -275,7 +352,8 @@ async function main() {
     assert.ok(listCustomFieldValuesQuerySchema.safeParse({ entityId: TASK_A }).success);
     assert.ok(!listCustomFieldValuesQuerySchema.safeParse({}).success, 'G7: list needs a filter');
     assert.ok(
-      !listCustomFieldValuesQuerySchema.safeParse({ entityId: TASK_A, projectId: PROJECT_A }).success,
+      !listCustomFieldValuesQuerySchema.safeParse({ entityId: TASK_A, projectId: PROJECT_A })
+        .success,
       'G7: list takes one filter',
     );
     console.log('  ok  G7 custom-field value writes take task update');
@@ -284,9 +362,27 @@ async function main() {
   // --- G8 sprint dates -------------------------------------------------------------
   {
     const day = (d: string) => new Date(`${d}T00:00:00.000Z`);
-    assert.ok(!createSprintSchema.safeParse({ name: 'S', startDate: day('2026-10-10'), endDate: day('2026-10-09') }).success, 'G8: create end < start is refused');
-    assert.ok(createSprintSchema.safeParse({ name: 'S', startDate: day('2026-10-10'), endDate: day('2026-10-10') }).success, 'G8: a one-day sprint is fine');
-    assert.ok(!updateSprintSchema.safeParse({ startDate: day('2026-10-10'), endDate: day('2026-10-01') }).success, 'G8: edit end < start is refused');
+    assert.ok(
+      !createSprintSchema.safeParse({
+        name: 'S',
+        startDate: day('2026-10-10'),
+        endDate: day('2026-10-09'),
+      }).success,
+      'G8: create end < start is refused',
+    );
+    assert.ok(
+      createSprintSchema.safeParse({
+        name: 'S',
+        startDate: day('2026-10-10'),
+        endDate: day('2026-10-10'),
+      }).success,
+      'G8: a one-day sprint is fine',
+    );
+    assert.ok(
+      !updateSprintSchema.safeParse({ startDate: day('2026-10-10'), endDate: day('2026-10-01') })
+        .success,
+      'G8: edit end < start is refused',
+    );
     assert.ok(updateSprintSchema.safeParse({ goal: null }).success, 'G8: goal clears');
 
     const SPRINT = 'cmsprint0000000000000spr';
@@ -323,7 +419,11 @@ async function main() {
     );
     assert.equal(updates.length, 0, 'G8: refused edits write nothing');
     await sprints.update(scope, SPRINT, { endDate: day('2026-10-10'), goal: null });
-    assert.deepEqual((updates[0] as Row)['data'], { endDate: day('2026-10-10'), goal: null }, 'G8: valid edit writes');
+    assert.deepEqual(
+      (updates[0] as Row)['data'],
+      { endDate: day('2026-10-10'), goal: null },
+      'G8: valid edit writes',
+    );
     console.log('  ok  G8 sprint dates stay in order');
   }
 
@@ -373,23 +473,38 @@ async function main() {
       jobId: `resync-folder-${FOLDER}`,
       healed: 0,
     });
-    await assert.rejects(mail.resyncFolder(USER, FOLDER), isStatus(429), 'G9: second resync in the window is a 429');
+    await assert.rejects(
+      mail.resyncFolder(USER, FOLDER),
+      isStatus(429),
+      'G9: second resync in the window is a 429',
+    );
     assert.equal(syncs, 1, 'G9: the refused resync never reaches IMAP');
     await mail.resyncFolder(USER, FOLDER_2);
     assert.equal(syncs, 2, 'G9: the window is per folder');
-    await assert.rejects(mail.resyncFolder(OTHER_USER, FOLDER), isStatus(403), "G9: someone else's folder is a 403");
+    await assert.rejects(
+      mail.resyncFolder(OTHER_USER, FOLDER),
+      isStatus(403),
+      "G9: someone else's folder is a 403",
+    );
 
     // Redis down: refused as a 503, never an uncapped sync.
     const downRedis = {
       client: { set: async () => Promise.reject(new Error('ECONNREFUSED')) },
     } as unknown as RedisService;
-    const mailNoRedis = new MailReadService(prisma, sync as never, {} as never, downRedis, queue as never);
+    const mailNoRedis = new MailReadService(
+      prisma,
+      sync as never,
+      {} as never,
+      downRedis,
+      queue as never,
+    );
     await assert.rejects(
       mailNoRedis.resyncFolder(USER, 'cmfolder000000000000fldr3'),
       (e: unknown) =>
         isStatus(503)(e) &&
         (e as HttpException).getResponse() instanceof Object &&
-        ((e as HttpException).getResponse() as { code?: string }).code === 'mail_resync_unavailable',
+        ((e as HttpException).getResponse() as { code?: string }).code ===
+          'mail_resync_unavailable',
       'G9: Redis down is a 503',
     );
     assert.equal(syncs, 2, 'G9: no sync runs without the rate limit');
@@ -399,14 +514,23 @@ async function main() {
     const hungRedis = {
       client: { set: () => new Promise<never>(() => undefined) },
     } as unknown as RedisService;
-    const mailHung = new MailReadService(prisma, sync as never, {} as never, hungRedis, queue as never);
+    const mailHung = new MailReadService(
+      prisma,
+      sync as never,
+      {} as never,
+      hungRedis,
+      queue as never,
+    );
     const started = Date.now();
     await assert.rejects(
       mailHung.resyncFolder(USER, 'cmfolder000000000000fldr4'),
       isStatus(503),
       'G9: a Redis that never answers is a 503',
     );
-    assert.ok(Date.now() - started < MailReadService.RESYNC_REDIS_TIMEOUT_MS + 1_000, 'G9: bounded wait');
+    assert.ok(
+      Date.now() - started < MailReadService.RESYNC_REDIS_TIMEOUT_MS + 1_000,
+      'G9: bounded wait',
+    );
     assert.equal(syncs, 2, 'G9: no sync runs while Redis hangs');
 
     // Redis slow: the claim lands after the timeout. It is released so the
@@ -424,14 +548,24 @@ async function main() {
         },
       },
     } as unknown as RedisService;
-    const mailSlow = new MailReadService(prisma, sync as never, {} as never, slowRedis, queue as never);
+    const mailSlow = new MailReadService(
+      prisma,
+      sync as never,
+      {} as never,
+      slowRedis,
+      queue as never,
+    );
     await assert.rejects(
       mailSlow.resyncFolder(USER, 'cmfolder000000000000fldr5'),
       isStatus(503),
       'G9: a slow Redis times out as a 503',
     );
     await new Promise((r) => setTimeout(r, 600));
-    assert.deepEqual(deleted, [`mail:resync:${USER}:cmfolder000000000000fldr5`], 'G9: late claim released');
+    assert.deepEqual(
+      deleted,
+      [`mail:resync:${USER}:cmfolder000000000000fldr5`],
+      'G9: late claim released',
+    );
     assert.equal(syncs, 2, 'G9: no sync runs on a late claim');
 
     // Enqueue fails after the claim: the slot is released (DEL of the same
@@ -459,14 +593,32 @@ async function main() {
         return { id: opts['jobId'] };
       },
     };
-    const mailFlaky = new MailReadService(prisma, sync as never, {} as never, fakeIoredis, flakyQueue as never);
+    const mailFlaky = new MailReadService(
+      prisma,
+      sync as never,
+      {} as never,
+      fakeIoredis,
+      flakyQueue as never,
+    );
     const FOLDER_6 = 'cmfolder000000000000fldr6';
-    await assert.rejects(mailFlaky.resyncFolder(USER, FOLDER_6), isStatus(503), 'G9: enqueue failure is a 503');
+    await assert.rejects(
+      mailFlaky.resyncFolder(USER, FOLDER_6),
+      isStatus(503),
+      'G9: enqueue failure is a 503',
+    );
     await new Promise((r) => setImmediate(r));
-    assert.deepEqual(released, [`mail:resync:${USER}:${FOLDER_6}`], 'G9: failed enqueue releases its slot');
+    assert.deepEqual(
+      released,
+      [`mail:resync:${USER}:${FOLDER_6}`],
+      'G9: failed enqueue releases its slot',
+    );
     assert.equal(claimed.size, 0);
     queueUp = true;
-    assert.equal((await mailFlaky.resyncFolder(USER, FOLDER_6)).queued, true, 'G9: retry after a failed enqueue');
+    assert.equal(
+      (await mailFlaky.resyncFolder(USER, FOLDER_6)).queued,
+      true,
+      'G9: retry after a failed enqueue',
+    );
     console.log('  ok  G9 folder resync is rate limited');
   }
 
@@ -543,7 +695,12 @@ async function main() {
       'G12: blank rate on a non-base expense',
     );
     await assert.rejects(
-      expenses.create(scope, { description: 'x', amount: '5', currency: 'USD', fxRate: '' } as never),
+      expenses.create(scope, {
+        description: 'x',
+        amount: '5',
+        currency: 'USD',
+        fxRate: '',
+      } as never),
       codeIs('fx_rate_required'),
       'G12: blank rate on a new non-base expense',
     );
@@ -572,7 +729,10 @@ async function main() {
     const prisma = {
       client: {
         workspace: { findUnique: async () => ({ organization: { baseCurrency: 'PKR' } }) },
-        project: { findFirst: async () => ({ id: PROJECT_A }), findUnique: async () => ({ clientId: null }) },
+        project: {
+          findFirst: async () => ({ id: PROJECT_A }),
+          findUnique: async () => ({ clientId: null }),
+        },
         contract: { findFirst: async () => existing },
         payment: { count: async () => 0 },
         $transaction: async (fn: (tx: unknown) => Promise<unknown>) =>
@@ -602,7 +762,12 @@ async function main() {
     assert.equal(writes.length, 0, 'G11: refused create writes nothing');
 
     await assert.rejects(
-      contracts.create(scope, { title: 'x', projectId: PROJECT_A, currency: 'PKR', fxRateToBase: '280' } as never),
+      contracts.create(scope, {
+        title: 'x',
+        projectId: PROJECT_A,
+        currency: 'PKR',
+        fxRateToBase: '280',
+      } as never),
       stopped,
     );
     assert.equal(rateOf(0), '1', 'G11: a base-currency contract books at 1');
@@ -614,22 +779,39 @@ async function main() {
     );
     assert.equal(writes.length, 1, 'G11: refused update writes nothing');
 
-    await assert.rejects(contracts.update(scope, CONTRACT, { currency: 'PKR', fxRateToBase: '280' }), stopped);
+    await assert.rejects(
+      contracts.update(scope, CONTRACT, { currency: 'PKR', fxRateToBase: '280' }),
+      stopped,
+    );
     assert.equal(rateOf(1), '1', 'G11: moving to the base currency books at 1');
 
     await assert.rejects(contracts.update(scope, CONTRACT, { title: 'renamed' }), stopped);
-    assert.equal((writes[2]?.data as Row)['fxRateToBase'], undefined, 'G11: an edit without a rate keeps the stored one');
+    assert.equal(
+      (writes[2]?.data as Row)['fxRateToBase'],
+      undefined,
+      'G11: an edit without a rate keeps the stored one',
+    );
     console.log('  ok  G11 contracts book a real rate to base');
 
     // G12 (service level, schema bypassed): a blank rate is "no rate", and a
     // zero rate is refused rather than booked.
     await assert.rejects(
-      contracts.create(scope, { title: 'x', projectId: PROJECT_A, currency: 'USD', fxRateToBase: '' } as never),
+      contracts.create(scope, {
+        title: 'x',
+        projectId: PROJECT_A,
+        currency: 'USD',
+        fxRateToBase: '',
+      } as never),
       codeIs('fx_rate_required'),
       'G12: blank contract rate reads as missing',
     );
     await assert.rejects(
-      contracts.create(scope, { title: 'x', projectId: PROJECT_A, currency: 'USD', fxRateToBase: '0' } as never),
+      contracts.create(scope, {
+        title: 'x',
+        projectId: PROJECT_A,
+        currency: 'USD',
+        fxRateToBase: '0',
+      } as never),
       codeIs('invalid_fx_rate'),
       'G12: zero contract rate refused',
     );
@@ -644,11 +826,21 @@ async function main() {
   {
     const base = { title: 'x', projectId: PROJECT_A, currency: 'USD' };
     const cases: Array<[string, (rate: unknown) => boolean]> = [
-      ['contract create', (r) => createContractSchema.safeParse({ ...base, fxRateToBase: r }).success],
+      [
+        'contract create',
+        (r) => createContractSchema.safeParse({ ...base, fxRateToBase: r }).success,
+      ],
       ['contract update', (r) => updateContractSchema.safeParse({ fxRateToBase: r }).success],
-      ['payment create', (r) => createPaymentSchema.safeParse({ contractId: CONTRACT, amount: '1', fxRate: r }).success],
+      [
+        'payment create',
+        (r) =>
+          createPaymentSchema.safeParse({ contractId: CONTRACT, amount: '1', fxRate: r }).success,
+      ],
       ['payment update', (r) => updatePaymentSchema.safeParse({ fxRate: r }).success],
-      ['expense create', (r) => createExpenseSchema.safeParse({ description: 'x', amount: '1', fxRate: r }).success],
+      [
+        'expense create',
+        (r) => createExpenseSchema.safeParse({ description: 'x', amount: '1', fxRate: r }).success,
+      ],
       ['expense update', (r) => updateExpenseSchema.safeParse({ fxRate: r }).success],
       ['invoice payment', (r) => recordPaymentSchema.safeParse({ amount: '1', fxRate: r }).success],
     ];
@@ -677,8 +869,15 @@ async function main() {
     // Rounded to the stored 8dp before use; bounded to Decimal(18, 8).
     assert.equal(bookRate('278.123456789').toString(), '278.12345679', 'G12: rate rounded to 8dp');
     assert.equal(bookRate(' .5 ').toString(), '0.5', 'G12: ".5" books as 0.5');
-    assert.throws(() => bookRate('9999999999.999999999'), (e: unknown) => e instanceof BadRequestException);
-    assert.throws(() => bookRate('0.000000001'), (e: unknown) => e instanceof BadRequestException, 'G12: rounds to 0');
+    assert.throws(
+      () => bookRate('9999999999.999999999'),
+      (e: unknown) => e instanceof BadRequestException,
+    );
+    assert.throws(
+      () => bookRate('0.000000001'),
+      (e: unknown) => e instanceof BadRequestException,
+      'G12: rounds to 0',
+    );
     console.log('  ok  G12 FX rates must be positive numbers');
   }
 

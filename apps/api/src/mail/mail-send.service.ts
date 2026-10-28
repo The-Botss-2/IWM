@@ -190,7 +190,7 @@ export class MailSendService {
       const appendResult = await imap.append(sentFolder.path, raw, ['\\Seen']);
       let appendedUid: number | null =
         appendResult && typeof appendResult === 'object' && 'uid' in appendResult
-          ? (appendResult as { uid?: number }).uid ?? null
+          ? ((appendResult as { uid?: number }).uid ?? null)
           : null;
 
       // Fallback: open the Sent folder and grab the latest sequence number.
@@ -316,9 +316,7 @@ export class MailSendService {
             data: parsedAttachments.map((a, idx) => {
               const partIdRaw = (a as unknown as { partId?: string }).partId;
               const partId =
-                typeof partIdRaw === 'string' && partIdRaw.length > 0
-                  ? partIdRaw
-                  : String(idx + 1);
+                typeof partIdRaw === 'string' && partIdRaw.length > 0 ? partIdRaw : String(idx + 1);
               return {
                 messageId: upserted.id,
                 partId,
@@ -390,10 +388,7 @@ export class MailSendService {
    * Drafts folder. If `replacesDraftId` is provided, the previous draft is
    * deleted from IMAP first.
    */
-  async saveDraft(
-    userId: string,
-    input: SaveMailDraftInput,
-  ): Promise<SaveMailDraftResult> {
+  async saveDraft(userId: string, input: SaveMailDraftInput): Promise<SaveMailDraftResult> {
     const account = await this.prisma.client.mailAccount.findUnique({
       where: { id: input.accountId },
     });
@@ -441,10 +436,7 @@ export class MailSendService {
     // Without this, "Save Draft" silently drops uploaded files and the
     // user only notices when they reopen the draft and the chips are gone.
     const draftAttachmentIds = (input.attachmentFileObjectIds ?? []).filter(Boolean);
-    const draftAttachments = await this.resolveAttachments(
-      draftAttachmentIds,
-      userId,
-    );
+    const draftAttachments = await this.resolveAttachments(draftAttachmentIds, userId);
 
     const { default: MailComposer } = await import('nodemailer/lib/mail-composer');
     const composer = new MailComposer({
@@ -455,13 +447,14 @@ export class MailSendService {
       subject,
       text: bodyText,
       html: bodyHtml ?? `<p>${escapeHtml(bodyText)}</p>`,
-      attachments: draftAttachments.length > 0
-        ? draftAttachments.map((a) => ({
-            filename: a.filename,
-            content: a.content,
-            contentType: a.contentType,
-          }))
-        : undefined,
+      attachments:
+        draftAttachments.length > 0
+          ? draftAttachments.map((a) => ({
+              filename: a.filename,
+              content: a.content,
+              contentType: a.contentType,
+            }))
+          : undefined,
     });
     const raw = await new Promise<Buffer>((resolve, reject) => {
       composer.compile().build((err: Error | null, msg: Buffer) => {
@@ -506,14 +499,10 @@ export class MailSendService {
           }
         }
 
-        const appendResult = await imap.append(
-          draftsFolder.path,
-          raw,
-          ['\\Draft', '\\Seen'],
-        );
+        const appendResult = await imap.append(draftsFolder.path, raw, ['\\Draft', '\\Seen']);
         appendedUid =
           appendResult && typeof appendResult === 'object' && 'uid' in appendResult
-            ? (appendResult as { uid?: number }).uid ?? null
+            ? ((appendResult as { uid?: number }).uid ?? null)
             : null;
         if (appendedUid == null) {
           const fetched = (await imap.fetchOne('*', { uid: true })) as unknown;
@@ -616,9 +605,7 @@ export class MailSendService {
     });
 
     if (oldDraftRowId && oldDraftRowId !== created.id) {
-      await this.prisma.client.mailMessage
-        .delete({ where: { id: oldDraftRowId } })
-        .catch(() => {});
+      await this.prisma.client.mailMessage.delete({ where: { id: oldDraftRowId } }).catch(() => {});
     }
 
     await this.prisma.client.mailFolder.update({
@@ -649,9 +636,7 @@ export class MailSendService {
         lock.release();
       }
     });
-    await this.prisma.client.mailMessage
-      .delete({ where: { id: draftMessageId } })
-      .catch(() => {});
+    await this.prisma.client.mailMessage.delete({ where: { id: draftMessageId } }).catch(() => {});
   }
 
   async enqueue(userId: string, input: SendMailMessageInput) {
@@ -706,8 +691,8 @@ export class MailSendService {
         bodyHtml: input.bodyHtml ?? null,
         inReplyToMessageId: input.inReplyToMessageId ?? null,
         replacesDraftId: input.replacesDraftId ?? null,
-        attachmentFileObjectIds:
-          (input.attachmentFileObjectIds ?? []) as unknown as Prisma.InputJsonValue,
+        attachmentFileObjectIds: (input.attachmentFileObjectIds ??
+          []) as unknown as Prisma.InputJsonValue,
         status: 'QUEUED',
       },
     });
@@ -774,13 +759,8 @@ export class MailSendService {
       // worker pulls bytes from S3/MinIO before MailComposer is built so the
       // raw RFC822 contains the parts inline and the IMAP APPEND copy carries
       // them too.
-      const attachmentIds = ((row.attachmentFileObjectIds as string[]) ?? []).filter(
-        Boolean,
-      );
-      const attachments = await this.resolveAttachments(
-        attachmentIds,
-        row.userId,
-      );
+      const attachmentIds = ((row.attachmentFileObjectIds as string[]) ?? []).filter(Boolean);
+      const attachments = await this.resolveAttachments(attachmentIds, row.userId);
 
       // Build the raw RFC822 bytes ONCE so SMTP send and IMAP APPEND operate
       // on identical content. Without this, the Sent-folder copy would have
@@ -797,13 +777,14 @@ export class MailSendService {
         html: row.bodyHtml ?? `<p>${escapeHtml(row.bodyText)}</p>`,
         inReplyTo: inReplyTo ?? undefined,
         references: references.length > 0 ? references : undefined,
-        attachments: attachments.length > 0
-          ? attachments.map((a) => ({
-              filename: a.filename,
-              content: a.content,
-              contentType: a.contentType,
-            }))
-          : undefined,
+        attachments:
+          attachments.length > 0
+            ? attachments.map((a) => ({
+                filename: a.filename,
+                content: a.content,
+                contentType: a.contentType,
+              }))
+            : undefined,
       });
       const raw = await new Promise<Buffer>((resolve, reject) => {
         composer.compile().build((err: Error | null, msg: Buffer) => {

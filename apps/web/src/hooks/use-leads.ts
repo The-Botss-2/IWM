@@ -52,10 +52,7 @@ function removeEverywhere(qc: ReturnType<typeof useQueryClient>, leadId: string)
   return pages;
 }
 
-function restore(
-  qc: ReturnType<typeof useQueryClient>,
-  pages: ReturnType<typeof snapshotPages>,
-) {
+function restore(qc: ReturnType<typeof useQueryClient>, pages: ReturnType<typeof snapshotPages>) {
   for (const [key, data] of pages) qc.setQueryData(key, data);
 }
 

@@ -1,13 +1,4 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Patch,
-  Post,
-  Query,
-} from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query } from '@nestjs/common';
 import {
   type CreateLeaveInput,
   createLeaveSchema,
@@ -65,10 +56,7 @@ export class LeavesController {
 
   @Delete(':id')
   @SkipPermissions()
-  remove(
-    @CurrentUser() user: AuthedUser,
-    @Param('id', new ZodValidationPipe(cuid)) id: string,
-  ) {
+  remove(@CurrentUser() user: AuthedUser, @Param('id', new ZodValidationPipe(cuid)) id: string) {
     return this.leaves.remove(user.id, id);
   }
 }

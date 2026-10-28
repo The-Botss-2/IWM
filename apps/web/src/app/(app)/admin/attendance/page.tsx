@@ -15,19 +15,13 @@ import { useMemo, useState } from 'react';
 import type { AttendanceStatus, Holiday } from '@botss/shared-types';
 
 import { Button } from '@/components/ui/button';
-import {
-  ContextMenu,
-  type ContextMenuItem,
-} from '@/components/ui/context-menu';
+import { ContextMenu, type ContextMenuItem } from '@/components/ui/context-menu';
 import { Label } from '@/components/ui/label';
 import { Loader } from '@/components/ui/loader';
 import { QueryError } from '@/components/ui/query-error';
 import { Textarea } from '@/components/ui/textarea';
 import { UserAvatar } from '@/components/ui/avatar';
-import {
-  useAttendanceMatrix,
-  useOverrideAttendance,
-} from '@/hooks/use-attendance';
+import { useAttendanceMatrix, useOverrideAttendance } from '@/hooks/use-attendance';
 import {
   useApplyHoliday,
   useCreateHoliday,
@@ -49,9 +43,7 @@ import { HolidayDetails } from '@/components/admin/holiday-details';
  * so non-privileged users bounce to `/home` before any data fetch.
  */
 export default function AdminAttendancePage() {
-  const [monthCursor, setMonthCursor] = useState<Date>(
-    () => startOfMonth(new Date()),
-  );
+  const [monthCursor, setMonthCursor] = useState<Date>(() => startOfMonth(new Date()));
   const range = useMemo(() => {
     const from = startOfMonth(monthCursor);
     const to = endOfMonth(monthCursor);
@@ -84,10 +76,8 @@ export default function AdminAttendancePage() {
     <div className="space-y-4">
       <header className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h2 className="text-base font-semibold text-ink">Attendance</h2>
-          <p className="text-sm text-ink-muted">
-            Monthly status grid. Click any cell to override.
-          </p>
+          <h2 className="text-ink text-base font-semibold">Attendance</h2>
+          <p className="text-ink-muted text-sm">Monthly status grid. Click any cell to override.</p>
         </div>
         <div className="flex items-center gap-2">
           <Button
@@ -95,14 +85,12 @@ export default function AdminAttendancePage() {
             size="icon"
             variant="ghost"
             aria-label="Previous month"
-            onClick={() =>
-              setMonthCursor((d) => addMonths(startOfMonth(d), -1))
-            }
-            className="h-9 w-9 min-h-0 min-w-0"
+            onClick={() => setMonthCursor((d) => addMonths(startOfMonth(d), -1))}
+            className="h-9 min-h-0 w-9 min-w-0"
           >
             <ChevronLeft className="h-4 w-4" />
           </Button>
-          <span className="min-w-[130px] text-center text-sm font-medium text-ink">
+          <span className="text-ink min-w-[130px] text-center text-sm font-medium">
             {monthLabel}
           </span>
           <Button
@@ -110,10 +98,8 @@ export default function AdminAttendancePage() {
             size="icon"
             variant="ghost"
             aria-label="Next month"
-            onClick={() =>
-              setMonthCursor((d) => addMonths(startOfMonth(d), 1))
-            }
-            className="h-9 w-9 min-h-0 min-w-0"
+            onClick={() => setMonthCursor((d) => addMonths(startOfMonth(d), 1))}
+            className="h-9 min-h-0 w-9 min-w-0"
           >
             <ChevronRight className="h-4 w-4" />
           </Button>
@@ -140,7 +126,7 @@ export default function AdminAttendancePage() {
       <div className="relative max-w-xs">
         <Search
           aria-hidden
-          className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-muted"
+          className="text-ink-muted pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2"
         />
         <input
           type="search"
@@ -152,20 +138,15 @@ export default function AdminAttendancePage() {
         />
       </div>
 
-      <div className="overflow-x-auto rounded-xl bg-white shadow-soft">
+      <div className="shadow-soft overflow-x-auto rounded-xl bg-white">
         <table className="w-full border-collapse text-xs">
           <thead>
-            <tr className="border-b border-line bg-bg-subtle text-ink-muted">
-              <th className="sticky left-0 z-10 min-w-[200px] bg-bg-subtle px-3 py-2 text-left font-medium">
+            <tr className="border-line bg-bg-subtle text-ink-muted border-b">
+              <th className="bg-bg-subtle sticky left-0 z-10 min-w-[200px] px-3 py-2 text-left font-medium">
                 Member
               </th>
               {(data?.dateRange ?? []).map((d) => (
-                <th
-                  key={d}
-                  className="w-7 px-1 py-2 text-center font-medium"
-                  scope="col"
-                  title={d}
-                >
+                <th key={d} className="w-7 px-1 py-2 text-center font-medium" scope="col" title={d}>
                   {d.slice(-2)}
                 </th>
               ))}
@@ -174,40 +155,29 @@ export default function AdminAttendancePage() {
           <tbody>
             {isLoading ? (
               <tr>
-                <td
-                  colSpan={dayCount + 1}
-                  className="px-3 py-12 text-center"
-                >
+                <td colSpan={dayCount + 1} className="px-3 py-12 text-center">
                   <Loader size="sm" label="Loading attendance" />
                 </td>
               </tr>
             ) : isError && !data ? (
               <tr>
                 <td colSpan={dayCount + 1} className="px-3 py-6">
-                  <QueryError
-                    message="Couldn't load attendance."
-                    onRetry={() => void refetch()}
-                  />
+                  <QueryError message="Couldn't load attendance." onRetry={() => void refetch()} />
                 </td>
               </tr>
             ) : filteredRows.length === 0 ? (
               <tr>
-                <td
-                  colSpan={dayCount + 1}
-                  className="px-3 py-12 text-center text-ink-muted"
-                >
-                  {search.trim()
-                    ? 'No members match that search.'
-                    : 'No users to display.'}
+                <td colSpan={dayCount + 1} className="text-ink-muted px-3 py-12 text-center">
+                  {search.trim() ? 'No members match that search.' : 'No users to display.'}
                 </td>
               </tr>
             ) : (
               filteredRows.map((row) => (
-                <tr key={row.user.id} className="border-b border-line hover:bg-bg-subtle/40">
+                <tr key={row.user.id} className="border-line hover:bg-bg-subtle/40 border-b">
                   <td className="sticky left-0 z-10 bg-white px-3 py-2">
                     <div className="flex items-center gap-2">
                       <UserAvatar size="xs" name={row.user.name} image={row.user.image} />
-                      <span className="truncate text-ink">{row.user.name}</span>
+                      <span className="text-ink truncate">{row.user.name}</span>
                     </div>
                   </td>
                   {row.cells.map((cell) => (
@@ -225,7 +195,7 @@ export default function AdminAttendancePage() {
                         }
                         className={cn(
                           'inline-block h-6 w-6 rounded-md border border-transparent',
-                          'transition hover:border-ink/30 focus-visible:outline-none focus-visible:shadow-focus',
+                          'hover:border-ink/30 focus-visible:shadow-focus transition focus-visible:outline-none',
                           cellTone(cell.status),
                         )}
                       >
@@ -255,7 +225,7 @@ export default function AdminAttendancePage() {
 
 function Legend() {
   return (
-    <div className="flex flex-wrap items-center gap-3 text-[11px] text-ink-muted">
+    <div className="text-ink-muted flex flex-wrap items-center gap-3 text-[11px]">
       <LegendKey color="bg-brand-teal" label="Present" />
       <LegendKey color="bg-state-error" label="Absent" />
       <LegendKey color="bg-brand-orange" label="Leave" />
@@ -310,17 +280,17 @@ function OverrideDialog({
     <div
       role="dialog"
       aria-label="Override attendance"
-      className="fixed inset-0 z-50 flex items-center justify-center bg-ink/40 backdrop-blur-[2px]"
+      className="bg-ink/40 fixed inset-0 z-50 flex items-center justify-center backdrop-blur-[2px]"
       onClick={onClose}
     >
       <div
-        className="w-full max-w-md rounded-xl bg-white p-6 shadow-soft-lg"
+        className="shadow-soft-lg w-full max-w-md rounded-xl bg-white p-6"
         onClick={(e) => e.stopPropagation()}
       >
         <header className="mb-4 flex items-start justify-between">
           <div>
-            <h3 className="text-base font-semibold text-ink">Override attendance</h3>
-            <p className="text-xs text-ink-muted">
+            <h3 className="text-ink text-base font-semibold">Override attendance</h3>
+            <p className="text-ink-muted text-xs">
               {name} · {date}
             </p>
           </div>
@@ -330,7 +300,7 @@ function OverrideDialog({
             size="icon"
             aria-label="Close"
             onClick={onClose}
-            className="h-8 w-8 min-h-0 min-w-0"
+            className="h-8 min-h-0 w-8 min-w-0"
           >
             <X className="h-4 w-4" />
           </Button>
@@ -339,11 +309,7 @@ function OverrideDialog({
         <div className="space-y-3">
           <div className="space-y-1.5">
             <Label htmlFor="override-status">Status</Label>
-            <div
-              id="override-status"
-              role="radiogroup"
-              className="flex flex-wrap gap-2"
-            >
+            <div id="override-status" role="radiogroup" className="flex flex-wrap gap-2">
               {(['PRESENT', 'ABSENT', 'LEAVE', 'HOLIDAY'] as const).map((s) => (
                 <button
                   key={s}
@@ -457,26 +423,22 @@ function HolidaysPanel({ range }: { range: { from: Date; to: Date } }) {
           id: 'clear',
           label: 'Clear (unmark for all)',
           icon: <Eraser className="h-3.5 w-3.5" aria-hidden />,
-          onSelect: () =>
-            unmark.mutate({ id: unmarkMenu.holidayId, status: 'CLEAR' }),
+          onSelect: () => unmark.mutate({ id: unmarkMenu.holidayId, status: 'CLEAR' }),
         },
         {
           id: 'present',
           label: 'Mark everyone Present',
-          onSelect: () =>
-            unmark.mutate({ id: unmarkMenu.holidayId, status: 'PRESENT' }),
+          onSelect: () => unmark.mutate({ id: unmarkMenu.holidayId, status: 'PRESENT' }),
         },
         {
           id: 'absent',
           label: 'Mark everyone Absent',
-          onSelect: () =>
-            unmark.mutate({ id: unmarkMenu.holidayId, status: 'ABSENT' }),
+          onSelect: () => unmark.mutate({ id: unmarkMenu.holidayId, status: 'ABSENT' }),
         },
         {
           id: 'leave',
           label: 'Mark everyone on Leave',
-          onSelect: () =>
-            unmark.mutate({ id: unmarkMenu.holidayId, status: 'LEAVE' }),
+          onSelect: () => unmark.mutate({ id: unmarkMenu.holidayId, status: 'LEAVE' }),
         },
       ]
     : [];
@@ -505,20 +467,20 @@ function HolidaysPanel({ range }: { range: { from: Date; to: Date } }) {
   }
 
   return (
-    <section className="rounded-xl bg-white p-4 shadow-soft">
+    <section className="shadow-soft rounded-xl bg-white p-4">
       <header className="mb-3 flex items-center justify-between gap-2">
         <div>
-          <h3 className="text-sm font-semibold text-ink">Public holidays</h3>
-          <p className="text-xs text-ink-muted">
-            Mark a day off for the whole organisation. Every member&apos;s
-            attendance row for that date is set to HOLIDAY immediately.
+          <h3 className="text-ink text-sm font-semibold">Public holidays</h3>
+          <p className="text-ink-muted text-xs">
+            Mark a day off for the whole organisation. Every member&apos;s attendance row for that
+            date is set to HOLIDAY immediately.
           </p>
         </div>
       </header>
 
       <form
         onSubmit={handleAdd}
-        className="grid gap-2 rounded-lg border border-line bg-bg-subtle/40 p-3 sm:grid-cols-[140px_1fr_1fr_auto]"
+        className="border-line bg-bg-subtle/40 grid gap-2 rounded-lg border p-3 sm:grid-cols-[140px_1fr_1fr_auto]"
       >
         <div className="space-y-1">
           <Label htmlFor="holiday-date" className="text-[11px]">
@@ -563,40 +525,29 @@ function HolidaysPanel({ range }: { range: { from: Date; to: Date } }) {
           />
         </div>
         <div className="flex items-end">
-          <Button
-            type="submit"
-            disabled={create.isPending}
-            className="h-9 gap-1.5"
-          >
+          <Button type="submit" disabled={create.isPending} className="h-9 gap-1.5">
             <CalendarPlus className="h-4 w-4" aria-hidden />
             Add holiday
           </Button>
         </div>
       </form>
 
-      <ul role="list" className="mt-3 divide-y divide-line">
+      <ul role="list" className="divide-line mt-3 divide-y">
         {isLoading ? (
           <li className="flex justify-center py-6">
             <Loader size="sm" label="Loading holidays" />
           </li>
         ) : isError && !data ? (
           <li className="py-3">
-            <QueryError
-              compact
-              message="Couldn't load holidays."
-              onRetry={() => void refetch()}
-            />
+            <QueryError compact message="Couldn't load holidays." onRetry={() => void refetch()} />
           </li>
         ) : items.length === 0 ? (
-          <li className="py-6 text-center text-xs text-ink-muted">
+          <li className="text-ink-muted py-6 text-center text-xs">
             No holidays scheduled in this month.
           </li>
         ) : (
           items.map((h: Holiday) => (
-            <li
-              key={h.id}
-              className="flex items-center justify-between gap-3 py-2"
-            >
+            <li key={h.id} className="flex items-center justify-between gap-3 py-2">
               <HolidayDetails holiday={h} />
               <div className="flex items-center gap-1">
                 <Button
@@ -639,7 +590,7 @@ function HolidaysPanel({ range }: { range: { from: Date; to: Date } }) {
                       remove.mutate(h.id);
                     }
                   }}
-                  className="h-8 w-8 min-h-0 min-w-0 text-state-error hover:bg-tint-error"
+                  className="text-state-error hover:bg-tint-error h-8 min-h-0 w-8 min-w-0"
                 >
                   <Trash2 className="h-4 w-4" />
                 </Button>

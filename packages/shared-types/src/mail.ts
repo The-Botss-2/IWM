@@ -27,13 +27,7 @@ export const MailFolderRole = z.enum([
 ]);
 export type MailFolderRole = z.infer<typeof MailFolderRole>;
 
-export const MailOutboxStatus = z.enum([
-  'QUEUED',
-  'SENDING',
-  'SENT',
-  'FAILED',
-  'CANCELLED',
-]);
+export const MailOutboxStatus = z.enum(['QUEUED', 'SENDING', 'SENT', 'FAILED', 'CANCELLED']);
 export type MailOutboxStatus = z.infer<typeof MailOutboxStatus>;
 
 /**
@@ -115,8 +109,7 @@ export type MailAccount = z.infer<typeof mailAccountSchema>;
  */
 const PRIVATE_HOSTNAME_RE =
   /^(?:127\.|10\.|192\.168\.|169\.254\.|0\.0\.0\.0|::1$|::$|fc[0-9a-f]{2}:|fe[89ab][0-9a-f]:|localhost(?:\.|$))/i;
-const RFC1918_172_RE =
-  /^172\.(?:1[6-9]|2\d|3[01])\./;
+const RFC1918_172_RE = /^172\.(?:1[6-9]|2\d|3[01])\./;
 
 function isPublicMailHostname(host: string): boolean {
   let h = host.trim().toLowerCase();
@@ -141,13 +134,9 @@ function isPublicMailHostname(host: string): boolean {
  * config. Blocks private/link-local/numeric-encoded hosts at input time; the
  * API additionally re-resolves at connect time (see mail-ssrf in apps/api).
  */
-export const mailHost = z
-  .string()
-  .min(1)
-  .max(255)
-  .refine(isPublicMailHostname, {
-    message: 'Hostname must not point at a private or link-local network.',
-  });
+export const mailHost = z.string().min(1).max(255).refine(isPublicMailHostname, {
+  message: 'Hostname must not point at a private or link-local network.',
+});
 
 export const addMailAccountSchema = z.object({
   email: z.string().email().max(254),
@@ -284,17 +273,13 @@ export const recipientSuggestionsQuerySchema = z.object({
   q: z.string().max(255).optional(),
   limit: z.coerce.number().int().min(1).max(50).default(10),
 });
-export type RecipientSuggestionsQuery = z.infer<
-  typeof recipientSuggestionsQuerySchema
->;
+export type RecipientSuggestionsQuery = z.infer<typeof recipientSuggestionsQuerySchema>;
 
 export const recipientSuggestionsResponseSchema = z.object({
   /** Distinct recipient addresses, most-frequently-used first. */
   items: z.array(z.string()),
 });
-export type RecipientSuggestionsResponse = z.infer<
-  typeof recipientSuggestionsResponseSchema
->;
+export type RecipientSuggestionsResponse = z.infer<typeof recipientSuggestionsResponseSchema>;
 
 /** Self-serve mailbox setup for users whose email is on the cPanel-managed
  *  domain. The password the user types is set on cPanel (via passwd_pop)

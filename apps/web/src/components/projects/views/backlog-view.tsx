@@ -100,8 +100,7 @@ export default function BacklogView({ projectId }: { projectId: string }) {
     () =>
       (tasks.data?.items ?? [])
         .filter(
-          (t) =>
-            t.status === 'BACKLOG' && t.deletedAt === null && !sprintMembership.has(t.id),
+          (t) => t.status === 'BACKLOG' && t.deletedAt === null && !sprintMembership.has(t.id),
         )
         .sort((a, b) => a.position - b.position)
         .map((t) => t.id),
@@ -209,7 +208,7 @@ export default function BacklogView({ projectId }: { projectId: string }) {
     [containerOfTask, containerForOverId, sprints.data, addTask, removeTask, reorderTask, moveTask],
   );
 
-  const draggedTask = draggingId ? taskById.get(draggingId) ?? null : null;
+  const draggedTask = draggingId ? (taskById.get(draggingId) ?? null) : null;
 
   return (
     <DndContext
@@ -222,16 +221,12 @@ export default function BacklogView({ projectId }: { projectId: string }) {
         {tasks.isError && !tasks.data ? (
           <QueryError message="Couldn't load backlog tasks." onRetry={() => void tasks.refetch()} />
         ) : (
-          <BacklogPane
-            ids={backlogTaskIds}
-            taskById={taskById}
-            loading={tasks.isLoading}
-          />
+          <BacklogPane ids={backlogTaskIds} taskById={taskById} loading={tasks.isLoading} />
         )}
 
         <section className="space-y-3">
           <div className="flex items-center justify-between">
-            <h3 className="text-sm font-semibold text-ink">Sprints</h3>
+            <h3 className="text-ink text-sm font-semibold">Sprints</h3>
             <Button size="sm" onClick={() => setNewOpen(true)}>
               <Plus className="h-4 w-4" /> New sprint
             </Button>
@@ -253,7 +248,7 @@ export default function BacklogView({ projectId }: { projectId: string }) {
               />
             ))
           ) : (
-            <div className="rounded-md border border-dashed border-line p-6 text-center text-sm text-ink-muted">
+            <div className="border-line text-ink-muted rounded-md border border-dashed p-6 text-center text-sm">
               No sprints yet.
             </div>
           )}
@@ -300,7 +295,7 @@ export default function BacklogView({ projectId }: { projectId: string }) {
 
       <DragOverlay>
         {draggedTask ? (
-          <div className="rounded-md border border-line-strong bg-white px-3 py-2 text-sm shadow-lg">
+          <div className="border-line-strong rounded-md border bg-white px-3 py-2 text-sm shadow-lg">
             {draggedTask.title}
           </div>
         ) : null}
@@ -323,15 +318,15 @@ function BacklogPane({
     <section
       ref={setNodeRef}
       className={cn(
-        'rounded-lg border border-line bg-white p-4 transition-colors',
+        'border-line rounded-lg border bg-white p-4 transition-colors',
         isOver && 'border-brand-400 bg-brand-50/40',
       )}
     >
-      <h3 className="text-sm font-semibold text-ink">Backlog</h3>
+      <h3 className="text-ink text-sm font-semibold">Backlog</h3>
       {loading ? (
         <Skeleton className="mt-3 h-32" />
       ) : ids.length === 0 ? (
-        <p className="mt-3 text-sm text-ink-muted">No backlog tasks.</p>
+        <p className="text-ink-muted mt-3 text-sm">No backlog tasks.</p>
       ) : (
         <SortableContext items={ids} strategy={verticalListSortingStrategy}>
           <ul className="mt-3 space-y-1.5">
@@ -378,11 +373,11 @@ function SprintCard({
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="min-w-0">
           <div className="flex items-center gap-2">
-            <h4 className="text-sm font-semibold text-ink">{sprint.name}</h4>
+            <h4 className="text-ink text-sm font-semibold">{sprint.name}</h4>
             <Badge tone={tone}>{sprint.status}</Badge>
             {isCompleted ? (
               <span
-                className="inline-flex items-center gap-1 text-[10px] text-ink-muted"
+                className="text-ink-muted inline-flex items-center gap-1 text-[10px]"
                 aria-label="Locked"
               >
                 <Lock className="h-3 w-3" />
@@ -390,8 +385,8 @@ function SprintCard({
               </span>
             ) : null}
           </div>
-          {sprint.goal ? <p className="mt-0.5 text-xs text-ink-muted">{sprint.goal}</p> : null}
-          <p className="mt-1 text-xs text-ink-muted">
+          {sprint.goal ? <p className="text-ink-muted mt-0.5 text-xs">{sprint.goal}</p> : null}
+          <p className="text-ink-muted mt-1 text-xs">
             {sprint.taskCount} tasks · {sprint.totalEstimateHours.toFixed(1)}h
           </p>
         </div>
@@ -417,7 +412,7 @@ function SprintCard({
       <SortableContext items={sprint.taskIds} strategy={verticalListSortingStrategy}>
         <ul className="mt-3 min-h-[60px] space-y-1.5">
           {sprint.taskIds.length === 0 ? (
-            <li className="rounded-md border border-dashed border-line px-3 py-3 text-center text-xs text-ink-disabled">
+            <li className="border-line text-ink-disabled rounded-md border border-dashed px-3 py-3 text-center text-xs">
               Drop tasks here
             </li>
           ) : (
@@ -451,7 +446,7 @@ function TaskRow({ task, disabled }: { task: TaskWithPeople; disabled?: boolean 
         {...attributes}
         {...listeners}
         className={cn(
-          'flex items-center justify-between rounded-md border border-line px-3 py-2 text-sm bg-white',
+          'border-line flex items-center justify-between rounded-md border bg-white px-3 py-2 text-sm',
           disabled ? 'cursor-not-allowed' : 'cursor-grab active:cursor-grabbing',
         )}
       >
@@ -507,7 +502,12 @@ function SprintDialog({
         <div className="space-y-3">
           <div className="space-y-1.5">
             <Label htmlFor="sprint-name">Name</Label>
-            <Input id="sprint-name" value={name} onChange={(e) => setName(e.target.value)} autoFocus />
+            <Input
+              id="sprint-name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              autoFocus
+            />
           </div>
           <div className="space-y-1.5">
             <Label htmlFor="sprint-goal">Goal (optional)</Label>
@@ -536,7 +536,7 @@ function SprintDialog({
             </div>
           </div>
           {datesInvalid ? (
-            <p id="sprint-dates-error" className="text-xs text-state-error">
+            <p id="sprint-dates-error" className="text-state-error text-xs">
               {SPRINT_DATES_MESSAGE}
             </p>
           ) : null}

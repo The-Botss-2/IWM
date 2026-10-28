@@ -80,8 +80,15 @@ export class DocumentsResource {
   shareTargets(documentId: string): Promise<DocumentShareTargets> {
     return this.http.get(`/documents/${documentId}/share-targets`, documentShareTargetsSchema);
   }
-  addClientShare(documentId: string, input: AddDocumentClientShareInput): Promise<DocumentClientShare> {
-    return this.http.post(`/documents/${documentId}/client-shares`, documentClientShareSchema, input);
+  addClientShare(
+    documentId: string,
+    input: AddDocumentClientShareInput,
+  ): Promise<DocumentClientShare> {
+    return this.http.post(
+      `/documents/${documentId}/client-shares`,
+      documentClientShareSchema,
+      input,
+    );
   }
   removeClientShare(documentId: string, clientId: string) {
     return this.http.delete(`/documents/${documentId}/client-shares/${clientId}`, okSchema);

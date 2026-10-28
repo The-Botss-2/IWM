@@ -59,7 +59,10 @@ interface DashboardFilterBarProps {
   className?: string;
 }
 
-export function DashboardFilterBar({ overviewTasksEnabled = true, className }: DashboardFilterBarProps) {
+export function DashboardFilterBar({
+  overviewTasksEnabled = true,
+  className,
+}: DashboardFilterBarProps) {
   const session = useSessionContext();
   const currentUserId = session.data?.user?.id ?? '';
   const filters = useDashboardFilters();
@@ -101,7 +104,7 @@ export function DashboardFilterBar({ overviewTasksEnabled = true, className }: D
   const tasks = useMemo<TaskWithPeople[]>(
     () =>
       overviewTasksEnabled && !overviewTasks.isPlaceholderData
-        ? overviewTasks.data?.items ?? []
+        ? (overviewTasks.data?.items ?? [])
         : [],
     [overviewTasksEnabled, overviewTasks.data, overviewTasks.isPlaceholderData],
   );
@@ -118,7 +121,7 @@ export function DashboardFilterBar({ overviewTasksEnabled = true, className }: D
   return (
     <div
       className={cn(
-        'rounded-xl border border-line bg-white/95 p-3.5 shadow-soft backdrop-blur-sm transition-all',
+        'border-line shadow-soft rounded-xl border bg-white/95 p-3.5 backdrop-blur-sm transition-all',
         className,
       )}
     >
@@ -127,7 +130,7 @@ export function DashboardFilterBar({ overviewTasksEnabled = true, className }: D
         {/* Search input */}
         <div className="relative min-w-[200px] flex-1 sm:max-w-xs">
           <Search
-            className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-ink-disabled"
+            className="text-ink-disabled pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2"
             aria-hidden
           />
           <Input
@@ -162,9 +165,7 @@ export function DashboardFilterBar({ overviewTasksEnabled = true, className }: D
         <StatusDropdown
           selected={status}
           onToggle={toggleStatus}
-          onSelectAllOpen={() =>
-            setStatus(['BACKLOG', 'TODO', 'IN_PROGRESS', 'IN_REVIEW'])
-          }
+          onSelectAllOpen={() => setStatus(['BACKLOG', 'TODO', 'IN_PROGRESS', 'IN_REVIEW'])}
           onClear={() => setStatus([])}
         />
 
@@ -190,7 +191,7 @@ export function DashboardFilterBar({ overviewTasksEnabled = true, className }: D
             variant="ghost"
             size="sm"
             onClick={resetFilters}
-            className="h-9 gap-1.5 px-2.5 text-xs text-state-error hover:bg-state-error/10 hover:text-state-error"
+            className="text-state-error hover:bg-state-error/10 hover:text-state-error h-9 gap-1.5 px-2.5 text-xs"
           >
             <X className="h-3.5 w-3.5" />
             Clear all ({activeCount})
@@ -200,8 +201,8 @@ export function DashboardFilterBar({ overviewTasksEnabled = true, className }: D
 
       {/* Active filter chips pill strip */}
       {hasActive ? (
-        <div className="mt-3 flex flex-wrap items-center gap-1.5 border-t border-line/60 pt-2.5 text-xs">
-          <span className="text-[11px] font-medium uppercase tracking-wider text-ink-muted">
+        <div className="border-line/60 mt-3 flex flex-wrap items-center gap-1.5 border-t pt-2.5 text-xs">
+          <span className="text-ink-muted text-[11px] font-medium uppercase tracking-wider">
             Filtered by:
           </span>
 
@@ -211,10 +212,7 @@ export function DashboardFilterBar({ overviewTasksEnabled = true, className }: D
               onRemove={() => setWorkspaceId(null)}
             />
           ) : (
-            <FilterChip
-              label="All Workspaces (Org-wide)"
-              variant="subtle"
-            />
+            <FilterChip label="All Workspaces (Org-wide)" variant="subtle" />
           )}
 
           {duePreset !== 'all' ? (
@@ -233,30 +231,18 @@ export function DashboardFilterBar({ overviewTasksEnabled = true, className }: D
           ) : null}
 
           {status.map((s) => (
-            <FilterChip
-              key={s}
-              label={statusLabel(s)}
-              onRemove={() => toggleStatus(s)}
-            />
+            <FilterChip key={s} label={statusLabel(s)} onRemove={() => toggleStatus(s)} />
           ))}
 
           {assigneeIds.map((id) => {
             if (id === '__unassigned__') {
               return (
-                <FilterChip
-                  key={id}
-                  label="Unassigned"
-                  onRemove={() => toggleAssigneeId(id)}
-                />
+                <FilterChip key={id} label="Unassigned" onRemove={() => toggleAssigneeId(id)} />
               );
             }
             if (id === '__assigned_to_me__') {
               return (
-                <FilterChip
-                  key={id}
-                  label="Assigned to Me"
-                  onRemove={() => toggleAssigneeId(id)}
-                />
+                <FilterChip key={id} label="Assigned to Me" onRemove={() => toggleAssigneeId(id)} />
               );
             }
             const person = allAssignees.find((a) => a.id === id);
@@ -280,10 +266,7 @@ export function DashboardFilterBar({ overviewTasksEnabled = true, className }: D
           ))}
 
           {search.trim() ? (
-            <FilterChip
-              label={`Search: "${search}"`}
-              onRemove={() => setSearch('')}
-            />
+            <FilterChip label={`Search: "${search}"`} onRemove={() => setSearch('')} />
           ) : null}
         </div>
       ) : null}
@@ -305,7 +288,7 @@ function WorkspaceDropdown({
 }) {
   const [open, setOpen] = useState(false);
   const selectedName = selectedWorkspaceId
-    ? workspaces.find((w) => w.id === selectedWorkspaceId)?.name ?? 'Workspace'
+    ? (workspaces.find((w) => w.id === selectedWorkspaceId)?.name ?? 'Workspace')
     : 'All Workspaces';
 
   return (
@@ -316,16 +299,17 @@ function WorkspaceDropdown({
           size="sm"
           className={cn(
             'h-9 gap-1.5 text-xs',
-            selectedWorkspaceId && 'border-brand-purple/40 bg-brand-50/50 text-brand-700 font-medium',
+            selectedWorkspaceId &&
+              'border-brand-purple/40 bg-brand-50/50 text-brand-700 font-medium',
           )}
         >
-          <Building2 className="h-3.5 w-3.5 text-ink-muted" />
+          <Building2 className="text-ink-muted h-3.5 w-3.5" />
           <span className="max-w-[130px] truncate">{selectedName}</span>
-          <ChevronDown className="h-3 w-3 text-ink-disabled" />
+          <ChevronDown className="text-ink-disabled h-3 w-3" />
         </Button>
       </PopoverTrigger>
       <PopoverContent align="start" className="w-56 p-1">
-        <div className="px-2 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-ink-muted">
+        <div className="text-ink-muted px-2 py-1.5 text-[11px] font-semibold uppercase tracking-wider">
           Filter by Workspace
         </div>
         <div className="space-y-0.5">
@@ -338,14 +322,14 @@ function WorkspaceDropdown({
             className={cn(
               'flex w-full items-center justify-between rounded px-2.5 py-1.5 text-left text-xs transition-colors',
               selectedWorkspaceId === null
-                ? 'bg-brand-50 font-medium text-brand-700'
+                ? 'bg-brand-50 text-brand-700 font-medium'
                 : 'text-ink hover:bg-bg-subtle',
             )}
           >
             <span>All workspaces (Org-wide)</span>
             {selectedWorkspaceId === null ? <Check className="h-3.5 w-3.5" /> : null}
           </button>
-          <div className="my-1 border-t border-line/60" />
+          <div className="border-line/60 my-1 border-t" />
           {workspaces.map((w) => {
             const active = selectedWorkspaceId === w.id;
             return (
@@ -358,9 +342,7 @@ function WorkspaceDropdown({
                 }}
                 className={cn(
                   'flex w-full items-center justify-between rounded px-2.5 py-1.5 text-left text-xs transition-colors',
-                  active
-                    ? 'bg-brand-50 font-medium text-brand-700'
-                    : 'text-ink hover:bg-bg-subtle',
+                  active ? 'bg-brand-50 text-brand-700 font-medium' : 'text-ink hover:bg-bg-subtle',
                 )}
               >
                 <span className="truncate">{w.name}</span>
@@ -406,17 +388,18 @@ function DueDateDropdown({
           size="sm"
           className={cn(
             'h-9 gap-1.5 text-xs',
-            selected !== 'all' && 'border-brand-purple/40 bg-brand-50/50 text-brand-700 font-medium',
+            selected !== 'all' &&
+              'border-brand-purple/40 bg-brand-50/50 text-brand-700 font-medium',
             selected === 'overdue' && 'border-state-error/40 bg-state-error/10 text-state-error',
           )}
         >
-          <Calendar className="h-3.5 w-3.5 text-ink-muted" />
+          <Calendar className="text-ink-muted h-3.5 w-3.5" />
           <span>{current?.label ?? 'Due Date'}</span>
-          <ChevronDown className="h-3 w-3 text-ink-disabled" />
+          <ChevronDown className="text-ink-disabled h-3 w-3" />
         </Button>
       </PopoverTrigger>
       <PopoverContent align="start" className="w-52 p-1">
-        <div className="px-2 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-ink-muted">
+        <div className="text-ink-muted px-2 py-1.5 text-[11px] font-semibold uppercase tracking-wider">
           Due Date Range
         </div>
         <div className="space-y-0.5">
@@ -432,9 +415,7 @@ function DueDateDropdown({
                 }}
                 className={cn(
                   'flex w-full items-center justify-between rounded px-2.5 py-1.5 text-left text-xs transition-colors',
-                  active
-                    ? 'bg-brand-50 font-medium text-brand-700'
-                    : 'text-ink hover:bg-bg-subtle',
+                  active ? 'bg-brand-50 text-brand-700 font-medium' : 'text-ink hover:bg-bg-subtle',
                   opt.badgeClass,
                 )}
               >
@@ -478,11 +459,11 @@ function DateRangeFilter({
       placeholder="Date range"
       header={
         <div>
-          <p className="px-0.5 pb-1.5 text-[11px] font-semibold uppercase tracking-wider text-ink-muted">
+          <p className="text-ink-muted px-0.5 pb-1.5 text-[11px] font-semibold uppercase tracking-wider">
             Filter tasks by
           </p>
           <div
-            className="grid grid-cols-3 gap-0.5 rounded-lg border border-line p-0.5"
+            className="border-line grid grid-cols-3 gap-0.5 rounded-lg border p-0.5"
             role="radiogroup"
             aria-label="Date to filter on"
           >
@@ -495,7 +476,9 @@ function DateRangeFilter({
                 onClick={() => onFieldChange(f)}
                 className={cn(
                   'whitespace-nowrap rounded-md px-2 py-1 text-xs font-medium transition-colors',
-                  field === f ? 'bg-brand-50 text-brand-700 shadow-sm' : 'text-ink-muted hover:text-ink',
+                  field === f
+                    ? 'bg-brand-50 text-brand-700 shadow-sm'
+                    : 'text-ink-muted hover:text-ink',
                 )}
               >
                 {DATE_FIELD_LABEL[f]}
@@ -532,20 +515,21 @@ function StatusDropdown({
           size="sm"
           className={cn(
             'h-9 gap-1.5 text-xs',
-            selected.length > 0 && 'border-brand-purple/40 bg-brand-50/50 text-brand-700 font-medium',
+            selected.length > 0 &&
+              'border-brand-purple/40 bg-brand-50/50 text-brand-700 font-medium',
           )}
         >
-          <CheckCircle2 className="h-3.5 w-3.5 text-ink-muted" />
+          <CheckCircle2 className="text-ink-muted h-3.5 w-3.5" />
           <span>
             Status
             {selected.length > 0 ? ` (${selected.length})` : ''}
           </span>
-          <ChevronDown className="h-3 w-3 text-ink-disabled" />
+          <ChevronDown className="text-ink-disabled h-3 w-3" />
         </Button>
       </PopoverTrigger>
       <PopoverContent align="start" className="w-60 p-2">
         <div className="flex items-center justify-between pb-1.5 text-[11px]">
-          <span className="font-semibold uppercase tracking-wider text-ink-muted">
+          <span className="text-ink-muted font-semibold uppercase tracking-wider">
             Filter Status
           </span>
           <div className="flex gap-2">
@@ -557,11 +541,7 @@ function StatusDropdown({
               Open
             </button>
             {selected.length > 0 ? (
-              <button
-                type="button"
-                onClick={onClear}
-                className="text-ink-muted hover:underline"
-              >
+              <button type="button" onClick={onClear} className="text-ink-muted hover:underline">
                 Reset
               </button>
             ) : null}
@@ -574,13 +554,10 @@ function StatusDropdown({
             return (
               <label
                 key={s}
-                className="flex cursor-pointer items-center gap-2.5 rounded px-2 py-1.5 text-xs hover:bg-bg-subtle"
+                className="hover:bg-bg-subtle flex cursor-pointer items-center gap-2.5 rounded px-2 py-1.5 text-xs"
               >
-                <Checkbox
-                  checked={active}
-                  onCheckedChange={() => onToggle(s)}
-                />
-                <span className="flex-1 text-ink">{statusLabel(s)}</span>
+                <Checkbox checked={active} onCheckedChange={() => onToggle(s)} />
+                <span className="text-ink flex-1">{statusLabel(s)}</span>
               </label>
             );
           })}
@@ -613,9 +590,7 @@ export function AssigneeMultiSelect({
     if (!search.trim()) return assignees;
     const needle = search.toLowerCase();
     return assignees.filter(
-      (a) =>
-        a.name.toLowerCase().includes(needle) ||
-        a.email.toLowerCase().includes(needle),
+      (a) => a.name.toLowerCase().includes(needle) || a.email.toLowerCase().includes(needle),
     );
   }, [assignees, search]);
 
@@ -644,21 +619,21 @@ export function AssigneeMultiSelect({
               'border-brand-purple/40 bg-brand-50/50 text-brand-700 font-medium',
           )}
         >
-          <Users className="h-3.5 w-3.5 text-ink-muted" />
+          <Users className="text-ink-muted h-3.5 w-3.5" />
           <span className="max-w-[140px] truncate">{triggerLabel}</span>
-          <ChevronDown className="h-3 w-3 text-ink-disabled" />
+          <ChevronDown className="text-ink-disabled h-3 w-3" />
         </Button>
       </PopoverTrigger>
       <PopoverContent align="start" className="w-72 p-2.5">
         <div className="flex items-center justify-between pb-2 text-[11px]">
-          <span className="font-semibold uppercase tracking-wider text-ink-muted">
+          <span className="text-ink-muted font-semibold uppercase tracking-wider">
             Filter Assignee(s)
           </span>
           {selectedIds.length > 0 ? (
             <button
               type="button"
               onClick={() => onSetIds([])}
-              className="text-xs text-brand-600 hover:underline"
+              className="text-brand-600 text-xs hover:underline"
             >
               Clear
             </button>
@@ -666,7 +641,7 @@ export function AssigneeMultiSelect({
         </div>
 
         {/* Quick select presets */}
-        <div className="mb-2 flex flex-wrap gap-1.5 border-b border-line/60 pb-2">
+        <div className="border-line/60 mb-2 flex flex-wrap gap-1.5 border-b pb-2">
           <Button
             type="button"
             variant="ghost"
@@ -674,7 +649,9 @@ export function AssigneeMultiSelect({
             onClick={() => onSetIds([])}
             className={cn(
               'h-7 px-2 text-[11px]',
-              selectedIds.length === 0 ? 'bg-brand-50 font-semibold text-brand-700' : 'text-ink-muted',
+              selectedIds.length === 0
+                ? 'bg-brand-50 text-brand-700 font-semibold'
+                : 'text-ink-muted',
             )}
           >
             All Team
@@ -689,7 +666,7 @@ export function AssigneeMultiSelect({
               className={cn(
                 'h-7 px-2 text-[11px]',
                 selectedIds.includes('__assigned_to_me__')
-                  ? 'bg-brand-50 font-semibold text-brand-700'
+                  ? 'bg-brand-50 text-brand-700 font-semibold'
                   : 'text-ink-muted',
               )}
             >
@@ -705,7 +682,7 @@ export function AssigneeMultiSelect({
             className={cn(
               'h-7 px-2 text-[11px]',
               selectedIds.includes('__unassigned__')
-                ? 'bg-brand-50 font-semibold text-brand-700'
+                ? 'bg-brand-50 text-brand-700 font-semibold'
                 : 'text-ink-muted',
             )}
           >
@@ -715,7 +692,7 @@ export function AssigneeMultiSelect({
 
         {/* Member search */}
         <div className="relative mb-2">
-          <Search className="absolute left-2.5 top-1/2 h-3 w-3 -translate-y-1/2 text-ink-disabled" />
+          <Search className="text-ink-disabled absolute left-2.5 top-1/2 h-3 w-3 -translate-y-1/2" />
           <Input
             type="search"
             placeholder="Search members…"
@@ -728,9 +705,7 @@ export function AssigneeMultiSelect({
         {/* Member list with checkboxes */}
         <div className="max-h-56 space-y-0.5 overflow-y-auto">
           {filteredAssignees.length === 0 ? (
-            <p className="py-3 text-center text-xs text-ink-muted">
-              No matching members
-            </p>
+            <p className="text-ink-muted py-3 text-center text-xs">No matching members</p>
           ) : (
             filteredAssignees.map((a) => {
               const checked = selectedIds.includes(a.id);
@@ -738,20 +713,15 @@ export function AssigneeMultiSelect({
                 <label
                   key={a.id}
                   className={cn(
-                    'flex cursor-pointer items-center gap-2 rounded px-2 py-1.5 text-xs transition-colors hover:bg-bg-subtle',
+                    'hover:bg-bg-subtle flex cursor-pointer items-center gap-2 rounded px-2 py-1.5 text-xs transition-colors',
                     checked && 'bg-brand-50/50',
                   )}
                 >
-                  <Checkbox
-                    checked={checked}
-                    onCheckedChange={() => onToggle(a.id)}
-                  />
+                  <Checkbox checked={checked} onCheckedChange={() => onToggle(a.id)} />
                   <UserAvatar size="xs" name={a.name} image={a.image} />
                   <div className="min-w-0 flex-1 truncate">
-                    <div className="truncate font-medium text-ink">{a.name}</div>
-                    <div className="truncate text-[10px] text-ink-muted">
-                      {a.email}
-                    </div>
+                    <div className="text-ink truncate font-medium">{a.name}</div>
+                    <div className="text-ink-muted truncate text-[10px]">{a.email}</div>
                   </div>
                 </label>
               );
@@ -785,25 +755,22 @@ function PriorityDropdown({
           size="sm"
           className={cn(
             'h-9 gap-1.5 text-xs',
-            selected.length > 0 && 'border-brand-purple/40 bg-brand-50/50 text-brand-700 font-medium',
+            selected.length > 0 &&
+              'border-brand-purple/40 bg-brand-50/50 text-brand-700 font-medium',
           )}
         >
-          <SlidersHorizontal className="h-3.5 w-3.5 text-ink-muted" />
+          <SlidersHorizontal className="text-ink-muted h-3.5 w-3.5" />
           <span>Priority{selected.length > 0 ? ` (${selected.length})` : ''}</span>
-          <ChevronDown className="h-3 w-3 text-ink-disabled" />
+          <ChevronDown className="text-ink-disabled h-3 w-3" />
         </Button>
       </PopoverTrigger>
       <PopoverContent align="start" className="w-52 p-2">
         <div className="flex items-center justify-between pb-1.5 text-[11px]">
-          <span className="font-semibold uppercase tracking-wider text-ink-muted">
+          <span className="text-ink-muted font-semibold uppercase tracking-wider">
             Filter Priority
           </span>
           {selected.length > 0 ? (
-            <button
-              type="button"
-              onClick={onClear}
-              className="text-ink-muted hover:underline"
-            >
+            <button type="button" onClick={onClear} className="text-ink-muted hover:underline">
               Reset
             </button>
           ) : null}
@@ -814,13 +781,10 @@ function PriorityDropdown({
             return (
               <label
                 key={p}
-                className="flex cursor-pointer items-center gap-2.5 rounded px-2 py-1.5 text-xs hover:bg-bg-subtle"
+                className="hover:bg-bg-subtle flex cursor-pointer items-center gap-2.5 rounded px-2 py-1.5 text-xs"
               >
-                <Checkbox
-                  checked={active}
-                  onCheckedChange={() => onToggle(p)}
-                />
-                <span className="flex-1 text-ink">{priorityLabel(p)}</span>
+                <Checkbox checked={active} onCheckedChange={() => onToggle(p)} />
+                <span className="text-ink flex-1">{priorityLabel(p)}</span>
               </label>
             );
           })}
@@ -850,9 +814,9 @@ function FilterChip({
         'inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[11px] font-medium transition-colors',
         variant === 'default'
           ? highlight
-            ? 'border border-state-error/30 bg-state-error/10 text-state-error'
-            : 'border border-brand-purple/20 bg-brand-50 text-brand-700'
-          : 'border border-line bg-bg-subtle text-ink-muted',
+            ? 'border-state-error/30 bg-state-error/10 text-state-error border'
+            : 'border-brand-purple/20 bg-brand-50 text-brand-700 border'
+          : 'border-line bg-bg-subtle text-ink-muted border',
       )}
     >
       <span>{label}</span>

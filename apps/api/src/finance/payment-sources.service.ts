@@ -1,8 +1,4 @@
-import {
-  BadRequestException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import type {
   CreatePaymentSourceInput,
   ListPaymentSourcesQuery,
@@ -28,14 +24,29 @@ const DEFAULT_SOURCES: ReadonlyArray<{
   defaultRegion: 'LOCAL' | 'INTERNATIONAL' | null;
   defaultFeePercent: number | null;
 }> = [
-  { name: 'Upwork', kind: 'FREELANCE_PLATFORM', defaultRegion: 'INTERNATIONAL', defaultFeePercent: 10 },
-  { name: 'Fiverr', kind: 'FREELANCE_PLATFORM', defaultRegion: 'INTERNATIONAL', defaultFeePercent: 20 },
+  {
+    name: 'Upwork',
+    kind: 'FREELANCE_PLATFORM',
+    defaultRegion: 'INTERNATIONAL',
+    defaultFeePercent: 10,
+  },
+  {
+    name: 'Fiverr',
+    kind: 'FREELANCE_PLATFORM',
+    defaultRegion: 'INTERNATIONAL',
+    defaultFeePercent: 20,
+  },
   { name: 'Payoneer', kind: 'WALLET', defaultRegion: 'INTERNATIONAL', defaultFeePercent: 2 },
   { name: 'Wise', kind: 'REMITTANCE', defaultRegion: 'INTERNATIONAL', defaultFeePercent: 1 },
   { name: 'Remitly', kind: 'REMITTANCE', defaultRegion: 'INTERNATIONAL', defaultFeePercent: null },
   { name: 'PayPal', kind: 'GATEWAY', defaultRegion: 'INTERNATIONAL', defaultFeePercent: 4.4 },
   { name: 'Stripe', kind: 'GATEWAY', defaultRegion: 'INTERNATIONAL', defaultFeePercent: 2.9 },
-  { name: 'IBFT / Local Bank Transfer', kind: 'BANK', defaultRegion: 'LOCAL', defaultFeePercent: null },
+  {
+    name: 'IBFT / Local Bank Transfer',
+    kind: 'BANK',
+    defaultRegion: 'LOCAL',
+    defaultFeePercent: null,
+  },
   { name: 'Cash', kind: 'CASH', defaultRegion: 'LOCAL', defaultFeePercent: null },
   { name: 'Other', kind: 'OTHER', defaultRegion: null, defaultFeePercent: null },
 ];
@@ -128,9 +139,7 @@ export class PaymentSourcesService {
         kind: input.kind ?? 'OTHER',
         defaultRegion: input.defaultRegion ?? null,
         defaultFeePercent:
-          input.defaultFeePercent == null
-            ? null
-            : toDecimal(input.defaultFeePercent, 0),
+          input.defaultFeePercent == null ? null : toDecimal(input.defaultFeePercent, 0),
         position: input.position ?? (last._max.position ?? -1) + 1,
       },
       include: { _count: { select: { payments: true, expenses: true } } },
@@ -138,11 +147,7 @@ export class PaymentSourcesService {
     return this.serialize(created);
   }
 
-  async update(
-    organizationId: string,
-    id: string,
-    input: UpdatePaymentSourceInput,
-  ) {
+  async update(organizationId: string, id: string, input: UpdatePaymentSourceInput) {
     await this.require(organizationId, id);
     const data: Record<string, unknown> = {};
     if (input.name !== undefined) data['name'] = input.name;
@@ -152,9 +157,7 @@ export class PaymentSourcesService {
     if (input.isActive !== undefined) data['isActive'] = input.isActive;
     if (input.defaultFeePercent !== undefined) {
       data['defaultFeePercent'] =
-        input.defaultFeePercent == null
-          ? null
-          : toDecimal(input.defaultFeePercent, 0);
+        input.defaultFeePercent == null ? null : toDecimal(input.defaultFeePercent, 0);
     }
     const updated = await this.prisma.client.paymentSource.update({
       where: { id },

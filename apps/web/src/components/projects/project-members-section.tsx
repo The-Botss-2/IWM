@@ -60,10 +60,10 @@ export function ProjectMembersSection({ projectId }: { projectId: string }) {
   return (
     <section
       aria-labelledby="project-members-heading"
-      className="rounded-lg border border-line bg-white p-5"
+      className="border-line rounded-lg border bg-white p-5"
     >
       <div className="flex items-center justify-between gap-3">
-        <h2 id="project-members-heading" className="text-base font-semibold text-ink">
+        <h2 id="project-members-heading" className="text-ink text-base font-semibold">
           Members
         </h2>
         <Button onClick={() => setAddOpen(true)} size="sm">
@@ -81,19 +81,15 @@ export function ProjectMembersSection({ projectId }: { projectId: string }) {
         ) : isError && !data ? (
           <QueryError message="Couldn't load project members." onRetry={() => void refetch()} />
         ) : data && data.length > 0 ? (
-          <ul className="divide-y divide-line rounded-md border border-line">
+          <ul className="divide-line border-line divide-y rounded-md border">
             {data.map((m) => (
               <li key={m.id} className="flex items-center gap-3 p-3">
-                <UserAvatar
-                  size="md"
-                  name={m.user.name || m.user.email}
-                  image={m.user.image}
-                />
+                <UserAvatar size="md" name={m.user.name || m.user.email} image={m.user.image} />
                 <div className="min-w-0 flex-1">
-                  <div className="truncate text-sm font-medium text-ink">
+                  <div className="text-ink truncate text-sm font-medium">
                     {m.user.name || m.user.email}
                   </div>
-                  <div className="truncate text-xs text-ink-muted">{m.user.email}</div>
+                  <div className="text-ink-muted truncate text-xs">{m.user.email}</div>
                 </div>
                 <Badge tone="brand">{roleLabel(m.role)}</Badge>
                 <Select
@@ -102,7 +98,10 @@ export function ProjectMembersSection({ projectId }: { projectId: string }) {
                     updateMember.mutate({ id: m.id, input: { role: v as ProjectRole } })
                   }
                 >
-                  <SelectTrigger className="w-[140px]" aria-label={`Change role for ${m.user.name || m.user.email}`}>
+                  <SelectTrigger
+                    className="w-[140px]"
+                    aria-label={`Change role for ${m.user.name || m.user.email}`}
+                  >
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -119,13 +118,13 @@ export function ProjectMembersSection({ projectId }: { projectId: string }) {
                   aria-label={`Remove ${m.user.name || m.user.email}`}
                   onClick={() => setRemoveTarget({ id: m.id, name: m.user.name || m.user.email })}
                 >
-                  <UserMinus className="h-4 w-4 text-ink-muted" />
+                  <UserMinus className="text-ink-muted h-4 w-4" />
                 </Button>
               </li>
             ))}
           </ul>
         ) : (
-          <div className="rounded-md border border-dashed border-line p-6 text-center text-sm text-ink-muted">
+          <div className="border-line text-ink-muted rounded-md border border-dashed p-6 text-center text-sm">
             No members assigned yet.
           </div>
         )}
@@ -150,11 +149,7 @@ export function ProjectMembersSection({ projectId }: { projectId: string }) {
           if (!next) setRemoveTarget(null);
         }}
         title="Remove this member?"
-        description={
-          removeTarget
-            ? `${removeTarget.name} will lose access to this project.`
-            : ''
-        }
+        description={removeTarget ? `${removeTarget.name} will lose access to this project.` : ''}
         confirmLabel="Remove"
         variant="destructive"
         pending={remove.isPending}
@@ -201,7 +196,7 @@ function AddMemberDialog({
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="text-lg font-semibold">Add project member</DialogTitle>
-          <DialogDescription className="text-sm text-ink-muted">
+          <DialogDescription className="text-ink-muted text-sm">
             Pick a workspace member and assign their role on this project.
           </DialogDescription>
         </DialogHeader>

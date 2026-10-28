@@ -4,10 +4,7 @@ import { Pencil, Trash2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import type { ExpenseCategory, ExpenseWithRefs } from '@botss/shared-types';
 
-import {
-  CATEGORY_LABEL,
-  EXPENSE_CATEGORY_OPTIONS,
-} from '@/components/financials/finance-badges';
+import { CATEGORY_LABEL, EXPENSE_CATEGORY_OPTIONS } from '@/components/financials/finance-badges';
 import { BaseCurrencyNotice } from '@/components/financials/base-currency-notice';
 import { PaymentSourceCombobox } from '@/components/financials/payment-source-combobox';
 import { Badge } from '@/components/ui/badge';
@@ -50,13 +47,7 @@ import {
 } from '@/lib/finance-forms';
 import { CURRENCY_OPTIONS, formatCurrency } from '@/lib/money';
 
-export function ExpenseList({
-  items,
-  loading,
-}: {
-  items: ExpenseWithRefs[];
-  loading?: boolean;
-}) {
+export function ExpenseList({ items, loading }: { items: ExpenseWithRefs[]; loading?: boolean }) {
   const del = useDeleteExpense();
   const [confirming, setConfirming] = useState<ExpenseWithRefs | null>(null);
   const [editing, setEditing] = useState<ExpenseWithRefs | null>(null);
@@ -78,9 +69,8 @@ export function ExpenseList({
 
   if (items.length === 0) {
     return (
-      <div className="rounded-md border border-dashed border-line bg-bg-surface p-8 text-center text-sm text-ink-muted">
-        No expenses recorded. Costs logged here are what turn revenue into
-        profit on the overview.
+      <div className="border-line bg-bg-surface text-ink-muted rounded-md border border-dashed p-8 text-center text-sm">
+        No expenses recorded. Costs logged here are what turn revenue into profit on the overview.
       </div>
     );
   }
@@ -90,7 +80,7 @@ export function ExpenseList({
       <div className="hidden overflow-x-auto md:block">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-line text-left text-xs uppercase tracking-wide text-ink-muted">
+            <tr className="border-line text-ink-muted border-b text-left text-xs uppercase tracking-wide">
               <th className="px-3 py-2 font-medium">Date</th>
               <th className="px-3 py-2 font-medium">Description</th>
               <th className="px-3 py-2 font-medium">Category</th>
@@ -102,14 +92,14 @@ export function ExpenseList({
           </thead>
           <tbody>
             {items.map((e) => (
-              <tr key={e.id} className="border-b border-line last:border-0 hover:bg-bg-subtle">
-                <td className="px-3 py-2 whitespace-nowrap">
+              <tr key={e.id} className="border-line hover:bg-bg-subtle border-b last:border-0">
+                <td className="whitespace-nowrap px-3 py-2">
                   {new Date(e.incurredAt).toLocaleDateString()}
                 </td>
                 <td className="px-3 py-2">
                   {e.description}
                   {e.vendor ? (
-                    <span className="block text-xs text-ink-muted">{e.vendor}</span>
+                    <span className="text-ink-muted block text-xs">{e.vendor}</span>
                   ) : null}
                 </td>
                 <td className="px-3 py-2">
@@ -118,13 +108,11 @@ export function ExpenseList({
                     {e.fromPayroll ? <Badge tone="info">Payroll</Badge> : null}
                   </div>
                 </td>
-                <td className="px-3 py-2 text-ink-muted">
-                  {e.project?.name ?? 'Overhead'}
-                </td>
+                <td className="text-ink-muted px-3 py-2">{e.project?.name ?? 'Overhead'}</td>
                 <td className="px-3 py-2 text-right tabular-nums">
                   {formatCurrency(e.amount, e.currency)}
                 </td>
-                <td className="px-3 py-2 text-right tabular-nums font-medium">
+                <td className="px-3 py-2 text-right font-medium tabular-nums">
                   {baseCurrency ? formatCurrency(e.baseAmount, baseCurrency) : e.baseAmount}
                 </td>
                 <td className="px-3 py-2 text-right">
@@ -163,12 +151,12 @@ export function ExpenseList({
 
       <ul className="space-y-2 md:hidden" role="list">
         {items.map((e) => (
-          <li key={e.id} className="rounded-md border border-line bg-bg-surface p-3">
+          <li key={e.id} className="border-line bg-bg-surface rounded-md border p-3">
             <div className="flex items-center justify-between">
               <span className="font-medium">{e.description}</span>
               <span className="tabular-nums">{formatCurrency(e.amount, e.currency)}</span>
             </div>
-            <p className="mt-0.5 text-xs text-ink-muted">
+            <p className="text-ink-muted mt-0.5 text-xs">
               {CATEGORY_LABEL[e.category]} · {e.project?.name ?? 'Overhead'} ·{' '}
               {new Date(e.incurredAt).toLocaleDateString()}
             </p>
@@ -288,7 +276,11 @@ export function ExpenseFormDialog({
     description: p.key,
   }));
   if (existing?.project && !projectOptions.some((o) => o.value === existing.project?.id)) {
-    projectOptions.unshift({ value: existing.project.id, label: existing.project.name, description: '' });
+    projectOptions.unshift({
+      value: existing.project.id,
+      label: existing.project.name,
+      description: '',
+    });
   }
 
   async function submit() {
@@ -410,7 +402,9 @@ export function ExpenseFormDialog({
                       nextCurrency: v,
                       currentRate: f.fxRate,
                       baseCurrency: baseCode,
-                      ...(existing ? { stored: { currency: existing.currency, rate: existing.fxRate } } : {}),
+                      ...(existing
+                        ? { stored: { currency: existing.currency, rate: existing.fxRate } }
+                        : {}),
                     }),
                   }))
                 }
@@ -440,7 +434,7 @@ export function ExpenseFormDialog({
                 aria-describedby={rateError ? 'exp-fx-error' : undefined}
               />
               {rateError ? (
-                <p id="exp-fx-error" className="mt-1 text-xs text-state-error">
+                <p id="exp-fx-error" className="text-state-error mt-1 text-xs">
                   {rateError}
                 </p>
               ) : null}

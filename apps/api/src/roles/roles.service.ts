@@ -115,12 +115,14 @@ export class RolesService {
       }),
       this.prisma.client.workspaceMembership.groupBy({
         by: ['customRoleId'],
-        where: { customRoleId: { not: null }, workspace: { organizationId: orgId, deletedAt: null } },
+        where: {
+          customRoleId: { not: null },
+          workspace: { organizationId: orgId, deletedAt: null },
+        },
         _count: { _all: true },
       }),
     ]);
-    const sysCount = (r: SystemRole) =>
-      sysCounts.find((c) => c.systemRole === r)?._count._all ?? 0;
+    const sysCount = (r: SystemRole) => sysCounts.find((c) => c.systemRole === r)?._count._all ?? 0;
     const customCount = new Map<string, number>();
     for (const c of [...customUserCounts, ...customWsCounts]) {
       if (c.customRoleId) customCount.set(c.customRoleId, c._count._all);
@@ -274,7 +276,7 @@ export class RolesService {
         wsId !== actor.activeWorkspaceId ||
         !actor.permissions.workspace.includes('members.manage')
       ) {
-        throw this.forbidden('You can not view this person\'s permissions.');
+        throw this.forbidden("You can not view this person's permissions.");
       }
     }
     if (wsId) await this.assertWorkspaceInOrg(orgId, wsId);
@@ -359,7 +361,8 @@ export class RolesService {
 
     const isRolesManager = actor.permissions.company.includes('roles.manage');
     if (!input.workspaceId) {
-      if (!isRolesManager) throw this.forbidden('Only role managers can change company permissions.');
+      if (!isRolesManager)
+        throw this.forbidden('Only role managers can change company permissions.');
     } else {
       await this.assertWorkspaceInOrg(orgId, input.workspaceId);
       const member = await this.prisma.client.workspaceMembership.findUnique({
@@ -407,11 +410,7 @@ export class RolesService {
       from: before,
       to: input.overrides,
     });
-    return this.getUserPermissions(
-      actor,
-      userId,
-      input.workspaceId ?? undefined,
-    );
+    return this.getUserPermissions(actor, userId, input.workspaceId ?? undefined);
   }
 
   // ─── Guardrails ────────────────────────────────────────────────────────
@@ -535,6 +534,12 @@ export class RolesService {
     target: string,
     metadata: Record<string, unknown>,
   ): void {
-    void this.audit.emit({ organizationId: orgId, actorUserId: actor.userId, action, target, metadata });
+    void this.audit.emit({
+      organizationId: orgId,
+      actorUserId: actor.userId,
+      action,
+      target,
+      metadata,
+    });
   }
 }

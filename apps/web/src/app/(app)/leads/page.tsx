@@ -79,13 +79,13 @@ export default function LeadsPage() {
     <div className="mx-auto max-w-7xl space-y-5 px-4 py-6 sm:px-6 lg:px-8">
       <header className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <p className="text-xs font-medium text-ink-muted">
-            <span className="hover:underline cursor-pointer">Dashboard</span>
+          <p className="text-ink-muted text-xs font-medium">
+            <span className="cursor-pointer hover:underline">Dashboard</span>
             <span className="mx-1">›</span>
             <span className="underline">Leads</span>
           </p>
-          <h1 className="mt-2 text-2xl font-semibold text-ink">Leads</h1>
-          <p className="text-sm text-ink-muted">Pipeline of opportunities.</p>
+          <h1 className="text-ink mt-2 text-2xl font-semibold">Leads</h1>
+          <p className="text-ink-muted text-sm">Pipeline of opportunities.</p>
         </div>
         <Can I="create" a="Lead">
           <Button onClick={() => setCreateOpen(true)}>
@@ -110,16 +110,9 @@ export default function LeadsPage() {
 
       <div role="region" aria-label={`${view} view`}>
         {isError && !data ? (
-          <QueryError
-            message="Couldn't load leads."
-            onRetry={() => void refetch()}
-          />
+          <QueryError message="Couldn't load leads." onRetry={() => void refetch()} />
         ) : view === 'pipeline' ? (
-          <LeadPipeline
-            leads={filteredLeads}
-            isLoading={isLoading}
-            onSelect={setSelectedLeadId}
-          />
+          <LeadPipeline leads={filteredLeads} isLoading={isLoading} onSelect={setSelectedLeadId} />
         ) : (
           <LeadList
             leads={filteredLeads}

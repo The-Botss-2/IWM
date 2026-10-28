@@ -55,7 +55,8 @@ export class SecurityAlertsService implements OnModuleInit, OnModuleDestroy {
       const rule = SECURITY_ALERT_RULES.failedSignins;
       const count = await this.bump(`sec:signin:${organizationId}`, 1, rule.windowSeconds);
       if (count < rule.threshold) return;
-      if (!(await this.claimAlert(`sec:signin:alerted:${organizationId}`, rule.windowSeconds))) return;
+      if (!(await this.claimAlert(`sec:signin:alerted:${organizationId}`, rule.windowSeconds)))
+        return;
       await this.audit.emit({
         organizationId,
         actorUserId: null,
@@ -171,7 +172,8 @@ export class SecurityAlertsService implements OnModuleInit, OnModuleDestroy {
   private warn(kind: string, err: unknown): void {
     const e = err as { name?: unknown; code?: unknown } | null;
     const name = typeof e?.name === 'string' ? e.name : 'unknown';
-    const code = typeof e?.code === 'string' || typeof e?.code === 'number' ? ` code=${e.code}` : '';
+    const code =
+      typeof e?.code === 'string' || typeof e?.code === 'number' ? ` code=${e.code}` : '';
     this.logger.warn(`security alert ${kind} skipped error=${name}${code}`);
   }
 }

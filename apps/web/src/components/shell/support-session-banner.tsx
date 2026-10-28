@@ -19,9 +19,9 @@ export function SupportSessionBanner() {
       <div
         role="status"
         aria-live="polite"
-        className="pointer-events-auto flex max-w-full flex-wrap items-center gap-3 rounded-full border border-brand-orange/40 bg-tint-warning px-4 py-2 text-sm text-ink shadow-soft"
+        className="border-brand-orange/40 bg-tint-warning text-ink shadow-soft pointer-events-auto flex max-w-full flex-wrap items-center gap-3 rounded-full border px-4 py-2 text-sm"
       >
-        <Eye className="h-4 w-4 shrink-0 text-brand-orange" aria-hidden />
+        <Eye className="text-brand-orange h-4 w-4 shrink-0" aria-hidden />
         <span className="min-w-0">
           Read only support session for{' '}
           <span className="font-semibold">{support.organizationName}</span>, ends{' '}

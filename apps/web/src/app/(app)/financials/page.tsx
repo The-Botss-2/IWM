@@ -15,10 +15,7 @@ import {
   paymentStatusLabel,
 } from '@/components/financials/finance-badges';
 import { InvoiceList } from '@/components/financials/invoice-list';
-import {
-  FinancialsTabs,
-  useFinanceTab,
-} from '@/components/financials/financials-tabs';
+import { FinancialsTabs, useFinanceTab } from '@/components/financials/financials-tabs';
 import { PaymentList } from '@/components/financials/payment-list';
 import { PaymentSourceManager } from '@/components/financials/payment-source-manager';
 import { PayrollPanel } from '@/components/financials/payroll/payroll-panel';
@@ -33,12 +30,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useDebouncedValue } from '@/hooks/use-debounced';
-import {
-  useContracts,
-  useExpenses,
-  useFinanceSummary,
-  usePayments,
-} from '@/hooks/use-finance';
+import { useContracts, useExpenses, useFinanceSummary, usePayments } from '@/hooks/use-finance';
 import { useRequireSystemRole } from '@/hooks/use-require-system-role';
 
 const ALL = '__all__';
@@ -73,11 +65,7 @@ const FinanceOverview = dynamic(
 );
 
 export default function FinancialsPage() {
-  const { checking, allowed } = useRequireSystemRole([
-    'ADMIN',
-    'SUPER_ADMIN',
-    'FINANCE',
-  ]);
+  const { checking, allowed } = useRequireSystemRole(['ADMIN', 'SUPER_ADMIN', 'FINANCE']);
   const { tab, setTab } = useFinanceTab();
 
   const [search, setSearch] = useState('');
@@ -103,18 +91,15 @@ export default function FinancialsPage() {
   const contracts = useContracts({
     ...(debouncedSearch ? { q: debouncedSearch } : {}),
     ...(status !== ALL ? { status: status as ContractStatus } : {}),
-    ...(paymentStatus !== ALL
-      ? { paymentStatus: paymentStatus as PaymentStatus }
-      : {}),
+    ...(paymentStatus !== ALL ? { paymentStatus: paymentStatus as PaymentStatus } : {}),
     pageSize: 100,
   });
   const payments = usePayments({ pageSize: 100 });
   const expenses = useExpenses({ pageSize: 100 });
 
-
   if (checking || !allowed) {
     return (
-      <div className="p-6 text-sm text-ink-muted">
+      <div className="text-ink-muted p-6 text-sm">
         {checking ? 'Checking access…' : 'Redirecting…'}
       </div>
     );
@@ -125,7 +110,7 @@ export default function FinancialsPage() {
       <header className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-xl font-semibold">Financials</h1>
-          <p className="text-sm text-ink-muted">
+          <p className="text-ink-muted text-sm">
             Contracts, what has been paid, and where the money came from.
           </p>
         </div>
@@ -202,25 +187,16 @@ export default function FinancialsPage() {
               </Button>
             ) : null}
           </div>
-          <ContractList
-            items={contracts.data?.items ?? []}
-            loading={contracts.isLoading}
-          />
+          <ContractList items={contracts.data?.items ?? []} loading={contracts.isLoading} />
         </div>
       ) : null}
 
       {tab === 'payments' ? (
-        <PaymentList
-          items={payments.data?.items ?? []}
-          loading={payments.isLoading}
-        />
+        <PaymentList items={payments.data?.items ?? []} loading={payments.isLoading} />
       ) : null}
 
       {tab === 'expenses' ? (
-        <ExpenseList
-          items={expenses.data?.items ?? []}
-          loading={expenses.isLoading}
-        />
+        <ExpenseList items={expenses.data?.items ?? []} loading={expenses.isLoading} />
       ) : null}
 
       {tab === 'payroll' ? (
@@ -237,14 +213,8 @@ export default function FinancialsPage() {
 
       {tab === 'sources' ? <PaymentSourceManager /> : null}
 
-      <ContractFormDialog
-        open={creating}
-        onOpenChange={setCreating}
-      />
-      <ExpenseFormDialog
-        open={addingExpense}
-        onOpenChange={setAddingExpense}
-      />
+      <ContractFormDialog open={creating} onOpenChange={setCreating} />
+      <ExpenseFormDialog open={addingExpense} onOpenChange={setAddingExpense} />
     </div>
   );
 }

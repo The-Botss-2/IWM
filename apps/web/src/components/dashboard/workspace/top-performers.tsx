@@ -37,7 +37,9 @@ export function TopPerformersWidget() {
         <WidgetEmpty
           icon={Flame}
           message={
-            rangeLabel ? `No tasks completed in ${rangeLabel}.` : 'No tasks completed this week yet.'
+            rangeLabel
+              ? `No tasks completed in ${rangeLabel}.`
+              : 'No tasks completed this week yet.'
           }
         />
       ) : (
@@ -46,32 +48,32 @@ export function TopPerformersWidget() {
             <li key={r.userId} className="space-y-1">
               <div className="flex items-center justify-between gap-2 text-xs">
                 <span className="flex min-w-0 items-center gap-2">
-                  <span className="grid h-5 w-5 shrink-0 place-items-center text-[11px] font-semibold text-ink-muted">
+                  <span className="text-ink-muted grid h-5 w-5 shrink-0 place-items-center text-[11px] font-semibold">
                     {idx === 0 ? (
-                      <Trophy className="h-3.5 w-3.5 text-brand-orange" aria-hidden />
+                      <Trophy className="text-brand-orange h-3.5 w-3.5" aria-hidden />
                     ) : (
                       <>#{idx + 1}</>
                     )}
                   </span>
                   <UserAvatar size="xs" name={r.name} image={r.image} />
-                  <span className="truncate text-ink">{r.name}</span>
+                  <span className="text-ink truncate">{r.name}</span>
                 </span>
-                <span className="shrink-0 text-xs font-semibold text-ink tabular-nums">
+                <span className="text-ink shrink-0 text-xs font-semibold tabular-nums">
                   {r.count}
                 </span>
               </div>
-              <div className="relative h-1.5 rounded-full bg-bg-subtle" aria-hidden>
+              <div className="bg-bg-subtle relative h-1.5 rounded-full" aria-hidden>
                 <span
-                  className="absolute inset-y-0 left-0 rounded-full bg-brand-gradient"
+                  className="bg-brand-gradient absolute inset-y-0 left-0 rounded-full"
                   style={{ width: `${(r.count / max) * 100}%` }}
                 />
               </div>
             </li>
           ))}
           {truncated ? (
-            <li className="text-xs text-ink-muted">
-              Partial data: ranked from the most recent completions only. Pick a shorter range
-              for full counts.
+            <li className="text-ink-muted text-xs">
+              Partial data: ranked from the most recent completions only. Pick a shorter range for
+              full counts.
             </li>
           ) : null}
         </ul>
@@ -79,4 +81,3 @@ export function TopPerformersWidget() {
     </WidgetShell>
   );
 }
-

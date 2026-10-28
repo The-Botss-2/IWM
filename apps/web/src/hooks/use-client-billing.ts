@@ -8,8 +8,7 @@ import { getApi } from '@/lib/api';
  * Under `['finance', 'summary']` so every money write (contract, payment)
  * that refreshes the finance summary refreshes this one too.
  */
-const clientBillingKey = (clientId: string) =>
-  ['finance', 'summary', 'client', clientId] as const;
+const clientBillingKey = (clientId: string) => ['finance', 'summary', 'client', clientId] as const;
 
 /** Per-currency billing totals for one client. Finance roles only. */
 export function useClientBilling(clientId: string, enabled = true) {

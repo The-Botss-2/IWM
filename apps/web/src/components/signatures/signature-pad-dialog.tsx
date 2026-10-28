@@ -120,7 +120,8 @@ export function SignaturePadDialog({
     }
     if (mode === 'DRAWN') {
       const canvas = canvasRef.current;
-      const png = canvas && padRef.current && !padRef.current.isEmpty() ? trimmedCanvasPng(canvas) : null;
+      const png =
+        canvas && padRef.current && !padRef.current.isEmpty() ? trimmedCanvasPng(canvas) : null;
       if (!png) {
         setError('Draw your signature in the box.');
         return;
@@ -142,12 +143,16 @@ export function SignaturePadDialog({
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle className="text-lg font-semibold">Adopt your signature</DialogTitle>
-          <DialogDescription className="text-sm text-ink-muted">
+          <DialogDescription className="text-ink-muted text-sm">
             It is placed in every signature box that is yours.
           </DialogDescription>
         </DialogHeader>
 
-        <div role="tablist" aria-label="Signature style" className="flex gap-1 rounded-lg bg-bg-subtle p-1">
+        <div
+          role="tablist"
+          aria-label="Signature style"
+          className="bg-bg-subtle flex gap-1 rounded-lg p-1"
+        >
           {(['DRAWN', 'TYPED'] as const).map((m) => (
             <button
               key={m}
@@ -167,15 +172,15 @@ export function SignaturePadDialog({
 
         {mode === 'DRAWN' ? (
           <div className="space-y-2">
-            <div className="relative rounded-lg border border-line bg-white">
+            <div className="border-line relative rounded-lg border bg-white">
               <canvas
                 ref={canvasRef}
                 className="block h-44 w-full touch-none rounded-lg"
                 aria-label="Signature pad. Draw your signature with a mouse, finger or pen."
               />
-              <div className="pointer-events-none absolute inset-x-6 bottom-9 border-b border-dashed border-line-strong" />
+              <div className="border-line-strong pointer-events-none absolute inset-x-6 bottom-9 border-b border-dashed" />
               {!hasInk ? (
-                <span className="pointer-events-none absolute inset-x-0 top-1/2 -translate-y-1/2 text-center text-sm text-ink-disabled">
+                <span className="text-ink-disabled pointer-events-none absolute inset-x-0 top-1/2 -translate-y-1/2 text-center text-sm">
                   Sign here
                 </span>
               ) : null}
@@ -201,7 +206,7 @@ export function SignaturePadDialog({
               autoComplete="name"
             />
             <div
-              className="flex h-24 items-center overflow-hidden rounded-lg border border-line bg-white px-5 text-4xl italic text-[#0f1f5c]"
+              className="border-line flex h-24 items-center overflow-hidden rounded-lg border bg-white px-5 text-4xl italic text-[#0f1f5c]"
               style={{ fontFamily: TYPED_SIGNATURE_FONT }}
               aria-hidden
             >
@@ -210,10 +215,10 @@ export function SignaturePadDialog({
           </div>
         )}
 
-        <label className="flex items-start gap-2.5 rounded-lg bg-bg-subtle p-3 text-sm text-ink">
+        <label className="bg-bg-subtle text-ink flex items-start gap-2.5 rounded-lg p-3 text-sm">
           <input
             type="checkbox"
-            className="mt-0.5 h-4 w-4 shrink-0 accent-brand-purple"
+            className="accent-brand-purple mt-0.5 h-4 w-4 shrink-0"
             checked={consent}
             onChange={(e) => {
               setConsent(e.target.checked);
@@ -224,7 +229,7 @@ export function SignaturePadDialog({
         </label>
 
         {error ? (
-          <p role="alert" className="text-sm text-state-error">
+          <p role="alert" className="text-state-error text-sm">
             {error}
           </p>
         ) : null}

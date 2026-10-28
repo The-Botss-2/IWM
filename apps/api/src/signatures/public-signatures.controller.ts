@@ -44,7 +44,10 @@ export class PublicSignaturesController {
     @Ip() ip: string | undefined,
     @Headers('user-agent') userAgent: string | undefined,
   ) {
-    return this.signatures.session(token, parseCode(rawCode), { ip: ip ?? null, userAgent: userAgent ?? null });
+    return this.signatures.session(token, parseCode(rawCode), {
+      ip: ip ?? null,
+      userAgent: userAgent ?? null,
+    });
   }
 
   @Get(':token/file')

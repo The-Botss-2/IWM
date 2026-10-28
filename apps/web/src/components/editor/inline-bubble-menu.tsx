@@ -36,7 +36,7 @@ export function InlineBubbleMenu({ editor }: Props) {
         if (e.isActive('image')) return false;
         return true;
       }}
-      className="flex items-center gap-0.5 rounded-md border border-line bg-white p-1 shadow-lg"
+      className="border-line flex items-center gap-0.5 rounded-md border bg-white p-1 shadow-lg"
     >
       <MarkButton
         editor={editor}
@@ -116,13 +116,7 @@ interface MarkButtonProps {
   onClick: () => void;
 }
 
-function MarkButton({
-  editor,
-  label,
-  icon: Icon,
-  active = false,
-  onClick,
-}: MarkButtonProps) {
+function MarkButton({ editor, label, icon: Icon, active = false, onClick }: MarkButtonProps) {
   return (
     <button
       type="button"
@@ -132,8 +126,8 @@ function MarkButton({
       onClick={onClick}
       title={label}
       className={cn(
-        'inline-flex h-8 w-8 items-center justify-center rounded text-ink-muted hover:bg-bg-subtle hover:text-ink',
-        'focus-visible:outline-none focus-visible:ring-2 focus-visible:shadow-focus',
+        'text-ink-muted hover:bg-bg-subtle hover:text-ink inline-flex h-8 w-8 items-center justify-center rounded',
+        'focus-visible:shadow-focus focus-visible:outline-none focus-visible:ring-2',
         active ? 'bg-brand-50 text-brand-700' : '',
       )}
     >

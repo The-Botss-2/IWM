@@ -19,13 +19,7 @@ import {
   Quote,
   Table as TableIcon,
 } from 'lucide-react';
-import {
-  forwardRef,
-  useEffect,
-  useImperativeHandle,
-  useState,
-  type ComponentType,
-} from 'react';
+import { forwardRef, useEffect, useImperativeHandle, useState, type ComponentType } from 'react';
 
 export interface SlashItem {
   title: string;
@@ -200,14 +194,14 @@ export const SlashMenuList = forwardRef<SlashMenuListRef, SlashMenuListProps>(
 
     if (items.length === 0) {
       return (
-        <div className="rounded-md border border-line bg-white px-3 py-2 text-xs text-ink-muted shadow-lg">
+        <div className="border-line text-ink-muted rounded-md border bg-white px-3 py-2 text-xs shadow-lg">
           No commands match.
         </div>
       );
     }
 
     return (
-      <div className="w-72 max-h-80 overflow-y-auto rounded-md border border-line bg-white p-1 shadow-lg">
+      <div className="border-line max-h-80 w-72 overflow-y-auto rounded-md border bg-white p-1 shadow-lg">
         {items.map((item, i) => {
           const Icon = item.icon;
           const active = i === selectedIndex;
@@ -221,10 +215,10 @@ export const SlashMenuList = forwardRef<SlashMenuListRef, SlashMenuListProps>(
                 active ? 'bg-brand-50 text-brand-700' : 'text-ink hover:bg-bg-subtle'
               }`}
             >
-              <Icon className="h-4 w-4 shrink-0 text-ink-muted" aria-hidden />
+              <Icon className="text-ink-muted h-4 w-4 shrink-0" aria-hidden />
               <span className="flex-1">
                 <span className="block font-medium">{item.title}</span>
-                <span className="block text-xs text-ink-muted">{item.description}</span>
+                <span className="text-ink-muted block text-xs">{item.description}</span>
               </span>
             </button>
           );
@@ -252,7 +246,11 @@ export const SlashCommand = Extension.create<SlashCommandOptions>({
         char: '/',
         startOfLine: false,
         allowSpaces: false,
-        command: ({ editor, range, props }: {
+        command: ({
+          editor,
+          range,
+          props,
+        }: {
           editor: Editor;
           range: Range;
           props: { command: (params: { editor: Editor; range: Range }) => void };

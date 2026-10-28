@@ -6,7 +6,6 @@ import {
   type SupportSession,
 } from '@botss/shared-types';
 
-
 /**
  * The platform operator's read only support session in THIS tab. The token
  * lives in sessionStorage, so it ends when the tab closes and never leaks
@@ -125,7 +124,9 @@ export function endSupportSession(): void {
 /** Whether an API error means the support session is over (ended, revoked, invalid). */
 export function isSupportSessionEndError(err: unknown): boolean {
   const code = (err as { problem?: { code?: unknown } } | null)?.problem?.code;
-  return typeof code === 'string' && (SUPPORT_SESSION_END_CODES as readonly string[]).includes(code);
+  return (
+    typeof code === 'string' && (SUPPORT_SESSION_END_CODES as readonly string[]).includes(code)
+  );
 }
 
 /** Where the operator lands after a support session; `?support=ended` explains why. */

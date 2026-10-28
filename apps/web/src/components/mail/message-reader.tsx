@@ -104,9 +104,9 @@ export function MessageReader({
 
   if (!messageId) {
     return (
-      <div className="flex h-full items-center justify-center bg-bg-subtle px-6">
-        <div className="text-center text-sm text-ink-muted">
-          <Mail className="mx-auto h-10 w-10 text-line-strong" aria-hidden />
+      <div className="bg-bg-subtle flex h-full items-center justify-center px-6">
+        <div className="text-ink-muted text-center text-sm">
+          <Mail className="text-line-strong mx-auto h-10 w-10" aria-hidden />
           <p className="mt-3">Select a message to read.</p>
         </div>
       </div>
@@ -115,7 +115,7 @@ export function MessageReader({
 
   if (isError && !data) {
     return (
-      <div className="flex h-full flex-col items-center justify-center bg-bg-subtle px-6">
+      <div className="bg-bg-subtle flex h-full flex-col items-center justify-center px-6">
         <QueryError compact message="Couldn't load this message." onRetry={() => void refetch()} />
       </div>
     );
@@ -123,7 +123,7 @@ export function MessageReader({
 
   if (isLoading || !data) {
     return (
-      <div className="flex h-full flex-col items-center justify-center gap-3 bg-bg-subtle px-6">
+      <div className="bg-bg-subtle flex h-full flex-col items-center justify-center gap-3 px-6">
         <Loader label="Loading message" />
       </div>
     );
@@ -139,29 +139,29 @@ export function MessageReader({
     // fixed header, an internally-scrolling body, and a pinned attachments
     // strip - because there's room for it.
     <div className="flex min-h-0 flex-1 flex-col overflow-y-auto bg-white lg:overflow-hidden">
-      <header className="border-b border-line p-4">
+      <header className="border-line border-b p-4">
         <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between sm:gap-3">
           <div className="min-w-0">
-            <h2 className="truncate text-lg font-semibold text-ink">
+            <h2 className="text-ink truncate text-lg font-semibold">
               {data.subject || '(no subject)'}
             </h2>
-            <div className="mt-1 truncate text-sm text-ink">
+            <div className="text-ink mt-1 truncate text-sm">
               <span className="font-medium">{sender}</span>
               {data.fromName ? (
-                <span className="ml-1 text-ink-muted">&lt;{data.fromAddress}&gt;</span>
+                <span className="text-ink-muted ml-1">&lt;{data.fromAddress}&gt;</span>
               ) : null}
             </div>
-            <div className="mt-0.5 truncate text-xs text-ink-muted">
+            <div className="text-ink-muted mt-0.5 truncate text-xs">
               To {data.toAddresses.join(', ') || 'undisclosed'}
               {data.ccAddresses.length > 0 ? (
                 <>
-                  <span className="mx-1.5 text-line-strong">·</span>
+                  <span className="text-line-strong mx-1.5">·</span>
                   Cc {data.ccAddresses.join(', ')}
                 </>
               ) : null}
             </div>
             <div
-              className="mt-0.5 truncate text-xs text-ink-muted"
+              className="text-ink-muted mt-0.5 truncate text-xs"
               title={absoluteTime(data.receivedAt)}
             >
               {absoluteTime(data.receivedAt)} ({relativeTime(data.receivedAt)})
@@ -174,9 +174,7 @@ export function MessageReader({
               size="sm"
               variant="ghost"
               aria-label={data.isStarred ? 'Unstar' : 'Star'}
-              onClick={() =>
-                flag.mutate({ id: data.id, op: data.isStarred ? 'unstar' : 'star' })
-              }
+              onClick={() => flag.mutate({ id: data.id, op: data.isStarred ? 'unstar' : 'star' })}
               className={cn(data.isStarred && 'text-amber-500')}
             >
               <Star className="h-4 w-4" fill={data.isStarred ? 'currentColor' : 'none'} />
@@ -260,7 +258,7 @@ export function MessageReader({
        * flex-1/overflow here - the whole reader scrolls as one, so the body
        * sits in normal flow and the header above it scrolls away.
        */}
-      <div className="p-4 lg:flex-1 lg:min-h-0 lg:overflow-hidden">
+      <div className="p-4 lg:min-h-0 lg:flex-1 lg:overflow-hidden">
         {data.bodyHtml && data.bodyHtml.trim().length > 0 ? (
           <SandboxedBody
             key={data.id}
@@ -292,17 +290,14 @@ function AttachmentsStrip({
   messageId: string;
   attachments: readonly MailAttachment[];
 }) {
-  const visible = useMemo(
-    () => attachments.filter((a) => !a.isInline),
-    [attachments],
-  );
+  const visible = useMemo(() => attachments.filter((a) => !a.isInline), [attachments]);
   if (visible.length === 0) return null;
   return (
     // Pinned outside the body scroll so they're always visible without
     // scrolling past the message. shrink-0 keeps them from being squeezed
     // when the body iframe takes its share of the column.
-    <section className="shrink-0 border-t border-line p-4">
-      <h3 className="mb-3 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-ink-muted">
+    <section className="border-line shrink-0 border-t p-4">
+      <h3 className="text-ink-muted mb-3 flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide">
         <Paperclip className="h-3 w-3" />
         {visible.length} {visible.length === 1 ? 'attachment' : 'attachments'}
       </h3>
@@ -349,9 +344,9 @@ function AttachmentCard({
       }
       title={`Download ${attachment.filename}`}
       className={cn(
-        'group relative flex h-16 w-full items-center gap-3 overflow-hidden rounded-lg border border-line bg-white px-3 text-left sm:w-[260px]',
-        'transition-all duration-200 hover:border-line-strong hover:shadow-soft',
-        'focus-visible:outline-none focus-visible:shadow-focus focus-visible:border-brand-purple',
+        'border-line group relative flex h-16 w-full items-center gap-3 overflow-hidden rounded-lg border bg-white px-3 text-left sm:w-[260px]',
+        'hover:border-line-strong hover:shadow-soft transition-all duration-200',
+        'focus-visible:shadow-focus focus-visible:border-brand-purple focus-visible:outline-none',
         isDownloading && 'cursor-progress opacity-70',
       )}
     >
@@ -383,18 +378,13 @@ function AttachmentCard({
             }}
           />
         ) : null}
-        <Icon
-          className={cn('h-5 w-5', color.fg, isImage && 'hidden')}
-          aria-hidden
-        />
+        <Icon className={cn('h-5 w-5', color.fg, isImage && 'hidden')} aria-hidden />
       </div>
 
       {/* Filename + meta */}
       <div className="min-w-0 flex-1">
-        <div className="truncate text-sm font-medium text-ink">
-          {attachment.filename}
-        </div>
-        <div className="mt-0.5 flex items-center gap-1.5 text-[11px] text-ink-muted">
+        <div className="text-ink truncate text-sm font-medium">{attachment.filename}</div>
+        <div className="text-ink-muted mt-0.5 flex items-center gap-1.5 text-[11px]">
           {ext ? <span className="uppercase">{ext}</span> : null}
           {ext ? <span className="text-line-strong">·</span> : null}
           <span>{formatBytes(attachment.sizeBytes)}</span>
@@ -407,11 +397,11 @@ function AttachmentCard({
       <span
         aria-hidden
         className={cn(
-          'pointer-events-none absolute right-2 top-2 grid h-7 w-7 place-items-center rounded-full bg-brand-gradient text-white shadow-soft',
+          'bg-brand-gradient shadow-soft pointer-events-none absolute right-2 top-2 grid h-7 w-7 place-items-center rounded-full text-white',
           'transition-all duration-200',
           isDownloading
-            ? 'opacity-100 translate-y-0'
-            : 'opacity-0 translate-y-1 group-hover:opacity-100 group-hover:translate-y-0 group-focus-visible:opacity-100 group-focus-visible:translate-y-0',
+            ? 'translate-y-0 opacity-100'
+            : 'translate-y-1 opacity-0 group-hover:translate-y-0 group-hover:opacity-100 group-focus-visible:translate-y-0 group-focus-visible:opacity-100',
         )}
       >
         {isDownloading ? (
@@ -424,20 +414,17 @@ function AttachmentCard({
   );
 }
 
-const ICON_BY_KIND: Record<
-  string,
-  { Icon: LucideIcon; color: { bg: string; fg: string } }
-> = {
-  image:       { Icon: FileImage,       color: { bg: 'bg-tint-warning', fg: 'text-brand-orange' } },
-  pdf:         { Icon: FileText,        color: { bg: 'bg-tint-error', fg: 'text-state-error' } },
-  word:        { Icon: FileText,        color: { bg: 'bg-[#EAF0FC]', fg: 'text-brand-blue' } },
+const ICON_BY_KIND: Record<string, { Icon: LucideIcon; color: { bg: string; fg: string } }> = {
+  image: { Icon: FileImage, color: { bg: 'bg-tint-warning', fg: 'text-brand-orange' } },
+  pdf: { Icon: FileText, color: { bg: 'bg-tint-error', fg: 'text-state-error' } },
+  word: { Icon: FileText, color: { bg: 'bg-[#EAF0FC]', fg: 'text-brand-blue' } },
   spreadsheet: { Icon: FileSpreadsheet, color: { bg: 'bg-tint-info', fg: 'text-brand-teal' } },
-  slides:      { Icon: FileText,        color: { bg: 'bg-tint-warning', fg: 'text-brand-orange' } },
-  audio:       { Icon: FileAudio,       color: { bg: 'bg-[#FAEBFE]', fg: 'text-brand-magenta' } },
-  video:       { Icon: FileVideo,       color: { bg: 'bg-[#EAF0FC]', fg: 'text-brand-blue' } },
-  archive:     { Icon: FileArchive,     color: { bg: 'bg-tint-warning', fg: 'text-brand-orange' } },
-  text:        { Icon: FileText,        color: { bg: 'bg-bg-subtle', fg: 'text-ink-muted' } },
-  default:     { Icon: FileIcon,        color: { bg: 'bg-bg-subtle', fg: 'text-ink-muted' } },
+  slides: { Icon: FileText, color: { bg: 'bg-tint-warning', fg: 'text-brand-orange' } },
+  audio: { Icon: FileAudio, color: { bg: 'bg-[#FAEBFE]', fg: 'text-brand-magenta' } },
+  video: { Icon: FileVideo, color: { bg: 'bg-[#EAF0FC]', fg: 'text-brand-blue' } },
+  archive: { Icon: FileArchive, color: { bg: 'bg-tint-warning', fg: 'text-brand-orange' } },
+  text: { Icon: FileText, color: { bg: 'bg-bg-subtle', fg: 'text-ink-muted' } },
+  default: { Icon: FileIcon, color: { bg: 'bg-bg-subtle', fg: 'text-ink-muted' } },
 };
 
 function pickAttachmentIcon(
@@ -543,8 +530,7 @@ const IFRAME_SHELL_TAIL = `</body></html>`;
 function useIframeDarkMode(): boolean {
   const [isDark, setIsDark] = useState(false);
   useEffect(() => {
-    const compute = () =>
-      document.documentElement.classList.contains('dark');
+    const compute = () => document.documentElement.classList.contains('dark');
     setIsDark(compute());
     // Re-run when the ThemeMount toggles the dark class on <html>.
     const observer = new MutationObserver(() => setIsDark(compute()));
@@ -607,33 +593,35 @@ const SandboxedBody = memo(function SandboxedBody({
   return (
     <div className="flex h-full flex-col">
       {prepared.blockedRemote > 0 && !loadRemote ? (
-        <div className="mb-2 flex flex-wrap items-center justify-between gap-2 rounded-md border border-line bg-bg-subtle px-3 py-2 text-xs text-ink-muted">
-          <span>Remote images are hidden so the sender can&apos;t tell when you open this message.</span>
+        <div className="border-line bg-bg-subtle text-ink-muted mb-2 flex flex-wrap items-center justify-between gap-2 rounded-md border px-3 py-2 text-xs">
+          <span>
+            Remote images are hidden so the sender can&apos;t tell when you open this message.
+          </span>
           <Button size="sm" variant="ghost" onClick={() => setLoadRemote(true)}>
             Show images
           </Button>
         </div>
       ) : null}
-    <iframe
-      title="Message body"
-      // We deliberately do NOT include `allow-scripts` - message bodies are
-      // untrusted. `allow-popups` + `allow-popups-to-escape-sandbox` lets
-      // anchor tags with `target="_blank"` (set via the shell's `<base>`)
-      // actually open a new tab; without these flags, the empty sandbox
-      // silently swallows every link click. `allow-popups-to-escape-sandbox`
-      // ensures the new tab does NOT inherit the iframe's restrictive
-      // sandbox (otherwise the opened page would also be JS-disabled and
-      // unable to render most modern sites).
-      sandbox="allow-popups allow-popups-to-escape-sandbox"
-      srcDoc={srcDoc}
-      // At lg+ the iframe fills the body slot and scrolls its own document.
-      // Below lg the whole reader scrolls as one (so the header can slide
-      // away), but a sandboxed iframe can't report its content height back
-      // to size itself, so we give it a tall fixed viewport height and let
-      // it scroll internally past that - the standard mobile-webmail
-      // tradeoff.
-      className="block h-[75vh] w-full border-0 lg:min-h-0 lg:flex-1"
-    />
+      <iframe
+        title="Message body"
+        // We deliberately do NOT include `allow-scripts` - message bodies are
+        // untrusted. `allow-popups` + `allow-popups-to-escape-sandbox` lets
+        // anchor tags with `target="_blank"` (set via the shell's `<base>`)
+        // actually open a new tab; without these flags, the empty sandbox
+        // silently swallows every link click. `allow-popups-to-escape-sandbox`
+        // ensures the new tab does NOT inherit the iframe's restrictive
+        // sandbox (otherwise the opened page would also be JS-disabled and
+        // unable to render most modern sites).
+        sandbox="allow-popups allow-popups-to-escape-sandbox"
+        srcDoc={srcDoc}
+        // At lg+ the iframe fills the body slot and scrolls its own document.
+        // Below lg the whole reader scrolls as one (so the header can slide
+        // away), but a sandboxed iframe can't report its content height back
+        // to size itself, so we give it a tall fixed viewport height and let
+        // it scroll internally past that - the standard mobile-webmail
+        // tradeoff.
+        className="block h-[75vh] w-full border-0 lg:min-h-0 lg:flex-1"
+      />
     </div>
   );
 });
@@ -654,7 +642,7 @@ const SandboxedBody = memo(function SandboxedBody({
 function PlainTextBody({ text }: { text: string }) {
   const tokens = useMemo(() => linkifyTokens(text), [text]);
   return (
-    <div className="w-full whitespace-pre-wrap break-words font-sans text-sm leading-6 text-ink lg:h-full lg:overflow-y-auto">
+    <div className="text-ink w-full whitespace-pre-wrap break-words font-sans text-sm leading-6 lg:h-full lg:overflow-y-auto">
       {tokens.map((tok, i) =>
         tok.kind === 'link' ? (
           <a
@@ -662,7 +650,7 @@ function PlainTextBody({ text }: { text: string }) {
             href={tok.href}
             target="_blank"
             rel="noopener noreferrer nofollow"
-            className="text-brand-700 underline hover:text-brand-800"
+            className="text-brand-700 hover:text-brand-800 underline"
           >
             {tok.text}
           </a>

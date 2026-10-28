@@ -90,28 +90,28 @@ export function CommandPalette() {
     <>
       {open ? (
         <div
-          className="fixed inset-0 z-50 flex items-start justify-center bg-ink/40 pt-[15vh] backdrop-blur-sm"
+          className="bg-ink/40 fixed inset-0 z-50 flex items-start justify-center pt-[15vh] backdrop-blur-sm"
           onClick={(e) => {
             if (e.target === e.currentTarget) setOpen(false);
           }}
         >
           <Command
             label="Command Menu"
-            className="w-full max-w-xl overflow-hidden rounded-lg border border-line bg-white shadow-2xl"
+            className="border-line w-full max-w-xl overflow-hidden rounded-lg border bg-white shadow-2xl"
             shouldFilter={!showSearch}
           >
-            <div className="flex items-center gap-2 border-b border-line px-3">
-              <Search className="h-4 w-4 text-ink-disabled" aria-hidden />
+            <div className="border-line flex items-center gap-2 border-b px-3">
+              <Search className="text-ink-disabled h-4 w-4" aria-hidden />
               <Command.Input
                 value={query}
                 onValueChange={setQuery}
                 placeholder="Type a command or search…"
-                className="h-11 flex-1 bg-transparent text-sm outline-none placeholder:text-ink-disabled"
+                className="placeholder:text-ink-disabled h-11 flex-1 bg-transparent text-sm outline-none"
                 autoFocus
               />
             </div>
             <Command.List className="max-h-[60vh] overflow-y-auto p-2">
-              <Command.Empty className="px-3 py-6 text-center text-sm text-ink-disabled">
+              <Command.Empty className="text-ink-disabled px-3 py-6 text-center text-sm">
                 {showSearch && search.isFetching ? 'Searching…' : 'No results.'}
               </Command.Empty>
 
@@ -121,7 +121,7 @@ export function CommandPalette() {
                     <Item key={`recent-${r.href}`} icon={iconFor(r.kind)} onSelect={() => go(r)}>
                       {r.title}
                       {r.context ? (
-                        <span className="ml-auto text-xs text-ink-disabled">{r.context}</span>
+                        <span className="text-ink-disabled ml-auto text-xs">{r.context}</span>
                       ) : null}
                     </Item>
                   ))}
@@ -187,7 +187,9 @@ export function CommandPalette() {
                   <Command.Group heading="Actions">
                     <Item
                       icon={<Plus className="h-4 w-4" />}
-                      onSelect={() => go({ kind: 'nav', title: 'New Project', href: '/projects?new=1' })}
+                      onSelect={() =>
+                        go({ kind: 'nav', title: 'New Project', href: '/projects?new=1' })
+                      }
                     >
                       New Project
                     </Item>
@@ -197,7 +199,9 @@ export function CommandPalette() {
                       <>
                         <Item
                           icon={<Plus className="h-4 w-4" />}
-                          onSelect={() => go({ kind: 'nav', title: 'New Lead', href: '/leads?new=1' })}
+                          onSelect={() =>
+                            go({ kind: 'nav', title: 'New Lead', href: '/leads?new=1' })
+                          }
                         >
                           New Lead
                         </Item>
@@ -213,7 +217,9 @@ export function CommandPalette() {
                     ) : null}
                     <Item
                       icon={<Plus className="h-4 w-4" />}
-                      onSelect={() => go({ kind: 'nav', title: 'New Document', href: '/documents?new=1' })}
+                      onSelect={() =>
+                        go({ kind: 'nav', title: 'New Document', href: '/documents?new=1' })
+                      }
                     >
                       New Document
                     </Item>
@@ -333,12 +339,12 @@ function Item({
   return (
     <Command.Item
       onSelect={onSelect}
-      className="flex cursor-pointer items-center gap-2 rounded px-2 py-1.5 text-sm aria-selected:bg-brand-50 aria-selected:text-brand-700"
+      className="aria-selected:bg-brand-50 aria-selected:text-brand-700 flex cursor-pointer items-center gap-2 rounded px-2 py-1.5 text-sm"
     >
       {icon ? <span className="text-ink-muted">{icon}</span> : null}
       <span className="flex-1">{children}</span>
       {shortcut ? (
-        <kbd className="ml-2 rounded border border-line bg-bg-subtle px-1.5 py-0.5 text-[10px] font-mono uppercase text-ink-muted">
+        <kbd className="border-line bg-bg-subtle text-ink-muted ml-2 rounded border px-1.5 py-0.5 font-mono text-[10px] uppercase">
           {shortcut}
         </kbd>
       ) : null}
@@ -346,22 +352,16 @@ function Item({
   );
 }
 
-function SearchResultItem({
-  result,
-  onSelect,
-}: {
-  result: SearchResult;
-  onSelect: () => void;
-}) {
+function SearchResultItem({ result, onSelect }: { result: SearchResult; onSelect: () => void }) {
   const icon = useMemo(() => iconFor(result.kind), [result.kind]);
   return (
     <Item icon={icon} onSelect={onSelect}>
       <span>{result.title}</span>
-      <span className="ml-2 text-xs uppercase tracking-wide text-ink-disabled">
+      <span className="text-ink-disabled ml-2 text-xs uppercase tracking-wide">
         {result.kind.replace('_', ' ')}
       </span>
       {result.context ? (
-        <span className="ml-auto truncate text-xs text-ink-disabled">{result.context}</span>
+        <span className="text-ink-disabled ml-auto truncate text-xs">{result.context}</span>
       ) : null}
     </Item>
   );

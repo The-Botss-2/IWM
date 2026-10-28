@@ -53,7 +53,7 @@ export function CustomFieldControl({
     <Label htmlFor={id}>
       {def.name}
       {def.required ? (
-        <span className="ml-0.5 text-state-error" aria-label="required">
+        <span className="text-state-error ml-0.5" aria-label="required">
           *
         </span>
       ) : null}
@@ -109,7 +109,9 @@ export function CustomFieldControl({
         </div>
       );
     case 'MULTI_SELECT':
-      return <MultiSelectField id={id} def={def} value={value} readOnly={readOnly} onSave={onSave} />;
+      return (
+        <MultiSelectField id={id} def={def} value={value} readOnly={readOnly} onSave={onSave} />
+      );
     case 'USER':
       return (
         <div className="space-y-1.5">
@@ -153,12 +155,12 @@ function MultiSelectField({
   const options = def.options ?? [];
   return (
     <fieldset className="space-y-1.5">
-      <legend className="text-sm font-medium text-ink">
+      <legend className="text-ink text-sm font-medium">
         {def.name}
-        {def.required ? <span className="ml-0.5 text-state-error">*</span> : null}
+        {def.required ? <span className="text-state-error ml-0.5">*</span> : null}
       </legend>
       {options.length === 0 ? (
-        <p className="text-sm text-ink-muted">No options defined.</p>
+        <p className="text-ink-muted text-sm">No options defined.</p>
       ) : (
         <div className="flex flex-wrap gap-x-4 gap-y-2 pt-1">
           {options.map((o) => {
@@ -273,7 +275,7 @@ function TextField({
         ) : null}
       </div>
       {error ? (
-        <p id={errorId} className="text-xs text-state-error">
+        <p id={errorId} className="text-state-error text-xs">
           {error}
         </p>
       ) : null}

@@ -46,7 +46,6 @@ export function boxAt(kind: SignatureFieldKind, page: number, cx: number, cy: nu
   return clampBox({ page, x: cx - w / 2, y: cy - h / 2, w, h });
 }
 
-
 export function moveBy<T extends FieldBox>(f: T, dx: number, dy: number): T {
   return clampBox({ ...f, x: f.x + dx, y: f.y + dy });
 }

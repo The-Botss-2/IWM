@@ -22,7 +22,8 @@ function ownedElsewhere(): ConflictException {
   return new ConflictException({
     title: 'Registered to another account',
     status: 409,
-    detail: 'This device is still registered for another account. Sign that account out on the device first.',
+    detail:
+      'This device is still registered for another account. Sign that account out on the device first.',
     code: 'push-target-owned',
   });
 }
@@ -60,9 +61,7 @@ export class NotificationsPushService {
   // EXPO_ACCESS_TOKEN only raises rate limits. The project's FCM/APNs creds
   // live in EAS, not here. Reaches a fully closed app, unlike Web Push.
   private readonly expo = new Expo(
-    process.env.EXPO_ACCESS_TOKEN
-      ? { accessToken: process.env.EXPO_ACCESS_TOKEN }
-      : undefined,
+    process.env.EXPO_ACCESS_TOKEN ? { accessToken: process.env.EXPO_ACCESS_TOKEN } : undefined,
   );
 
   constructor(
@@ -101,10 +100,7 @@ export class NotificationsPushService {
    * must not let anyone redirect another person's notifications to their
    * own account or silence that person's device.
    */
-  async subscribe(
-    userId: string,
-    input: SubscribePushInput,
-  ): Promise<{ ok: true }> {
+  async subscribe(userId: string, input: SubscribePushInput): Promise<{ ok: true }> {
     if (!isAllowedPushEndpoint(input.endpoint)) {
       throw new BadRequestException({
         title: 'Unsupported push endpoint',
@@ -198,9 +194,7 @@ export class NotificationsPushService {
     if (!this.enabled) {
       if (!this.warnedDisabledOnce) {
         this.warnedDisabledOnce = true;
-        this.logger.warn(
-          'sendDesktopNotification called but Web Push is disabled - skipping.',
-        );
+        this.logger.warn('sendDesktopNotification called but Web Push is disabled - skipping.');
       }
       return { sent: 0, dropped: 0 };
     }
@@ -267,10 +261,7 @@ export class NotificationsPushService {
    *  rebinding it would let anyone take over that person's device
    *  notifications. The mobile shell unregisters on sign-out, which frees
    *  the token for the next account on the device. */
-  async registerDevice(
-    userId: string,
-    input: RegisterPushDeviceInput,
-  ): Promise<{ ok: true }> {
+  async registerDevice(userId: string, input: RegisterPushDeviceInput): Promise<{ ok: true }> {
     const existing = await this.prisma.client.userPushDevice.findUnique({
       where: { token: input.token },
       select: { userId: true },
@@ -341,10 +332,7 @@ export class NotificationsPushService {
           const ticket = tickets[i];
           const device = valid[cursor + i];
           if (!ticket || !device) continue;
-          if (
-            ticket.status === 'error' &&
-            ticket.details?.error === 'DeviceNotRegistered'
-          ) {
+          if (ticket.status === 'error' && ticket.details?.error === 'DeviceNotRegistered') {
             await this.prisma.client.userPushDevice
               .delete({ where: { id: device.id } })
               .catch((cleanupErr) => {
@@ -355,9 +343,7 @@ export class NotificationsPushService {
           }
         }
       } catch (err) {
-        this.logger.warn(
-          `Expo push chunk failed ${who}:${(err as Error)?.message ?? 'unknown'}`,
-        );
+        this.logger.warn(`Expo push chunk failed ${who}:${(err as Error)?.message ?? 'unknown'}`);
       }
       cursor += chunk.length;
     }

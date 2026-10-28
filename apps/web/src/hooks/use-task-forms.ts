@@ -1,11 +1,7 @@
 'use client';
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import type {
-  CreateTaskFormInput,
-  TaskForm,
-  UpdateTaskFormInput,
-} from '@botss/shared-types';
+import type { CreateTaskFormInput, TaskForm, UpdateTaskFormInput } from '@botss/shared-types';
 
 import { getApi } from '@/lib/api';
 
@@ -17,8 +13,7 @@ const PINNED = {
 };
 
 const taskFormsKey = (projectId: string) => ['task-forms', projectId] as const;
-const taskFormSubmissionsKey = (formId: string) =>
-  ['task-forms', 'submissions', formId] as const;
+const taskFormSubmissionsKey = (formId: string) => ['task-forms', 'submissions', formId] as const;
 
 export function useTaskForms(projectId: string) {
   return useQuery({

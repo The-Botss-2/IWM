@@ -31,7 +31,7 @@ export function ClientBillingTab({ clientId }: { clientId: string }) {
   return (
     <div className="space-y-6">
       <section aria-labelledby="client-billing-heading" className="space-y-3">
-        <h2 id="client-billing-heading" className="text-base font-semibold text-ink">
+        <h2 id="client-billing-heading" className="text-ink text-base font-semibold">
           Billing
         </h2>
         {summary.isLoading ? (
@@ -76,7 +76,7 @@ function BillingSummary({ summary }: { summary: ClientBillingSummary }) {
   const { counts } = summary;
   return (
     <div className="space-y-3">
-      <p className="text-sm text-ink-muted">
+      <p className="text-ink-muted text-sm">
         {plural(counts.invoices, 'invoice', 'invoices')}
         {counts.openInvoices > 0 ? `, ${counts.openInvoices} open` : ''}
         {counts.overdueInvoices > 0 ? (
@@ -88,7 +88,7 @@ function BillingSummary({ summary }: { summary: ClientBillingSummary }) {
         {plural(counts.payments, 'payment', 'payments')}
       </p>
       {summary.byCurrency.length === 0 ? (
-        <p className="rounded-lg border border-dashed border-line bg-white p-6 text-center text-sm text-ink-muted">
+        <p className="border-line text-ink-muted rounded-lg border border-dashed bg-white p-6 text-center text-sm">
           Nothing billed or received yet.
         </p>
       ) : (
@@ -107,9 +107,9 @@ function CurrencyCard({ row }: { row: ClientBillingCurrency }) {
   return (
     <section
       aria-label={`${row.currency} totals`}
-      className="rounded-lg border border-line bg-white p-4"
+      className="border-line rounded-lg border bg-white p-4"
     >
-      <h3 className="text-xs font-semibold uppercase tracking-wide text-ink-muted">
+      <h3 className="text-ink-muted text-xs font-semibold uppercase tracking-wide">
         {row.currency}
       </h3>
       <div className="mt-3 grid gap-4 sm:grid-cols-3">
@@ -141,7 +141,7 @@ function CurrencyCard({ row }: { row: ClientBillingCurrency }) {
 function Group({ title, children }: { title: string; children: ReactNode }) {
   return (
     <div>
-      <p className="text-xs font-medium text-ink">{title}</p>
+      <p className="text-ink text-xs font-medium">{title}</p>
       <dl className="mt-1.5 space-y-1">{children}</dl>
     </div>
   );
@@ -164,8 +164,8 @@ function Figure({
       <dd
         className={cn(
           'tabular-nums',
-          strong && 'font-semibold text-ink',
-          alert && 'font-medium text-brand-orange',
+          strong && 'text-ink font-semibold',
+          alert && 'text-brand-orange font-medium',
         )}
       >
         {value}
@@ -186,18 +186,11 @@ function ClientContracts({ clientId }: { clientId: string }) {
         </Button>
       </div>
       {contracts.isError ? (
-        <QueryError
-          message="Couldn't load contracts."
-          onRetry={() => void contracts.refetch()}
-        />
+        <QueryError message="Couldn't load contracts." onRetry={() => void contracts.refetch()} />
       ) : (
         <ContractList items={contracts.data?.items ?? []} loading={contracts.isLoading} />
       )}
-      <ContractFormDialog
-        open={creating}
-        onOpenChange={setCreating}
-        defaultClientId={clientId}
-      />
+      <ContractFormDialog open={creating} onOpenChange={setCreating} defaultClientId={clientId} />
     </div>
   );
 }
@@ -205,17 +198,7 @@ function ClientContracts({ clientId }: { clientId: string }) {
 function ClientPayments({ clientId }: { clientId: string }) {
   const payments = usePayments({ clientId, pageSize: 100 });
   if (payments.isError) {
-    return (
-      <QueryError
-        message="Couldn't load payments."
-        onRetry={() => void payments.refetch()}
-      />
-    );
+    return <QueryError message="Couldn't load payments." onRetry={() => void payments.refetch()} />;
   }
-  return (
-    <PaymentList
-      items={payments.data?.items ?? []}
-      loading={payments.isLoading}
-    />
-  );
+  return <PaymentList items={payments.data?.items ?? []} loading={payments.isLoading} />;
 }

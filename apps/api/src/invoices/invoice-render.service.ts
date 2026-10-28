@@ -143,10 +143,15 @@ export class InvoiceRenderService {
     private readonly files: FilesService,
   ) {}
 
-  async settingsFor(workspaceId: string): Promise<{ organizationId: string; settings: InvoiceSettings }> {
+  async settingsFor(
+    workspaceId: string,
+  ): Promise<{ organizationId: string; settings: InvoiceSettings }> {
     const ws = await this.prisma.client.workspace.findUniqueOrThrow({
       where: { id: workspaceId },
-      select: { organizationId: true, organization: { select: { invoiceSettings: true, name: true } } },
+      select: {
+        organizationId: true,
+        organization: { select: { invoiceSettings: true, name: true } },
+      },
     });
     const parsed = invoiceSettingsSchema.safeParse(ws.organization.invoiceSettings ?? {});
     const settings: InvoiceSettings = parsed.success ? parsed.data : {};
@@ -155,7 +160,10 @@ export class InvoiceRenderService {
   }
 
   /** Resolve which template renders an invoice: its own, the org default, or built-in. */
-  async resolveTemplateKey(explicit: string | null | undefined, settings: InvoiceSettings): Promise<string> {
+  async resolveTemplateKey(
+    explicit: string | null | undefined,
+    settings: InvoiceSettings,
+  ): Promise<string> {
     const available = new Set((await this.templates.list()).map((t) => t.key));
     for (const key of [explicit, settings.defaultTemplateKey, DEFAULT_TEMPLATE_KEY]) {
       if (key && available.has(key)) return key;
@@ -163,7 +171,10 @@ export class InvoiceRenderService {
     return DEFAULT_TEMPLATE_KEY;
   }
 
-  async renderSaved(workspaceId: string, invoiceId: string): Promise<{
+  async renderSaved(
+    workspaceId: string,
+    invoiceId: string,
+  ): Promise<{
     html: string;
     paper: 'A4' | 'Letter';
     marginsMm: { top: number; right: number; bottom: number; left: number };
@@ -269,10 +280,11 @@ export class InvoiceRenderService {
         total: totals.total,
         amountPaid: amountPaid.toFixed(2),
         balanceDue: (balance.isNegative() ? new D(0) : balance).toFixed(2),
-        notes: input.notes === undefined ? saved?.notes ?? null : input.notes,
+        notes: input.notes === undefined ? (saved?.notes ?? null) : input.notes,
         terms:
           (input.terms === undefined ? saved?.terms : input.terms) ?? settings.paymentTerms ?? null,
-        footer: (input.footer === undefined ? saved?.footer : input.footer) ?? settings.footer ?? null,
+        footer:
+          (input.footer === undefined ? saved?.footer : input.footer) ?? settings.footer ?? null,
       },
       client: client
         ? this.clientView(client)
@@ -310,9 +322,12 @@ export class InvoiceRenderService {
     country: string | null;
   }): InvoiceViewModel['client'] {
     const cityLine = [client.city, client.state, client.postalCode].filter(Boolean).join(', ');
-    const addressLines = [client.addressLine1, client.addressLine2, cityLine, client.country].filter(
-      (v): v is string => Boolean(v && v.trim()),
-    );
+    const addressLines = [
+      client.addressLine1,
+      client.addressLine2,
+      cityLine,
+      client.country,
+    ].filter((v): v is string => Boolean(v && v.trim()));
     return {
       name: client.name,
       legalName: client.legalName,
@@ -335,7 +350,10 @@ export class InvoiceRenderService {
     return this.companyView(workspaceId, settings);
   }
 
-  private async companyView(workspaceId: string, settings: InvoiceSettings): Promise<InvoiceViewModel['company']> {
+  private async companyView(
+    workspaceId: string,
+    settings: InvoiceSettings,
+  ): Promise<InvoiceViewModel['company']> {
     let logo: string | null = null;
     if (settings.logoFileId) {
       try {
@@ -344,7 +362,9 @@ export class InvoiceRenderService {
           logo = `data:${file.mimeType};base64,${file.body.toString('base64')}`;
         }
       } catch (err) {
-        this.logger.warn(`Invoice logo could not be loaded: ${(err as Error)?.message ?? 'unknown'}`);
+        this.logger.warn(
+          `Invoice logo could not be loaded: ${(err as Error)?.message ?? 'unknown'}`,
+        );
       }
     }
     return {

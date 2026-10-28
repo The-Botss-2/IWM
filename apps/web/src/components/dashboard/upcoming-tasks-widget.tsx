@@ -43,23 +43,18 @@ export function UpcomingTasksWidget() {
       ) : isError ? (
         <QueryError compact onRetry={() => void refetch()} />
       ) : items.length === 0 ? (
-        <WidgetEmpty
-          icon={ListChecks}
-          message="No tasks due in the next 7 days."
-        />
+        <WidgetEmpty icon={ListChecks} message="No tasks due in the next 7 days." />
       ) : (
         <ul className="space-y-1.5" role="list">
           {items.map((t) => (
             <li key={t.id}>
               <Link
                 href={`/projects/${t.projectId}`}
-                className="flex items-center justify-between gap-2 rounded-md px-1.5 py-1 text-sm hover:bg-bg-subtle"
+                className="hover:bg-bg-subtle flex items-center justify-between gap-2 rounded-md px-1.5 py-1 text-sm"
               >
-                <span className="min-w-0 flex-1 truncate text-ink">
-                  {t.title}
-                </span>
+                <span className="text-ink min-w-0 flex-1 truncate">{t.title}</span>
                 {t.dueDate ? (
-                  <span className="shrink-0 text-[11px] text-ink-muted">
+                  <span className="text-ink-muted shrink-0 text-[11px]">
                     {new Date(t.dueDate).toLocaleDateString(undefined, {
                       month: 'short',
                       day: 'numeric',

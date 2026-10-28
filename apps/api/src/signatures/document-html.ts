@@ -176,7 +176,8 @@ export function tiptapToPrintHtml(doc: unknown, images: Map<string, string>): st
         const colspan = Math.max(1, Math.round(num(n.attrs?.['colspan'], 1)));
         const rowspan = Math.max(1, Math.round(num(n.attrs?.['rowspan'], 1)));
         const span =
-          (colspan > 1 ? ` colspan="${colspan}"` : '') + (rowspan > 1 ? ` rowspan="${rowspan}"` : '');
+          (colspan > 1 ? ` colspan="${colspan}"` : '') +
+          (rowspan > 1 ? ` rowspan="${rowspan}"` : '');
         return `<${tag}${span}>${children(n)}</${tag}>`;
       }
       case 'image': {
@@ -186,7 +187,11 @@ export function tiptapToPrintHtml(doc: unknown, images: Map<string, string>): st
         const width = Math.min(100, Math.max(10, num(n.attrs?.['width'], 100)));
         const align = str(n.attrs?.['align']);
         const margin =
-          align === 'left' ? 'margin:0 auto 0 0' : align === 'right' ? 'margin:0 0 0 auto' : 'margin:0 auto';
+          align === 'left'
+            ? 'margin:0 auto 0 0'
+            : align === 'right'
+              ? 'margin:0 0 0 auto'
+              : 'margin:0 auto';
         const alt = escapeHtml(str(n.attrs?.['alt']) ?? '');
         return `<img src="${data}" alt="${alt}" style="display:block;width:${width}%;height:auto;${margin}">`;
       }

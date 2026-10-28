@@ -43,10 +43,7 @@ export class TimesheetsService {
    * Failures are swallowed: a hiccup here must never block the
    * timesheet write itself.
    */
-  private async autoMarkAttendance(
-    userId: string,
-    date: Date,
-  ): Promise<void> {
+  private async autoMarkAttendance(userId: string, date: Date): Promise<void> {
     const day = new Date(date);
     day.setUTCHours(0, 0, 0, 0);
     try {
@@ -104,10 +101,7 @@ export class TimesheetsService {
    * users can log time against a project from a different workspace without
    * having to switch tenants in the UI first.
    */
-  private async assertProjectAccessibleToUser(
-    userId: string,
-    projectId: string,
-  ): Promise<void> {
+  private async assertProjectAccessibleToUser(userId: string, projectId: string): Promise<void> {
     const orgId = await userOrgId(this.prisma, userId);
     const project = orgId
       ? await this.prisma.client.project.findFirst({
@@ -193,8 +187,7 @@ export class TimesheetsService {
       where: { id: actingUserId },
       select: { systemRole: true, organizationId: true },
     });
-    const isAdmin =
-      actor?.systemRole === 'ADMIN' || actor?.systemRole === 'SUPER_ADMIN';
+    const isAdmin = actor?.systemRole === 'ADMIN' || actor?.systemRole === 'SUPER_ADMIN';
     if (!isAdmin) return actingUserId;
     const target = await this.prisma.client.user.findUnique({
       where: { id: requestedUserId },
@@ -214,10 +207,7 @@ export class TimesheetsService {
     _workspaceId: string,
     query: ListTimesheetsQuery,
   ): Promise<{ items: TimeEntryWithMeta[] }> {
-    const targetUserId = await this.resolveAdminTargetUser(
-      actingUserId,
-      query.userId,
-    );
+    const targetUserId = await this.resolveAdminTargetUser(actingUserId, query.userId);
     // Timesheets are intentionally cross-workspace: a single user's tracked
     // time is a personal log, not tenant-scoped. We still keep workspaceId on
     // the row for traceability but don't filter by it on reads.
@@ -286,11 +276,7 @@ export class TimesheetsService {
               ? projectLabel
               : null,
           taskId: input.taskId ?? null,
-          taskLabel: input.taskId
-            ? null
-            : taskLabel && taskLabel.length > 0
-              ? taskLabel
-              : null,
+          taskLabel: input.taskId ? null : taskLabel && taskLabel.length > 0 ? taskLabel : null,
           description: input.description ?? null,
           startTime: new Date(),
           billable: input.billable ?? true,
@@ -302,10 +288,7 @@ export class TimesheetsService {
     return this.mapRow(row);
   }
 
-  async stopTimer(
-    userId: string,
-    entryId: string,
-  ): Promise<TimeEntryWithMeta> {
+  async stopTimer(userId: string, entryId: string): Promise<TimeEntryWithMeta> {
     // Wrap stop in a transaction so the pause-fold + endTime + durationMin
     // update is atomic. Stopping a paused timer needs to first credit the
     // open pause delta to `accumulatedPauseMin`, then close out the row.
@@ -372,10 +355,7 @@ export class TimesheetsService {
    * all run inside the transaction so a racing pause/resume pair from
    * two tabs can't both succeed.
    */
-  async pauseTimer(
-    userId: string,
-    entryId: string,
-  ): Promise<TimeEntryWithMeta> {
+  async pauseTimer(userId: string, entryId: string): Promise<TimeEntryWithMeta> {
     return this.prisma.client.$transaction(async (tx) => {
       const existing = await tx.timeEntry.findFirst({
         where: { id: entryId, deletedAt: null },
@@ -413,10 +393,7 @@ export class TimesheetsService {
    * accumulator and clears `pausedAt`. Rejects with `400` if the timer
    * is running (nothing to resume) or stopped.
    */
-  async resumeTimer(
-    userId: string,
-    entryId: string,
-  ): Promise<TimeEntryWithMeta> {
+  async resumeTimer(userId: string, entryId: string): Promise<TimeEntryWithMeta> {
     return this.prisma.client.$transaction(async (tx) => {
       const existing = await tx.timeEntry.findFirst({
         where: { id: entryId, deletedAt: null },
@@ -491,11 +468,7 @@ export class TimesheetsService {
             ? projectLabel
             : null,
         taskId: input.taskId ?? null,
-        taskLabel: input.taskId
-          ? null
-          : taskLabel && taskLabel.length > 0
-            ? taskLabel
-            : null,
+        taskLabel: input.taskId ? null : taskLabel && taskLabel.length > 0 ? taskLabel : null,
         description: input.description ?? null,
         startTime: input.startTime,
         endTime: input.endTime,
@@ -527,15 +500,12 @@ export class TimesheetsService {
       await this.assertProjectAccessibleToUser(userId, input.projectId);
     }
     if (input.taskId !== undefined && input.taskId !== null) {
-      const targetProjectId =
-        input.projectId !== undefined ? input.projectId : existing.projectId;
+      const targetProjectId = input.projectId !== undefined ? input.projectId : existing.projectId;
       await this.assertTaskInProject(userId, input.taskId, targetProjectId ?? undefined);
     }
     const data: Prisma.TimeEntryUpdateInput = {};
     if (input.projectId !== undefined) {
-      data.project = input.projectId
-        ? { connect: { id: input.projectId } }
-        : { disconnect: true };
+      data.project = input.projectId ? { connect: { id: input.projectId } } : { disconnect: true };
       // Clear any leftover free-text label when a concrete project takes over.
       if (input.projectId) data.projectLabel = null;
     }
@@ -544,9 +514,7 @@ export class TimesheetsService {
       data.projectLabel = trimmed && trimmed.length > 0 ? trimmed : null;
     }
     if (input.taskId !== undefined) {
-      data.task = input.taskId
-        ? { connect: { id: input.taskId } }
-        : { disconnect: true };
+      data.task = input.taskId ? { connect: { id: input.taskId } } : { disconnect: true };
       // Drop any free-text label when a concrete task takes over.
       if (input.taskId) data.taskLabel = null;
     }
@@ -560,8 +528,7 @@ export class TimesheetsService {
     if (input.billable !== undefined) data.billable = input.billable;
 
     const startTime = input.startTime ?? existing.startTime;
-    const endTime =
-      input.endTime !== undefined ? input.endTime : existing.endTime;
+    const endTime = input.endTime !== undefined ? input.endTime : existing.endTime;
     if (endTime) {
       data.durationMin = Math.max(
         0,
@@ -605,10 +572,7 @@ export class TimesheetsService {
     to: Date,
     userIdOverride: string | undefined,
   ): Promise<TimesheetSummaryResponse> {
-    const targetUserId = await this.resolveAdminTargetUser(
-      actingUserId,
-      userIdOverride,
-    );
+    const targetUserId = await this.resolveAdminTargetUser(actingUserId, userIdOverride);
     // Summed in the database, one row per (project, label) pair, instead of
     // loading every entry. The pairs fold into the same buckets as before:
     // a project id wins, else a non-empty label, else "no project".
@@ -639,7 +603,13 @@ export class TimesheetsService {
 
     const byProject = new Map<
       string,
-      { projectId: string | null; projectName: string | null; projectColor: string | null; totalMinutes: number; entryCount: number }
+      {
+        projectId: string | null;
+        projectName: string | null;
+        projectColor: string | null;
+        totalMinutes: number;
+        entryCount: number;
+      }
     >();
     let total = 0;
     for (const g of groups) {
@@ -647,14 +617,13 @@ export class TimesheetsService {
       const key = g.projectId ?? labelKey ?? '__none__';
       const project = g.projectId ? projectById.get(g.projectId) : undefined;
       const minutes = g._sum.durationMin ?? 0;
-      const existing =
-        byProject.get(key) ?? {
-          projectId: g.projectId,
-          projectName: project?.name ?? g.projectLabel ?? null,
-          projectColor: project?.color ?? null,
-          totalMinutes: 0,
-          entryCount: 0,
-        };
+      const existing = byProject.get(key) ?? {
+        projectId: g.projectId,
+        projectName: project?.name ?? g.projectLabel ?? null,
+        projectColor: project?.color ?? null,
+        totalMinutes: 0,
+        entryCount: 0,
+      };
       existing.totalMinutes += minutes;
       existing.entryCount += g._count._all;
       total += minutes;
@@ -662,9 +631,7 @@ export class TimesheetsService {
     }
     return {
       totalMinutes: total,
-      byProject: Array.from(byProject.values()).sort(
-        (a, b) => b.totalMinutes - a.totalMinutes,
-      ),
+      byProject: Array.from(byProject.values()).sort((a, b) => b.totalMinutes - a.totalMinutes),
     };
   }
 

@@ -89,25 +89,14 @@ export class ChatResource {
   }
 
   addParticipants(roomId: string, input: AddParticipantsInput) {
-    return this.http.post(
-      `/chat/rooms/${roomId}/participants`,
-      addParticipantsResultSchema,
-      input,
-    );
+    return this.http.post(`/chat/rooms/${roomId}/participants`, addParticipantsResultSchema, input);
   }
 
   removeParticipant(roomId: string, userId: string) {
-    return this.http.delete(
-      `/chat/rooms/${roomId}/participants/${userId}`,
-      okSchema,
-    );
+    return this.http.delete(`/chat/rooms/${roomId}/participants/${userId}`, okSchema);
   }
 
-  updateParticipantRole(
-    roomId: string,
-    userId: string,
-    role: ChatRoomParticipantRole,
-  ) {
+  updateParticipantRole(roomId: string, userId: string, role: ChatRoomParticipantRole) {
     return this.http.put(
       `/chat/rooms/${roomId}/participants/${userId}/role`,
       z.object({
@@ -139,7 +128,10 @@ export class ChatResource {
     );
   }
 
-  sendMessage(roomId: string, body: SendChatMessageBody): Promise<{ ok: true; message: ChatRoomMessage }> {
+  sendMessage(
+    roomId: string,
+    body: SendChatMessageBody,
+  ): Promise<{ ok: true; message: ChatRoomMessage }> {
     return this.http.post(
       `/chat/rooms/${roomId}/messages`,
       z.object({ ok: z.literal(true), message: chatRoomMessageSchema }),
@@ -148,11 +140,7 @@ export class ChatResource {
   }
 
   createInvite(roomId: string, input: CreateInviteInput = {}): Promise<ChatRoomInvite> {
-    return this.http.post(
-      `/chat/rooms/${roomId}/invites`,
-      chatRoomInviteSchema,
-      input,
-    );
+    return this.http.post(`/chat/rooms/${roomId}/invites`, chatRoomInviteSchema, input);
   }
 
   previewInvite(code: string): Promise<InvitePreview> {
@@ -172,10 +160,7 @@ export class ChatResource {
   }
 
   adminDeleteRoom(roomId: string) {
-    return this.http.delete(
-      `/chat/admin/rooms/${roomId}`,
-      z.object({ ok: z.literal(true) }),
-    );
+    return this.http.delete(`/chat/admin/rooms/${roomId}`, z.object({ ok: z.literal(true) }));
   }
 
   initiateCall(roomId: string) {

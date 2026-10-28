@@ -15,10 +15,7 @@ import { CurrentUser, type AuthedUser } from '../common/decorators/current-user.
 import { CurrentWorkspaceId } from '../common/decorators/current-workspace.decorator';
 import { RequestAbility } from '../common/decorators/request-ability.decorator';
 import { RequireAbility } from '../common/decorators/required-ability.decorator';
-import {
-  RequestUserScope,
-  type UserScope,
-} from '../common/decorators/user-scope.decorator';
+import { RequestUserScope, type UserScope } from '../common/decorators/user-scope.decorator';
 import { ZodValidationPipe } from '../common/pipes/zod-validation.pipe';
 import { ProjectsService } from './projects.service';
 
@@ -47,10 +44,7 @@ export class ProjectsController {
 
   @Get(':id')
   @RequireAbility('read', 'Project')
-  get(
-    @RequestUserScope() scope: UserScope,
-    @Param('id', new ZodValidationPipe(cuid)) id: string,
-  ) {
+  get(@RequestUserScope() scope: UserScope, @Param('id', new ZodValidationPipe(cuid)) id: string) {
     return this.projects.get(scope, id);
   }
 

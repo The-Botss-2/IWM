@@ -18,10 +18,7 @@ import type { AppAbility } from '@botss/auth';
 import { CurrentUser, type AuthedUser } from '../common/decorators/current-user.decorator';
 import { RequestAbility } from '../common/decorators/request-ability.decorator';
 import { RequireAbility } from '../common/decorators/required-ability.decorator';
-import {
-  RequestUserScope,
-  type UserScope,
-} from '../common/decorators/user-scope.decorator';
+import { RequestUserScope, type UserScope } from '../common/decorators/user-scope.decorator';
 import { ZodValidationPipe } from '../common/pipes/zod-validation.pipe';
 import { TasksService } from './tasks.service';
 
@@ -60,10 +57,7 @@ export class TasksController {
 
   @Get(':id')
   @RequireAbility('read', 'Task')
-  get(
-    @RequestUserScope() scope: UserScope,
-    @Param('id', new ZodValidationPipe(cuid)) id: string,
-  ) {
+  get(@RequestUserScope() scope: UserScope, @Param('id', new ZodValidationPipe(cuid)) id: string) {
     return this.tasks.get(scope, id);
   }
 

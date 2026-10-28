@@ -1,11 +1,6 @@
 'use client';
 
-import {
-  useMutation,
-  useQuery,
-  useQueryClient,
-  type QueryClient,
-} from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient, type QueryClient } from '@tanstack/react-query';
 import type {
   ChatRoomListResponse,
   ChatRoomMessage,
@@ -19,8 +14,7 @@ import { getApi } from '@/lib/api';
 import { toast, toastError } from '@/lib/toast';
 
 export const chatRoomsKey = ['chat', 'rooms'] as const;
-export const chatMessagesKey = (roomId: string) =>
-  ['chat', 'messages', roomId] as const;
+export const chatMessagesKey = (roomId: string) => ['chat', 'messages', roomId] as const;
 
 function asDate(value: unknown): Date {
   if (value instanceof Date) return value;
@@ -33,9 +27,7 @@ function asNullableDate(value: unknown): Date | null {
   return asDate(value);
 }
 
-export function hydrateMessage<T extends ChatRoomMessage & Record<string, unknown>>(
-  raw: T,
-): T {
+export function hydrateMessage<T extends ChatRoomMessage & Record<string, unknown>>(raw: T): T {
   return {
     ...raw,
     createdAt: asDate(raw.createdAt),
@@ -47,7 +39,7 @@ export function hydrateMessage<T extends ChatRoomMessage & Record<string, unknow
           createdAt: asDate(raw.parentMessage.createdAt),
           deletedAt: asNullableDate(raw.parentMessage.deletedAt),
         }
-      : raw.parentMessage ?? null,
+      : (raw.parentMessage ?? null),
   };
 }
 
@@ -64,8 +56,7 @@ export function useChatRooms(options: { enabled?: boolean } = {}) {
 export function useRoomMessages(roomId: string | null) {
   return useQuery({
     queryKey: chatMessagesKey(roomId ?? '__none__'),
-    queryFn: () =>
-      getApi().chat.listMessages({ roomId: roomId as string, limit: 50 }),
+    queryFn: () => getApi().chat.listMessages({ roomId: roomId as string, limit: 50 }),
     enabled: !!roomId,
     staleTime: 5_000,
     refetchOnWindowFocus: false,
@@ -76,8 +67,7 @@ export function useAddParticipants(roomId: string) {
   const qc = useQueryClient();
   return useMutation({
     meta: { errorTitle: "Couldn't add members" },
-    mutationFn: (userIds: string[]) =>
-      getApi().chat.addParticipants(roomId, { userIds }),
+    mutationFn: (userIds: string[]) => getApi().chat.addParticipants(roomId, { userIds }),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: chatRoomsKey });
     },
@@ -88,8 +78,7 @@ export function useRemoveParticipant(roomId: string) {
   const qc = useQueryClient();
   return useMutation({
     meta: { errorTitle: "Couldn't remove member" },
-    mutationFn: (userId: string) =>
-      getApi().chat.removeParticipant(roomId, userId),
+    mutationFn: (userId: string) => getApi().chat.removeParticipant(roomId, userId),
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: chatRoomsKey });
     },
@@ -121,18 +110,13 @@ export function applyReactionUpdate(
   messageId: string,
   reactions: { emoji: string; count: number; reactedByMe: boolean; userIds: string[] }[],
 ): void {
-  qc.setQueryData<ChatRoomMessagesResponse | undefined>(
-    chatMessagesKey(roomId),
-    (prev) => {
-      if (!prev) return prev;
-      return {
-        ...prev,
-        items: prev.items.map((m) =>
-          m.id === messageId ? { ...m, reactions } : m,
-        ),
-      };
-    },
-  );
+  qc.setQueryData<ChatRoomMessagesResponse | undefined>(chatMessagesKey(roomId), (prev) => {
+    if (!prev) return prev;
+    return {
+      ...prev,
+      items: prev.items.map((m) => (m.id === messageId ? { ...m, reactions } : m)),
+    };
+  });
 }
 
 export function useRenameRoom() {
@@ -179,29 +163,20 @@ export function useUpdateRoom() {
  * body in place and refreshes the room's lastMessage preview if it was the one
  * edited.
  */
-export function applyMessageUpdate(
-  qc: QueryClient,
-  roomId: string,
-  raw: ChatRoomMessage,
-): void {
+export function applyMessageUpdate(qc: QueryClient, roomId: string, raw: ChatRoomMessage): void {
   const message = hydrateMessage(raw as ChatRoomMessage & Record<string, unknown>);
-  qc.setQueryData<ChatRoomMessagesResponse | undefined>(
-    chatMessagesKey(roomId),
-    (prev) => {
-      if (!prev) return prev;
-      return {
-        ...prev,
-        items: prev.items.map((m) => (m.id === message.id ? message : m)),
-      };
-    },
-  );
+  qc.setQueryData<ChatRoomMessagesResponse | undefined>(chatMessagesKey(roomId), (prev) => {
+    if (!prev) return prev;
+    return {
+      ...prev,
+      items: prev.items.map((m) => (m.id === message.id ? message : m)),
+    };
+  });
   qc.setQueryData<ChatRoomListResponse | undefined>(chatRoomsKey, (prev) => {
     if (!prev) return prev;
     return {
       items: prev.items.map((r) =>
-        r.id === roomId && r.lastMessage?.id === message.id
-          ? { ...r, lastMessage: message }
-          : r,
+        r.id === roomId && r.lastMessage?.id === message.id ? { ...r, lastMessage: message } : r,
       ),
     };
   });
@@ -221,13 +196,8 @@ export function useForwardMessages() {
   const qc = useQueryClient();
   return useMutation({
     meta: { errorTitle: "Couldn't forward messages" },
-    mutationFn: ({
-      targetRoomId,
-      messageIds,
-    }: {
-      targetRoomId: string;
-      messageIds: string[];
-    }) => getApi().chat.forwardMessages(targetRoomId, messageIds),
+    mutationFn: ({ targetRoomId, messageIds }: { targetRoomId: string; messageIds: string[] }) =>
+      getApi().chat.forwardMessages(targetRoomId, messageIds),
     onSuccess: () => {
       // The forwarder may not have the target room open; nudge the room list so
       // its lastMessage/ordering refreshes even without the socket echo.
@@ -250,28 +220,23 @@ export function useLoadOlderMessages(roomId: string | null) {
     meta: { errorTitle: "Couldn't load older messages" },
     mutationFn: async () => {
       if (!roomId) return null;
-      const current = qc.getQueryData<ChatRoomMessagesResponse>(
-        chatMessagesKey(roomId),
-      );
+      const current = qc.getQueryData<ChatRoomMessagesResponse>(chatMessagesKey(roomId));
       const cursor = current?.nextCursor ?? undefined;
       if (!cursor) return null; // reached the start of history
       return getApi().chat.listMessages({ roomId, cursor, limit: 50 });
     },
     onSuccess: (result) => {
       if (!roomId || !result) return;
-      qc.setQueryData<ChatRoomMessagesResponse | undefined>(
-        chatMessagesKey(roomId),
-        (prev) => {
-          if (!prev) return result;
-          const existing = new Set(prev.items.map((m) => m.id));
-          // api-client already coerced dates; just de-dupe against what's loaded.
-          const older = result.items.filter((m) => !existing.has(m.id));
-          return {
-            items: [...older, ...prev.items],
-            nextCursor: result.nextCursor,
-          };
-        },
-      );
+      qc.setQueryData<ChatRoomMessagesResponse | undefined>(chatMessagesKey(roomId), (prev) => {
+        if (!prev) return result;
+        const existing = new Set(prev.items.map((m) => m.id));
+        // api-client already coerced dates; just de-dupe against what's loaded.
+        const older = result.items.filter((m) => !existing.has(m.id));
+        return {
+          items: [...older, ...prev.items],
+          nextCursor: result.nextCursor,
+        };
+      });
     },
   });
 }
@@ -289,9 +254,7 @@ export function useDeleteMessage() {
           return {
             ...prev,
             items: prev.items.map((m) =>
-              m.id === result.messageId
-                ? { ...m, deletedAt: new Date(), content: null }
-                : m,
+              m.id === result.messageId ? { ...m, deletedAt: new Date(), content: null } : m,
             ),
           };
         },
@@ -340,9 +303,7 @@ export function useMarkRoomRead() {
       qc.setQueryData<ChatRoomListResponse | undefined>(chatRoomsKey, (prev) => {
         if (!prev) return prev;
         return {
-          items: prev.items.map((r) =>
-            r.id === roomId ? { ...r, unreadCount: 0 } : r,
-          ),
+          items: prev.items.map((r) => (r.id === roomId ? { ...r, unreadCount: 0 } : r)),
         };
       });
       return { previous };
@@ -353,20 +314,15 @@ export function useMarkRoomRead() {
     onSuccess: (result, roomId) => {
       // Bump every targeted message's status to READ in the open chat
       // window's cache; harmless if the messages aren't loaded.
-      qc.setQueryData<ChatRoomMessagesResponse | undefined>(
-        chatMessagesKey(roomId),
-        (prev) => {
-          if (!prev) return prev;
-          if (result.messageIds.length === 0) return prev;
-          const ids = new Set(result.messageIds);
-          return {
-            ...prev,
-            items: prev.items.map((m) =>
-              ids.has(m.id) ? { ...m, status: 'READ' as const } : m,
-            ),
-          };
-        },
-      );
+      qc.setQueryData<ChatRoomMessagesResponse | undefined>(chatMessagesKey(roomId), (prev) => {
+        if (!prev) return prev;
+        if (result.messageIds.length === 0) return prev;
+        const ids = new Set(result.messageIds);
+        return {
+          ...prev,
+          items: prev.items.map((m) => (ids.has(m.id) ? { ...m, status: 'READ' as const } : m)),
+        };
+      });
     },
   });
 }
@@ -382,9 +338,7 @@ export function useCreateChatRoom() {
         if (prev.items.some((r) => r.id === room.id)) return prev;
         return { items: [room, ...prev.items] };
       });
-      toast.success(
-        room.type === 'DM' ? 'Chat ready.' : `${room.name ?? 'Group'} created.`,
-      );
+      toast.success(room.type === 'DM' ? 'Chat ready.' : `${room.name ?? 'Group'} created.`);
     },
     onError: (err) => {
       console.error('[chat] createRoom failed:', err);
@@ -398,29 +352,26 @@ export function appendIncomingRoomMessage(
   roomId: string,
   raw: ChatRoomMessage & { clientNonce?: string | null },
 ): void {
-  const message = hydrateMessage(raw as ChatRoomMessage & Record<string, unknown>) as
-    ChatRoomMessage & { clientNonce?: string | null };
-  qc.setQueryData<ChatRoomMessagesResponse | undefined>(
-    chatMessagesKey(roomId),
-    (prev) => {
-      if (!prev) return { items: [message], nextCursor: null };
-      if (prev.items.some((m) => m.id === message.id)) return prev;
-      if (message.clientNonce) {
-        const idx = prev.items.findIndex(
-          (m) =>
-            m.id.startsWith('tmp:') &&
-            (m as ChatRoomMessage & { clientNonce?: string }).clientNonce ===
-              message.clientNonce,
-        );
-        if (idx >= 0) {
-          const next = [...prev.items];
-          next[idx] = message;
-          return { ...prev, items: next };
-        }
+  const message = hydrateMessage(
+    raw as ChatRoomMessage & Record<string, unknown>,
+  ) as ChatRoomMessage & { clientNonce?: string | null };
+  qc.setQueryData<ChatRoomMessagesResponse | undefined>(chatMessagesKey(roomId), (prev) => {
+    if (!prev) return { items: [message], nextCursor: null };
+    if (prev.items.some((m) => m.id === message.id)) return prev;
+    if (message.clientNonce) {
+      const idx = prev.items.findIndex(
+        (m) =>
+          m.id.startsWith('tmp:') &&
+          (m as ChatRoomMessage & { clientNonce?: string }).clientNonce === message.clientNonce,
+      );
+      if (idx >= 0) {
+        const next = [...prev.items];
+        next[idx] = message;
+        return { ...prev, items: next };
       }
-      return { ...prev, items: [...prev.items, message] };
-    },
-  );
+    }
+    return { ...prev, items: [...prev.items, message] };
+  });
 }
 
 export function insertOptimisticRoomMessage(
@@ -428,13 +379,10 @@ export function insertOptimisticRoomMessage(
   roomId: string,
   message: ChatRoomMessage & { clientNonce: string },
 ): void {
-  qc.setQueryData<ChatRoomMessagesResponse | undefined>(
-    chatMessagesKey(roomId),
-    (prev) => {
-      if (!prev) return { items: [message], nextCursor: null };
-      return { ...prev, items: [...prev.items, message] };
-    },
-  );
+  qc.setQueryData<ChatRoomMessagesResponse | undefined>(chatMessagesKey(roomId), (prev) => {
+    if (!prev) return { items: [message], nextCursor: null };
+    return { ...prev, items: [...prev.items, message] };
+  });
   // Re-sort the sidebar immediately. Waiting for the server's `room_bumped`
   // echo means the room the user just typed in visibly lags behind rooms
   // with older messages until the round-trip lands.
@@ -443,17 +391,9 @@ export function insertOptimisticRoomMessage(
 
 /** Drop an optimistic message from the cache (e.g. the user cancelled an
  *  in-flight attachment upload, or a send failed). No-op if not present. */
-export function removeRoomMessage(
-  qc: QueryClient,
-  roomId: string,
-  messageId: string,
-): void {
-  qc.setQueryData<ChatRoomMessagesResponse | undefined>(
-    chatMessagesKey(roomId),
-    (prev) =>
-      prev
-        ? { ...prev, items: prev.items.filter((m) => m.id !== messageId) }
-        : prev,
+export function removeRoomMessage(qc: QueryClient, roomId: string, messageId: string): void {
+  qc.setQueryData<ChatRoomMessagesResponse | undefined>(chatMessagesKey(roomId), (prev) =>
+    prev ? { ...prev, items: prev.items.filter((m) => m.id !== messageId) } : prev,
   );
   // The optimistic insert also bumped the sidebar preview to this message.
   // Now that it's gone, re-fetch the room list so the preview falls back to
@@ -483,21 +423,18 @@ export function applyStatusUpdate(
   isSelfRead?: boolean,
 ): void {
   const ids = messageIds ? new Set(messageIds) : null;
-  qc.setQueryData<ChatRoomMessagesResponse | undefined>(
-    chatMessagesKey(roomId),
-    (prev) => {
-      if (!prev) return prev;
-      return {
-        ...prev,
-        items: prev.items.map((m) => {
-          if (m.id.startsWith('tmp:')) return m;
-          if (ids && !ids.has(m.id)) return m;
-          if (statusRank(m.status) >= statusRank(status)) return m;
-          return { ...m, status };
-        }),
-      };
-    },
-  );
+  qc.setQueryData<ChatRoomMessagesResponse | undefined>(chatMessagesKey(roomId), (prev) => {
+    if (!prev) return prev;
+    return {
+      ...prev,
+      items: prev.items.map((m) => {
+        if (m.id.startsWith('tmp:')) return m;
+        if (ids && !ids.has(m.id)) return m;
+        if (statusRank(m.status) >= statusRank(status)) return m;
+        return { ...m, status };
+      }),
+    };
+  });
   qc.setQueryData<ChatRoomListResponse | undefined>(chatRoomsKey, (prev) => {
     if (!prev) return prev;
     return {
@@ -560,8 +497,7 @@ export function bumpRoom(
       ...current,
       lastMessage,
       updatedAt: lastMessage.createdAt,
-      unreadCount:
-        isSelf || isRepeat ? current.unreadCount : current.unreadCount + 1,
+      unreadCount: isSelf || isRepeat ? current.unreadCount : current.unreadCount + 1,
     };
     const without = prev.items.filter((_, i) => i !== idx);
     return { items: [updated, ...without] };
@@ -654,9 +590,7 @@ export type ParsedSystemMessage =
   | { type: 'created'; actor: string; name: string }
   | { type: 'renamed'; actor: string; from: string; to: string }
   | { type: 'topic'; actor: string; topic: string | null };
-export function parseSystemMessage(
-  content: string | null,
-): ParsedSystemMessage | null {
+export function parseSystemMessage(content: string | null): ParsedSystemMessage | null {
   if (!content || !content.startsWith('__system__:')) return null;
   const rest = content.slice('__system__:'.length);
   const firstColon = rest.indexOf(':');
@@ -684,7 +618,11 @@ export function parseSystemMessage(
     return { type: 'joined', user: str(payload.user) };
   }
   if (event === 'created') {
-    return { type: 'created', actor: str(payload.actor), name: str(payload.name, 'this conversation') };
+    return {
+      type: 'created',
+      actor: str(payload.actor),
+      name: str(payload.name, 'this conversation'),
+    };
   }
   if (event === 'renamed') {
     return {
@@ -731,9 +669,7 @@ export function clearUnread(qc: QueryClient, roomId: string): void {
   qc.setQueryData<ChatRoomListResponse | undefined>(chatRoomsKey, (prev) => {
     if (!prev) return prev;
     return {
-      items: prev.items.map((r) =>
-        r.id === roomId ? { ...r, unreadCount: 0 } : r,
-      ),
+      items: prev.items.map((r) => (r.id === roomId ? { ...r, unreadCount: 0 } : r)),
     };
   });
 }

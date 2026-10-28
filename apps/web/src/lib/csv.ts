@@ -1,13 +1,7 @@
-import type {
-  SprintWithStats,
-  TaskWithPeople,
-} from '@botss/shared-types';
+import type { SprintWithStats, TaskWithPeople } from '@botss/shared-types';
 
 import { customFieldIdOf, type ListColumn } from '@/hooks/use-board-prefs';
-import {
-  priorityLabel,
-  statusLabel,
-} from '@/components/tasks/task-badges';
+import { priorityLabel, statusLabel } from '@/components/tasks/task-badges';
 import { saveFile } from '@/lib/save-file';
 
 const COLUMN_HEADERS: Record<ListColumn | 'title', string> = {

@@ -7,7 +7,7 @@ export function PortalBackLink({ href, label }: { href: string; label: string })
   return (
     <Link
       href={href}
-      className="inline-flex items-center gap-1.5 rounded-md text-sm font-medium text-ink-muted transition-colors hover:text-ink focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-purple/50"
+      className="text-ink-muted hover:text-ink focus-visible:ring-brand-purple/50 inline-flex items-center gap-1.5 rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2"
     >
       <ArrowLeft className="h-4 w-4" aria-hidden />
       {label}
@@ -37,10 +37,10 @@ export function PortalPageHeader({
       {back ? <PortalBackLink href={back.href} label={back.label} /> : null}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div className="min-w-0 space-y-1.5">
-          <h1 className="text-2xl font-semibold text-ink">{title}</h1>
-          {description ? <p className="max-w-2xl text-sm text-ink-muted">{description}</p> : null}
+          <h1 className="text-ink text-2xl font-semibold">{title}</h1>
+          {description ? <p className="text-ink-muted max-w-2xl text-sm">{description}</p> : null}
           {meta ? (
-            <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-sm text-ink-muted">
+            <div className="text-ink-muted flex flex-wrap items-center gap-x-3 gap-y-1.5 text-sm">
               {meta}
             </div>
           ) : null}

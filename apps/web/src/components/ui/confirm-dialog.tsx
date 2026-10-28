@@ -5,7 +5,14 @@ import { type ReactNode, useState } from 'react';
 import { getErrorToastCount, toastError } from '@/lib/toast';
 
 import { Button } from './button';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from './dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from './dialog';
 import { Input } from './input';
 import { Label } from './label';
 
@@ -56,15 +63,11 @@ export function ConfirmDialog({
         <DialogHeader>
           <DialogTitle className="text-lg font-semibold">{title}</DialogTitle>
           {description ? (
-            <DialogDescription className="text-sm text-ink-muted">{description}</DialogDescription>
+            <DialogDescription className="text-ink-muted text-sm">{description}</DialogDescription>
           ) : null}
         </DialogHeader>
         <DialogFooter>
-          <Button
-            variant="secondary"
-            onClick={() => onOpenChange(false)}
-            disabled={pending}
-          >
+          <Button variant="secondary" onClick={() => onOpenChange(false)} disabled={pending}>
             {cancelLabel}
           </Button>
           <Button
@@ -118,12 +121,12 @@ export function ConfirmByTypingDialog({
         <DialogHeader>
           <DialogTitle className="text-lg font-semibold">{title}</DialogTitle>
           {description ? (
-            <DialogDescription className="text-sm text-ink-muted">{description}</DialogDescription>
+            <DialogDescription className="text-ink-muted text-sm">{description}</DialogDescription>
           ) : null}
         </DialogHeader>
         <div className="space-y-2">
           <Label htmlFor="confirm-typing">
-            {challengeLabel}: <span className="font-mono text-ink">{challenge}</span>
+            {challengeLabel}: <span className="text-ink font-mono">{challenge}</span>
           </Label>
           <Input
             id="confirm-typing"

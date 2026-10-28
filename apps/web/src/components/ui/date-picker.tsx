@@ -58,9 +58,7 @@ export function DatePicker({
             aria-label="Clear date"
             onClick={() => onChange(null)}
             disabled={disabled}
-            className={cn(
-              compact && 'h-8 w-8 min-h-0 min-w-0 rounded-md p-0',
-            )}
+            className={cn(compact && 'h-8 min-h-0 w-8 min-w-0 rounded-md p-0')}
           >
             <X className={cn(compact ? 'h-3.5 w-3.5' : 'h-4 w-4')} />
           </Button>

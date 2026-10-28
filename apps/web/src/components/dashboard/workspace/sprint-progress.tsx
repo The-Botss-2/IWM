@@ -64,11 +64,7 @@ export function SprintProgressWidget() {
     });
     // Sort by end date ascending so the soonest-deadline sprint surfaces first.
     return out
-      .sort(
-        (a, b) =>
-          new Date(a.sprint.endDate).getTime() -
-          new Date(b.sprint.endDate).getTime(),
-      )
+      .sort((a, b) => new Date(a.sprint.endDate).getTime() - new Date(b.sprint.endDate).getTime())
       .slice(0, 4);
   }, [projects, sprintQueries]);
 
@@ -93,18 +89,14 @@ export function SprintProgressWidget() {
   const cards = useMemo<ActiveSprint[]>(() => {
     const tasksByProject = new Map<string, TaskWithPeople[]>();
     taskQueries.forEach((q, i) => {
-      const projectId = [
-        ...new Set(activeSprints.map((s) => s.projectId)),
-      ][i];
+      const projectId = [...new Set(activeSprints.map((s) => s.projectId))][i];
       if (!projectId) return;
       tasksByProject.set(projectId, q.data?.items ?? []);
     });
     return activeSprints.map(({ projectId, projectName, sprint }) => {
       const tasks = tasksByProject.get(projectId) ?? [];
       const taskIdSet = new Set(sprint.taskIds);
-      const done = tasks.filter(
-        (t) => taskIdSet.has(t.id) && t.status === 'DONE',
-      ).length;
+      const done = tasks.filter((t) => taskIdSet.has(t.id) && t.status === 'DONE').length;
       return { projectId, projectName, sprint, doneCount: done };
     });
   }, [activeSprints, taskQueries]);
@@ -117,11 +109,7 @@ export function SprintProgressWidget() {
   const failed = projectsQ.isError && !projectsQ.data;
 
   return (
-    <WidgetShell
-      id="widget-ws-sprint-progress"
-      title="Sprint progress"
-      icon={GitBranch}
-    >
+    <WidgetShell id="widget-ws-sprint-progress" title="Sprint progress" icon={GitBranch}>
       {loading ? (
         <div className="space-y-3">
           {Array.from({ length: 2 }).map((_, i) => (
@@ -129,7 +117,11 @@ export function SprintProgressWidget() {
           ))}
         </div>
       ) : failed ? (
-        <QueryError compact message="Couldn't load sprint progress." onRetry={() => void projectsQ.refetch()} />
+        <QueryError
+          compact
+          message="Couldn't load sprint progress."
+          onRetry={() => void projectsQ.refetch()}
+        />
       ) : cards.length === 0 ? (
         <WidgetEmpty icon={GitBranch} message="No active sprints right now." />
       ) : (
@@ -151,33 +143,27 @@ function SprintCard({ card }: { card: ActiveSprint }) {
   const start = new Date(sprint.startDate).getTime();
   const end = new Date(sprint.endDate).getTime();
   const totalDays = Math.max(1, Math.round((end - start) / 86_400_000));
-  const daysRemaining = Math.max(
-    0,
-    Math.ceil((end - now) / 86_400_000),
-  );
+  const daysRemaining = Math.max(0, Math.ceil((end - now) / 86_400_000));
   const overdue = now > end && doneCount < total;
   // Pace = expected % at this point in time. Used to flag sprints where
   // completion is lagging the calendar.
-  const elapsedPct = Math.max(
-    0,
-    Math.min(100, Math.round(((now - start) / (end - start)) * 100)),
-  );
+  const elapsedPct = Math.max(0, Math.min(100, Math.round(((now - start) / (end - start)) * 100)));
   const behind = pct < elapsedPct - 15 && total > 0;
   return (
-    <li className="rounded-lg border border-line bg-white p-3 transition-shadow hover:shadow-soft">
+    <li className="border-line hover:shadow-soft rounded-lg border bg-white p-3 transition-shadow">
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0">
-          <div className="truncate text-sm font-medium text-ink">{sprint.name}</div>
+          <div className="text-ink truncate text-sm font-medium">{sprint.name}</div>
           <Link
             href={`/projects/${projectId}?view=backlog`}
-            className="text-[11px] text-ink-muted hover:underline"
+            className="text-ink-muted text-[11px] hover:underline"
           >
             {projectName}
           </Link>
         </div>
         <span
           className={cn(
-            'whitespace-nowrap shrink-0 rounded-full px-2 py-0.5 text-[10px] font-semibold',
+            'shrink-0 whitespace-nowrap rounded-full px-2 py-0.5 text-[10px] font-semibold',
             overdue
               ? 'bg-tint-error text-state-error'
               : behind
@@ -185,27 +171,23 @@ function SprintCard({ card }: { card: ActiveSprint }) {
                 : 'bg-tint-info text-brand-teal',
           )}
         >
-          {overdue
-            ? 'Overdue'
-            : daysRemaining === 0
-              ? 'Ends today'
-              : `${daysRemaining}d left`}
+          {overdue ? 'Overdue' : daysRemaining === 0 ? 'Ends today' : `${daysRemaining}d left`}
         </span>
       </div>
       <div className="mt-2.5 flex items-center justify-between text-xs">
         <span className="text-ink-muted">
           {doneCount}/{total} {total === 1 ? 'task' : 'tasks'}
         </span>
-        <span className="font-semibold text-ink tabular-nums">{pct}%</span>
+        <span className="text-ink font-semibold tabular-nums">{pct}%</span>
       </div>
-      <div className="relative mt-1 h-2 rounded-full bg-bg-subtle" aria-hidden>
+      <div className="bg-bg-subtle relative mt-1 h-2 rounded-full" aria-hidden>
         <span
-          className="absolute inset-y-0 left-0 rounded-full bg-brand-gradient"
+          className="bg-brand-gradient absolute inset-y-0 left-0 rounded-full"
           style={{ width: `${pct}%` }}
         />
         <span
           aria-hidden
-          className="absolute inset-y-0 w-px bg-ink/30"
+          className="bg-ink/30 absolute inset-y-0 w-px"
           style={{ left: `${elapsedPct}%` }}
           title={`Day ${Math.round((elapsedPct * totalDays) / 100)} of ${totalDays}`}
         />

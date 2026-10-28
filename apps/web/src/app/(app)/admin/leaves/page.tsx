@@ -41,9 +41,9 @@ export default function AdminLeavesPage() {
   if (perms.checking) return <Loader size="sm" label="Loading leave requests" />;
   if (!perms.has('hr.leave.approve')) {
     return (
-      <div className="rounded-xl bg-white px-4 py-12 text-center shadow-soft">
-        <p className="text-sm text-ink">Only people who can approve leave see this page.</p>
-        <p className="mt-1 text-xs text-ink-muted">
+      <div className="shadow-soft rounded-xl bg-white px-4 py-12 text-center">
+        <p className="text-ink text-sm">Only people who can approve leave see this page.</p>
+        <p className="text-ink-muted mt-1 text-xs">
           Ask an admin for the Approve leave permission.
         </p>
       </div>
@@ -63,8 +63,8 @@ function LeaveReview() {
     <div className="space-y-4">
       <header className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h2 className="text-base font-semibold text-ink">Leave requests</h2>
-          <p className="text-sm text-ink-muted">
+          <h2 className="text-ink text-base font-semibold">Leave requests</h2>
+          <p className="text-ink-muted text-sm">
             Approve or reject time off. Approved days show as leave in attendance.
           </p>
         </div>
@@ -125,20 +125,18 @@ function LeaveReview() {
           onRetry={() => void review.leaves.refetch()}
         />
       ) : review.leaves.isPending ? (
-        <div className="rounded-xl bg-white py-12 shadow-soft">
+        <div className="shadow-soft rounded-xl bg-white py-12">
           <Loader size="sm" label="Loading leave requests" />
         </div>
       ) : items.length === 0 ? (
-        <div className="rounded-xl bg-white px-4 py-12 text-center shadow-soft">
-          <p className="text-sm text-ink">
+        <div className="shadow-soft rounded-xl bg-white px-4 py-12 text-center">
+          <p className="text-ink text-sm">
             {review.status === 'PENDING' && review.userId === null
               ? 'No requests waiting for a decision.'
               : 'No leave requests match these filters.'}
           </p>
           {filtered ? (
-            <p className="mt-1 text-xs text-ink-muted">
-              Change the filters to see other requests.
-            </p>
+            <p className="text-ink-muted mt-1 text-xs">Change the filters to see other requests.</p>
           ) : null}
         </div>
       ) : (

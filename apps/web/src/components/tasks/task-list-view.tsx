@@ -1,13 +1,7 @@
 'use client';
 
 import { useVirtualizer } from '@tanstack/react-virtual';
-import {
-  AlertTriangle,
-  ChevronDown,
-  ChevronRight,
-  ChevronUp,
-  ChevronsUpDown,
-} from 'lucide-react';
+import { AlertTriangle, ChevronDown, ChevronRight, ChevronUp, ChevronsUpDown } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type {
   SprintWithStats,
@@ -188,7 +182,12 @@ export function TaskListView({
           onSelect={onSelect}
           selectionSet={selection.ids}
           onToggleSelect={selection.toggle}
-          onShiftRange={(id) => selection.range(sorted.map((t) => t.id), id)}
+          onShiftRange={(id) =>
+            selection.range(
+              sorted.map((t) => t.id),
+              id,
+            )
+          }
         />
       )}
 
@@ -203,9 +202,9 @@ export function TaskListView({
 
 function EmptyState() {
   return (
-    <div className="rounded-lg border border-dashed border-line bg-white p-10 text-center">
-      <p className="text-sm font-medium text-ink">No tasks match.</p>
-      <p className="mt-1 text-sm text-ink-muted">Try removing a filter, or clearing the search.</p>
+    <div className="border-line rounded-lg border border-dashed bg-white p-10 text-center">
+      <p className="text-ink text-sm font-medium">No tasks match.</p>
+      <p className="text-ink-muted mt-1 text-sm">Try removing a filter, or clearing the search.</p>
     </div>
   );
 }
@@ -325,9 +324,9 @@ function GroupedTable({
   }
 
   return (
-    <div className="overflow-x-auto rounded-lg border border-line bg-white">
+    <div className="border-line overflow-x-auto rounded-lg border bg-white">
       <table className="w-full text-sm">
-        <thead className="sticky top-0 z-10 bg-bg-subtle text-left text-xs font-medium uppercase tracking-wide text-ink-muted">
+        <thead className="bg-bg-subtle text-ink-muted sticky top-0 z-10 text-left text-xs font-medium uppercase tracking-wide">
           <tr>
             <th className="w-10 px-3 py-2" aria-label="Select" />
             <SortHeader label="Title" sortKey="title" sort={sort} onClick={onSortClick} />
@@ -338,12 +337,7 @@ function GroupedTable({
               <SortHeader label="Priority" sortKey="priority" sort={sort} onClick={onSortClick} />
             ) : null}
             {columns.includes('assignee') ? (
-              <SortHeader
-                label="Assignee"
-                sortKey="assignee"
-                sort={sort}
-                onClick={onSortClick}
-              />
+              <SortHeader label="Assignee" sortKey="assignee" sort={sort} onClick={onSortClick} />
             ) : null}
             {columns.includes('due') ? (
               <SortHeader label="Due" sortKey="dueDate" sort={sort} onClick={onSortClick} />
@@ -351,9 +345,7 @@ function GroupedTable({
             {columns.includes('updated') ? (
               <SortHeader label="Updated" sortKey="updatedAt" sort={sort} onClick={onSortClick} />
             ) : null}
-            {columns.includes('description') ? (
-              <th className="px-3 py-2">Description</th>
-            ) : null}
+            {columns.includes('description') ? <th className="px-3 py-2">Description</th> : null}
             {columns.includes('sprint') ? <th className="px-3 py-2">Sprint</th> : null}
             {columns.includes('estimate') ? <th className="px-3 py-2">Estimate</th> : null}
             {fieldCols.fields.map((f) => (
@@ -448,7 +440,7 @@ function FragmentGroup({
           <button
             type="button"
             onClick={onToggleCollapse}
-            className="flex w-full items-center gap-2 text-left text-xs font-semibold uppercase tracking-wide text-ink-muted hover:text-ink"
+            className="text-ink-muted hover:text-ink flex w-full items-center gap-2 text-left text-xs font-semibold uppercase tracking-wide"
             aria-expanded={!isCollapsed}
           >
             {isCollapsed ? (
@@ -457,7 +449,7 @@ function FragmentGroup({
               <ChevronDown className="h-3 w-3" />
             )}
             <span>{group.label}</span>
-            <span className="rounded-full bg-white px-1.5 py-0.5 text-[10px] font-mono text-ink-muted">
+            <span className="text-ink-muted rounded-full bg-white px-1.5 py-0.5 font-mono text-[10px]">
               {group.tasks.length}
             </span>
           </button>
@@ -531,13 +523,10 @@ function SortHeader({
       <button
         type="button"
         onClick={() => onClick(sortKey)}
-        className="flex items-center gap-1 text-xs uppercase tracking-wide text-ink-muted hover:text-ink focus-visible:outline-none focus-visible:text-ink"
+        className="text-ink-muted hover:text-ink focus-visible:text-ink flex items-center gap-1 text-xs uppercase tracking-wide focus-visible:outline-none"
       >
         {label}
-        <Icon
-          className={cn('h-3 w-3', active ? 'text-ink' : 'text-ink-disabled')}
-          aria-hidden
-        />
+        <Icon className={cn('h-3 w-3', active ? 'text-ink' : 'text-ink-disabled')} aria-hidden />
       </button>
     </th>
   );
@@ -564,10 +553,7 @@ function EditableRow({
 }) {
   return (
     <tr
-      className={cn(
-        'border-t border-line hover:bg-bg-subtle',
-        selected && 'bg-brand-50/40',
-      )}
+      className={cn('border-line hover:bg-bg-subtle border-t', selected && 'bg-brand-50/40')}
       onClick={(e) => {
         if (e.shiftKey) {
           e.preventDefault();
@@ -609,12 +595,12 @@ function EditableRow({
       {columns.includes('updated') ? (
         <td className="px-3 py-2 align-middle">
           <Tooltip content={absoluteTime(task.updatedAt)}>
-            <span className="text-xs text-ink-muted">{relativeTime(task.updatedAt)}</span>
+            <span className="text-ink-muted text-xs">{relativeTime(task.updatedAt)}</span>
           </Tooltip>
         </td>
       ) : null}
       {columns.includes('description') ? (
-        <td className="max-w-xs truncate px-3 py-2 align-middle text-xs text-ink-muted">
+        <td className="text-ink-muted max-w-xs truncate px-3 py-2 align-middle text-xs">
           {task.description ?? '-'}
         </td>
       ) : null}
@@ -625,13 +611,13 @@ function EditableRow({
       ) : null}
       {columns.includes('estimate') ? (
         <td className="px-3 py-2 align-middle">
-          <span className="text-xs text-ink">
+          <span className="text-ink text-xs">
             {task.estimateHours ? `${task.estimateHours}h` : '-'}
           </span>
         </td>
       ) : null}
       {fieldCols.fields.map((f) => (
-        <td key={f.column} className="max-w-xs truncate px-3 py-2 align-middle text-xs text-ink">
+        <td key={f.column} className="text-ink max-w-xs truncate px-3 py-2 align-middle text-xs">
           {fieldCols.textFor(task.id, f.definition) || <span className="text-ink-disabled">-</span>}
         </td>
       ))}
@@ -657,7 +643,7 @@ function VirtualRow(props: {
     <div
       role="row"
       className={cn(
-        'absolute left-0 right-0 grid items-center gap-2 border-t border-line px-3 hover:bg-bg-subtle',
+        'border-line hover:bg-bg-subtle absolute left-0 right-0 grid items-center gap-2 border-t px-3',
         selected && 'bg-brand-50/40',
       )}
       style={{
@@ -680,7 +666,7 @@ function VirtualRow(props: {
       <button
         type="button"
         onClick={() => onSelect(task.id)}
-        className="truncate text-left text-sm font-medium text-ink hover:text-brand-700"
+        className="text-ink hover:text-brand-700 truncate text-left text-sm font-medium"
       >
         {task.title}
       </button>
@@ -696,20 +682,22 @@ function VirtualRow(props: {
       ) : null}
       {columns.includes('updated') ? (
         <Tooltip content={absoluteTime(task.updatedAt)}>
-          <span className="text-xs text-ink-muted truncate">{relativeTime(task.updatedAt)}</span>
+          <span className="text-ink-muted truncate text-xs">{relativeTime(task.updatedAt)}</span>
         </Tooltip>
       ) : null}
       {columns.includes('description') ? (
-        <span className="truncate text-xs text-ink-muted">{task.description ?? '-'}</span>
+        <span className="text-ink-muted truncate text-xs">{task.description ?? '-'}</span>
       ) : null}
-      {columns.includes('sprint') ? <span className="truncate text-xs text-ink-muted">-</span> : null}
+      {columns.includes('sprint') ? (
+        <span className="text-ink-muted truncate text-xs">-</span>
+      ) : null}
       {columns.includes('estimate') ? (
-        <span className="text-xs text-ink">
+        <span className="text-ink text-xs">
           {task.estimateHours ? `${task.estimateHours}h` : '-'}
         </span>
       ) : null}
       {fieldCols.fields.map((f) => (
-        <span key={f.column} className="truncate text-xs text-ink">
+        <span key={f.column} className="text-ink truncate text-xs">
           {fieldCols.textFor(task.id, f.definition) || '-'}
         </span>
       ))}
@@ -733,7 +721,7 @@ function InlineTitle({ task, onOpen }: { task: TaskWithPeople; onOpen: () => voi
           e.preventDefault();
           setEditing(true);
         }}
-        className="text-left text-sm font-medium text-ink hover:text-brand-700 focus-visible:outline-none focus-visible:text-brand-700"
+        className="text-ink hover:text-brand-700 focus-visible:text-brand-700 text-left text-sm font-medium focus-visible:outline-none"
       >
         {task.title}
       </button>
@@ -771,7 +759,7 @@ function InlineStatus({ task }: { task: TaskWithPeople }) {
       }
     >
       <SelectTrigger
-        className="h-8 w-fit min-w-[140px] border-transparent shadow-none bg-transparent hover:bg-bg-subtle text-xs"
+        className="hover:bg-bg-subtle h-8 w-fit min-w-[140px] border-transparent bg-transparent text-xs shadow-none"
         aria-label={`Change status (currently ${statusLabel(task.status)})`}
       >
         <SelectValue>
@@ -799,7 +787,7 @@ function InlinePriority({ task }: { task: TaskWithPeople }) {
       }
     >
       <SelectTrigger
-        className="h-8 w-fit min-w-[120px] border-transparent shadow-none bg-transparent hover:bg-bg-subtle text-xs"
+        className="hover:bg-bg-subtle h-8 w-fit min-w-[120px] border-transparent bg-transparent text-xs shadow-none"
         aria-label={`Change priority (currently ${priorityLabel(task.priority)})`}
       >
         <SelectValue>
@@ -849,7 +837,7 @@ function SprintCell({ task, projectId }: { task: TaskWithPeople; projectId: stri
   const { data: sprints } = useSprints(projectId);
   const sprint = sprints?.find((s) => s.taskIds.includes(task.id));
   return (
-    <span className="text-xs text-ink truncate">
+    <span className="text-ink truncate text-xs">
       {sprint ? sprint.name : <span className="text-ink-disabled">-</span>}
     </span>
   );
@@ -857,7 +845,7 @@ function SprintCell({ task, projectId }: { task: TaskWithPeople; projectId: stri
 
 function CellAssigneeReadOnly({ task }: { task: TaskWithPeople }) {
   if (!task.assignee) {
-    return <span className="text-xs text-ink-disabled">Unassigned</span>;
+    return <span className="text-ink-disabled text-xs">Unassigned</span>;
   }
   return (
     <div className="flex items-center gap-2">
@@ -866,9 +854,7 @@ function CellAssigneeReadOnly({ task }: { task: TaskWithPeople }) {
         name={task.assignee.name || task.assignee.email}
         image={task.assignee.image}
       />
-      <span className="truncate text-sm text-ink">
-        {task.assignee.name || task.assignee.email}
-      </span>
+      <span className="text-ink truncate text-sm">{task.assignee.name || task.assignee.email}</span>
     </div>
   );
 }
@@ -902,32 +888,32 @@ function CardListGroup({
   onSelect: (id: string) => void;
 }) {
   return (
-    <section className="overflow-hidden rounded-lg border border-line bg-white">
+    <section className="border-line overflow-hidden rounded-lg border bg-white">
       <button
         type="button"
         onClick={onToggle}
-        className="flex w-full items-center justify-between gap-2 bg-bg-subtle px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide text-ink-muted hover:text-ink"
+        className="bg-bg-subtle text-ink-muted hover:text-ink flex w-full items-center justify-between gap-2 px-3 py-2 text-left text-xs font-semibold uppercase tracking-wide"
         aria-expanded={!collapsed}
       >
         <span className="flex items-center gap-2">
           {collapsed ? <ChevronRight className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
           <span>{group.label}</span>
-          <span className="rounded-full bg-white px-1.5 py-0.5 text-[10px] font-mono">
+          <span className="rounded-full bg-white px-1.5 py-0.5 font-mono text-[10px]">
             {group.tasks.length}
           </span>
         </span>
       </button>
       {!collapsed ? (
-        <ul className="divide-y divide-line">
+        <ul className="divide-line divide-y">
           {group.tasks.map((t) => (
             <li key={t.id}>
               <button
                 type="button"
                 onClick={() => onSelect(t.id)}
-                className="flex w-full flex-col gap-2 p-3 text-left hover:bg-bg-subtle"
+                className="hover:bg-bg-subtle flex w-full flex-col gap-2 p-3 text-left"
               >
                 <div className="flex items-start justify-between gap-2">
-                  <span className="text-sm font-medium text-ink">{t.title}</span>
+                  <span className="text-ink text-sm font-medium">{t.title}</span>
                   <StatusBadge status={t.status} />
                 </div>
                 <div className="flex items-center justify-between gap-2">
@@ -939,7 +925,7 @@ function CardListGroup({
                       image={t.assignee.image}
                     />
                   ) : (
-                    <span className="text-xs text-ink-disabled">Unassigned</span>
+                    <span className="text-ink-disabled text-xs">Unassigned</span>
                   )}
                 </div>
                 {t.dueDate ? <DueDisplay value={t.dueDate} /> : null}

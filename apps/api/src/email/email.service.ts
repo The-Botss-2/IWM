@@ -59,11 +59,7 @@ export class EmailService {
    * response body as a copy-paste fallback. Errors are logged and swallowed.
    * Returns true if successfully queued, false otherwise.
    */
-  private async enqueueSafe(
-    name: string,
-    data: EmailJobData,
-    context: string,
-  ): Promise<boolean> {
+  private async enqueueSafe(name: string, data: EmailJobData, context: string): Promise<boolean> {
     try {
       await this.queue.add(name, data, EMAIL_JOB_OPTIONS);
       this.logger.log(`Email queued kind=${data.kind} ${context}`);

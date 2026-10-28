@@ -21,22 +21,22 @@ export function ClientSettings({ client }: { client: ClientDetail }) {
   return (
     <section
       aria-labelledby="client-danger-heading"
-      className="rounded-lg border-2 border-state-error/30 bg-state-error/10 p-5"
+      className="border-state-error/30 bg-state-error/10 rounded-lg border-2 p-5"
     >
-      <h2 id="client-danger-heading" className="text-base font-semibold text-state-error">
+      <h2 id="client-danger-heading" className="text-state-error text-base font-semibold">
         Danger zone
       </h2>
-      <p className="mt-1 text-sm text-state-error">
+      <p className="text-state-error mt-1 text-sm">
         These actions affect everything tied to this client. Proceed carefully.
       </p>
 
       <div className="mt-4 space-y-3">
-        <div className="flex flex-col gap-3 rounded-md border border-state-error/30 bg-white p-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="border-state-error/30 flex flex-col gap-3 rounded-md border bg-white p-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <div className="text-sm font-medium text-ink">
+            <div className="text-ink text-sm font-medium">
               {paused ? 'Client paused' : 'Archive client'}
             </div>
-            <div className="text-sm text-ink-muted">
+            <div className="text-ink-muted text-sm">
               {paused
                 ? 'The client is paused. Change the status from the Overview tab to reactivate.'
                 : 'Marks the client as paused. They remain visible but drop out of active queues.'}
@@ -53,10 +53,10 @@ export function ClientSettings({ client }: { client: ClientDetail }) {
           </Button>
         </div>
 
-        <div className="flex flex-col gap-3 rounded-md border border-state-error/30 bg-white p-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="border-state-error/30 flex flex-col gap-3 rounded-md border bg-white p-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <div className="text-sm font-medium text-ink">Delete client</div>
-            <div className="text-sm text-ink-muted">
+            <div className="text-ink text-sm font-medium">Delete client</div>
+            <div className="text-ink-muted text-sm">
               Soft-deletes the client. Linked projects keep working but lose their client reference.
             </div>
           </div>

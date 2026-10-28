@@ -62,10 +62,7 @@ export function abortChatAttachmentUpload(nonce: string): void {
 
 /** presign -> PUT (abortable) -> confirm, threading an AbortSignal so
  *  cancelling actually stops the transfer. */
-async function uploadFileAbortable(
-  file: File,
-  signal: AbortSignal,
-): Promise<ChatAttachmentInput> {
+async function uploadFileAbortable(file: File, signal: AbortSignal): Promise<ChatAttachmentInput> {
   const confirmed = await getApi().files.upload(file, { signal });
   return {
     fileUrl: confirmed.url ?? '',
@@ -237,11 +234,15 @@ export const ChatInput = forwardRef<ChatInputHandle, Props>(function ChatInput(
   async function startRecording(): Promise<void> {
     if (recording || pending) return;
     if (typeof window === 'undefined' || !navigator.mediaDevices?.getUserMedia) {
-      toastErrorMessage("Couldn't start recording", { description: "This browser cannot record audio. Try a recent Chrome, Edge or Safari." });
+      toastErrorMessage("Couldn't start recording", {
+        description: 'This browser cannot record audio. Try a recent Chrome, Edge or Safari.',
+      });
       return;
     }
     if (typeof MediaRecorder === 'undefined') {
-      toastErrorMessage("Couldn't start recording", { description: "This browser cannot record audio. Try a recent Chrome, Edge or Safari." });
+      toastErrorMessage("Couldn't start recording", {
+        description: 'This browser cannot record audio. Try a recent Chrome, Edge or Safari.',
+      });
       return;
     }
     try {
@@ -258,7 +259,8 @@ export const ChatInput = forwardRef<ChatInputHandle, Props>(function ChatInput(
         'audio/mp4',
       ];
       const mimeType = candidates.find(
-        (m) => typeof MediaRecorder.isTypeSupported === 'function' && MediaRecorder.isTypeSupported(m),
+        (m) =>
+          typeof MediaRecorder.isTypeSupported === 'function' && MediaRecorder.isTypeSupported(m),
       );
       const recorder = mimeType
         ? new MediaRecorder(stream, { mimeType })
@@ -320,17 +322,14 @@ export const ChatInput = forwardRef<ChatInputHandle, Props>(function ChatInput(
     } catch (err) {
       console.error('[chat] mic access failed:', err);
       const name = (err as { name?: unknown } | null)?.name;
-      toastErrorMessage(
-        "Couldn't start recording",
-        {
-          description:
-        name === 'NotFoundError'
-          ? 'No microphone was found. Plug one in and try again.'
-          : name === 'NotAllowedError' || name === 'SecurityError'
-            ? 'Microphone access is blocked. Allow it in your browser or system settings.'
-            : 'The microphone could not be opened. Another app may be using it.',
-        },
-      );
+      toastErrorMessage("Couldn't start recording", {
+        description:
+          name === 'NotFoundError'
+            ? 'No microphone was found. Plug one in and try again.'
+            : name === 'NotAllowedError' || name === 'SecurityError'
+              ? 'Microphone access is blocked. Allow it in your browser or system settings.'
+              : 'The microphone could not be opened. Another app may be using it.',
+      });
       stopRecorderHardware();
     }
   }
@@ -557,21 +556,28 @@ export const ChatInput = forwardRef<ChatInputHandle, Props>(function ChatInput(
    * doesn't blow up the bubble vertically.
    */
   function normalisePastedWhitespace(raw: string): string {
-    return raw
-      // Normalise line endings.
-      .replace(/\r\n?/g, '\n')
-      // Strip BOM and zero-width characters that some copy sources inject.
-      .replace(/[﻿​-‍⁠]/g, '')
-      // Split into lines, strip leading whitespace per line, collapse any
-      // run of internal tabs/multiple spaces to a single space (preserves
-      // intentional single spaces between words).
-      .split('\n')
-      .map((line) => line.replace(/^[ \t]+/, '').replace(/[ \t]+/g, ' ').trimEnd())
-      .join('\n')
-      // Collapse runs of 3+ blank lines down to a single blank line so
-      // pasted prose doesn't blow up the bubble vertically.
-      .replace(/\n{3,}/g, '\n\n')
-      .trim();
+    return (
+      raw
+        // Normalise line endings.
+        .replace(/\r\n?/g, '\n')
+        // Strip BOM and zero-width characters that some copy sources inject.
+        .replace(/[﻿​-‍⁠]/g, '')
+        // Split into lines, strip leading whitespace per line, collapse any
+        // run of internal tabs/multiple spaces to a single space (preserves
+        // intentional single spaces between words).
+        .split('\n')
+        .map((line) =>
+          line
+            .replace(/^[ \t]+/, '')
+            .replace(/[ \t]+/g, ' ')
+            .trimEnd(),
+        )
+        .join('\n')
+        // Collapse runs of 3+ blank lines down to a single blank line so
+        // pasted prose doesn't blow up the bubble vertically.
+        .replace(/\n{3,}/g, '\n\n')
+        .trim()
+    );
   }
 
   function send(): void {
@@ -678,8 +684,7 @@ export const ChatInput = forwardRef<ChatInputHandle, Props>(function ChatInput(
     const start = ta.selectionStart ?? value.length;
     const end = ta.selectionEnd ?? value.length;
     const sel = value.slice(start, end);
-    const next =
-      value.slice(0, start) + marker + sel + marker + value.slice(end);
+    const next = value.slice(0, start) + marker + sel + marker + value.slice(end);
     setValue(next);
     notifyTyping();
     requestAnimationFrame(() => {
@@ -772,204 +777,197 @@ export const ChatInput = forwardRef<ChatInputHandle, Props>(function ChatInput(
 
   return (
     <>
-      <div className="border-t border-line bg-white p-3 dark:border-slate-700 dark:bg-ink">
-      {editing ? (
-        <div className="mb-2 flex items-start gap-2 rounded-md border-l-2 border-brand-purple bg-bg-subtle px-2 py-1.5">
-          <div className="min-w-0 flex-1">
-            <div className="text-[11px] font-semibold text-brand-gradient">
-              Editing message
+      <div className="border-line dark:bg-ink border-t bg-white p-3 dark:border-slate-700">
+        {editing ? (
+          <div className="border-brand-purple bg-bg-subtle mb-2 flex items-start gap-2 rounded-md border-l-2 px-2 py-1.5">
+            <div className="min-w-0 flex-1">
+              <div className="text-brand-gradient text-[11px] font-semibold">Editing message</div>
+              <div className="text-ink-muted line-clamp-2 text-xs">
+                Enter to save · Esc to cancel
+              </div>
             </div>
-            <div className="line-clamp-2 text-xs text-ink-muted">
-              Enter to save · Esc to cancel
-            </div>
+            <Button
+              variant="ghost"
+              size="icon"
+              aria-label="Cancel edit"
+              onClick={() => {
+                setValue('');
+                onClearEdit?.();
+              }}
+              className="text-ink-muted h-6 w-6"
+            >
+              <X className="h-3.5 w-3.5" />
+            </Button>
           </div>
-          <Button
-            variant="ghost"
-            size="icon"
-            aria-label="Cancel edit"
-            onClick={() => {
-              setValue('');
-              onClearEdit?.();
-            }}
-            className="h-6 w-6 text-ink-muted"
-          >
-            <X className="h-3.5 w-3.5" />
-          </Button>
-        </div>
-      ) : null}
-      {replyTo && !editing ? (
-        <div className="mb-2 flex items-start gap-2 rounded-md border-l-2 border-brand-purple bg-bg-subtle px-2 py-1.5">
-          <div className="min-w-0 flex-1">
-            <div className="text-[11px] font-semibold text-brand-gradient">
-              Replying to {replyTo.senderName}
+        ) : null}
+        {replyTo && !editing ? (
+          <div className="border-brand-purple bg-bg-subtle mb-2 flex items-start gap-2 rounded-md border-l-2 px-2 py-1.5">
+            <div className="min-w-0 flex-1">
+              <div className="text-brand-gradient text-[11px] font-semibold">
+                Replying to {replyTo.senderName}
+              </div>
+              <div className="text-ink-muted line-clamp-2 text-xs">
+                {replyTo.content ?? '(no text)'}
+              </div>
             </div>
-            <div className="line-clamp-2 text-xs text-ink-muted">
-              {replyTo.content ?? '(no text)'}
+            <Button
+              variant="ghost"
+              size="icon"
+              aria-label="Cancel reply"
+              onClick={onClearReply}
+              className="text-ink-muted h-6 w-6"
+            >
+              <X className="h-3.5 w-3.5" />
+            </Button>
+          </div>
+        ) : null}
+        {!recording ? (
+          <div className="mb-1.5 flex items-center gap-0.5">
+            <FormatButton label="Bold (Ctrl+B)" onClick={() => surround('**')}>
+              <Bold className="h-3.5 w-3.5" />
+            </FormatButton>
+            <FormatButton label="Italic (Ctrl+I)" onClick={() => surround('*')}>
+              <Italic className="h-3.5 w-3.5" />
+            </FormatButton>
+            <FormatButton label="Strikethrough" onClick={() => surround('~')}>
+              <Strikethrough className="h-3.5 w-3.5" />
+            </FormatButton>
+            <FormatButton label="Code block" onClick={insertCodeBlock}>
+              <Code2 className="h-3.5 w-3.5" />
+            </FormatButton>
+            <FormatButton label="Bulleted list" onClick={bulletSelection}>
+              <List className="h-3.5 w-3.5" />
+            </FormatButton>
+            <FormatButton label="Insert link" onClick={insertLinkMarkdown}>
+              <Link2 className="h-3.5 w-3.5" />
+            </FormatButton>
+          </div>
+        ) : null}
+        <div className="flex items-end gap-2">
+          {recording ? (
+            // Recording mode: hide the textarea entirely and show a single
+            // live-status pill plus cancel/send controls. WhatsApp-style;
+            // keeps the affordance unambiguous so the user can't accidentally
+            // type while a recording is in flight.
+            <div
+              role="status"
+              aria-live="polite"
+              className="bg-tint-error text-state-error ring-state-error/30 flex h-10 flex-1 items-center gap-3 rounded-full px-4 text-sm ring-1"
+            >
+              <span aria-hidden className="bg-state-error h-2 w-2 animate-pulse rounded-full" />
+              <span className="font-mono tabular-nums">{formatRecordSeconds(recordSeconds)}</span>
+              <span className="text-state-error/80 text-xs">Recording…</span>
             </div>
-          </div>
-          <Button
-            variant="ghost"
-            size="icon"
-            aria-label="Cancel reply"
-            onClick={onClearReply}
-            className="h-6 w-6 text-ink-muted"
-          >
-            <X className="h-3.5 w-3.5" />
-          </Button>
-        </div>
-      ) : null}
-      {!recording ? (
-        <div className="mb-1.5 flex items-center gap-0.5">
-          <FormatButton label="Bold (Ctrl+B)" onClick={() => surround('**')}>
-            <Bold className="h-3.5 w-3.5" />
-          </FormatButton>
-          <FormatButton label="Italic (Ctrl+I)" onClick={() => surround('*')}>
-            <Italic className="h-3.5 w-3.5" />
-          </FormatButton>
-          <FormatButton label="Strikethrough" onClick={() => surround('~')}>
-            <Strikethrough className="h-3.5 w-3.5" />
-          </FormatButton>
-          <FormatButton label="Code block" onClick={insertCodeBlock}>
-            <Code2 className="h-3.5 w-3.5" />
-          </FormatButton>
-          <FormatButton label="Bulleted list" onClick={bulletSelection}>
-            <List className="h-3.5 w-3.5" />
-          </FormatButton>
-          <FormatButton label="Insert link" onClick={insertLinkMarkdown}>
-            <Link2 className="h-3.5 w-3.5" />
-          </FormatButton>
-        </div>
-      ) : null}
-      <div className="flex items-end gap-2">
-        {recording ? (
-          // Recording mode: hide the textarea entirely and show a single
-          // live-status pill plus cancel/send controls. WhatsApp-style;
-          // keeps the affordance unambiguous so the user can't accidentally
-          // type while a recording is in flight.
-          <div
-            role="status"
-            aria-live="polite"
-            className="flex h-10 flex-1 items-center gap-3 rounded-full bg-tint-error px-4 text-sm text-state-error ring-1 ring-state-error/30"
-          >
-            <span
-              aria-hidden
-              className="h-2 w-2 animate-pulse rounded-full bg-state-error"
-            />
-            <span className="font-mono tabular-nums">{formatRecordSeconds(recordSeconds)}</span>
-            <span className="text-xs text-state-error/80">Recording…</span>
-          </div>
-        ) : (
-          <Textarea
-            ref={taRef}
-            value={value}
-            onChange={(e) => {
-              setValue(e.target.value);
-              if (e.target.value.length > 0) notifyTyping();
-              else stopTypingNow();
-            }}
-            onPaste={(e) => {
-              // Ctrl+V of an image (screenshot / copied picture) stages it as
-              // an attachment - same path as the attach button and drag-drop -
-              // instead of dropping nothing useful into the text box.
-              const pastedImages = e.clipboardData
-                ? Array.from(e.clipboardData.files).filter((f) =>
-                    f.type.startsWith('image/'),
-                  )
-                : [];
-              if (pastedImages.length > 0) {
+          ) : (
+            <Textarea
+              ref={taRef}
+              value={value}
+              onChange={(e) => {
+                setValue(e.target.value);
+                if (e.target.value.length > 0) notifyTyping();
+                else stopTypingNow();
+              }}
+              onPaste={(e) => {
+                // Ctrl+V of an image (screenshot / copied picture) stages it as
+                // an attachment - same path as the attach button and drag-drop -
+                // instead of dropping nothing useful into the text box.
+                const pastedImages = e.clipboardData
+                  ? Array.from(e.clipboardData.files).filter((f) => f.type.startsWith('image/'))
+                  : [];
+                if (pastedImages.length > 0) {
+                  e.preventDefault();
+                  addFiles(pastedImages);
+                  return;
+                }
+                // Intercept paste so the preview text in the box matches what
+                // gets sent. Without this the user pastes "    weird indent",
+                // hits Enter, and only on send does normalisation kick in -
+                // the inflight render in the bubble can still look skewed
+                // before the optimistic message gets replaced.
+                const raw = e.clipboardData?.getData('text');
+                if (!raw) return;
                 e.preventDefault();
-                addFiles(pastedImages);
-                return;
-              }
-              // Intercept paste so the preview text in the box matches what
-              // gets sent. Without this the user pastes "    weird indent",
-              // hits Enter, and only on send does normalisation kick in -
-              // the inflight render in the bubble can still look skewed
-              // before the optimistic message gets replaced.
-              const raw = e.clipboardData?.getData('text');
-              if (!raw) return;
-              e.preventDefault();
-              const ta = e.currentTarget;
-              const cleaned = normalisePastedWhitespace(raw);
-              const start = ta.selectionStart ?? value.length;
-              const end = ta.selectionEnd ?? value.length;
-              const nextValue = value.slice(0, start) + cleaned + value.slice(end);
-              setValue(nextValue);
-              if (nextValue.length > 0) notifyTyping();
-              // Restore cursor immediately after the inserted snippet.
-              requestAnimationFrame(() => {
-                ta.selectionStart = ta.selectionEnd = start + cleaned.length;
-              });
-            }}
-            onBlur={stopTypingNow}
-            onKeyDown={onKeyDown}
-            placeholder="Message - Enter to send, Shift+Enter for newline."
-            rows={1}
-            className="min-h-[40px] max-h-[200px] flex-1 resize-none overflow-y-auto rounded-2xl bg-bg-surface px-4 py-2 text-ink"
-          />
-        )}
+                const ta = e.currentTarget;
+                const cleaned = normalisePastedWhitespace(raw);
+                const start = ta.selectionStart ?? value.length;
+                const end = ta.selectionEnd ?? value.length;
+                const nextValue = value.slice(0, start) + cleaned + value.slice(end);
+                setValue(nextValue);
+                if (nextValue.length > 0) notifyTyping();
+                // Restore cursor immediately after the inserted snippet.
+                requestAnimationFrame(() => {
+                  ta.selectionStart = ta.selectionEnd = start + cleaned.length;
+                });
+              }}
+              onBlur={stopTypingNow}
+              onKeyDown={onKeyDown}
+              placeholder="Message - Enter to send, Shift+Enter for newline."
+              rows={1}
+              className="bg-bg-surface text-ink max-h-[200px] min-h-[40px] flex-1 resize-none overflow-y-auto rounded-2xl px-4 py-2"
+            />
+          )}
 
-        {recording ? (
-          <>
-            <Button
-              type="button"
-              onClick={() => stopRecording(false)}
-              aria-label="Cancel recording"
-              variant="ghost"
-              className="h-10 w-10 rounded-full p-0 text-ink-muted hover:text-ink"
-            >
-              <X className="h-4 w-4" />
-            </Button>
-            <Button
-              type="button"
-              onClick={() => stopRecording(true)}
-              aria-label="Stop and send recording"
-              disabled={upload.isPending || pending}
-              className="h-10 w-10 min-h-0 min-w-0 rounded-full bg-brand-gradient p-0 shadow-soft hover:shadow-soft-lg"
-            >
-              <Square className="h-4 w-4" fill="currentColor" />
-            </Button>
-          </>
-        ) : value.trim() ? (
-          <>
-            <ImageUploadButton
-              pickerRef={filePickerRef}
-              onSelect={addFiles}
-              disabled={pending || upload.isPending}
-            />
-            <Button
-              type="button"
-              onClick={send}
-              disabled={!value.trim() || pending}
-              aria-label="Send message"
-              className="h-10 w-10 min-h-0 min-w-0 rounded-full bg-brand-gradient p-0 shadow-soft hover:shadow-soft-lg"
-            >
-              <Send className="h-4 w-4" />
-            </Button>
-          </>
-        ) : (
-          <>
-            <ImageUploadButton
-              pickerRef={filePickerRef}
-              onSelect={addFiles}
-              disabled={pending || upload.isPending}
-            />
-            <Button
-              type="button"
-              onClick={startRecording}
-              disabled={pending || upload.isPending}
-              aria-label="Record voice note"
-              variant="ghost"
-              className={cn(
-                'h-10 w-10 min-h-0 min-w-0 rounded-full p-0',
-                'text-ink-muted hover:bg-bg-subtle hover:text-ink',
-              )}
-            >
-              <Mic className="h-4 w-4" />
-            </Button>
-          </>
-        )}
-      </div>
+          {recording ? (
+            <>
+              <Button
+                type="button"
+                onClick={() => stopRecording(false)}
+                aria-label="Cancel recording"
+                variant="ghost"
+                className="text-ink-muted hover:text-ink h-10 w-10 rounded-full p-0"
+              >
+                <X className="h-4 w-4" />
+              </Button>
+              <Button
+                type="button"
+                onClick={() => stopRecording(true)}
+                aria-label="Stop and send recording"
+                disabled={upload.isPending || pending}
+                className="bg-brand-gradient shadow-soft hover:shadow-soft-lg h-10 min-h-0 w-10 min-w-0 rounded-full p-0"
+              >
+                <Square className="h-4 w-4" fill="currentColor" />
+              </Button>
+            </>
+          ) : value.trim() ? (
+            <>
+              <ImageUploadButton
+                pickerRef={filePickerRef}
+                onSelect={addFiles}
+                disabled={pending || upload.isPending}
+              />
+              <Button
+                type="button"
+                onClick={send}
+                disabled={!value.trim() || pending}
+                aria-label="Send message"
+                className="bg-brand-gradient shadow-soft hover:shadow-soft-lg h-10 min-h-0 w-10 min-w-0 rounded-full p-0"
+              >
+                <Send className="h-4 w-4" />
+              </Button>
+            </>
+          ) : (
+            <>
+              <ImageUploadButton
+                pickerRef={filePickerRef}
+                onSelect={addFiles}
+                disabled={pending || upload.isPending}
+              />
+              <Button
+                type="button"
+                onClick={startRecording}
+                disabled={pending || upload.isPending}
+                aria-label="Record voice note"
+                variant="ghost"
+                className={cn(
+                  'h-10 min-h-0 w-10 min-w-0 rounded-full p-0',
+                  'text-ink-muted hover:bg-bg-subtle hover:text-ink',
+                )}
+              >
+                <Mic className="h-4 w-4" />
+              </Button>
+            </>
+          )}
+        </div>
       </div>
 
       {staged.length > 0 ? (
@@ -1017,7 +1015,7 @@ function FormatButton({
       aria-label={label}
       title={label}
       className={cn(
-        'grid h-7 w-7 place-items-center rounded text-ink-muted',
+        'text-ink-muted grid h-7 w-7 place-items-center rounded',
         'hover:bg-bg-subtle hover:text-ink',
       )}
     >
@@ -1061,7 +1059,7 @@ function ImageUploadButton({
         aria-label="Attach file"
         onClick={() => pickerRef.current?.click()}
         className={cn(
-          'h-10 w-10 min-h-0 min-w-0 rounded-full p-0',
+          'h-10 min-h-0 w-10 min-w-0 rounded-full p-0',
           'text-ink-muted hover:bg-bg-subtle hover:text-ink',
         )}
       >

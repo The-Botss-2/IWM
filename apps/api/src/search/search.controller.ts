@@ -3,14 +3,8 @@ import { searchQuerySchema, type SearchQuery } from '@botss/shared-types';
 
 import { CurrentUser, type AuthedUser } from '../common/decorators/current-user.decorator';
 import { RequireAbility } from '../common/decorators/required-ability.decorator';
-import {
-  CurrentSalesActor,
-  type SalesActor,
-} from '../common/decorators/sales-actor.decorator';
-import {
-  RequestUserScope,
-  type UserScope,
-} from '../common/decorators/user-scope.decorator';
+import { CurrentSalesActor, type SalesActor } from '../common/decorators/sales-actor.decorator';
+import { RequestUserScope, type UserScope } from '../common/decorators/user-scope.decorator';
 import { ZodValidationPipe } from '../common/pipes/zod-validation.pipe';
 import { SearchService } from './search.service';
 

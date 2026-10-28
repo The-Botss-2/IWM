@@ -13,8 +13,7 @@ export const PERSONAL_DASHBOARD_WIDGETS = [
   'upcomingTasks',
   'calendarMini',
 ] as const;
-type PersonalDashboardWidgetId =
-  (typeof PERSONAL_DASHBOARD_WIDGETS)[number];
+type PersonalDashboardWidgetId = (typeof PERSONAL_DASHBOARD_WIDGETS)[number];
 
 /**
  * Workspace summary widgets - scoped to the current workspace. Data
@@ -39,8 +38,7 @@ export const WORKSPACE_DASHBOARD_WIDGETS = [
   'wsDocHeatmap',
   'wsHoursByProject',
 ] as const;
-type WorkspaceDashboardWidgetId =
-  (typeof WORKSPACE_DASHBOARD_WIDGETS)[number];
+type WorkspaceDashboardWidgetId = (typeof WORKSPACE_DASHBOARD_WIDGETS)[number];
 
 export const DASHBOARD_WIDGETS = [
   ...PERSONAL_DASHBOARD_WIDGETS,
@@ -128,8 +126,7 @@ export function useDashboardPrefs(userId: string): {
   setVisible: (ids: DashboardWidgetId[]) => void;
   isVisible: (id: DashboardWidgetId) => boolean;
 } {
-  const [visibleWidgets, setVisibleState] =
-    useState<DashboardWidgetId[]>(DEFAULT_VISIBLE);
+  const [visibleWidgets, setVisibleState] = useState<DashboardWidgetId[]>(DEFAULT_VISIBLE);
 
   useEffect(() => {
     if (!userId) return;
@@ -147,9 +144,7 @@ export function useDashboardPrefs(userId: string): {
   const toggleWidget = useCallback(
     (id: DashboardWidgetId) => {
       setVisibleState((prev) => {
-        const next = prev.includes(id)
-          ? prev.filter((x) => x !== id)
-          : [...prev, id];
+        const next = prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id];
         if (userId) write(userId, next);
         return next;
       });

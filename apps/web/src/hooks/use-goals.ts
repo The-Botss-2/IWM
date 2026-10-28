@@ -81,8 +81,10 @@ export function goalChanges(goal: GoalWithDetails, next: UpdateGoalInput): Updat
   }
   if (next.ownerId !== undefined && next.ownerId !== goal.ownerId) out.ownerId = next.ownerId;
   if (next.status !== undefined && next.status !== goal.status) out.status = next.status;
-  const sameDay = (a: Date, b: Date) => a.toISOString().slice(0, 10) === b.toISOString().slice(0, 10);
-  if (next.startDate && !sameDay(next.startDate, new Date(goal.startDate))) out.startDate = next.startDate;
+  const sameDay = (a: Date, b: Date) =>
+    a.toISOString().slice(0, 10) === b.toISOString().slice(0, 10);
+  if (next.startDate && !sameDay(next.startDate, new Date(goal.startDate)))
+    out.startDate = next.startDate;
   if (next.endDate && !sameDay(next.endDate, new Date(goal.endDate))) out.endDate = next.endDate;
   return out;
 }

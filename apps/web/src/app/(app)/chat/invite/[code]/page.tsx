@@ -32,7 +32,7 @@ export default function InvitePage() {
     onSuccess: async (res) => {
       await qc.invalidateQueries({ queryKey: chatRoomsKey });
       if (res.alreadyJoined) {
-        toast.success('You\'re already in this chat.');
+        toast.success("You're already in this chat.");
       } else {
         toast.success('Joined.');
       }
@@ -86,14 +86,14 @@ function InviteCard({
 
   return (
     <div className="grid h-full place-items-center px-6 py-12">
-      <div className="w-[min(420px,90vw)] rounded-2xl border border-line bg-white p-6 text-center shadow-sm">
-        <div className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-tint-info text-brand-teal">
+      <div className="border-line w-[min(420px,90vw)] rounded-2xl border bg-white p-6 text-center shadow-sm">
+        <div className="bg-tint-info text-brand-teal mx-auto grid h-14 w-14 place-items-center rounded-full">
           <Icon className="h-6 w-6" aria-hidden />
         </div>
-        <h1 className="mt-4 text-lg font-semibold text-ink">
+        <h1 className="text-ink mt-4 text-lg font-semibold">
           {preview.room.name ?? (preview.room.type === 'GROUP' ? 'Group chat' : 'Channel')}
         </h1>
-        <p className="mt-1 text-xs uppercase tracking-wide text-ink-muted">
+        <p className="text-ink-muted mt-1 text-xs uppercase tracking-wide">
           {preview.room.type === 'GROUP'
             ? 'Group invite'
             : preview.room.type === 'TEXT_CHANNEL'
@@ -102,28 +102,28 @@ function InviteCard({
                 ? 'Voice channel invite'
                 : 'Invite'}
         </p>
-        <p className="mt-3 text-sm text-ink-muted">
+        <p className="text-ink-muted mt-3 text-sm">
           {preview.room.participantCount}{' '}
           {preview.room.participantCount === 1 ? 'member' : 'members'}
         </p>
 
-        <div className="mt-4 flex items-center justify-center gap-2 text-xs text-ink-muted">
+        <div className="text-ink-muted mt-4 flex items-center justify-center gap-2 text-xs">
           <UserAvatar size="sm" name={preview.invitedBy.name} image={preview.invitedBy.image} />
           <span>
-            Invited by <span className="font-medium text-ink">{preview.invitedBy.name}</span>
+            Invited by <span className="text-ink font-medium">{preview.invitedBy.name}</span>
           </span>
         </div>
 
         {preview.expired ? (
-          <p className="mt-4 rounded-md bg-tint-error px-3 py-2 text-xs text-state-error">
+          <p className="bg-tint-error text-state-error mt-4 rounded-md px-3 py-2 text-xs">
             This invite has expired. Ask {preview.invitedBy.name} for a new link.
           </p>
         ) : preview.exhausted ? (
-          <p className="mt-4 rounded-md bg-tint-error px-3 py-2 text-xs text-state-error">
+          <p className="bg-tint-error text-state-error mt-4 rounded-md px-3 py-2 text-xs">
             This invite has reached its limit.
           </p>
         ) : preview.alreadyJoined ? (
-          <p className="mt-4 rounded-md bg-tint-info px-3 py-2 text-xs text-brand-teal">
+          <p className="bg-tint-info text-brand-teal mt-4 rounded-md px-3 py-2 text-xs">
             You&apos;re already in this chat - taking you there.
           </p>
         ) : null}
@@ -143,9 +143,7 @@ function InviteCard({
 
 function LoadingState() {
   return (
-    <div className="grid h-full place-items-center text-sm text-ink-muted">
-      Looking up invite…
-    </div>
+    <div className="text-ink-muted grid h-full place-items-center text-sm">Looking up invite…</div>
   );
 }
 
@@ -153,9 +151,9 @@ function UnavailableState({ message }: { message: string }) {
   const router = useRouter();
   return (
     <div className="grid h-full place-items-center px-6 py-12">
-      <div className="w-[min(360px,90vw)] rounded-2xl border border-line bg-white p-6 text-center shadow-sm">
-        <h1 className="text-lg font-semibold text-ink">Invite unavailable</h1>
-        <p className="mt-2 text-sm text-ink-muted">{message}</p>
+      <div className="border-line w-[min(360px,90vw)] rounded-2xl border bg-white p-6 text-center shadow-sm">
+        <h1 className="text-ink text-lg font-semibold">Invite unavailable</h1>
+        <p className="text-ink-muted mt-2 text-sm">{message}</p>
         <Button onClick={() => router.push('/chat')} className="mt-4">
           Back to chat
         </Button>

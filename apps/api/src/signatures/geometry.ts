@@ -25,7 +25,7 @@ export interface FieldFractions {
 
 /** Normalise a /Rotate value to 0, 90, 180 or 270. */
 export function normaliseRotation(angle: number): 0 | 90 | 180 | 270 {
-  const r = ((Math.round(angle / 90) * 90) % 360 + 360) % 360;
+  const r = (((Math.round(angle / 90) * 90) % 360) + 360) % 360;
   return r as 0 | 90 | 180 | 270;
 }
 

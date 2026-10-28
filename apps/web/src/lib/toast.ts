@@ -52,10 +52,7 @@ export function markErrorReported(): void {
   errorToastCount += 1;
 }
 
-function showError(
-  title: string,
-  opts: { description?: string; onRetry?: () => void } = {},
-): void {
+function showError(title: string, opts: { description?: string; onRetry?: () => void } = {}): void {
   errorToastCount += 1;
   const safeTitle = scrubSecrets(title);
   const description = opts.description ? scrubSecrets(opts.description) : undefined;
@@ -377,10 +374,7 @@ export function scrubSecrets(input: string): string {
   let out = input;
 
   // JWTs: three base64url segments separated by dots, starting with `eyJ`.
-  out = out.replace(
-    /eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+/g,
-    '<token>',
-  );
+  out = out.replace(/eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+/g, '<token>');
 
   // Bearer tokens - covers HTTP Authorization headers leaking into messages.
   out = out.replace(/Bearer\s+[A-Za-z0-9._\-+/=]+/gi, 'Bearer <token>');
@@ -392,10 +386,7 @@ export function scrubSecrets(input: string): string {
   out = out.replace(/\b(?:AKIA|ASIA)[A-Z0-9]{16,}\b/g, '<key>');
 
   // URLs with embedded basic-auth credentials (https://user:pass@host).
-  out = out.replace(
-    /(https?:\/\/)[^:@/\s]+:[^@\s]+@/gi,
-    '$1<redacted>@',
-  );
+  out = out.replace(/(https?:\/\/)[^:@/\s]+:[^@\s]+@/gi, '$1<redacted>@');
 
   // Common `password=foo` / `secret: bar` / `api_key=baz` patterns.
   out = out.replace(

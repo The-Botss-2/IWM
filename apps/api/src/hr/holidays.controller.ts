@@ -1,13 +1,4 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Patch,
-  Post,
-  Query,
-} from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query } from '@nestjs/common';
 import {
   type CreateHolidayInput,
   createHolidaySchema,
@@ -72,10 +63,7 @@ export class HolidaysController {
 
   @Delete(':id')
   @SkipPermissions()
-  remove(
-    @CurrentUser() user: AuthedUser,
-    @Param('id', new ZodValidationPipe(cuid)) id: string,
-  ) {
+  remove(@CurrentUser() user: AuthedUser, @Param('id', new ZodValidationPipe(cuid)) id: string) {
     return this.holidays.remove(user.id, id);
   }
 
@@ -86,10 +74,7 @@ export class HolidaysController {
    */
   @Post(':id/apply')
   @SkipPermissions()
-  apply(
-    @CurrentUser() user: AuthedUser,
-    @Param('id', new ZodValidationPipe(cuid)) id: string,
-  ) {
+  apply(@CurrentUser() user: AuthedUser, @Param('id', new ZodValidationPipe(cuid)) id: string) {
     return this.holidays.apply(user.id, id);
   }
 

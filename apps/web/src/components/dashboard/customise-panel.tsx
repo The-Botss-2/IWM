@@ -2,8 +2,7 @@
 
 import Link from 'next/link';
 
-import {
-  Compass, X } from 'lucide-react';
+import { Compass, X } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { DASHBOARD_WIDGET_META } from '@/components/dashboard/dashboard-widgets';
@@ -31,34 +30,27 @@ interface Props {
  * Each widget toggle persists to localStorage so the user keeps their
  * layout across reloads and tab switches.
  */
-export function CustomisePanel({
-  open,
-  onClose,
-  isVisible,
-  toggleWidget,
-}: Props) {
+export function CustomisePanel({ open, onClose, isVisible, toggleWidget }: Props) {
   if (!open) return null;
   return (
     <div
       role="dialog"
       aria-label="Customise dashboard"
-      className="fixed inset-0 z-40 flex justify-end bg-ink/40"
+      className="bg-ink/40 fixed inset-0 z-40 flex justify-end"
       onClick={onClose}
     >
       <aside
-        className="h-full w-[min(420px,92vw)] overflow-y-auto border-l border-line bg-white shadow-drawer"
+        className="border-line shadow-drawer h-full w-[min(420px,92vw)] overflow-y-auto border-l bg-white"
         onClick={(e) => e.stopPropagation()}
       >
-        <header className="sticky top-0 z-10 flex items-center justify-between border-b border-line bg-white px-4 py-3">
-          <h2 className="text-base font-semibold text-ink">
-            Customise dashboard
-          </h2>
+        <header className="border-line sticky top-0 z-10 flex items-center justify-between border-b bg-white px-4 py-3">
+          <h2 className="text-ink text-base font-semibold">Customise dashboard</h2>
           <Button
             variant="ghost"
             size="icon"
             aria-label="Close"
             onClick={onClose}
-            className="h-7 w-7 min-h-0 min-w-0 text-ink-muted"
+            className="text-ink-muted h-7 min-h-0 w-7 min-w-0"
           >
             <X className="h-4 w-4" />
           </Button>
@@ -82,23 +74,22 @@ export function CustomisePanel({
           />
 
           {/* Navigation customisation lives in Settings now. */}
-            <section>
-              <h3 className="mb-2 text-xs font-semibold uppercase tracking-wide text-ink-muted">
-                Navigation
-              </h3>
-              <p className="mb-3 text-xs text-ink-muted">
-                Which sections appear in the navbar, your layout, and the
-                keyboard shortcuts now live in Settings, so they are reachable
-                from anywhere rather than only from this panel.
-              </p>
-              <Link
-                href="/settings/navigation"
-                className="inline-flex items-center gap-1.5 rounded-md border border-line px-3 py-2 text-sm font-medium text-ink transition-colors hover:bg-bg-subtle"
-              >
-                <Compass className="h-4 w-4" aria-hidden />
-                Open navigation settings
-              </Link>
-            </section>
+          <section>
+            <h3 className="text-ink-muted mb-2 text-xs font-semibold uppercase tracking-wide">
+              Navigation
+            </h3>
+            <p className="text-ink-muted mb-3 text-xs">
+              Which sections appear in the navbar, your layout, and the keyboard shortcuts now live
+              in Settings, so they are reachable from anywhere rather than only from this panel.
+            </p>
+            <Link
+              href="/settings/navigation"
+              className="border-line text-ink hover:bg-bg-subtle inline-flex items-center gap-1.5 rounded-md border px-3 py-2 text-sm font-medium transition-colors"
+            >
+              <Compass className="h-4 w-4" aria-hidden />
+              Open navigation settings
+            </Link>
+          </section>
         </div>
       </aside>
     </div>
@@ -132,18 +123,16 @@ function WidgetSection({
   return (
     <section>
       <div className="mb-2 flex items-center justify-between gap-2">
-        <h3 className="text-xs font-semibold uppercase tracking-wide text-ink-muted">
-          {title}
-        </h3>
+        <h3 className="text-ink-muted text-xs font-semibold uppercase tracking-wide">{title}</h3>
         <button
           type="button"
           onClick={toggleAll}
-          className="text-[11px] font-medium text-brand-gradient hover:underline focus-visible:outline-none focus-visible:shadow-focus rounded-sm"
+          className="text-brand-gradient focus-visible:shadow-focus rounded-sm text-[11px] font-medium hover:underline focus-visible:outline-none"
         >
           {allOn ? 'Hide all' : 'Show all'}
         </button>
       </div>
-      <p className="mb-3 text-xs text-ink-muted">{subtitle}</p>
+      <p className="text-ink-muted mb-3 text-xs">{subtitle}</p>
       <ul className="space-y-2" role="list">
         {ids.map((id) => {
           const meta = DASHBOARD_WIDGET_META[id];
@@ -152,17 +141,12 @@ function WidgetSection({
           return (
             <li
               key={id}
-              className="flex items-start gap-3 rounded-md border border-line px-3 py-2.5"
+              className="border-line flex items-start gap-3 rounded-md border px-3 py-2.5"
             >
-              <Icon
-                className="mt-0.5 h-4 w-4 shrink-0 text-brand-purple"
-                aria-hidden
-              />
+              <Icon className="text-brand-purple mt-0.5 h-4 w-4 shrink-0" aria-hidden />
               <div className="min-w-0 flex-1">
-                <div className="text-sm font-medium text-ink">
-                  {meta.title}
-                </div>
-                <div className="text-xs text-ink-muted">{meta.description}</div>
+                <div className="text-ink text-sm font-medium">{meta.title}</div>
+                <div className="text-ink-muted text-xs">{meta.description}</div>
               </div>
               <label className="inline-flex items-center">
                 <input
@@ -170,7 +154,7 @@ function WidgetSection({
                   type="checkbox"
                   checked={visible}
                   onChange={() => toggleWidget(id)}
-                  className="h-4 w-4 accent-brand-purple"
+                  className="accent-brand-purple h-4 w-4"
                   aria-label={`Toggle ${meta.title}`}
                 />
               </label>

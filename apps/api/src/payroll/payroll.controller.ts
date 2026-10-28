@@ -21,10 +21,7 @@ import {
 } from '@botss/shared-types';
 
 import { RequireAbility } from '../common/decorators/required-ability.decorator';
-import {
-  RequestUserScope,
-  type UserScope,
-} from '../common/decorators/user-scope.decorator';
+import { RequestUserScope, type UserScope } from '../common/decorators/user-scope.decorator';
 import { ZodValidationPipe } from '../common/pipes/zod-validation.pipe';
 import { sendPdf } from '../signatures/send-pdf';
 import { PayrollService } from './payroll.service';
@@ -115,10 +112,7 @@ export class PayrollController {
 
   @Get('runs/:id')
   @RequireAbility('read', 'Payroll')
-  run(
-    @RequestUserScope() scope: UserScope,
-    @Param('id', new ZodValidationPipe(cuid)) id: string,
-  ) {
+  run(@RequestUserScope() scope: UserScope, @Param('id', new ZodValidationPipe(cuid)) id: string) {
     return this.payroll.getRun(scope, id);
   }
 

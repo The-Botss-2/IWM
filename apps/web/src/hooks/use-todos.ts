@@ -1,10 +1,6 @@
 'use client';
 
-import {
-  useMutation,
-  useQuery,
-  useQueryClient,
-} from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useMemo } from 'react';
 import type {
   CreateTodoInput,
@@ -26,8 +22,7 @@ export interface UseTodosArgs {
   projectId?: string;
 }
 
-const todosKey = (args: UseTodosArgs) =>
-  ['todos', 'list', args] as const;
+const todosKey = (args: UseTodosArgs) => ['todos', 'list', args] as const;
 
 export function useTodos(args: UseTodosArgs = {}) {
   return useQuery({

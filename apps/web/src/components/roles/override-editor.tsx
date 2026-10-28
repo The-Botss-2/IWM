@@ -39,7 +39,7 @@ export function OverrideEditor({
     <div className="space-y-4">
       {groups.map((g) => (
         <fieldset key={g.group} className="space-y-1.5">
-          <legend className="text-[11px] font-semibold uppercase tracking-wide text-ink-muted">
+          <legend className="text-ink-muted text-[11px] font-semibold uppercase tracking-wide">
             {g.group}
           </legend>
           {g.permissions.map((p) => {
@@ -48,17 +48,19 @@ export function OverrideEditor({
             return (
               <div
                 key={p.key}
-                className="flex items-center justify-between gap-3 rounded-md border border-line px-3 py-2"
+                className="border-line flex items-center justify-between gap-3 rounded-md border px-3 py-2"
               >
                 <span className="min-w-0 text-sm">
-                  <span className="block font-medium text-ink">{p.label}</span>
-                  <span className="block text-[11px] text-ink-muted">
+                  <span className="text-ink block font-medium">{p.label}</span>
+                  <span className="text-ink-muted block text-[11px]">
                     Role: {fromRole.includes(p.key) ? 'allowed' : 'not allowed'}
                   </span>
                 </span>
                 <Select
                   value={state}
-                  onValueChange={(v) => onChange(withOverride(overrides, p.key, v as OverrideState))}
+                  onValueChange={(v) =>
+                    onChange(withOverride(overrides, p.key, v as OverrideState))
+                  }
                   disabled={locked}
                 >
                   <SelectTrigger className="w-32" aria-label={`${p.label} override`}>

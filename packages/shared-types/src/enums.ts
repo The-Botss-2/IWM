@@ -119,13 +119,7 @@ export type SignatureEventKind = z.infer<typeof SignatureEventKind>;
 export const SprintStatus = z.enum(['PLANNED', 'ACTIVE', 'COMPLETED']);
 export type SprintStatus = z.infer<typeof SprintStatus>;
 
-export const GoalStatus = z.enum([
-  'ON_TRACK',
-  'AT_RISK',
-  'OFF_TRACK',
-  'COMPLETED',
-  'ARCHIVED',
-]);
+export const GoalStatus = z.enum(['ON_TRACK', 'AT_RISK', 'OFF_TRACK', 'COMPLETED', 'ARCHIVED']);
 export type GoalStatus = z.infer<typeof GoalStatus>;
 
 export const KeyResultMetric = z.enum(['NUMBER', 'PERCENT', 'CURRENCY', 'BOOLEAN']);

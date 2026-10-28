@@ -92,9 +92,7 @@ export function useDesktopNotifications(userId: string | null): void {
             // The PushManager BufferSource overload across DOM lib
             // versions disagrees on Uint8Array<ArrayBufferLike> vs
             // BufferSource. Cast through unknown to bridge cleanly.
-            applicationServerKey: urlBase64ToUint8Array(
-              vapidPublicKey,
-            ) as unknown as BufferSource,
+            applicationServerKey: urlBase64ToUint8Array(vapidPublicKey) as unknown as BufferSource,
           });
         }
         if (cancelled) return;

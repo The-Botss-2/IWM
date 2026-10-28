@@ -108,9 +108,7 @@ export class TimesheetWarningService {
       select: { id: true },
     });
     if (!hrSender) {
-      this.logger.warn(
-        `No active user with email=${senderEmail}; cannot send timesheet warnings.`,
-      );
+      this.logger.warn(`No active user with email=${senderEmail}; cannot send timesheet warnings.`);
       return { scanned: 0, warned: 0, employeesWarned: 0, supervisorsNotified: 0 };
     }
 
@@ -158,9 +156,7 @@ export class TimesheetWarningService {
     const yesterday = startOfDay(referenceDate ?? new Date());
     yesterday.setUTCDate(yesterday.getUTCDate() - 1);
     const windowStart = new Date(yesterday);
-    windowStart.setUTCDate(
-      windowStart.getUTCDate() - TimesheetWarningService.LOOKBACK_DAYS,
-    );
+    windowStart.setUTCDate(windowStart.getUTCDate() - TimesheetWarningService.LOOKBACK_DAYS);
 
     const employeeIds = employees.map((e) => e.id);
     const rows = await this.prisma.client.attendance.findMany({
@@ -210,11 +206,7 @@ export class TimesheetWarningService {
 
       // Warn the (non-exempt) employee directly, as a DM from the HR bot.
       try {
-        await this.sendDm(
-          hrSender.id,
-          emp.id,
-          buildEmployeeWarningText(emp.name, streak),
-        );
+        await this.sendDm(hrSender.id, emp.id, buildEmployeeWarningText(emp.name, streak));
         employeesWarned++;
       } catch (err) {
         this.logger.error(
@@ -282,10 +274,7 @@ export class TimesheetWarningService {
    * row extends the streak; any other status (PRESENT / LEAVE / HOLIDAY)
    * or a missing weekday row ends it.
    */
-  private missedStreak(
-    statusByDay: Map<string, string> | undefined,
-    lastDay: Date,
-  ): number {
+  private missedStreak(statusByDay: Map<string, string> | undefined, lastDay: Date): number {
     if (!statusByDay) return 0;
     let streak = 0;
     const cursor = new Date(lastDay);
@@ -311,11 +300,7 @@ export class TimesheetWarningService {
    * online recipient see it immediately; the persisted row + the
    * service's web-push fan-out cover the offline case.
    */
-  private async sendDm(
-    hrUserId: string,
-    recipientId: string,
-    content: string,
-  ): Promise<void> {
+  private async sendDm(hrUserId: string, recipientId: string, content: string): Promise<void> {
     const room = await this.chat.createRoom(
       hrUserId,
       { type: 'DM', participantUserIds: [recipientId] },
@@ -355,10 +340,7 @@ function buildHrAlertText(
   );
 }
 
-function buildEmployeeWarningText(
-  employeeName: string | null,
-  streak: number,
-): string {
+function buildEmployeeWarningText(employeeName: string | null, streak: number): string {
   const greeting = employeeName?.trim() ? `Hi ${employeeName.trim()}, ` : 'Hi, ';
   return (
     `${greeting}this is an automated reminder from HR. ` +

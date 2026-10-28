@@ -34,11 +34,7 @@ import { QueryError } from '@/components/ui/query-error';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tooltip } from '@/components/ui/tooltip';
 import { BulkActionBar } from '@/components/tasks/bulk-action-bar';
-import {
-  PriorityBadge,
-  StatusBadge,
-  priorityLabel,
-} from '@/components/tasks/task-badges';
+import { PriorityBadge, StatusBadge, priorityLabel } from '@/components/tasks/task-badges';
 import { TaskFormDialog } from '@/components/tasks/task-form-dialog';
 import { type BoardDensity, type BoardGroupBy } from '@/hooks/use-board-prefs';
 import { useTaskSelection } from '@/hooks/use-task-selection';
@@ -294,8 +290,11 @@ export function BoardView({
     return (
       <div className="flex gap-3 overflow-x-auto pb-2 [-webkit-overflow-scrolling:touch]">
         {COLUMNS.map((col) => (
-          <div key={col.id} className="w-[80vw] max-w-[18rem] shrink-0 rounded-lg bg-bg-subtle p-2 md:w-72 md:max-w-none">
-            <div className="px-2 py-1 text-xs font-semibold uppercase tracking-wide text-ink">
+          <div
+            key={col.id}
+            className="bg-bg-subtle w-[80vw] max-w-[18rem] shrink-0 rounded-lg p-2 md:w-72 md:max-w-none"
+          >
+            <div className="text-ink px-2 py-1 text-xs font-semibold uppercase tracking-wide">
               {col.label}
             </div>
             <div className="mt-1 space-y-2 p-1">
@@ -332,7 +331,7 @@ export function BoardView({
                   {lanes.map((lane) => (
                     <div
                       key={lane.id}
-                      className="rounded-md bg-bg-subtle px-3 py-2 text-xs font-medium text-ink"
+                      className="bg-bg-subtle text-ink rounded-md px-3 py-2 text-xs font-medium"
                     >
                       <span className="line-clamp-2">{lane.label}</span>
                     </div>
@@ -363,11 +362,7 @@ export function BoardView({
         </div>
       </DndContext>
 
-      <BulkActionBar
-        projectId={projectId}
-        selectedIds={selectedIds}
-        onClear={selection.clear}
-      />
+      <BulkActionBar projectId={projectId} selectedIds={selectedIds} onClear={selection.clear} />
 
       {creatingFor ? (
         <TaskFormDialog
@@ -411,14 +406,16 @@ function Column({
   return (
     <div
       className={cn(
-        'w-72 shrink-0 rounded-lg bg-bg-subtle p-2',
+        'bg-bg-subtle w-72 shrink-0 rounded-lg p-2',
         atLimit && 'border border-red-400',
       )}
     >
       <div className="flex h-9 items-center justify-between px-2">
-        <div className="min-w-0 flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-ink">
-          <span className="truncate" title={label}>{label}</span>
-          <span className="shrink-0 rounded-full bg-white px-1.5 py-0.5 text-[10px] font-mono text-ink-muted">
+        <div className="text-ink flex min-w-0 items-center gap-2 text-xs font-semibold uppercase tracking-wide">
+          <span className="truncate" title={label}>
+            {label}
+          </span>
+          <span className="text-ink-muted shrink-0 rounded-full bg-white px-1.5 py-0.5 font-mono text-[10px]">
             {wipLimit != null ? `${total} / ${wipLimit}` : total}
           </span>
           {atLimit ? (
@@ -430,7 +427,7 @@ function Column({
               }
             >
               <span
-                className="whitespace-nowrap inline-flex items-center gap-1 rounded-full bg-tint-error px-1.5 py-0.5 text-[10px] font-medium text-state-error"
+                className="bg-tint-error text-state-error inline-flex items-center gap-1 whitespace-nowrap rounded-full px-1.5 py-0.5 text-[10px] font-medium"
                 role="status"
               >
                 <AlertTriangle className="h-3 w-3" aria-hidden />
@@ -491,10 +488,7 @@ function ColumnBody({
   return (
     <div
       ref={setNodeRef}
-      className={cn(
-        'mt-1 min-h-[200px] rounded-md p-1 transition-colors',
-        isOver && 'bg-brand-50',
-      )}
+      className={cn('mt-1 min-h-[200px] rounded-md p-1 transition-colors', isOver && 'bg-brand-50')}
     >
       <SortableContext items={allIds} strategy={verticalListSortingStrategy}>
         {showLanes ? (
@@ -619,10 +613,10 @@ function Card({
         }
       }}
       className={cn(
-        'group rounded-lg border bg-white shadow-sm cursor-grab active:cursor-grabbing',
-        'focus-visible:outline-none focus-visible:ring-2 focus-visible:shadow-focus',
+        'group cursor-grab rounded-lg border bg-white shadow-sm active:cursor-grabbing',
+        'focus-visible:shadow-focus focus-visible:outline-none focus-visible:ring-2',
         'hover:border-line-strong transition-colors',
-        selected ? 'border-brand-purple ring-2 ring-brand-500/20' : 'border-line',
+        selected ? 'border-brand-purple ring-brand-500/20 ring-2' : 'border-line',
         padding,
       )}
     >
@@ -634,12 +628,12 @@ function Card({
           // Stop pointer events from bubbling so we don't initiate a drag.
           onPointerDown={(e) => e.stopPropagation()}
           aria-label={`Select ${task.title}`}
-          className="mt-0.5 opacity-0 group-hover:opacity-100 data-[state=checked]:opacity-100 focus-visible:opacity-100"
+          className="mt-0.5 opacity-0 focus-visible:opacity-100 group-hover:opacity-100 data-[state=checked]:opacity-100"
         />
         <div className="min-w-0 flex-1">
-          <div className="text-sm font-medium text-ink leading-snug">{task.title}</div>
+          <div className="text-ink text-sm font-medium leading-snug">{task.title}</div>
           {showDetailed && task.description ? (
-            <p className="mt-1 line-clamp-1 text-xs text-ink-muted">{task.description}</p>
+            <p className="text-ink-muted mt-1 line-clamp-1 text-xs">{task.description}</p>
           ) : null}
         </div>
       </div>
@@ -659,7 +653,7 @@ function Card({
         </div>
       ) : null}
       {showDetailed ? (
-        <div className="mt-2 flex flex-wrap items-center gap-1.5 text-[11px] text-ink-muted">
+        <div className="text-ink-muted mt-2 flex flex-wrap items-center gap-1.5 text-[11px]">
           {task.dueDate ? (
             <Tooltip content={absoluteTime(task.dueDate)}>
               <span>{relativeTime(task.dueDate)}</span>

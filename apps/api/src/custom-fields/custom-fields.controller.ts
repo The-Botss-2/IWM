@@ -16,10 +16,7 @@ import {
 
 import { RequestAbility } from '../common/decorators/request-ability.decorator';
 import { RequireAbility } from '../common/decorators/required-ability.decorator';
-import {
-  RequestUserScope,
-  type UserScope,
-} from '../common/decorators/user-scope.decorator';
+import { RequestUserScope, type UserScope } from '../common/decorators/user-scope.decorator';
 import { ZodValidationPipe } from '../common/pipes/zod-validation.pipe';
 import { CustomFieldsService } from './custom-fields.service';
 

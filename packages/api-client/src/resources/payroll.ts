@@ -60,7 +60,11 @@ export class PayrollResource {
     return this.http.post(`/finance/payroll/runs/${runId}/items`, payrollRunSchema, input);
   }
   updateItem(runId: string, itemId: string, input: UpdatePayrollItemInput) {
-    return this.http.patch(`/finance/payroll/runs/${runId}/items/${itemId}`, payrollRunSchema, input);
+    return this.http.patch(
+      `/finance/payroll/runs/${runId}/items/${itemId}`,
+      payrollRunSchema,
+      input,
+    );
   }
   removeItem(runId: string, itemId: string) {
     return this.http.delete(`/finance/payroll/runs/${runId}/items/${itemId}`, payrollRunSchema);
@@ -83,7 +87,11 @@ export class PayrollResource {
 
   /** Email payslips from a mailbox; the password is used for this call only. */
   sendPayslips(runId: string, input: SendPayslipsInput) {
-    return this.http.post(`/finance/payroll/runs/${runId}/send-payslips`, sendPayslipsResultSchema, input);
+    return this.http.post(
+      `/finance/payroll/runs/${runId}/send-payslips`,
+      sendPayslipsResultSchema,
+      input,
+    );
   }
 
   /** Every payslip in the run, one page each. */

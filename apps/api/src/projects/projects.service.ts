@@ -110,10 +110,7 @@ export class ProjectsService {
    * tombstoned rows - a generated key colliding with a soft-deleted project
    * would otherwise throw a confusing 409.
    */
-  private async generateProjectKey(
-    workspaceId: string,
-    name: string,
-  ): Promise<string> {
+  private async generateProjectKey(workspaceId: string, name: string): Promise<string> {
     // Uppercase alphanumerics only, must start with a letter. Cap the base at
     // 5 chars so there's room for a numeric suffix within the 10-char limit.
     const cleaned = name
@@ -158,8 +155,7 @@ export class ProjectsService {
 
   async create(workspaceId: string, userId: string, input: CreateProjectInput) {
     if (input.clientId) await this.assertClientInWorkspace(workspaceId, input.clientId);
-    const key =
-      input.key ?? (await this.generateProjectKey(workspaceId, input.name));
+    const key = input.key ?? (await this.generateProjectKey(workspaceId, input.name));
     return this.prisma.client.project.create({
       data: {
         workspaceId,
@@ -214,7 +210,9 @@ export class ProjectsService {
         ...(input.color !== undefined ? { color: input.color } : {}),
         ...(input.clientId !== undefined ? { clientId: input.clientId } : {}),
         ...(hideFromPortal ? { portalVisible: false } : {}),
-        ...(input.workflowSettings !== undefined ? { workflowSettings: input.workflowSettings } : {}),
+        ...(input.workflowSettings !== undefined
+          ? { workflowSettings: input.workflowSettings }
+          : {}),
       },
     });
   }
@@ -237,7 +235,8 @@ export class ProjectsService {
       throw new ForbiddenException({
         title: 'Forbidden',
         status: 403,
-        detail: 'Only a lead of this project, or someone allowed to delete projects, can delete it.',
+        detail:
+          'Only a lead of this project, or someone allowed to delete projects, can delete it.',
         code: 'insufficient_permissions',
       });
     }
@@ -318,7 +317,14 @@ export class ProjectsService {
         where: { projectId: id },
         orderBy: { updatedAt: 'desc' },
         take: 10,
-        select: { id: true, title: true, status: true, createdAt: true, updatedAt: true, completedAt: true },
+        select: {
+          id: true,
+          title: true,
+          status: true,
+          createdAt: true,
+          updatedAt: true,
+          completedAt: true,
+        },
       }),
       this.prisma.client.sprint.findMany({
         where: { projectId: id, status: 'ACTIVE' },
@@ -382,10 +388,7 @@ export class ProjectsService {
       recentActivity: [
         ...recentTasks.map((t) => ({
           id: `task-${t.id}`,
-          kind:
-            t.status === 'DONE'
-              ? ('task_completed' as const)
-              : ('task_created' as const),
+          kind: t.status === 'DONE' ? ('task_completed' as const) : ('task_created' as const),
           title: t.title,
           at: (t.status === 'DONE' && t.completedAt ? t.completedAt : t.updatedAt) as Date,
         })),
@@ -411,9 +414,9 @@ export class ProjectsService {
     await this.get(scope, id);
     // Include soft-deleted rows AND CANCELLED status.
     // The soft-delete extension filter is bypassed with { includeDeleted: true }.
-    const items = await (this.prisma.client.task.findMany as unknown as (
-      args: unknown,
-    ) => Promise<unknown>)({
+    const items = await (
+      this.prisma.client.task.findMany as unknown as (args: unknown) => Promise<unknown>
+    )({
       where: {
         projectId: id,
         OR: [{ deletedAt: { not: null } }, { status: 'CANCELLED' }],

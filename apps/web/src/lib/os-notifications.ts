@@ -47,7 +47,10 @@ export function markBellRowSeen(notificationId: string): boolean {
  *  - While focused, skip a banner for the page already on screen, and skip
  *    calls (the incoming-call modal is showing).
  */
-export function osBannerAllowed(url: string | null | undefined, type: NativeNotification['type']): boolean {
+export function osBannerAllowed(
+  url: string | null | undefined,
+  type: NativeNotification['type'],
+): boolean {
   if (typeof document === 'undefined') return false;
   if (getChatNotifications().doNotDisturb) return false;
   const focused = !document.hidden && document.hasFocus();

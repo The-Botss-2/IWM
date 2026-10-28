@@ -47,7 +47,11 @@ export function buildTaskListFilters(q: ListTasksQuery, userId: string): TaskWhe
   } else {
     const ids = asArray(q.assigneeIds ?? q.assigneeId);
     const idClause =
-      ids.length === 0 ? null : ids.length === 1 ? { assigneeId: ids[0] } : { assigneeId: { in: ids } };
+      ids.length === 0
+        ? null
+        : ids.length === 1
+          ? { assigneeId: ids[0] }
+          : { assigneeId: { in: ids } };
     if (idClause && q.unassigned) clauses.push({ OR: [idClause, { assigneeId: null }] });
     else if (idClause) clauses.push(idClause);
     else if (q.unassigned) clauses.push({ assigneeId: null });

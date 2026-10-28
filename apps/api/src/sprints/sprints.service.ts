@@ -70,10 +70,7 @@ export class SprintsService {
       createdAt: s.createdAt,
       updatedAt: s.updatedAt,
       taskCount: s.tasks.length,
-      totalEstimateHours: s.tasks.reduce(
-        (sum, t) => sum + Number(t.task.estimateHours ?? 0),
-        0,
-      ),
+      totalEstimateHours: s.tasks.reduce((sum, t) => sum + Number(t.task.estimateHours ?? 0), 0),
       taskIds: s.tasks.map((t) => t.task.id),
     }));
   }

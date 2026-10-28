@@ -21,7 +21,7 @@ export function ClientSignaturesTab({ clientId }: { clientId: string }) {
   let body: ReactNode;
   if (!list.canRead) {
     body = (
-      <p className="rounded-lg border border-line bg-white p-6 text-sm text-ink-muted">
+      <p className="border-line text-ink-muted rounded-lg border bg-white p-6 text-sm">
         Your role cannot view signature requests.
       </p>
     );
@@ -34,16 +34,13 @@ export function ClientSignaturesTab({ clientId }: { clientId: string }) {
     );
   } else if (list.isError && list.items.length === 0) {
     body = (
-      <QueryError
-        message="Couldn't load signature requests."
-        onRetry={() => void list.refetch()}
-      />
+      <QueryError message="Couldn't load signature requests." onRetry={() => void list.refetch()} />
     );
   } else if (list.items.length === 0) {
     body = (
-      <div className="rounded-lg border border-dashed border-line bg-white p-10 text-center">
-        <p className="text-sm font-medium text-ink">No signature requests yet.</p>
-        <p className="mt-1 text-sm text-ink-muted">
+      <div className="border-line rounded-lg border border-dashed bg-white p-10 text-center">
+        <p className="text-ink text-sm font-medium">No signature requests yet.</p>
+        <p className="text-ink-muted mt-1 text-sm">
           Use &ldquo;Request signature&rdquo; on a document in the Documents tab to send one.
         </p>
       </div>
@@ -85,10 +82,10 @@ export function ClientSignaturesTab({ clientId }: { clientId: string }) {
   return (
     <section className="space-y-4" aria-labelledby="client-signatures-heading">
       <div>
-        <h2 id="client-signatures-heading" className="text-base font-semibold text-ink">
+        <h2 id="client-signatures-heading" className="text-ink text-base font-semibold">
           Signatures
         </h2>
-        <p className="mt-0.5 text-sm text-ink-muted">
+        <p className="text-ink-muted mt-0.5 text-sm">
           Requests for this client&apos;s documents or sent to people at this client.
         </p>
       </div>

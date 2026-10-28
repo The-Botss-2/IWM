@@ -22,7 +22,7 @@ export const DialogContent = forwardRef<
     <DialogPrimitive.Portal>
       <DialogPrimitive.Overlay
         className={cn(
-          'fixed inset-0 z-40 bg-ink/20 backdrop-blur-[2px]',
+          'bg-ink/20 fixed inset-0 z-40 backdrop-blur-[2px]',
           'data-[state=open]:animate-in data-[state=open]:fade-in-0',
           'data-[state=closed]:animate-out data-[state=closed]:fade-out-0',
         )}
@@ -31,12 +31,12 @@ export const DialogContent = forwardRef<
         ref={ref}
         className={cn(
           'fixed left-1/2 top-1/2 z-50 grid w-full max-w-[440px] -translate-x-1/2 -translate-y-1/2 gap-4',
-          'bg-bg-surface p-8 shadow-soft-lg outline-none rounded-xl',
+          'bg-bg-surface shadow-soft-lg rounded-xl p-8 outline-none',
           // Tall forms (Lead has 12+ fields) used to overflow the viewport
           // without scrolling. Cap height + scroll the content area; mobile
           // takes the full screen and scrolls vertically.
           'max-h-[90vh] overflow-y-auto',
-          'max-sm:inset-0 max-sm:max-w-none max-sm:translate-x-0 max-sm:translate-y-0 max-sm:rounded-none max-sm:h-full max-sm:max-h-none',
+          'max-sm:inset-0 max-sm:h-full max-sm:max-h-none max-sm:max-w-none max-sm:translate-x-0 max-sm:translate-y-0 max-sm:rounded-none',
           'data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95',
           'data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95',
           className,
@@ -47,7 +47,7 @@ export const DialogContent = forwardRef<
         {hideClose ? null : (
           <DialogPrimitive.Close
             aria-label="Close dialog"
-            className="absolute right-4 top-4 rounded-md p-1.5 text-ink-muted hover:bg-bg-subtle hover:text-ink focus-visible:outline-none focus-visible:shadow-focus transition-all"
+            className="text-ink-muted hover:bg-bg-subtle hover:text-ink focus-visible:shadow-focus absolute right-4 top-4 rounded-md p-1.5 transition-all focus-visible:outline-none"
           >
             <X className="h-4 w-4" />
           </DialogPrimitive.Close>

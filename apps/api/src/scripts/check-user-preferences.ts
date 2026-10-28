@@ -23,10 +23,7 @@ import { SKIP_PERMISSIONS_KEY } from '../common/decorators/skip-permissions.deco
 import { ZodValidationPipe } from '../common/pipes/zod-validation.pipe';
 import type { PrismaService } from '../prisma/prisma.service';
 import { UserPreferencesController } from '../users/user-preferences.controller';
-import {
-  mergeUserPreferences,
-  UserPreferencesService,
-} from '../users/user-preferences.service';
+import { mergeUserPreferences, UserPreferencesService } from '../users/user-preferences.service';
 
 let failures = 0;
 
@@ -153,7 +150,11 @@ async function main(): Promise<void> {
   const lenient = parseStoredUserPreferences({
     version: 1,
     appearance: { theme: 'sepia', gradientId: 'ocean', uiScale: 'lg', extra: true },
-    navigation: { layout: 'rail', panelCollapsed: 'nope', hidden: ['leads', 'BAD ID', 3, 'leads', 'chat'] },
+    navigation: {
+      layout: 'rail',
+      panelCollapsed: 'nope',
+      hidden: ['leads', 'BAD ID', 3, 'leads', 'chat'],
+    },
     other: 'x',
   });
   check(
@@ -259,7 +260,10 @@ async function main(): Promise<void> {
     check('persistent contention answers 409', conflict instanceof ConflictException);
     if (conflict instanceof ConflictException) {
       const body = conflict.getResponse() as { status?: number; title?: string };
-      check('409 body is a problem document', body.status === 409 && typeof body.title === 'string');
+      check(
+        '409 body is a problem document',
+        body.status === 409 && typeof body.title === 'string',
+      );
     }
     db.interleave = [];
   }
@@ -305,7 +309,10 @@ async function main(): Promise<void> {
     const pipe = new ZodValidationPipe(userPreferencesSchema);
     const body = pipe.transform({ appearance: { theme: 'dark' }, userId: bob.id });
     const out = await controller.update(alice, body);
-    check('controller output satisfies the response schema', userPreferencesResponseSchema.safeParse(out).success);
+    check(
+      'controller output satisfies the response schema',
+      userPreferencesResponseSchema.safeParse(out).success,
+    );
     check(
       'writes land on the session user only, whatever the body says',
       same(db.writes, [alice.id]) && !db.rows.has(bob.id),
@@ -323,7 +330,10 @@ async function main(): Promise<void> {
     check('invalid input is a 400', rejected instanceof BadRequestException);
     if (rejected instanceof BadRequestException) {
       const problem = rejected.getResponse() as { status?: number; code?: string };
-      check('400 is a validation problem', problem.status === 400 && problem.code === 'validation_failed');
+      check(
+        '400 is a validation problem',
+        problem.status === 400 && problem.code === 'validation_failed',
+      );
     }
   }
 

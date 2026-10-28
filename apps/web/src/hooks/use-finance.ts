@@ -39,10 +39,8 @@ import { toast } from '@/lib/toast';
 const contractsKey = (q?: Partial<ListContractsQuery>) =>
   ['finance', 'contracts', q ?? {}] as const;
 const contractKey = (id: string) => ['finance', 'contract', id] as const;
-const paymentsKey = (q?: Partial<ListPaymentsQuery>) =>
-  ['finance', 'payments', q ?? {}] as const;
-const expensesKey = (q?: Partial<ListExpensesQuery>) =>
-  ['finance', 'expenses', q ?? {}] as const;
+const paymentsKey = (q?: Partial<ListPaymentsQuery>) => ['finance', 'payments', q ?? {}] as const;
+const expensesKey = (q?: Partial<ListExpensesQuery>) => ['finance', 'expenses', q ?? {}] as const;
 const paymentSourcesKey = (includeInactive = false) =>
   ['finance', 'payment-sources', includeInactive] as const;
 const financeSummaryKey = (q: FinanceSummaryQuery) =>
@@ -57,10 +55,7 @@ const READ_OPTS = {
 } as const;
 
 /** Everything a money write can invalidate. */
-function invalidateMoney(
-  qc: ReturnType<typeof useQueryClient>,
-  contractId?: string | null,
-) {
+function invalidateMoney(qc: ReturnType<typeof useQueryClient>, contractId?: string | null) {
   void qc.invalidateQueries({ queryKey: ['finance', 'contracts'] });
   void qc.invalidateQueries({ queryKey: ['finance', 'payments'] });
   void qc.invalidateQueries({ queryKey: ['finance', 'summary'] });
@@ -387,10 +382,8 @@ export function useDeleteExpense() {
 export function useCreatePaymentSource() {
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (input: CreatePaymentSourceInput) =>
-      getApi().finance.createPaymentSource(input),
-    onSuccess: () =>
-      void qc.invalidateQueries({ queryKey: ['finance', 'payment-sources'] }),
+    mutationFn: (input: CreatePaymentSourceInput) => getApi().finance.createPaymentSource(input),
+    onSuccess: () => void qc.invalidateQueries({ queryKey: ['finance', 'payment-sources'] }),
     meta: { successMessage: 'Payment source added.', errorTitle: "Couldn't add payment source" },
   });
 }
@@ -400,13 +393,14 @@ export function useUpdatePaymentSource() {
   return useMutation({
     mutationFn: ({ id, input }: { id: string; input: UpdatePaymentSourceInput }) =>
       getApi().finance.updatePaymentSource(id, input),
-    onSuccess: () =>
-      void qc.invalidateQueries({ queryKey: ['finance', 'payment-sources'] }),
+    onSuccess: () => void qc.invalidateQueries({ queryKey: ['finance', 'payment-sources'] }),
     meta: { errorTitle: "Couldn't update payment source" },
   });
 }
 
-type PaymentSourceList = Awaited<ReturnType<ReturnType<typeof getApi>['finance']['listPaymentSources']>>;
+type PaymentSourceList = Awaited<
+  ReturnType<ReturnType<typeof getApi>['finance']['listPaymentSources']>
+>;
 
 /**
  * `ids` is the full list in the new order. Optimistic across every cached

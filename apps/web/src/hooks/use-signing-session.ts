@@ -96,7 +96,10 @@ function goneCopy(kind: SigningSource['kind'], err: unknown): { title: string; m
   if (status === 423) {
     return {
       title: 'This link is locked',
-      message: describeError(err, 'Too many wrong codes were entered. Ask the sender to send it again.'),
+      message: describeError(
+        err,
+        'Too many wrong codes were entered. Ask the sender to send it again.',
+      ),
     };
   }
   return {
@@ -205,7 +208,10 @@ export function useSigningSession(source: SigningSource) {
         mine: false,
       }));
       if (!canPlace) return given;
-      return [...given, ...placed.map((f) => ({ key: f.key, kind: f.kind, box: f as FieldBox, mine: true }))];
+      return [
+        ...given,
+        ...placed.map((f) => ({ key: f.key, kind: f.kind, box: f as FieldBox, mine: true })),
+      ];
     }, [session, canPlace, placed]);
 
   const placeAt = (page: number, point: { x: number; y: number }, kind: SignatureFieldKind) => {
@@ -239,7 +245,14 @@ export function useSigningSession(source: SigningSource) {
         ...(signerName?.trim() ? { signerName: signerName.trim() } : {}),
         ...(canPlace
           ? {
-              fields: placed.map((f) => ({ kind: f.kind, page: f.page, x: f.x, y: f.y, w: f.w, h: f.h })),
+              fields: placed.map((f) => ({
+                kind: f.kind,
+                page: f.page,
+                x: f.x,
+                y: f.y,
+                w: f.w,
+                h: f.h,
+              })),
             }
           : {}),
       });

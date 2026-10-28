@@ -9,18 +9,15 @@ import Link from 'next/link';
 export default function ForgotPasswordDisabledPage() {
   return (
     <div className="space-y-4 text-center">
-      <h1 className="text-lg font-semibold text-ink">
-        Password resets are admin-managed
-      </h1>
-      <p className="text-sm text-ink-muted">
-        Ask your administrator to reset your password from the Users panel.
-        Self-serve reset is disabled so that your CRM password stays in
-        sync with your webmail.
+      <h1 className="text-ink text-lg font-semibold">Password resets are admin-managed</h1>
+      <p className="text-ink-muted text-sm">
+        Ask your administrator to reset your password from the Users panel. Self-serve reset is
+        disabled so that your CRM password stays in sync with your webmail.
       </p>
       <div className="pt-2">
         <Link
           href="/sign-in"
-          className="inline-flex items-center justify-center rounded-md bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:shadow-focus"
+          className="bg-brand-600 hover:bg-brand-700 focus-visible:shadow-focus inline-flex items-center justify-center rounded-md px-4 py-2 text-sm font-medium text-white focus-visible:outline-none focus-visible:ring-2"
         >
           Back to sign in
         </Link>

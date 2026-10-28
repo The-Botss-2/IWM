@@ -4,12 +4,7 @@ import { ChevronRight, FileText } from 'lucide-react';
 import Link from 'next/link';
 import { use } from 'react';
 
-import {
-  documentGlyph,
-  documentTitle,
-  formatDate,
-  isoDate,
-} from '@/components/portal/format';
+import { documentGlyph, documentTitle, formatDate, isoDate } from '@/components/portal/format';
 import { usePortalClient } from '@/components/portal/portal-context';
 import { PortalPageHeader } from '@/components/portal/portal-page-header';
 import { PortalEmpty } from '@/components/portal/portal-states';
@@ -33,7 +28,7 @@ export default function PortalDocumentsPage({ params }: { params: Promise<{ clie
         description={`Documents ${client.agency.name} has shared with you. They are view only.`}
       />
       {documents.isLoading ? (
-        <div className="card divide-y divide-line" aria-busy="true">
+        <div className="card divide-line divide-y" aria-busy="true">
           {Array.from({ length: 4 }).map((_, i) => (
             <div key={i} className="flex items-center gap-3 px-4 py-3.5 sm:px-5">
               <Skeleton className="h-9 w-9 rounded-md" />
@@ -45,10 +40,7 @@ export default function PortalDocumentsPage({ params }: { params: Promise<{ clie
           ))}
         </div>
       ) : documents.isError ? (
-        <QueryError
-          message="Couldn't load documents."
-          onRetry={() => void documents.refetch()}
-        />
+        <QueryError message="Couldn't load documents." onRetry={() => void documents.refetch()} />
       ) : items.length === 0 ? (
         <PortalEmpty
           icon={FileText}
@@ -56,36 +48,38 @@ export default function PortalDocumentsPage({ params }: { params: Promise<{ clie
           description={`When ${client.agency.name} shares a document with you or your company, it appears here.`}
         />
       ) : (
-        <ul className="card divide-y divide-line overflow-hidden">
+        <ul className="card divide-line divide-y overflow-hidden">
           {items.map((doc) => {
             const glyph = documentGlyph(doc.icon);
             return (
               <li key={doc.id}>
                 <Link
                   href={portalDocumentHref(client.id, doc.id)}
-                  className="flex items-center gap-3 px-4 py-3.5 transition-colors hover:bg-bg-subtle focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-brand-purple/50 sm:px-5"
+                  className="hover:bg-bg-subtle focus-visible:ring-brand-purple/50 flex items-center gap-3 px-4 py-3.5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset sm:px-5"
                 >
                   <span
                     aria-hidden
-                    className="grid h-9 w-9 shrink-0 place-items-center rounded-md bg-bg-subtle text-lg text-ink-muted"
+                    className="bg-bg-subtle text-ink-muted grid h-9 w-9 shrink-0 place-items-center rounded-md text-lg"
                   >
                     {glyph ?? <FileText className="h-4 w-4" />}
                   </span>
                   <span className="min-w-0 flex-1">
-                    <span className="block truncate text-sm font-medium text-ink">
+                    <span className="text-ink block truncate text-sm font-medium">
                       {documentTitle(doc.title)}
                     </span>
-                    <span className="block text-xs text-ink-muted">
+                    <span className="text-ink-muted block text-xs">
                       Updated{' '}
                       <time dateTime={isoDate(doc.updatedAt)} title={formatDate(doc.updatedAt)}>
                         {relativeTime(doc.updatedAt)}
                       </time>
                       <span aria-hidden> · </span>
                       <span className="sr-only">, </span>
-                      {doc.sharedWith === 'COMPANY' ? 'Shared with your company' : 'Shared with you'}
+                      {doc.sharedWith === 'COMPANY'
+                        ? 'Shared with your company'
+                        : 'Shared with you'}
                     </span>
                   </span>
-                  <ChevronRight className="h-4 w-4 shrink-0 text-ink-disabled" aria-hidden />
+                  <ChevronRight className="text-ink-disabled h-4 w-4 shrink-0" aria-hidden />
                 </Link>
               </li>
             );

@@ -1,8 +1,5 @@
 import { Controller, Get, Query, Res } from '@nestjs/common';
-import {
-  type ExportTimesheetQuery,
-  exportTimesheetQuerySchema,
-} from '@botss/shared-types';
+import { type ExportTimesheetQuery, exportTimesheetQuerySchema } from '@botss/shared-types';
 import type { Response } from 'express';
 
 import { CurrentUser, type AuthedUser } from '../common/decorators/current-user.decorator';
@@ -27,11 +24,6 @@ export class AttendanceExportController {
     query: ExportTimesheetQuery,
     @Res() res: Response,
   ) {
-    return this.exporter.streamMonthlyTimesheet(
-      user.id,
-      query.userId,
-      query.month,
-      res,
-    );
+    return this.exporter.streamMonthlyTimesheet(user.id, query.userId, query.month, res);
   }
 }

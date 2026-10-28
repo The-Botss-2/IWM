@@ -79,7 +79,9 @@ const summary: FinanceSummary = {
   contractedBase: '5000.00',
   awaitingPaymentBase: '10.01',
   byStatus: { NOT_PAID: 1, PARTIAL: 0, PAID: 2 },
-  bySource: [{ paymentSourceId: null, name: 'Unattributed', kind: 'OTHER', amountBase: '1200.50', count: 3 }],
+  bySource: [
+    { paymentSourceId: null, name: 'Unattributed', kind: 'OTHER', amountBase: '1200.50', count: 3 },
+  ],
   byRegion: [],
   byCurrency: [{ currency: 'USD', amount: '4.30', amountBase: '1200.50' }],
   byExpenseCategory: [],
@@ -90,7 +92,10 @@ const summary: FinanceSummary = {
 
 async function main() {
   // Key pins every query parameter.
-  assert.notEqual(financeSummaryKey('w1', q), financeSummaryKey('w1', { ...q, projectId: undefined }));
+  assert.notEqual(
+    financeSummaryKey('w1', q),
+    financeSummaryKey('w1', { ...q, projectId: undefined }),
+  );
   assert.notEqual(financeSummaryKey('w1', q), financeSummaryKey('w2', q));
   assert.notEqual(financeSummaryKey('w1', q), financeSummaryKey('w1', { ...q, clientId: 'ccli1' }));
 

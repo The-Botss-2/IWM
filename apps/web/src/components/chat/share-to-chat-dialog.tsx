@@ -39,13 +39,7 @@ interface Props {
  * `/chat/share`. Channels are intentionally excluded - they're project-
  * scoped and don't fit the cross-app share semantics.
  */
-export function ShareToChatDialog({
-  open,
-  onOpenChange,
-  itemType,
-  itemId,
-  itemLabel,
-}: Props) {
+export function ShareToChatDialog({ open, onOpenChange, itemType, itemId, itemLabel }: Props) {
   const session = useSessionContext();
   const userId = session.data?.user?.id ?? '';
   const [search, setSearch] = useState('');
@@ -87,8 +81,8 @@ export function ShareToChatDialog({
         <DialogHeader>
           <DialogTitle>Share to chat</DialogTitle>
           <DialogDescription>
-            Pick a chat to send a reference card for <strong>{itemLabel}</strong>.
-            Only DMs and groups in your organization are listed.
+            Pick a chat to send a reference card for <strong>{itemLabel}</strong>. Only DMs and
+            groups in your organization are listed.
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-3">
@@ -100,7 +94,7 @@ export function ShareToChatDialog({
           />
           <ul className="max-h-72 space-y-1 overflow-y-auto" role="listbox">
             {candidates.length === 0 ? (
-              <li className="px-2 py-4 text-center text-xs text-ink-muted">
+              <li className="text-ink-muted px-2 py-4 text-center text-xs">
                 {rooms.isLoading ? (
                   <Loader size="sm" label="Loading" />
                 ) : rooms.isError && !rooms.data ? (
@@ -117,9 +111,7 @@ export function ShareToChatDialog({
               candidates.map((r) => {
                 const title = roomTitle(r, userId);
                 const peer =
-                  r.type === 'DM'
-                    ? r.participants.find((p) => p.userId !== userId)?.user
-                    : null;
+                  r.type === 'DM' ? r.participants.find((p) => p.userId !== userId)?.user : null;
                 const active = picked === r.id;
                 return (
                   <li key={r.id}>
@@ -133,18 +125,12 @@ export function ShareToChatDialog({
                         active ? 'bg-tint-info' : 'hover:bg-bg-subtle',
                       )}
                     >
-                      <UserAvatar
-                        size="sm"
-                        name={title}
-                        image={peer?.image ?? null}
-                      />
+                      <UserAvatar size="sm" name={title} image={peer?.image ?? null} />
                       <div className="min-w-0 flex-1">
-                        <div className="truncate text-sm font-medium text-ink">
-                          {title}
-                        </div>
-                        <div className="truncate text-xs text-ink-muted">
+                        <div className="text-ink truncate text-sm font-medium">{title}</div>
+                        <div className="text-ink-muted truncate text-xs">
                           {r.type === 'DM'
-                            ? peer?.email ?? ''
+                            ? (peer?.email ?? '')
                             : `${r.participants.length} members`}
                         </div>
                       </div>
@@ -164,10 +150,7 @@ export function ShareToChatDialog({
           >
             Cancel
           </Button>
-          <Button
-            onClick={() => share.mutate()}
-            disabled={!picked || share.isPending}
-          >
+          <Button onClick={() => share.mutate()} disabled={!picked || share.isPending}>
             <Send className="h-3.5 w-3.5" />
             {share.isPending ? 'Sharing…' : 'Share'}
           </Button>

@@ -87,10 +87,7 @@ export function LivekitCallOverlay({
 
   // Everyone currently presenting a screen. When two people share at once we
   // let the user choose which one fills the stage.
-  const screenSharers = useMemo(
-    () => participants.filter((p) => p.screenSharing),
-    [participants],
-  );
+  const screenSharers = useMemo(() => participants.filter((p) => p.screenSharing), [participants]);
 
   // The share the user has explicitly focused (null = let us pick a default).
   const [focusedShareId, setFocusedShareId] = useState<string | null>(null);
@@ -126,21 +123,23 @@ export function LivekitCallOverlay({
           className={cn(
             'h-2 w-2 rounded-full',
             phase === 'connected' && 'bg-brand-teal',
-            phase === 'connecting' && 'animate-pulse bg-brand-orange',
-            phase === 'reconnecting' && 'animate-pulse bg-brand-orange',
+            phase === 'connecting' && 'bg-brand-orange animate-pulse',
+            phase === 'reconnecting' && 'bg-brand-orange animate-pulse',
             phase === 'error' && 'bg-state-error',
             (phase === 'idle' || phase === undefined) && 'bg-ink-muted',
           )}
         />
         <span className="text-sm font-medium">{title}</span>
-        <span aria-hidden className="text-white/30">·</span>
+        <span aria-hidden className="text-white/30">
+          ·
+        </span>
         <span aria-live="polite" className="text-[11px] text-white/70">
           {status}
         </span>
       </div>
 
       {/* Stage */}
-      <div className="flex-1 min-h-0 overflow-hidden p-4 pb-32 pt-20">
+      <div className="min-h-0 flex-1 overflow-hidden p-4 pb-32 pt-20">
         {activeShare ? (
           // Sharing mode: presenter at top, participant strip at bottom.
           <div className="grid h-full grid-rows-[minmax(0,1fr)_120px] gap-3">
@@ -149,9 +148,7 @@ export function LivekitCallOverlay({
               sharers={screenSharers}
               activeId={activeShare.identity}
               onSelectShare={setFocusedShareId}
-              onStopLocalShare={
-                screenShareEnabled ? onToggleScreenShare : undefined
-              }
+              onStopLocalShare={screenShareEnabled ? onToggleScreenShare : undefined}
             />
             <div className="grid h-full grid-flow-col grid-cols-[repeat(auto-fit,minmax(140px,1fr))] gap-2 overflow-x-auto">
               {participants.map((p) => (
@@ -176,18 +173,14 @@ export function LivekitCallOverlay({
 
       {/* Bottom control bar */}
       <div className="absolute bottom-8 left-1/2 -translate-x-1/2">
-        <div className="flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-2 py-2 backdrop-blur-lg shadow-soft-lg">
+        <div className="shadow-soft-lg flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-2 py-2 backdrop-blur-lg">
           <CallButton
             ariaLabel={micEnabled ? 'Mute microphone' : 'Unmute microphone'}
             onClick={onToggleMic}
             active={micEnabled}
             danger={!micEnabled}
           >
-            {micEnabled ? (
-              <Mic className="h-5 w-5" />
-            ) : (
-              <MicOff className="h-5 w-5" />
-            )}
+            {micEnabled ? <Mic className="h-5 w-5" /> : <MicOff className="h-5 w-5" />}
           </CallButton>
           <CallButton
             ariaLabel={cameraEnabled ? 'Turn camera off' : 'Turn camera on'}
@@ -195,16 +188,10 @@ export function LivekitCallOverlay({
             active={cameraEnabled}
             danger={!cameraEnabled}
           >
-            {cameraEnabled ? (
-              <Video className="h-5 w-5" />
-            ) : (
-              <VideoOff className="h-5 w-5" />
-            )}
+            {cameraEnabled ? <Video className="h-5 w-5" /> : <VideoOff className="h-5 w-5" />}
           </CallButton>
           <CallButton
-            ariaLabel={
-              screenShareEnabled ? 'Stop screen share' : 'Share your screen'
-            }
+            ariaLabel={screenShareEnabled ? 'Stop screen share' : 'Share your screen'}
             onClick={onToggleScreenShare}
             active={screenShareEnabled}
           >
@@ -226,7 +213,7 @@ export function LivekitCallOverlay({
             size="icon"
             aria-label="End call"
             onClick={onEnd}
-            className="h-12 w-12 min-h-0 min-w-0 rounded-full bg-state-error text-white shadow-soft hover:bg-[#D03B40]"
+            className="bg-state-error shadow-soft h-12 min-h-0 w-12 min-w-0 rounded-full text-white hover:bg-[#D03B40]"
           >
             <PhoneOff className="h-5 w-5" />
           </Button>
@@ -246,13 +233,7 @@ interface CallButtonProps {
   children: React.ReactNode;
 }
 
-function CallButton({
-  ariaLabel,
-  onClick,
-  active,
-  danger,
-  children,
-}: CallButtonProps) {
+function CallButton({ ariaLabel, onClick, active, danger, children }: CallButtonProps) {
   return (
     <Button
       type="button"
@@ -260,11 +241,11 @@ function CallButton({
       aria-label={ariaLabel}
       onClick={onClick}
       className={cn(
-        'h-12 w-12 min-h-0 min-w-0 rounded-full transition-all',
+        'h-12 min-h-0 w-12 min-w-0 rounded-full transition-all',
         danger
-          ? 'bg-state-error/85 text-white hover:bg-state-error'
+          ? 'bg-state-error/85 hover:bg-state-error text-white'
           : active
-            ? 'bg-brand-gradient text-white shadow-soft hover:shadow-soft-lg'
+            ? 'bg-brand-gradient shadow-soft hover:shadow-soft-lg text-white'
             : 'bg-white/10 text-white hover:bg-white/20',
       )}
     >
@@ -315,13 +296,7 @@ function ScreenShareStage({
       className="relative overflow-hidden rounded-xl bg-black ring-1 ring-white/10"
     >
       {participant.screenTrack ? (
-        <video
-          ref={videoRef}
-          autoPlay
-          playsInline
-          muted
-          className="h-full w-full object-contain"
-        />
+        <video ref={videoRef} autoPlay playsInline muted className="h-full w-full object-contain" />
       ) : (
         <div className="grid h-full place-items-center">
           <div className="text-sm text-white/60">
@@ -342,9 +317,7 @@ function ScreenShareStage({
               onClick={() => onSelectShare(s.identity)}
               className={cn(
                 'rounded-full px-3 py-1 text-xs font-medium transition-colors',
-                s.identity === activeId
-                  ? 'bg-white text-black'
-                  : 'text-white/80 hover:bg-white/15',
+                s.identity === activeId ? 'bg-white text-black' : 'text-white/80 hover:bg-white/15',
               )}
             >
               {s.isLocal ? 'Your screen' : s.name}
@@ -359,7 +332,7 @@ function ScreenShareStage({
           <button
             type="button"
             onClick={onStopLocalShare}
-            className="inline-flex items-center gap-1.5 rounded-full bg-state-error/90 px-3 py-1.5 text-xs font-medium text-white hover:bg-state-error"
+            className="bg-state-error/90 hover:bg-state-error inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium text-white"
           >
             <MonitorOff className="h-3.5 w-3.5" aria-hidden />
             Stop your share
@@ -371,19 +344,13 @@ function ScreenShareStage({
           aria-label={isFullscreen ? 'Exit full screen' : 'Full screen'}
           className="grid h-8 w-8 place-items-center rounded-full bg-black/55 text-white hover:bg-black/75"
         >
-          {isFullscreen ? (
-            <Minimize2 className="h-4 w-4" />
-          ) : (
-            <Maximize2 className="h-4 w-4" />
-          )}
+          {isFullscreen ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
         </button>
       </div>
 
       <div className="absolute bottom-2 left-2 inline-flex items-center gap-1.5 rounded-full bg-black/50 px-2.5 py-1 text-[11px]">
-        <Monitor className="h-3 w-3 text-brand-teal" aria-hidden />
-        {participant.isLocal
-          ? 'Your screen'
-          : `${participant.name} is presenting`}
+        <Monitor className="text-brand-teal h-3 w-3" aria-hidden />
+        {participant.isLocal ? 'Your screen' : `${participant.name} is presenting`}
       </div>
     </div>
   );
@@ -442,8 +409,7 @@ function ParticipantTile({
       className={cn(
         'relative overflow-hidden rounded-xl bg-[#1A1A2E] ring-1 ring-white/5',
         // Active-speaker glow: gradient ring on top of the dark frame.
-        participant.isSpeaking &&
-          'ring-2 ring-brand-teal shadow-[0_0_0_2px_rgba(34,197,197,0.35)]',
+        participant.isSpeaking && 'ring-brand-teal shadow-[0_0_0_2px_rgba(34,197,197,0.35)] ring-2',
       )}
     >
       {showVideo ? (
@@ -453,34 +419,25 @@ function ParticipantTile({
           playsInline
           // Mute + mirror the local self-view; remote video plays normally.
           muted={participant.isLocal}
-          className={cn(
-            'h-full w-full object-cover',
-            participant.isLocal && '-scale-x-100',
-          )}
+          className={cn('h-full w-full object-cover', participant.isLocal && '-scale-x-100')}
         />
       ) : (
         <div className="flex h-full w-full items-center justify-center">
-          <UserAvatar
-            size={compact ? 'md' : 'xl'}
-            name={participant.name}
-            image={null}
-          />
+          <UserAvatar size={compact ? 'md' : 'xl'} name={participant.name} image={null} />
         </div>
       )}
       <audio ref={audioRef} autoPlay playsInline className="hidden" />
       <div className="absolute bottom-2 left-2 right-2 flex items-center justify-between gap-2 rounded-md bg-black/55 px-2 py-1 text-xs backdrop-blur-sm">
         <span className="truncate">
           {participant.name}
-          {participant.isLocal ? (
-            <span className="ml-1 text-white/50">(you)</span>
-          ) : null}
+          {participant.isLocal ? <span className="ml-1 text-white/50">(you)</span> : null}
         </span>
         <span className="flex items-center gap-1">
           {participant.screenSharing ? (
-            <Monitor className="h-3.5 w-3.5 text-brand-teal" aria-label="Sharing" />
+            <Monitor className="text-brand-teal h-3.5 w-3.5" aria-label="Sharing" />
           ) : null}
           {participant.audioMuted ? (
-            <MicOff className="h-3.5 w-3.5 text-state-error" aria-label="Muted" />
+            <MicOff className="text-state-error h-3.5 w-3.5" aria-label="Muted" />
           ) : null}
         </span>
       </div>

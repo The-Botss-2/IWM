@@ -63,8 +63,8 @@ export class MailVerifierService {
         smtp.kind === 'auth'
           ? 'AUTH_FAILED'
           : smtp.kind === 'conn'
-          ? 'CONNECTION_FAILED'
-          : 'ACTIVE',
+            ? 'CONNECTION_FAILED'
+            : 'ACTIVE',
     };
   }
 

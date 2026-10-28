@@ -69,11 +69,7 @@ const ProjectTodosView = dynamic(
   { loading: () => <Skeleton className="h-72" /> },
 );
 
-export default function ProjectDetailPage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
+export default function ProjectDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const project = useProject(id);
   const { view, setView } = useProjectView();
@@ -163,7 +159,13 @@ export default function ProjectDetailPage({
         if (filtered.length > 0) setListColumns(filtered);
       }
       const g = snap.groupBy;
-      if (g === 'none' || g === 'status' || g === 'assignee' || g === 'priority' || g === 'sprint') {
+      if (
+        g === 'none' ||
+        g === 'status' ||
+        g === 'assignee' ||
+        g === 'priority' ||
+        g === 'sprint'
+      ) {
         setListGroupBy(g as ListGroupBy);
       }
     },
@@ -186,7 +188,7 @@ export default function ProjectDetailPage({
   }
   if (project.isError || !project.data) {
     return (
-      <div className="mx-auto max-w-7xl px-4 py-6 text-sm text-state-error sm:px-6 lg:px-8">
+      <div className="text-state-error mx-auto max-w-7xl px-4 py-6 text-sm sm:px-6 lg:px-8">
         Couldn&apos;t load project.{' '}
         <Link href="/projects" className="underline">
           Back
@@ -197,9 +199,7 @@ export default function ProjectDetailPage({
   const p = project.data;
 
   const exportCsv = () => {
-    const visibleTasks = (tasks.data?.items ?? []).filter((t) =>
-      matchesTaskFilters(t, filters),
-    );
+    const visibleTasks = (tasks.data?.items ?? []).filter((t) => matchesTaskFilters(t, filters));
     const csv = buildTasksCsv(visibleTasks, listColumns, sprints.data ?? []);
     downloadCsv(csvFilename(p.key), csv);
   };
@@ -207,7 +207,7 @@ export default function ProjectDetailPage({
   return (
     <div className="mx-auto max-w-7xl space-y-5 px-4 py-6 sm:px-6 lg:px-8">
       <div className="flex items-center gap-3">
-        <Link href="/projects" className="text-sm text-ink-muted hover:text-ink">
+        <Link href="/projects" className="text-ink-muted hover:text-ink text-sm">
           ← Projects
         </Link>
       </div>
@@ -220,10 +220,10 @@ export default function ProjectDetailPage({
               aria-hidden
             />
             <h1 className="text-xl font-semibold">{p.name}</h1>
-            <span className="font-mono text-xs text-ink-muted">{p.key}</span>
+            <span className="text-ink-muted font-mono text-xs">{p.key}</span>
           </div>
           {p.description ? (
-            <p className="mt-1 max-w-2xl text-sm text-ink-muted">{p.description}</p>
+            <p className="text-ink-muted mt-1 max-w-2xl text-sm">{p.description}</p>
           ) : null}
         </div>
       </header>
@@ -284,17 +284,11 @@ export default function ProjectDetailPage({
           />
         )}
         {view === 'backlog' && <BacklogView projectId={id} />}
-        {view === 'timeline' && (
-          <TimelineView projectId={id} onSelectTask={setSelectedTaskId} />
-        )}
-        {view === 'calendar' && (
-          <CalendarView projectId={id} onSelectTask={setSelectedTaskId} />
-        )}
+        {view === 'timeline' && <TimelineView projectId={id} onSelectTask={setSelectedTaskId} />}
+        {view === 'calendar' && <CalendarView projectId={id} onSelectTask={setSelectedTaskId} />}
         {view === 'forms' && <FormsView projectId={id} />}
         {view === 'goals' && <GoalsView projectId={id} />}
-        {view === 'todos' && (
-          <ProjectTodosView projectId={id} workspaceId={p.workspaceId} />
-        )}
+        {view === 'todos' && <ProjectTodosView projectId={id} workspaceId={p.workspaceId} />}
         {view === 'shortcuts' && <ShortcutsView projectId={id} />}
         {view === 'archive' && <ArchiveView projectId={id} />}
         {view === 'development' && (
@@ -338,13 +332,12 @@ function ComingSoon({
   description: string;
 }) {
   return (
-    <div className="rounded-lg border border-dashed border-line bg-bg-subtle p-10 text-center">
-      <div className="mx-auto mb-2 inline-flex h-10 w-10 items-center justify-center rounded-full bg-white text-ink-disabled">
+    <div className="border-line bg-bg-subtle rounded-lg border border-dashed p-10 text-center">
+      <div className="text-ink-disabled mx-auto mb-2 inline-flex h-10 w-10 items-center justify-center rounded-full bg-white">
         {icon}
       </div>
-      <h3 className="text-sm font-semibold text-ink">{title}</h3>
-      <p className="mx-auto mt-1 max-w-md text-sm text-ink-muted">{description}</p>
+      <h3 className="text-ink text-sm font-semibold">{title}</h3>
+      <p className="text-ink-muted mx-auto mt-1 max-w-md text-sm">{description}</p>
     </div>
   );
 }
-

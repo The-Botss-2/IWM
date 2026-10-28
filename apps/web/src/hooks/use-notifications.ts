@@ -2,10 +2,7 @@
 
 import { useEffect } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import type {
-  MarkReadByEntityInput,
-  NotificationListResponse,
-} from '@botss/shared-types';
+import type { MarkReadByEntityInput, NotificationListResponse } from '@botss/shared-types';
 
 import { getApi } from '@/lib/api';
 import { isDesktop } from '@/lib/desktop-runtime';

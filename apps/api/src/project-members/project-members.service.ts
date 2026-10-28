@@ -133,7 +133,7 @@ export class ProjectMembersService {
     }
     if (targetUser.organizationId !== project.workspace.organizationId) {
       throw new ForbiddenException({
-        title: 'User is outside this project\'s organization',
+        title: "User is outside this project's organization",
         status: 403,
       });
     }

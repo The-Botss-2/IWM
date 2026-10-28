@@ -1,13 +1,5 @@
-import {
-  BadRequestException,
-  ForbiddenException,
-  Injectable,
-} from '@nestjs/common';
-import type {
-  CreateClientInput,
-  ListClientsQuery,
-  UpdateClientInput,
-} from '@botss/shared-types';
+import { BadRequestException, ForbiddenException, Injectable } from '@nestjs/common';
+import type { CreateClientInput, ListClientsQuery, UpdateClientInput } from '@botss/shared-types';
 
 import type { SalesActor } from '../common/decorators/sales-actor.decorator';
 import { NotificationsService } from '../notifications/notifications.service';
@@ -49,10 +41,7 @@ export class ClientsService {
   }
 
   /** Reject an assignee that isn't in the same org as the client's workspace. */
-  private async assertAssigneeInOrg(
-    workspaceId: string,
-    assigneeId: string,
-  ): Promise<void> {
+  private async assertAssigneeInOrg(workspaceId: string, assigneeId: string): Promise<void> {
     const [ws, assignee] = await Promise.all([
       this.prisma.client.workspace.findUnique({
         where: { id: workspaceId },

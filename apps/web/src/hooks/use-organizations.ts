@@ -76,9 +76,11 @@ export function useHardDeleteOrganization() {
   });
 }
 
-export function useCreateOrganization(options: {
-  onSuccess?: (org: CreateOrganizationResponse) => void;
-} = {}) {
+export function useCreateOrganization(
+  options: {
+    onSuccess?: (org: CreateOrganizationResponse) => void;
+  } = {},
+) {
   const invalidate = useInvalidateOrganizations();
   return useMutation({
     meta: { errorTitle: "Couldn't create organization" },
@@ -90,9 +92,11 @@ export function useCreateOrganization(options: {
   });
 }
 
-export function useInviteOrganizationOwner(options: {
-  onSuccess?: (resp: InviteOrganizationOwnerResponse) => void;
-} = {}) {
+export function useInviteOrganizationOwner(
+  options: {
+    onSuccess?: (resp: InviteOrganizationOwnerResponse) => void;
+  } = {},
+) {
   const invalidate = useInvalidateOrganizations();
   return useMutation({
     meta: { errorTitle: "Couldn't send invite" },

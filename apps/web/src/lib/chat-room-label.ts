@@ -39,7 +39,7 @@ export function roomTitle(
 ): string {
   if (room.type === 'TEXT_CHANNEL') return `# ${room.name ?? 'channel'}`;
   if (room.type === 'VOICE_CHANNEL') {
-    return options.voiceAsChannel ? `# ${room.name ?? 'channel'}` : room.name ?? 'voice';
+    return options.voiceAsChannel ? `# ${room.name ?? 'channel'}` : (room.name ?? 'voice');
   }
   if (room.type === 'GROUP') return room.name ?? 'Group';
   return dmPeerName(room, currentUserId);

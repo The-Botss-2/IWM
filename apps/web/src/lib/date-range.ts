@@ -121,7 +121,10 @@ export function presetDayRange(id: DateRangePresetId, now: Date = new Date()): D
 }
 
 /** The preset a range equals today, if any - drives the picker's highlight. */
-export function matchingPreset(range: DayRange | null, now: Date = new Date()): DateRangePresetId | null {
+export function matchingPreset(
+  range: DayRange | null,
+  now: Date = new Date(),
+): DateRangePresetId | null {
   if (!range) return null;
   for (const p of DATE_RANGE_PRESETS) {
     const r = presetDayRange(p.id, now);
@@ -134,7 +137,8 @@ export function matchingPreset(range: DayRange | null, now: Date = new Date()): 
 export function formatDayRange(range: DayRange, now: Date = new Date()): string {
   const from = parseYmd(range.from)!;
   const to = parseYmd(range.to)!;
-  const sameYearAsNow = from.getFullYear() === now.getFullYear() && to.getFullYear() === now.getFullYear();
+  const sameYearAsNow =
+    from.getFullYear() === now.getFullYear() && to.getFullYear() === now.getFullYear();
   const opts: Intl.DateTimeFormatOptions = sameYearAsNow
     ? { month: 'short', day: 'numeric' }
     : { month: 'short', day: 'numeric', year: 'numeric' };

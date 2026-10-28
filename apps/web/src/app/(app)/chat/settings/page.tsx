@@ -14,10 +14,7 @@ import {
   type ChatFontSize,
   type ChatTheme,
 } from '@/lib/chat-prefs';
-import {
-  playMessageBlip,
-  playRingtoneOnce,
-} from '@/lib/chat-sounds';
+import { playMessageBlip, playRingtoneOnce } from '@/lib/chat-sounds';
 import { cn } from '@/lib/utils';
 
 const BACKGROUNDS = [
@@ -46,15 +43,15 @@ export default function ChatSettingsPage() {
   return (
     <div className="mx-auto h-full w-full max-w-3xl overflow-y-auto px-6 py-6">
       <header className="mb-6">
-        <h1 className="text-xl font-semibold text-ink">Chat settings</h1>
-        <p className="mt-0.5 text-sm text-ink-muted">
+        <h1 className="text-ink text-xl font-semibold">Chat settings</h1>
+        <p className="text-ink-muted mt-0.5 text-sm">
           Appearance, sounds, and quiet hours. Stored locally on this device.
         </p>
       </header>
 
-      <section className="rounded-lg border border-line bg-white p-5">
-        <div className="mb-3 flex items-center gap-2 text-sm font-semibold text-ink">
-          <Palette className="h-4 w-4 text-ink-muted" /> Appearance
+      <section className="border-line rounded-lg border bg-white p-5">
+        <div className="text-ink mb-3 flex items-center gap-2 text-sm font-semibold">
+          <Palette className="text-ink-muted h-4 w-4" /> Appearance
         </div>
 
         <div className="space-y-5">
@@ -93,13 +90,13 @@ export default function ChatSettingsPage() {
                   style={{ backgroundColor: bg.value }}
                 />
               ))}
-              <label className="ml-2 inline-flex items-center gap-1 text-xs text-ink-muted">
+              <label className="text-ink-muted ml-2 inline-flex items-center gap-1 text-xs">
                 Custom
                 <input
                   type="color"
                   value={appearance.backgroundColor}
                   onChange={onColorPick}
-                  className="h-7 w-9 cursor-pointer rounded-md border border-line bg-white p-0"
+                  className="border-line h-7 w-9 cursor-pointer rounded-md border bg-white p-0"
                 />
               </label>
             </div>
@@ -107,7 +104,7 @@ export default function ChatSettingsPage() {
 
           <div className="space-y-2">
             <Label className="inline-flex items-center gap-1.5">
-              <Type className="h-3.5 w-3.5 text-ink-muted" /> Font size
+              <Type className="text-ink-muted h-3.5 w-3.5" /> Font size
             </Label>
             <div className="flex gap-2">
               {FONT_SIZES.map((s) => (
@@ -133,12 +130,12 @@ export default function ChatSettingsPage() {
         </div>
       </section>
 
-      <section className="mt-6 rounded-lg border border-line bg-white p-5">
-        <div className="mb-3 flex items-center gap-2 text-sm font-semibold text-ink">
+      <section className="border-line mt-6 rounded-lg border bg-white p-5">
+        <div className="text-ink mb-3 flex items-center gap-2 text-sm font-semibold">
           {notifications.doNotDisturb ? (
-            <BellOff className="h-4 w-4 text-ink-muted" />
+            <BellOff className="text-ink-muted h-4 w-4" />
           ) : (
-            <Bell className="h-4 w-4 text-ink-muted" />
+            <Bell className="text-ink-muted h-4 w-4" />
           )}
           Notifications
         </div>
@@ -173,12 +170,10 @@ export default function ChatSettingsPage() {
                 max={1}
                 step={0.05}
                 value={notifications.volume}
-                onChange={(e) =>
-                  setChatNotifications({ volume: Number(e.target.value) })
-                }
+                onChange={(e) => setChatNotifications({ volume: Number(e.target.value) })}
                 className="flex-1 accent-emerald-600"
               />
-              <span className="w-10 text-right text-xs text-ink-muted">
+              <span className="text-ink-muted w-10 text-right text-xs">
                 {Math.round(notifications.volume * 100)}%
               </span>
             </div>
@@ -249,13 +244,13 @@ function ToggleRow({
   return (
     <label
       className={cn(
-        'flex items-start justify-between gap-3 rounded-md border border-line px-3 py-2.5',
+        'border-line flex items-start justify-between gap-3 rounded-md border px-3 py-2.5',
         disabled ? 'opacity-60' : '',
       )}
     >
       <div className="min-w-0">
-        <div className="text-sm font-medium text-ink">{label}</div>
-        <div className="text-xs text-ink-muted">{description}</div>
+        <div className="text-ink text-sm font-medium">{label}</div>
+        <div className="text-ink-muted text-xs">{description}</div>
       </div>
       <input
         type="checkbox"
@@ -271,21 +266,16 @@ function ToggleRow({
 function PreviewBubble() {
   const appearance = useChatAppearance();
   return (
-    <div className="rounded-md border border-line p-3">
-      <div className="mb-2 text-[11px] uppercase tracking-wide text-ink-muted">
-        Preview
-      </div>
+    <div className="border-line rounded-md border p-3">
+      <div className="text-ink-muted mb-2 text-[11px] uppercase tracking-wide">Preview</div>
       <div
-        className={cn(
-          'flex flex-col gap-2 rounded-lg p-3',
-          fontSizeClass[appearance.fontSize],
-        )}
+        className={cn('flex flex-col gap-2 rounded-lg p-3', fontSizeClass[appearance.fontSize])}
         style={{ backgroundColor: appearance.backgroundColor }}
       >
-        <div className="self-start max-w-[78%] rounded-xl rounded-bl-sm bg-white px-3 py-1.5 shadow-sm ring-1 ring-slate-200">
+        <div className="max-w-[78%] self-start rounded-xl rounded-bl-sm bg-white px-3 py-1.5 shadow-sm ring-1 ring-slate-200">
           Hey, how&apos;s the new background looking?
         </div>
-        <div className="self-end max-w-[78%] rounded-xl rounded-br-sm bg-[#d9fdd3] px-3 py-1.5 text-ink shadow-sm">
+        <div className="text-ink max-w-[78%] self-end rounded-xl rounded-br-sm bg-[#d9fdd3] px-3 py-1.5 shadow-sm">
           Looks great! 🌿
         </div>
       </div>

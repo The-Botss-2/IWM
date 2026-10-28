@@ -77,9 +77,7 @@ export const financeSummarySchema = z.object({
       amountBase: decimalString,
     }),
   ),
-  byExpenseCategory: z.array(
-    z.object({ category: ExpenseCategory, amountBase: decimalString }),
-  ),
+  byExpenseCategory: z.array(z.object({ category: ExpenseCategory, amountBase: decimalString })),
   /** Trailing 12 months, oldest first. `YYYY-MM`. */
   monthly: z.array(
     z.object({
@@ -88,13 +86,9 @@ export const financeSummarySchema = z.object({
       spentBase: decimalString,
     }),
   ),
-  topClients: z.array(
-    z.object({ clientId: cuid, name: z.string(), amountBase: decimalString }),
-  ),
+  topClients: z.array(z.object({ clientId: cuid, name: z.string(), amountBase: decimalString })),
   /** Exact per-currency outstanding, with no FX applied at all. */
-  outstandingByCurrency: z.array(
-    z.object({ currency: ISO_CURRENCY, amount: decimalString }),
-  ),
+  outstandingByCurrency: z.array(z.object({ currency: ISO_CURRENCY, amount: decimalString })),
 });
 export type FinanceSummary = z.infer<typeof financeSummarySchema>;
 

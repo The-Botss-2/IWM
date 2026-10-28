@@ -77,9 +77,7 @@ export function useBlockChatUser() {
     },
     onSuccess: (block) => {
       qc.setQueryData<ChatRequestBlockList | undefined>(chatRequestBlocksKey, (prev) =>
-        prev
-          ? { items: prev.items.map((b) => (b.user.id === block.user.id ? block : b)) }
-          : prev,
+        prev ? { items: prev.items.map((b) => (b.user.id === block.user.id ? block : b)) } : prev,
       );
     },
   });
@@ -167,7 +165,9 @@ export function useDeclineChatRequest() {
       const { id, name, email, image } = request.requester;
       qc.setQueryData<ChatRequestBlockList | undefined>(chatRequestBlocksKey, (prev) => {
         if (!prev || prev.items.some((b) => b.user.id === id)) return prev;
-        return { items: [{ user: { id, name, email, image }, blockedAt: new Date() }, ...prev.items] };
+        return {
+          items: [{ user: { id, name, email, image }, blockedAt: new Date() }, ...prev.items],
+        };
       });
     },
   });

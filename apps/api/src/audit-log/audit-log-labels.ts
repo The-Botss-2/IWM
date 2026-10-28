@@ -42,7 +42,11 @@ function isLabelKind(type: string): type is AuditLabelKind {
 }
 
 /** Every id-shaped string in `metadata`, walking nested objects and arrays. */
-export function collectMetadataIds(metadata: unknown, depth = 0, out = new Set<string>()): Set<string> {
+export function collectMetadataIds(
+  metadata: unknown,
+  depth = 0,
+  out = new Set<string>(),
+): Set<string> {
   if (depth > MAX_DEPTH || metadata === null || metadata === undefined) return out;
   if (typeof metadata === 'string') {
     if (looksLikeAuditId(metadata)) out.add(metadata);

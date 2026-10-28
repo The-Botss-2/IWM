@@ -113,10 +113,8 @@ const config: Config = {
         // the brand gradient at runtime without rebuilding Tailwind.
         'brand-gradient': 'var(--brand-gradient)',
         'brand-gradient-soft': 'var(--brand-gradient-soft)',
-        'fallback-avatar':
-          'linear-gradient(135deg, #F4845F 0%, #E040FB 100%)',
-        'status-success-text':
-          'linear-gradient(90deg, #5B7CE8 0%, #22C5C5 100%)',
+        'fallback-avatar': 'linear-gradient(135deg, #F4845F 0%, #E040FB 100%)',
+        'status-success-text': 'linear-gradient(90deg, #5B7CE8 0%, #22C5C5 100%)',
       },
       keyframes: {
         'gradient-pulse': {

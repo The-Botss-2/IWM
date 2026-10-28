@@ -49,16 +49,16 @@ export default function OrgSignupPage() {
   if (submitted) {
     return (
       <div className="space-y-4 text-center">
-        <h1 className="text-lg font-semibold text-ink">Check your email</h1>
-        <p className="text-sm text-ink-muted">
-          We sent an invitation to <span className="font-medium text-ink">{submitted}</span>.
-          Open it to set your password and finish creating your organization.
-          The link is valid for 7 days.
+        <h1 className="text-ink text-lg font-semibold">Check your email</h1>
+        <p className="text-ink-muted text-sm">
+          We sent an invitation to <span className="text-ink font-medium">{submitted}</span>. Open
+          it to set your password and finish creating your organization. The link is valid for 7
+          days.
         </p>
         <div className="pt-2">
           <Link
             href="/sign-in"
-            className="inline-flex items-center justify-center rounded-md bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:shadow-focus"
+            className="bg-brand-600 hover:bg-brand-700 focus-visible:shadow-focus inline-flex items-center justify-center rounded-md px-4 py-2 text-sm font-medium text-white focus-visible:outline-none focus-visible:ring-2"
           >
             Back to sign in
           </Link>
@@ -73,14 +73,15 @@ export default function OrgSignupPage() {
         <h1 className="text-2xl font-semibold">
           Create your <span className="text-brand-gradient">organization</span>
         </h1>
-        <p className="mt-1 text-sm text-ink-muted">
-          Set up a workspace for your team. You&apos;ll receive an email to
-          choose your password.
+        <p className="text-ink-muted mt-1 text-sm">
+          Set up a workspace for your team. You&apos;ll receive an email to choose your password.
         </p>
       </div>
 
       <div className="space-y-1.5">
-        <label className="label" htmlFor="organizationName">Organization name</label>
+        <label className="label" htmlFor="organizationName">
+          Organization name
+        </label>
         <input
           id="organizationName"
           type="text"
@@ -89,26 +90,22 @@ export default function OrgSignupPage() {
           {...register('organizationName')}
         />
         {errors.organizationName ? (
-          <p className="text-xs text-state-error">{errors.organizationName.message}</p>
+          <p className="text-state-error text-xs">{errors.organizationName.message}</p>
         ) : null}
       </div>
 
       <div className="space-y-1.5">
-        <label className="label" htmlFor="name">Your name</label>
-        <input
-          id="name"
-          type="text"
-          autoComplete="name"
-          className="input"
-          {...register('name')}
-        />
-        {errors.name ? (
-          <p className="text-xs text-state-error">{errors.name.message}</p>
-        ) : null}
+        <label className="label" htmlFor="name">
+          Your name
+        </label>
+        <input id="name" type="text" autoComplete="name" className="input" {...register('name')} />
+        {errors.name ? <p className="text-state-error text-xs">{errors.name.message}</p> : null}
       </div>
 
       <div className="space-y-1.5">
-        <label className="label" htmlFor="email">Work email</label>
+        <label className="label" htmlFor="email">
+          Work email
+        </label>
         <input
           id="email"
           type="email"
@@ -116,31 +113,27 @@ export default function OrgSignupPage() {
           className="input"
           {...register('email')}
         />
-        {errors.email ? (
-          <p className="text-xs text-state-error">{errors.email.message}</p>
-        ) : null}
+        {errors.email ? <p className="text-state-error text-xs">{errors.email.message}</p> : null}
       </div>
 
-      <div className="rounded-lg border border-line">
+      <div className="border-line rounded-lg border">
         <label className="flex cursor-pointer items-start gap-2 p-3">
           <input
             type="checkbox"
-            className="mt-0.5 h-4 w-4 rounded border-line"
+            className="border-line mt-0.5 h-4 w-4 rounded"
             checked={showMail}
             onChange={(e) => setShowMail(e.target.checked)}
           />
           <span className="min-w-0">
-            <span className="block text-sm font-medium text-ink">
-              Set up email now (optional)
-            </span>
-            <span className="mt-0.5 block text-xs text-ink-muted">
-              Add your SMTP/IMAP details so your organization can send and read
-              mail right away. You can also add this later in Settings.
+            <span className="text-ink block text-sm font-medium">Set up email now (optional)</span>
+            <span className="text-ink-muted mt-0.5 block text-xs">
+              Add your SMTP/IMAP details so your organization can send and read mail right away. You
+              can also add this later in Settings.
             </span>
           </span>
         </label>
         {showMail ? (
-          <div className="border-t border-line p-3">
+          <div className="border-line border-t p-3">
             <OrgMailFields
               register={register}
               errors={errors}
@@ -162,11 +155,11 @@ export default function OrgSignupPage() {
         )}
       </button>
 
-      <div className="text-center text-xs text-ink-muted">
+      <div className="text-ink-muted text-center text-xs">
         Already have an account?{' '}
         <Link
           href="/sign-in"
-          className="font-medium text-brand-600 hover:text-brand-700 hover:underline"
+          className="text-brand-600 hover:text-brand-700 font-medium hover:underline"
         >
           Sign in
         </Link>

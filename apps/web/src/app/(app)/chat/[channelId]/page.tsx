@@ -34,16 +34,13 @@ export default function RoomPage() {
   if (!room && isError && !data) {
     return (
       <div className="grid flex-1 place-items-center p-4">
-        <QueryError
-          message="Couldn't load this chat."
-          onRetry={() => void refetch()}
-        />
+        <QueryError message="Couldn't load this chat." onRetry={() => void refetch()} />
       </div>
     );
   }
   if (!room) {
     return (
-      <div className="grid flex-1 place-items-center text-sm text-ink-muted">
+      <div className="text-ink-muted grid flex-1 place-items-center text-sm">
         {isLoading ? <Loader size="sm" label="Loading chat" /> : 'Chat not found.'}
       </div>
     );
@@ -53,11 +50,7 @@ export default function RoomPage() {
     <div className="flex h-full min-h-0 overflow-hidden">
       <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
         {room.type === 'VOICE_CHANNEL' ? (
-          <VoiceChannelPanel
-            key={room.id}
-            roomId={room.id}
-            channelName={room.name ?? 'voice'}
-          />
+          <VoiceChannelPanel key={room.id} roomId={room.id} channelName={room.name ?? 'voice'} />
         ) : null}
         <ChatWindow
           room={room}

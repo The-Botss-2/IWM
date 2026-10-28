@@ -132,7 +132,7 @@ function PanelInner({
   return (
     <>
       <SheetHeader>
-        <SheetTitle className="text-xs uppercase tracking-wide text-ink-muted">Task</SheetTitle>
+        <SheetTitle className="text-ink-muted text-xs uppercase tracking-wide">Task</SheetTitle>
         <Input
           aria-label="Task title"
           value={title}
@@ -150,7 +150,7 @@ function PanelInner({
           onKeyDown={(e) => {
             if (e.key === 'Enter') (e.target as HTMLInputElement).blur();
           }}
-          className="text-lg font-semibold border-transparent shadow-none px-2 -mx-2 hover:bg-bg-subtle focus:bg-white focus:border-brand-purple"
+          className="hover:bg-bg-subtle focus:border-brand-purple -mx-2 border-transparent px-2 text-lg font-semibold shadow-none focus:bg-white"
         />
       </SheetHeader>
       <SheetBody>
@@ -168,7 +168,7 @@ function PanelInner({
             />
           </Field>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <Field label="Status" htmlFor="task-status">
               <Select
                 value={task.status}
@@ -259,7 +259,7 @@ function PanelInner({
             />
           ) : null}
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 border-t border-line pt-4">
+          <div className="border-line grid grid-cols-1 gap-4 border-t pt-4 sm:grid-cols-2">
             <ReadOnly label="Created by">
               <div className="flex items-center gap-2">
                 <UserAvatar
@@ -272,18 +272,18 @@ function PanelInner({
             </ReadOnly>
             <ReadOnly label="Created">
               <Tooltip content={absoluteTime(task.createdAt)}>
-                <span className="text-sm text-ink">{relativeTime(task.createdAt)}</span>
+                <span className="text-ink text-sm">{relativeTime(task.createdAt)}</span>
               </Tooltip>
             </ReadOnly>
             <ReadOnly label="Updated">
               <Tooltip content={absoluteTime(task.updatedAt)}>
-                <span className="text-sm text-ink">{relativeTime(task.updatedAt)}</span>
+                <span className="text-ink text-sm">{relativeTime(task.updatedAt)}</span>
               </Tooltip>
             </ReadOnly>
             {task.completedAt ? (
               <ReadOnly label="Completed">
                 <Tooltip content={absoluteTime(task.completedAt)}>
-                  <span className="text-sm text-ink">{relativeTime(task.completedAt)}</span>
+                  <span className="text-ink text-sm">{relativeTime(task.completedAt)}</span>
                 </Tooltip>
               </ReadOnly>
             ) : null}
@@ -291,12 +291,8 @@ function PanelInner({
 
           <TaskComments taskId={task.id} />
 
-          <div className="flex flex-wrap items-center gap-2 border-t border-line pt-4">
-            <Button
-              variant="secondary"
-              onClick={() => setShareOpen(true)}
-              className="sm:w-auto"
-            >
+          <div className="border-line flex flex-wrap items-center gap-2 border-t pt-4">
+            <Button variant="secondary" onClick={() => setShareOpen(true)} className="sm:w-auto">
               <Send className="h-4 w-4" />
               Share to chat
             </Button>
@@ -367,7 +363,7 @@ function ClientVisibilityToggle({
   // Absent reads as false: tasks start hidden from the client.
   const visible = task.portalVisible ?? false;
   return (
-    <div className="flex items-start gap-3 rounded-md border border-line p-3">
+    <div className="border-line flex items-start gap-3 rounded-md border p-3">
       <Checkbox
         id="task-portal-visible"
         checked={visible}
@@ -380,7 +376,7 @@ function ClientVisibilityToggle({
         <Label htmlFor="task-portal-visible" className="cursor-pointer leading-snug">
           Visible to client
         </Label>
-        <p id="task-portal-visible-help" className="mt-1 text-xs text-ink-muted">
+        <p id="task-portal-visible-help" className="text-ink-muted mt-1 text-xs">
           {!portalListsTaskStatus(task.status)
             ? 'Cancelled tasks are never listed in the client portal.'
             : projectShownInPortal
@@ -412,7 +408,7 @@ function Field({
 function ReadOnly({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="space-y-1">
-      <div className="text-xs font-medium uppercase tracking-wide text-ink-muted">{label}</div>
+      <div className="text-ink-muted text-xs font-medium uppercase tracking-wide">{label}</div>
       {children}
     </div>
   );

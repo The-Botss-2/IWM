@@ -19,9 +19,5 @@ const getEmpty = () => EMPTY;
  * over on hydration without a tearing flicker.
  */
 export function useInAppNotifications(): InAppNotification[] {
-  return useSyncExternalStore(
-    subscribeInApp,
-    listInAppNotifications,
-    getEmpty,
-  );
+  return useSyncExternalStore(subscribeInApp, listInAppNotifications, getEmpty);
 }

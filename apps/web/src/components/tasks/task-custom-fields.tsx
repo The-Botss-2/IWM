@@ -31,7 +31,7 @@ export function TaskCustomFields({ task }: { task: TaskWithPeople }) {
   if (cf.fields.length === 0) {
     return (
       <Can I="manage" a="Workspace">
-        <p className="text-xs text-ink-muted">
+        <p className="text-ink-muted text-xs">
           No custom fields on this project.{' '}
           <Link href="/settings/workspace/custom-fields" className="underline">
             Add fields in Settings
@@ -44,11 +44,11 @@ export function TaskCustomFields({ task }: { task: TaskWithPeople }) {
   return (
     <section aria-labelledby="task-custom-fields-heading" className="space-y-3">
       <div>
-        <h3 id="task-custom-fields-heading" className="text-sm font-medium text-ink">
+        <h3 id="task-custom-fields-heading" className="text-ink text-sm font-medium">
           Custom fields
         </h3>
         {cf.readOnly ? (
-          <p className="text-xs text-ink-muted">You can view these fields but not change them.</p>
+          <p className="text-ink-muted text-xs">You can view these fields but not change them.</p>
         ) : null}
       </div>
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">

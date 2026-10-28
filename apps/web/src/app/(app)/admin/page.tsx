@@ -14,7 +14,5 @@ export default function AdminIndexPage() {
   useEffect(() => {
     router.replace('/settings/users');
   }, [router]);
-  return (
-    <div className="text-sm text-ink-muted">Opening admin tools…</div>
-  );
+  return <div className="text-ink-muted text-sm">Opening admin tools…</div>;
 }

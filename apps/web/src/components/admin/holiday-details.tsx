@@ -80,7 +80,7 @@ export function HolidayDetails({ holiday }: { holiday: Holiday }) {
             />
           </div>
         </div>
-        <p className="text-xs text-ink-muted">
+        <p className="text-ink-muted text-xs">
           {day} · the date can&apos;t change. Delete and re-add the holiday to move it.
         </p>
         <div className="flex gap-2">
@@ -104,21 +104,21 @@ export function HolidayDetails({ holiday }: { holiday: Holiday }) {
   return (
     <div className="min-w-0">
       <div className="flex items-center gap-2 text-sm">
-        <span aria-hidden className="inline-block h-2 w-2 rounded-full bg-brand-purple" />
-        <span className="font-medium text-ink">{holiday.name}</span>
-        <span className="text-xs text-ink-muted">{day}</span>
+        <span aria-hidden className="bg-brand-purple inline-block h-2 w-2 rounded-full" />
+        <span className="text-ink font-medium">{holiday.name}</span>
+        <span className="text-ink-muted text-xs">{day}</span>
         <Button
           type="button"
           size="icon"
           variant="ghost"
           aria-label={`Edit ${holiday.name}`}
           onClick={startEdit}
-          className="h-7 w-7 min-h-0 min-w-0"
+          className="h-7 min-h-0 w-7 min-w-0"
         >
           <Pencil className="h-3.5 w-3.5" />
         </Button>
       </div>
-      {holiday.notes ? <p className="ml-4 text-xs text-ink-muted">{holiday.notes}</p> : null}
+      {holiday.notes ? <p className="text-ink-muted ml-4 text-xs">{holiday.notes}</p> : null}
     </div>
   );
 }

@@ -48,15 +48,51 @@ function rows(overrides: Partial<AuthContextRows> = {}): AuthContextRows {
       customRole: null,
     },
     workspaceMemberships: [
-      { workspaceId: 'wA', role: 'MEMBER', workspaceOrganizationId: 'org1', workspaceDeleted: false, customRole: null },
-      { workspaceId: 'wB', role: 'ADMIN', workspaceOrganizationId: 'org1', workspaceDeleted: false, customRole: null },
+      {
+        workspaceId: 'wA',
+        role: 'MEMBER',
+        workspaceOrganizationId: 'org1',
+        workspaceDeleted: false,
+        customRole: null,
+      },
+      {
+        workspaceId: 'wB',
+        role: 'ADMIN',
+        workspaceOrganizationId: 'org1',
+        workspaceDeleted: false,
+        customRole: null,
+      },
       // Deleted workspace and a cross-org row: both must be dropped.
-      { workspaceId: 'wDel', role: 'OWNER', workspaceOrganizationId: 'org1', workspaceDeleted: true, customRole: null },
-      { workspaceId: 'wX', role: 'OWNER', workspaceOrganizationId: 'org2', workspaceDeleted: false, customRole: null },
+      {
+        workspaceId: 'wDel',
+        role: 'OWNER',
+        workspaceOrganizationId: 'org1',
+        workspaceDeleted: true,
+        customRole: null,
+      },
+      {
+        workspaceId: 'wX',
+        role: 'OWNER',
+        workspaceOrganizationId: 'org2',
+        workspaceDeleted: false,
+        customRole: null,
+      },
     ],
     projectMemberships: [
-      { projectId: 'p1', role: 'CONTRIBUTOR', abilities: { a: 1 }, projectWorkspaceId: 'wA', workspaceOrganizationId: 'org1' },
-      { projectId: 'p2', role: 'VIEWER', abilities: null, projectWorkspaceId: 'wX', workspaceOrganizationId: 'org2' },
+      {
+        projectId: 'p1',
+        role: 'CONTRIBUTOR',
+        abilities: { a: 1 },
+        projectWorkspaceId: 'wA',
+        workspaceOrganizationId: 'org1',
+      },
+      {
+        projectId: 'p2',
+        role: 'VIEWER',
+        abilities: null,
+        projectWorkspaceId: 'wX',
+        workspaceOrganizationId: 'org2',
+      },
     ],
     overrides: [
       { permission: 'hr.attendance', grant: true, workspaceId: null },
@@ -73,7 +109,10 @@ async function main(): Promise<void> {
   // -------------------------------------------------------------------------
   {
     const ctx = buildAuthContext(rows());
-    check('ctx: default workspace is the first live membership', ctx.session.currentWorkspaceId === 'wA');
+    check(
+      'ctx: default workspace is the first live membership',
+      ctx.session.currentWorkspaceId === 'wA',
+    );
     check(
       'ctx: deleted and cross-org workspaces dropped',
       same(ctx.session.workspaceMemberships, [
@@ -103,8 +142,17 @@ async function main(): Promise<void> {
     check(
       'ctx: permissions match the old resolution',
       same(ctx.permissions, {
-        company: resolveCompanyPermissions({ systemRole: 'EMPLOYEE', customRolePermissions: null, overrides: ov }),
-        workspace: resolveWorkspacePermissions({ role: 'MEMBER', customRolePermissions: null, overrides: ov, workspaceId: 'wA' }),
+        company: resolveCompanyPermissions({
+          systemRole: 'EMPLOYEE',
+          customRolePermissions: null,
+          overrides: ov,
+        }),
+        workspace: resolveWorkspacePermissions({
+          role: 'MEMBER',
+          customRolePermissions: null,
+          overrides: ov,
+          workspaceId: 'wA',
+        }),
       }),
     );
   }
@@ -116,18 +164,35 @@ async function main(): Promise<void> {
       'ctx: workspace permissions follow the requested workspace',
       same(
         ctx.permissions.workspace,
-        resolveWorkspacePermissions({ role: 'ADMIN', customRolePermissions: null, overrides: ov, workspaceId: 'wB' }),
+        resolveWorkspacePermissions({
+          role: 'ADMIN',
+          customRolePermissions: null,
+          overrides: ov,
+          workspaceId: 'wB',
+        }),
       ),
     );
   }
   {
-    check('ctx: non-member workspace header ignored', buildAuthContext(rows(), 'wX').session.currentWorkspaceId === 'wA');
-    check('ctx: deleted workspace header ignored', buildAuthContext(rows(), 'wDel').session.currentWorkspaceId === 'wA');
+    check(
+      'ctx: non-member workspace header ignored',
+      buildAuthContext(rows(), 'wX').session.currentWorkspaceId === 'wA',
+    );
+    check(
+      'ctx: deleted workspace header ignored',
+      buildAuthContext(rows(), 'wDel').session.currentWorkspaceId === 'wA',
+    );
   }
   {
     const ctx = buildAuthContext(rows({ user: null }));
-    check('ctx: missing user is disabled', ctx.extras.userDisabled === true && ctx.extras.accountType === 'STAFF');
-    check('ctx: missing user has no permissions', same(ctx.permissions, { company: [], workspace: [] }));
+    check(
+      'ctx: missing user is disabled',
+      ctx.extras.userDisabled === true && ctx.extras.accountType === 'STAFF',
+    );
+    check(
+      'ctx: missing user has no permissions',
+      same(ctx.permissions, { company: [], workspace: [] }),
+    );
   }
   {
     const r = rows();
@@ -146,11 +211,19 @@ async function main(): Promise<void> {
     r.user!.organizationId = null;
     const ctx = buildAuthContext(r);
     check('ctx: org-less user keeps cross-org rows', ctx.session.workspaceMemberships.length === 3);
-    check('ctx: org-less user keeps cross-org projects', ctx.session.projectMemberships.length === 2);
+    check(
+      'ctx: org-less user keeps cross-org projects',
+      ctx.session.projectMemberships.length === 2,
+    );
   }
   {
     // Custom roles count only while live, of the right scope, in the user's org.
-    const live = { permissions: ['x.custom'], deleted: false, scope: 'COMPANY', organizationId: 'org1' };
+    const live = {
+      permissions: ['x.custom'],
+      deleted: false,
+      scope: 'COMPANY',
+      organizationId: 'org1',
+    };
     const variants: Array<[string, typeof live, boolean]> = [
       ['live', live, true],
       ['deleted', { ...live, deleted: true }, false],
@@ -161,10 +234,18 @@ async function main(): Promise<void> {
       const r = rows({ overrides: [] });
       r.user!.customRole = role;
       const company = buildAuthContext(r).permissions.company;
-      check(`ctx: company custom role ${name}`, company.includes('x.custom') === used, JSON.stringify(company));
+      check(
+        `ctx: company custom role ${name}`,
+        company.includes('x.custom') === used,
+        JSON.stringify(company),
+      );
     }
     const r = rows({ overrides: [] });
-    r.workspaceMemberships[0]!.customRole = { ...live, scope: 'WORKSPACE', permissions: ['y.custom'] };
+    r.workspaceMemberships[0]!.customRole = {
+      ...live,
+      scope: 'WORKSPACE',
+      permissions: ['y.custom'],
+    };
     check(
       'ctx: workspace custom role applies to the active workspace',
       buildAuthContext(r).permissions.workspace.includes('y.custom'),
@@ -176,12 +257,18 @@ async function main(): Promise<void> {
   }
   {
     const ctx = buildAuthContext(rows({ workspaceMemberships: [] }));
-    check('ctx: no memberships → null workspace, empty workspace perms', ctx.session.currentWorkspaceId === null && ctx.permissions.workspace.length === 0);
+    check(
+      'ctx: no memberships → null workspace, empty workspace perms',
+      ctx.session.currentWorkspaceId === null && ctx.permissions.workspace.length === 0,
+    );
   }
   {
     // The cache stores JSON: a round-trip must not change the answer.
     const r = rows();
-    check('ctx: JSON round-trip is lossless', same(buildAuthContext(JSON.parse(JSON.stringify(r)), 'wB'), buildAuthContext(r, 'wB')));
+    check(
+      'ctx: JSON round-trip is lossless',
+      same(buildAuthContext(JSON.parse(JSON.stringify(r)), 'wB'), buildAuthContext(r, 'wB')),
+    );
   }
 
   // -------------------------------------------------------------------------
@@ -250,7 +337,10 @@ async function main(): Promise<void> {
     const before = await cache.get('u2');
     await cache.invalidateAll();
     await cache.set('u2', before.epoch, rows());
-    check('cache: entry written with a stale epoch is ignored', (await cache.get('u2')).rows === null);
+    check(
+      'cache: entry written with a stale epoch is ignored',
+      (await cache.get('u2')).rows === null,
+    );
     await cache.set('u3', null, rows());
     check('cache: no epoch, no write', !store.has('authctx:v1:u3'));
     fake.status = 'reconnecting';
@@ -265,7 +355,12 @@ async function main(): Promise<void> {
   check('snapshot: none outside a request', requestAuthFor('u1') === null);
   await new Promise<void>((resolve) => {
     new RequestContextMiddleware().use({} as never, {} as never, () => {
-      setRequestAuth({ userId: 'u1', systemRole: 'HR', organizationId: 'org1', permissions: { company: ['a'], workspace: [] } });
+      setRequestAuth({
+        userId: 'u1',
+        systemRole: 'HR',
+        organizationId: 'org1',
+        permissions: { company: ['a'], workspace: [] },
+      });
       void (async () => {
         await Promise.resolve();
         check('snapshot: visible across awaits', requestAuthFor('u1')?.systemRole === 'HR');

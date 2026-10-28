@@ -16,17 +16,21 @@ import { InvoiceTemplatesService, TEMPLATE_HELPERS } from '../invoices/invoice-t
 import { compileTemplate, TemplateError } from '../invoices/template-engine';
 
 function engineSelfTest(): void {
-  const render = (src: string, data: unknown) => compileTemplate(src, TEMPLATE_HELPERS).render(data);
+  const render = (src: string, data: unknown) =>
+    compileTemplate(src, TEMPLATE_HELPERS).render(data);
 
   assert.equal(render('Hi {{name}}', { name: '<b>Ann</b>' }), 'Hi &lt;b&gt;Ann&lt;/b&gt;');
   assert.equal(render('{{{raw}}}', { raw: '<i>x</i>' }), '<i>x</i>');
   assert.equal(render('{{#if a}}yes{{else}}no{{/if}}', { a: 0 }), 'no');
   assert.equal(render('{{#unless a}}none{{/unless}}', { a: [] }), 'none');
   assert.equal(
-    render('{{#each items}}{{@number}}.{{name}}({{../cur}}){{#unless @last}},{{/unless}}{{/each}}', {
-      cur: 'USD',
-      items: [{ name: 'a' }, { name: 'b' }],
-    }),
+    render(
+      '{{#each items}}{{@number}}.{{name}}({{../cur}}){{#unless @last}},{{/unless}}{{/each}}',
+      {
+        cur: 'USD',
+        items: [{ name: 'a' }, { name: 'b' }],
+      },
+    ),
     '1.a(USD),2.b(USD)',
   );
   assert.equal(render('{{#each items}}x{{else}}empty{{/each}}', { items: [] }), 'empty');
@@ -38,7 +42,10 @@ function engineSelfTest(): void {
   assert.equal(render('{{#if (eq s "PAID")}}paid{{/if}}', { s: 'PAID' }), 'paid');
   assert.equal(render('{{#if (gt n 0)}}pos{{/if}}', { n: '2.00' }), 'pos');
   assert.equal(render('{{! hidden }}ok', {}), 'ok');
-  assert.equal(render('{{#each items}}{{company}}{{/each}}', { company: 'Root', items: [{}] }), 'Root');
+  assert.equal(
+    render('{{#each items}}{{company}}{{/each}}', { company: 'Root', items: [{}] }),
+    'Root',
+  );
 
   assert.throws(() => compileTemplate('{{#if a}}open', TEMPLATE_HELPERS), TemplateError);
   assert.throws(() => compileTemplate('{{/each}}', TEMPLATE_HELPERS), TemplateError);

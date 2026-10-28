@@ -82,9 +82,7 @@ export function pushInAppNotification(next: InAppNotification): void {
 export function markInAppRead(ids: string[]): void {
   const set = new Set(ids);
   const now = Date.now();
-  safeWrite(
-    safeRead().map((n) => (set.has(n.id) ? { ...n, readAt: n.readAt ?? now } : n)),
-  );
+  safeWrite(safeRead().map((n) => (set.has(n.id) ? { ...n, readAt: n.readAt ?? now } : n)));
 }
 
 export function markAllInAppRead(): void {

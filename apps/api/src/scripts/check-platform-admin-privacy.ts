@@ -193,9 +193,17 @@ async function main(): Promise<void> {
     );
     await asSuperAdmin(async () => {
       await users.list(SUPER);
-      assert.equal(lastWhere(seen, 'user')['organizationId'], ROOT_ORG_ID, 'user list pinned to root');
+      assert.equal(
+        lastWhere(seen, 'user')['organizationId'],
+        ROOT_ORG_ID,
+        'user list pinned to root',
+      );
 
-      await assert.rejects(users.update(SUPER, TENANT_USER, { name: 'x' }), forbidden, 'edit other org user');
+      await assert.rejects(
+        users.update(SUPER, TENANT_USER, { name: 'x' }),
+        forbidden,
+        'edit other org user',
+      );
       await assert.rejects(
         users.update(SUPER, TENANT_USER, { password: 'new-password-1' }),
         forbidden,
@@ -235,7 +243,11 @@ async function main(): Promise<void> {
     const superActor = { systemRole: 'SUPER_ADMIN', organizationId: ROOT_ORG_ID };
     await asSuperAdmin(async () => {
       await chat.listContactsForUser(SUPER);
-      assert.equal(lastWhere(seen, 'user')['organizationId'], ROOT_ORG_ID, 'contacts pinned to root');
+      assert.equal(
+        lastWhere(seen, 'user')['organizationId'],
+        ROOT_ORG_ID,
+        'contacts pinned to root',
+      );
       const dm = { type: 'DM', participantUserIds: [TENANT_USER] } as CreateChatRoomInput;
       await assert.rejects(chat.createRoom(SUPER, dm, null), forbidden, 'DM into other org');
 
@@ -267,7 +279,11 @@ async function main(): Promise<void> {
         ],
         'admin rooms pinned to root (no platform-wide DMs/groups)',
       );
-      await assert.rejects(chat.adminDeleteRoom(ROOM_B, superActor), notFound, 'delete other org room');
+      await assert.rejects(
+        chat.adminDeleteRoom(ROOM_B, superActor),
+        notFound,
+        'delete other org room',
+      );
     });
     assert.deepEqual(writes, [], 'refused chat actions write nothing');
   }
@@ -294,10 +310,23 @@ async function main(): Promise<void> {
     const day = new Date('2026-10-01T00:00:00.000Z');
     await asSuperAdmin(async () => {
       await leaves.list(SUPER, {});
-      assert.deepEqual(lastWhere(seen, 'leave')['user'], { organizationId: ROOT_ORG_ID }, 'leaves pinned');
-      await assert.rejects(leaves.list(SUPER, { userId: TENANT_USER }), forbidden, 'other org leaves');
+      assert.deepEqual(
+        lastWhere(seen, 'leave')['user'],
+        { organizationId: ROOT_ORG_ID },
+        'leaves pinned',
+      );
       await assert.rejects(
-        leaves.create(SUPER, { userId: TENANT_USER, startDate: day, endDate: day, type: 'ANNUAL' } as never),
+        leaves.list(SUPER, { userId: TENANT_USER }),
+        forbidden,
+        'other org leaves',
+      );
+      await assert.rejects(
+        leaves.create(SUPER, {
+          userId: TENANT_USER,
+          startDate: day,
+          endDate: day,
+          type: 'ANNUAL',
+        } as never),
         forbidden,
         'file leave for other org user',
       );
@@ -309,7 +338,11 @@ async function main(): Promise<void> {
       await assert.rejects(leaves.remove(SUPER, LEAVE_B), forbidden, 'delete other org leave');
 
       await attendance.listUsers(SUPER);
-      assert.equal(lastWhere(seen, 'user')['organizationId'], ROOT_ORG_ID, 'attendance users pinned');
+      assert.equal(
+        lastWhere(seen, 'user')['organizationId'],
+        ROOT_ORG_ID,
+        'attendance users pinned',
+      );
       await assert.rejects(
         attendance.summary(SUPER, { userId: TENANT_USER, from: day, to: day } as never),
         forbidden,
@@ -345,15 +378,27 @@ async function main(): Promise<void> {
     const auditLog = new AuditLogService(prisma);
     await asSuperAdmin(async () => {
       await auditLog.list(SUPER, { page: 1, pageSize: 50 });
-      assert.equal(lastWhere(seen, 'auditLog')['organizationId'], ROOT_ORG_ID, 'org log pinned to root');
+      assert.equal(
+        lastWhere(seen, 'auditLog')['organizationId'],
+        ROOT_ORG_ID,
+        'org log pinned to root',
+      );
 
       await auditLog.listPlatform(SUPER, { page: 1, pageSize: 50 });
       const platform = lastWhere(seen, 'auditLog');
-      assert.deepEqual(platform['action'], { in: [...PLATFORM_AUDIT_ACTIONS] }, 'org-level actions only');
+      assert.deepEqual(
+        platform['action'],
+        { in: [...PLATFORM_AUDIT_ACTIONS] },
+        'org-level actions only',
+      );
       assert.ok(!('organizationId' in platform), 'platform log spans organizations');
 
       await auditLog.listPlatform(SUPER, { page: 1, pageSize: 50, action: 'user.role_change' });
-      assert.deepEqual(lastWhere(seen, 'auditLog')['action'], { in: [] }, 'action filter cannot widen');
+      assert.deepEqual(
+        lastWhere(seen, 'auditLog')['action'],
+        { in: [] },
+        'action filter cannot widen',
+      );
     });
     await assert.rejects(
       auditLog.listPlatform(TENANT_ADMIN, { page: 1, pageSize: 50 }),
@@ -378,13 +423,22 @@ async function main(): Promise<void> {
     ]);
     const auditLog = new AuditLogService(prisma);
     const page = await asSuperAdmin(() => auditLog.listPlatform(SUPER, { page: 1, pageSize: 50 }));
-    assert.equal(page.items[0]?.organizationName, 'Acme Ltd', 'hard-deleted org named from metadata');
+    assert.equal(
+      page.items[0]?.organizationName,
+      'Acme Ltd',
+      'hard-deleted org named from metadata',
+    );
   }
 
   {
     // A security alert raised inside a tenant: the platform log shows the
     // count and the organization, never who did it or who was affected.
-    const tenantActor = { id: TENANT_ADMIN, name: 'Tenant Admin', email: 'tadmin@example.test', image: null };
+    const tenantActor = {
+      id: TENANT_ADMIN,
+      name: 'Tenant Admin',
+      email: 'tadmin@example.test',
+      image: null,
+    };
     const { prisma, seen } = fakePrisma([
       {
         id: 'cmauditrow000000000000002',

@@ -141,12 +141,7 @@ export const listSignatureRequestsQuerySchema = z.object({
 export type ListSignatureRequestsQuery = z.infer<typeof listSignatureRequestsQuerySchema>;
 
 const signerInput = z.object({
-  email: z
-    .string()
-    .trim()
-    .toLowerCase()
-    .email('Enter a valid email address')
-    .max(254),
+  email: z.string().trim().toLowerCase().email('Enter a valid email address').max(254),
   name: z.string().trim().max(120).optional(),
 });
 
@@ -177,9 +172,7 @@ export type CreateSignatureRequestInput = z.infer<typeof createSignatureRequestS
 /** Step 2: replace the DRAFT's fields. An empty list is allowed: signers
  *  without a field place their own signature box when they sign. */
 export const setSignatureFieldsSchema = z.object({
-  fields: z
-    .array(boundedGeometry.and(z.object({ signerId: cuid })))
-    .max(200),
+  fields: z.array(boundedGeometry.and(z.object({ signerId: cuid }))).max(200),
 });
 export type SetSignatureFieldsInput = z.infer<typeof setSignatureFieldsSchema>;
 

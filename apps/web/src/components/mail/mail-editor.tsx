@@ -149,7 +149,8 @@ export function MailEditor({ initialHtml, onChange, placeholder, resetKey }: Pro
       try {
         const obj = await upload.mutateAsync(file);
         if (obj.url) insertImage(obj.url);
-        else toastErrorMessage(`Couldn't insert ${file.name}`, {
+        else
+          toastErrorMessage(`Couldn't insert ${file.name}`, {
             description: 'The upload finished but the server returned no link. Try again.',
           });
       } catch (err) {
@@ -161,7 +162,7 @@ export function MailEditor({ initialHtml, onChange, placeholder, resetKey }: Pro
 
   if (!editor) {
     return (
-      <div className="flex min-h-[200px] flex-col items-center justify-center gap-2 rounded-md border border-line bg-bg-subtle px-3 py-2">
+      <div className="border-line bg-bg-subtle flex min-h-[200px] flex-col items-center justify-center gap-2 rounded-md border px-3 py-2">
         <Loader size="sm" label="Loading editor" />
       </div>
     );
@@ -169,7 +170,7 @@ export function MailEditor({ initialHtml, onChange, placeholder, resetKey }: Pro
 
   return (
     <div className="space-y-2">
-      <div className="flex flex-wrap items-center gap-0.5 rounded-md border border-line bg-bg-subtle px-1 py-1">
+      <div className="border-line bg-bg-subtle flex flex-wrap items-center gap-0.5 rounded-md border px-1 py-1">
         <ToolButton
           active={editor.isActive('bold')}
           onClick={() => editor.chain().focus().toggleBold().run()}
@@ -238,7 +239,7 @@ export function MailEditor({ initialHtml, onChange, placeholder, resetKey }: Pro
             <ImagePlus className="h-4 w-4" />
           </ToolButton>
           {imgMenu ? (
-            <div className="absolute left-0 z-10 mt-1 w-max min-w-[10rem] rounded-md border border-line bg-white py-1 shadow-md">
+            <div className="border-line absolute left-0 z-10 mt-1 w-max min-w-[10rem] rounded-md border bg-white py-1 shadow-md">
               <button
                 type="button"
                 onMouseDown={(e) => e.preventDefault()}
@@ -247,7 +248,7 @@ export function MailEditor({ initialHtml, onChange, placeholder, resetKey }: Pro
                   imgFileRef.current?.click();
                 }}
                 disabled={upload.isPending}
-                className="flex w-full items-center gap-2 px-3 py-1.5 text-left text-xs text-ink hover:bg-bg-subtle disabled:opacity-50"
+                className="text-ink hover:bg-bg-subtle flex w-full items-center gap-2 px-3 py-1.5 text-left text-xs disabled:opacity-50"
               >
                 <Upload className="h-3.5 w-3.5" />
                 {upload.isPending ? 'Uploading…' : 'Upload…'}
@@ -256,7 +257,7 @@ export function MailEditor({ initialHtml, onChange, placeholder, resetKey }: Pro
                 type="button"
                 onMouseDown={(e) => e.preventDefault()}
                 onClick={() => void insertImageFromUrl()}
-                className="flex w-full items-center gap-2 px-3 py-1.5 text-left text-xs text-ink hover:bg-bg-subtle"
+                className="text-ink hover:bg-bg-subtle flex w-full items-center gap-2 px-3 py-1.5 text-left text-xs"
               >
                 <LinkIcon className="h-3.5 w-3.5" />
                 From URL…
@@ -303,8 +304,8 @@ function ToolButton({
       aria-label={label}
       aria-pressed={active}
       className={cn(
-        'h-7 w-7 rounded text-ink-muted hover:text-ink',
-        active && 'bg-white text-brand-700 shadow-sm',
+        'text-ink-muted hover:text-ink h-7 w-7 rounded',
+        active && 'text-brand-700 bg-white shadow-sm',
       )}
     >
       {children}

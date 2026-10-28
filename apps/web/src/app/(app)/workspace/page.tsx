@@ -1,12 +1,6 @@
 'use client';
 
-import {
-  Briefcase,
-  FileText,
-  FolderKanban,
-  Users,
-  type LucideIcon,
-} from 'lucide-react';
+import { Briefcase, FileText, FolderKanban, Users, type LucideIcon } from 'lucide-react';
 import Link from 'next/link';
 
 import { Button } from '@/components/ui/button';
@@ -72,13 +66,13 @@ export default function WorkspaceLandingPage() {
     <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6 sm:py-14">
       <header className="mb-8 flex flex-wrap items-end justify-between gap-3">
         <div>
-          <p className="text-sm font-medium text-ink-muted">
+          <p className="text-ink-muted text-sm font-medium">
             Now in {workspace.data?.name ?? 'your workspace'}
           </p>
-          <h1 className="mt-1 text-2xl font-semibold text-ink sm:text-3xl">
+          <h1 className="text-ink mt-1 text-2xl font-semibold sm:text-3xl">
             What do you want to open?
           </h1>
-          <p className="mt-1 text-sm text-ink-muted">
+          <p className="text-ink-muted mt-1 text-sm">
             Pick one of the core workspace surfaces below, or head{' '}
             <Link href="/home" className="text-brand-700 underline">
               home
@@ -104,17 +98,19 @@ export default function WorkspaceLandingPage() {
               key={c.href}
               href={c.href}
               className={cn(
-                'group flex items-start gap-4 rounded-xl border border-line bg-white p-6 transition',
-                'hover:-translate-y-0.5 hover:border-brand-purple/40 hover:shadow-md',
-                'focus-visible:outline-none focus-visible:ring-2 focus-visible:shadow-focus',
+                'border-line group flex items-start gap-4 rounded-xl border bg-white p-6 transition',
+                'hover:border-brand-purple/40 hover:-translate-y-0.5 hover:shadow-md',
+                'focus-visible:shadow-focus focus-visible:outline-none focus-visible:ring-2',
               )}
             >
-              <span className={cn('grid h-12 w-12 shrink-0 place-items-center rounded-lg', c.accent)}>
+              <span
+                className={cn('grid h-12 w-12 shrink-0 place-items-center rounded-lg', c.accent)}
+              >
                 <Icon className="h-6 w-6" />
               </span>
               <span className="min-w-0">
-                <span className="block text-lg font-semibold text-ink">{c.title}</span>
-                <span className="mt-0.5 block text-sm text-ink-muted">{c.description}</span>
+                <span className="text-ink block text-lg font-semibold">{c.title}</span>
+                <span className="text-ink-muted mt-0.5 block text-sm">{c.description}</span>
               </span>
             </Link>
           );

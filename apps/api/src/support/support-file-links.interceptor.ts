@@ -31,11 +31,18 @@ export class SupportFileLinksInterceptor implements NestInterceptor {
     const token = req.support ? req.supportToken : undefined;
     if (!token) return next.handle();
     const workspaceIds = (req.workspaceMemberships ?? []).map((m) => m.workspaceId);
-    return next.handle().pipe(mergeMap((body: unknown) => from(this.rewrite(body, token, workspaceIds))));
+    return next
+      .handle()
+      .pipe(mergeMap((body: unknown) => from(this.rewrite(body, token, workspaceIds))));
   }
 
   private async rewrite(body: unknown, token: string, workspaceIds: string[]): Promise<unknown> {
-    if (body === null || body === undefined || body instanceof StreamableFile || Buffer.isBuffer(body)) {
+    if (
+      body === null ||
+      body === undefined ||
+      body instanceof StreamableFile ||
+      Buffer.isBuffer(body)
+    ) {
       return body;
     }
     const pattern = this.files.fileUrlPattern();

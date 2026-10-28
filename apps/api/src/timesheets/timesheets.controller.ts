@@ -1,13 +1,4 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  Param,
-  Patch,
-  Post,
-  Query,
-} from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Query } from '@nestjs/common';
 import {
   type AdminAttendanceQuery,
   adminAttendanceQuerySchema,
@@ -57,13 +48,7 @@ export class TimesheetsController {
     @CurrentWorkspaceId() workspaceId: string,
     @Query(new ZodValidationPipe(timesheetSummaryQuerySchema)) query: TimesheetSummaryQuery,
   ) {
-    return this.timesheets.summary(
-      user.id,
-      workspaceId,
-      query.from,
-      query.to,
-      query.userId,
-    );
+    return this.timesheets.summary(user.id, workspaceId, query.from, query.to, query.userId);
   }
 
   @Post('start')
@@ -78,10 +63,7 @@ export class TimesheetsController {
 
   @Post('stop/:id')
   @SkipPermissions()
-  stopTimer(
-    @CurrentUser() user: AuthedUser,
-    @Param('id', new ZodValidationPipe(cuid)) id: string,
-  ) {
+  stopTimer(@CurrentUser() user: AuthedUser, @Param('id', new ZodValidationPipe(cuid)) id: string) {
     return this.timesheets.stopTimer(user.id, id);
   }
 
@@ -135,10 +117,7 @@ export class TimesheetsController {
 
   @Delete(':id')
   @SkipPermissions()
-  remove(
-    @CurrentUser() user: AuthedUser,
-    @Param('id', new ZodValidationPipe(cuid)) id: string,
-  ) {
+  remove(@CurrentUser() user: AuthedUser, @Param('id', new ZodValidationPipe(cuid)) id: string) {
     return this.timesheets.remove(user.id, id);
   }
 

@@ -60,6 +60,8 @@ export function trimmedCanvasPng(source: HTMLCanvasElement): string | null {
   const out = document.createElement('canvas');
   out.width = right - left + 1;
   out.height = bottom - top + 1;
-  out.getContext('2d')?.drawImage(source, left, top, out.width, out.height, 0, 0, out.width, out.height);
+  out
+    .getContext('2d')
+    ?.drawImage(source, left, top, out.width, out.height, 0, 0, out.width, out.height);
   return out.toDataURL('image/png');
 }

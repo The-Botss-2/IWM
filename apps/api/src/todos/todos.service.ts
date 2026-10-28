@@ -94,10 +94,7 @@ export class TodosService {
   ): Promise<{ items: TodoWithRefs[] }> {
     let workspaceIds: string[] | null = null;
     if (this.workspaceScope && (query.aggregate === 'org' || query.workspaceId)) {
-      const scope = await this.workspaceScope.resolve(
-        userId,
-        query.workspaceId ?? null,
-      );
+      const scope = await this.workspaceScope.resolve(userId, query.workspaceId ?? null);
       workspaceIds = scope.workspaceIds;
     }
 
@@ -159,11 +156,7 @@ export class TodosService {
    * delegates it (the assignee must also be a member of the target
    * workspace).
    */
-  async create(
-    userId: string,
-    workspaceId: string,
-    input: CreateTodoInput,
-  ): Promise<TodoWithRefs> {
+  async create(userId: string, workspaceId: string, input: CreateTodoInput): Promise<TodoWithRefs> {
     const targetWorkspaceId = input.workspaceId ?? workspaceId;
 
     // Verify the caller can create in the target workspace.
@@ -254,11 +247,7 @@ export class TodosService {
     return this.mapRow(row as TodoRowWithRefs);
   }
 
-  async update(
-    userId: string,
-    todoId: string,
-    input: UpdateTodoInput,
-  ): Promise<TodoWithRefs> {
+  async update(userId: string, todoId: string, input: UpdateTodoInput): Promise<TodoWithRefs> {
     const existing = await this.prisma.client.todo.findFirst({
       where: { id: todoId, deletedAt: null },
       select: {
@@ -288,7 +277,7 @@ export class TodosService {
       });
       if (!proj) {
         throw new BadRequestException({
-          title: 'Project not in the todo\'s workspace',
+          title: "Project not in the todo's workspace",
           status: 400,
         });
       }
@@ -393,10 +382,7 @@ export class TodosService {
    * and that it is in their own organization (a leftover membership into
    * another org does not count).
    */
-  private async assertWorkspaceAccess(
-    userId: string,
-    workspaceId: string,
-  ): Promise<void> {
+  private async assertWorkspaceAccess(userId: string, workspaceId: string): Promise<void> {
     const membership = await orgWorkspaceMembership(this.prisma, userId, workspaceId);
     if (!membership) {
       throw new ForbiddenException({
